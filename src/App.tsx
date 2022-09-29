@@ -1,9 +1,25 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
+import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
 
-function App() {
-  const [count, setCount] = useState(0)
+type AppArgs = {
+  documentId: DocumentId
+}
+
+type AppDoc = {
+  count: number
+}
+
+function App({ documentId } : AppArgs) {
+  const [doc, change] = useDocument<AppDoc>(documentId)
+  console.log("doc", doc)
+  if (!doc) { return <div>loading...</div>}
+  if (doc.count === undefined) { 
+    change(d => {
+      d.count = 0
+    })
+  }
 
   return (
     <div className="App">
@@ -17,8 +33,8 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <button onClick={() => change((d) => d.count = d.count + 1)}>
+          count is {doc.count}
         </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR

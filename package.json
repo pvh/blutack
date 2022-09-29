@@ -9,8 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "automerge": "*",
+    "automerge-repo": "*",
+    "automerge-repo-network-broadcastchannel": "*",
+    "automerge-repo-react-hooks": "^0.0.11",
+    "automerge-repo-storage-localforage": "*",
+    "localforage": "^1.10.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "vite-plugin-top-level-await": "^1.1.1",
+    "vite-plugin-wasm": "^3.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
