@@ -1,0 +1,11 @@
+.Omnibox .ListMenu {
+  color: var(--colorBlueBlack);
+}
+
+.Omnibox .ListMenu__item .Actions {
+  visibility: hidden;
+}
+
+.Omnibox .ListMenu__item--selected .Actions {
+  visibility: visible;
+}

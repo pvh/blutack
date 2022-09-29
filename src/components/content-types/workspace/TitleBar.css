@@ -1,0 +1,74 @@
+.TitleBar {
+  display: flex;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0px;
+  height: 40px;
+  width: 100%;
+  align-items: center;
+  align-content: space-between;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  z-index: 3;
+  user-select: none;
+  background-color: white;
+}
+
+.TitleBar .ContentHeader {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  background: inherit;
+}
+
+.Inline {
+  display: inline-flex;
+}
+
+button[disabled].TitleBar-menuItem .fa {
+  color: #ccc;
+}
+
+.TitleBar-content {
+  flex: 1;
+}
+
+.TitleBar-menuItem {
+  font-size: 24px;
+  color: var(--colorSecondaryGrey);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: none;
+  margin: none;
+  border: none;
+  outline: none;
+  position: relative;
+}
+
+.TitleBar-menuItem:active,
+.TitleBar-menuItem:focus {
+  outline: none;
+}
+
+.TitleBar-menuItem:hover {
+  color: var(--colorBlueBlack);
+}
+
+.TitleBar-self {
+  padding-left: 4px;
+  border-left: 1px solid var(--colorPaleGrey);
+}
+
+@keyframes color-flash {
+  from {
+    color: transparent;
+  }
+
+  to {
+    color: var(--colorSecondaryGrey);
+  }
+}

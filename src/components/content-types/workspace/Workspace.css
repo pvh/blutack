@@ -1,0 +1,23 @@
+#workspace,
+.Workspace,
+.Workspace__container {
+  height: 100%;
+}
+
+.Workspace__container {
+  margin-top: 40px;
+}
+
+.Workspace__container > *::-webkit-scrollbar-track {
+  margin: 0;
+}
+
+.Workspace__container.Workspace__container--image {
+  background: var(--colorInputGrey);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.Workspace__container.Workspace__container--image > * {
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.45);
+}

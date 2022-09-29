@@ -11,16 +11,19 @@
   "dependencies": {
     "automerge": "*",
     "automerge-repo": "*",
-    "automerge-repo-network-broadcastchannel": "*",
+    "automerge-repo-network-broadcastchannel": "^0.0.11",
     "automerge-repo-react-hooks": "^0.0.11",
-    "automerge-repo-storage-localforage": "*",
+    "automerge-repo-storage-localforage": "^0.0.11",
+    "bs58": "^5.0.0",
     "localforage": "^1.10.0",
+    "mime-types": "^2.1.35",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "vite-plugin-top-level-await": "^1.1.1",
     "vite-plugin-wasm": "^3.0.0"
   },
   "devDependencies": {
+    "@types/mime-types": "^2.1.1",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.1.0",

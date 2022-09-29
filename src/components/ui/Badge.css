@@ -1,0 +1,76 @@
+.Badge {
+  background-color: #d5dfe5;
+  background-size: cover;
+  background-position: center;
+
+  text-align: center;
+  vertical-align: bottom;
+
+  width: var(--size);
+  height: var(--size);
+  line-height: var(--size);
+  font-size: calc(var(--size) * 0.625);
+}
+
+.Badge--tiny {
+  --size: 12px;
+  font-size: 12px;
+  /* tiny badge needs a bump in size */
+}
+
+.Badge--small {
+  --size: 20px;
+}
+
+.Badge--medium {
+  --size: 28px;
+}
+
+.Badge--large {
+  --size: 32px;
+}
+
+.Badge--huge {
+  --size: 60px;
+}
+
+.Badge--circle {
+  border-radius: 50%;
+}
+.Badge--square {
+  border-radius: 10%;
+}
+
+/* Several icons are offset, so we have to counteroffset manually. */
+.Badge .fa.fa-clipboard:before {
+  display: inline-block;
+  transform: translate(2%, -3%);
+}
+.Badge .fa.fa-files-o:before {
+  display: inline-block;
+  transform: translate(4%, 11%);
+}
+
+.Badge .fa.fa-file-o:before {
+  display: inline-block;
+  transform: translate(4%, 9%);
+}
+
+.Badge--hover:hover::after {
+  display: block;
+  position: absolute;
+  max-width: 204px;
+  text-align: center;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  padding: 2px 4px;
+  background-color: white;
+  border-radius: 4px;
+  content: attr(data-hover);
+  top: calc(100% + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--colorBlueBlack);
+  z-index: 3;
+}

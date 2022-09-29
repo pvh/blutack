@@ -1,0 +1,386 @@
+import React, {
+  useRef,
+  useCallback,
+  memo,
+  useMemo,
+  useImperativeHandle,
+  useEffect,
+  FunctionComponent,
+} from 'react'
+import Debug from 'debug'
+import { ContextMenuTrigger } from 'react-contextmenu'
+
+import * as ContentTypes from '../../pushpin-code/ContentTypes'
+import * as ImportData from '../../../ImportData'
+import { PushpinUrl } from '../../../ShareLink'
+import { ContentProps } from '../../Content'
+import { BoardDoc, BoardDocCard, CardId } from '.'
+import BoardCard, { BoardCardAction } from './BoardCard'
+import BoardContextMenu from './BoardContextMenu'
+import './Board.css'
+import { gridOffset, GRID_SIZE } from './BoardGrid'
+import { useSelection } from './BoardSelection'
+import {
+  deleteCards,
+  addCardForContent,
+  moveCardsBy,
+  cardResized,
+  changeBackgroundColor,
+  BoardDocManipulationAction,
+} from './BoardDocManipulation'
+
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN, MIMETYPE_BOARD_CARD_DATA } from '../../../constants'
+import { useDocumentReducer } from '../../../Hooks'
+
+const log = Debug('pushpin:board')
+
+export const BOARD_COLORS = {
+  DEFAULT: '#D5DFE5',
+  SNOW: '#EBEDF4',
+  BEIGE: '#f3f1ec',
+  CANVAS: '#D8D1C0',
+  SKY: '#dcf3f6',
+  VIOLET: '#e5dcf6',
+  PINK: '#ffe1e7',
+  HERB: '#daefd2',
+  PEACH: '#ffd2cc',
+  RUST: '#D96767',
+  ENGINEER: '#FFE283',
+  KEYLIME: '#A1E991',
+  PINE: '#63D2A5',
+  SOFT: '#64BCDF',
+  BIGBLUE: '#3A66A3',
+  ROYAL: '#A485E2',
+  KAWAII: '#ED77AA',
+  BLACK: '#2b2b2b',
+}
+
+export const BOARD_WIDTH = 5000
+export const BOARD_HEIGHT = 5000
+
+// We don't want to compute a new array in every render.
+const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
+
+export type BoardAction = BoardDocManipulationAction | BoardCardAction
+
+const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
+  useImperativeHandle(props.contentRef, () => ({
+    onContent: (url: PushpinUrl) => onContent(url),
+  }))
+
+  const boardRef = useRef<HTMLDivElement>(null)
+  const { selection, selectOnly, selectToggle, selectNone } = useSelection<CardId>(
+    props.documentId
+  )
+
+  const [doc, dispatch] = useDocumentReducer<BoardDoc, BoardAction>(
+    props.documentId,
+    (doc: BoardDoc, action: BoardAction) => {
+      switch (action.type) {
+        // board actions
+        case 'AddCardForContent':
+          addAndSelectCard(doc, action.card, action.selectOnly)
+          break
+        case 'ChangeBackgroundColor':
+          changeBackgroundColor(doc, action.color)
+          break
+        case 'DeleteCards':
+          deleteCards(doc, selection)
+          break
+
+        // card actions
+        case 'CardDragEnd':
+          moveCardsBy(doc, selection, action.distance)
+          break
+        case 'CardResized':
+          cardResized(doc, action.cardId, action.dimension)
+          break
+        case 'CardClicked':
+          onCardClicked(action.cardId, action.event)
+          break
+        case 'CardDoubleClicked':
+          onCardDoubleClicked(doc, action.cardId, action.event)
+          break
+      }
+    },
+    [selection]
+  )
+
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      // this event can be consumed by a card if it wants to keep control of backspace
+      // for example, see text-content.jsx onKeyDown
+      if (e.key === 'Backspace') {
+        dispatch({ type: 'DeleteCards', selection })
+      }
+    },
+    [dispatch, selection]
+  )
+
+  const onClick = useCallback(
+    (e: React.MouseEvent) => {
+      log('onClick')
+      selectNone()
+    },
+    [selectNone]
+  )
+
+  // xxx: this one is tricky because it feels like it should be in boardDocManipulation
+  // but there isn't really a good way to get the cardId back from the dispatch
+  function addAndSelectCard(doc: BoardDoc, card: BoardDocCard, shouldSelect?: boolean) {
+    const cardId = addCardForContent(doc, card)
+    if (shouldSelect) {
+      selectOnly(cardId)
+    }
+  }
+
+  const onCardClicked = (id: CardId, e: React.MouseEvent) => {
+    if (e.ctrlKey || e.shiftKey) {
+      selectToggle(id)
+    } else {
+      // otherwise we don't have shift/ctrl, so just set selection to this
+      selectOnly(id)
+    }
+    e.stopPropagation()
+  }
+
+  const onCardDoubleClicked = (doc: BoardDoc, id: CardId, e: React.MouseEvent) => {
+    const card = doc.cards[id]
+    if (card && card.url) {
+      window.location.href = card.url as string
+    }
+    e.stopPropagation()
+  }
+
+  const onDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      log('onDoubleClick')
+
+      // guard against a missing boardRef
+      if (!boardRef.current) {
+        return
+      }
+
+      const x = e.pageX - boardRef.current.offsetLeft
+      const y = e.pageY - boardRef.current.offsetTop
+
+      ContentTypes.create('text', { text: '' }, (url) => {
+        dispatch({ type: 'AddCardForContent', card: { x, y, url } })
+      })
+    },
+    [boardRef, dispatch]
+  )
+
+  const onDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
+
+  const onDropInternal = (e: React.DragEvent) => {
+    e.dataTransfer.dropEffect = 'move'
+    // do nothing (for now)
+  }
+
+  const onDropExternal = useCallback(
+    (e: React.DragEvent) => {
+      if (!boardRef.current) {
+        return
+      }
+
+      // Otherwise consttruct the drop point and import the data.
+      const { pageX, pageY } = e
+      const dropPosition = {
+        x: pageX - boardRef.current.offsetLeft,
+        y: pageY - boardRef.current.offsetTop,
+      }
+      ImportData.importDataTransfer(e.dataTransfer, (url, i) => {
+        const position = gridOffset(dropPosition, i)
+        dispatch({ type: 'AddCardForContent', card: { x: position.x, y: position.y, url } })
+      })
+    },
+    [dispatch]
+  )
+
+  const onDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      // If we have an origin board, and it's us, this is a move operation.
+      const originBoard = e.dataTransfer.getData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN)
+      if (originBoard === props.hypermergeUrl) {
+        onDropInternal(e)
+      } else {
+        onDropExternal(e)
+      }
+    },
+    [onDropExternal, props.hypermergeUrl]
+  )
+
+  const onPaste = useCallback(
+    (e: ClipboardEvent) => {
+      log('onPaste')
+      e.preventDefault()
+      e.stopPropagation()
+
+      if (!e.clipboardData) {
+        return
+      }
+
+      const offset = {
+        x: Math.round(window.pageXOffset),
+        y: Math.round(window.pageYOffset),
+      }
+
+      const jsonData = e.clipboardData.getData(MIMETYPE_BOARD_CARD_DATA)
+      if (jsonData) {
+        JSON.parse(jsonData)
+          .map((c) => ({ ...c, x: c.x + offset.x, y: c.y + offset.y }))
+          .forEach((card) => dispatch({ type: 'AddCardForContent', card }))
+        return
+      }
+
+      // import data doesn't have positioning, so just bump it into somewhere centerish
+      offset.x += window.innerWidth / 2 - GRID_SIZE * 6
+      offset.y += window.innerHeight / 2 - GRID_SIZE * 3
+
+      ImportData.importDataTransfer(e.clipboardData, (url, importCount) => {
+        const position = gridOffset(offset, importCount)
+        dispatch({ type: 'AddCardForContent', card: { x: position.x, y: position.y, url } })
+      })
+    },
+    [dispatch]
+  )
+
+  const { cards = [] } = doc || {}
+
+  const onCopy = useCallback(
+    (e: ClipboardEvent) => {
+      log('onCopy')
+      e.preventDefault()
+      e.stopPropagation()
+
+      if (!e.clipboardData) {
+        return
+      }
+
+      const offset = {
+        x: Math.round(window.pageXOffset) + GRID_SIZE, // nudge it over so a paste won't look like nothing happened
+        y: Math.round(window.pageYOffset) + GRID_SIZE,
+      }
+
+      const boardCards = selection
+        .map((c) => cards[c])
+        .map((c) => ({ ...c, x: c.x - offset.x, y: c.y - offset.y }))
+      e.clipboardData.setData(MIMETYPE_BOARD_CARD_DATA, JSON.stringify(boardCards))
+    },
+    [cards, selection]
+  )
+
+  const onCut = useCallback(
+    (e: ClipboardEvent) => {
+      onCopy(e)
+      dispatch({ type: 'DeleteCards', selection })
+    },
+    [dispatch, onCopy, selection]
+  )
+
+  useEffect(() => {
+    document.addEventListener('copy', onCopy)
+    document.addEventListener('cut', onCut)
+    document.addEventListener('paste', onPaste)
+    return () => {
+      document.removeEventListener('copy', onCopy)
+      document.removeEventListener('cut', onCut)
+      document.removeEventListener('paste', onPaste)
+    }
+  }, [onCopy, onCut, onPaste])
+
+  const onContent = useCallback(
+    (url: PushpinUrl) => {
+      log('onContent')
+
+      /* onContent currently comes from the omnibox sending us a clipper item,
+         which doesn't know where it should go, so let's just stick it mid-page
+         since this is also what we do for paste 
+      */
+      const position = {
+        x: window.pageXOffset + window.innerWidth / 2 - GRID_SIZE * 6,
+        y: window.pageYOffset + window.innerHeight / 2,
+      }
+
+      dispatch({ type: 'AddCardForContent', card: { x: position.x, y: position.y, url } })
+      return true
+    },
+    [dispatch]
+  )
+
+  const docTitle = doc && doc.title ? doc.title : ''
+  const contentTypes = useMemo(() => ContentTypes.list({ context: 'board' }), [])
+  const { backgroundColor = '#fff' } = doc || {}
+
+  const style = useMemo(
+    () => ({
+      backgroundColor,
+      width: BOARD_WIDTH,
+      height: BOARD_HEIGHT,
+    }),
+    [backgroundColor]
+  )
+
+  /**
+   * at long last, render begins here
+   */
+  log('render')
+  if (!doc) {
+    return null
+  }
+
+  const cardChildren = Object.entries(cards).map(([id, card]) => {
+    const isSelected = selection.includes(id as CardId) // sadly we can't have IDs as non-string types
+    const uniquelySelected = isSelected && selection.length === 1
+    return (
+      <BoardCard
+        key={id}
+        id={id as CardId}
+        x={card.x}
+        y={card.y}
+        width={card.width}
+        height={card.height}
+        url={card.url}
+        boardUrl={props.hypermergeUrl}
+        selected={isSelected}
+        uniquelySelected={uniquelySelected}
+        dispatch={dispatch}
+      />
+    )
+  })
+
+  return (
+    <div
+      className="Board"
+      ref={boardRef}
+      style={style}
+      onKeyDown={onKeyDown}
+      onClick={onClick}
+      onDoubleClick={onDoubleClick}
+      onDragOver={onDragOver}
+      onDragEnter={onDragOver}
+      onDrop={onDrop}
+      role="presentation"
+    >
+      <BoardContextMenu
+        boardTitle={docTitle}
+        contentTypes={contentTypes}
+        dispatch={dispatch}
+        backgroundColor={backgroundColor}
+        backgroundColors={BOARD_COLOR_VALUES}
+      />
+      <ContextMenuTrigger holdToDisplay={-1} id="BoardMenu">
+        <div>{cardChildren}</div>
+      </ContextMenuTrigger>
+    </div>
+  )
+}
+
+export default memo(Board)

@@ -1,0 +1,31 @@
+.Board {
+  position: relative;
+  background-image: url('../../../images/grid.svg');
+  background-blend-mode: exclusion;
+}
+
+.ActiveCard {
+  overflow: hidden;
+  margin: 0 3px;
+  flex: 1;
+  margin-left: -15px;
+  padding: 2px;
+}
+
+.ActiveCard .Badge {
+  box-shadow: -6px 1px 3px -3px rgba(0, 0, 0, 0.3);
+}
+
+.BoardSelection {
+  display: flex;
+  flex-flow: row;
+  background: inherit;
+}
+
+.BoardSelection .ActiveCard:not(:first-child) {
+  margin-left: -16px;
+}
+
+.BoardSelection .Badge {
+  --size: 22px;
+}

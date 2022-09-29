@@ -1,0 +1,8 @@
+.ListItem {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  overflow: hidden;
+  background: inherit;
+}

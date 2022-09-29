@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
+import Root from './components/Root'
 import './index.css'
 
 import localforage from "localforage"
@@ -11,7 +11,7 @@ import { BroadcastChannelNetworkAdapter } from "automerge-repo-network-broadcast
 import { DocumentId, RepoContext } from 'automerge-repo-react-hooks'
 
 const repo = await Repo({
-    storage: new LocalForageStorageAdapter(),
+    // storage: new LocalForageStorageAdapter(), <-- fix this alex
     network: [
       new BroadcastChannelNetworkAdapter(),
     ],
@@ -30,7 +30,7 @@ if (!rootDocId) {
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <RepoContext.Provider value={repo}>
-      <App documentId={rootDocId as DocumentId}/>
+      <Root documentId={rootDocId as DocumentId}/>
     </RepoContext.Provider>
   </React.StrictMode>
 )
