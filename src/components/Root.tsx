@@ -33,10 +33,6 @@ interface RootArgs {
   deviceDocId: DocumentId
 }
 export default function Root({ workspaceDocId, deviceDocId }: RootArgs) {
-  ContentTypes.create('workspace', {}, (workspaceUrl) => {
-    
-  })
-
   return (
       <CurrentDeviceContext.Provider value={deviceDocId}>
         <Content

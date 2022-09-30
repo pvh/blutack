@@ -56,6 +56,7 @@ export default function Workspace(props: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(props.documentId)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
 
+  console.log(props.documentId)
   console.log("WORKSPACE VALUE", workspace)
   
   const [self, changeSelf] = maybeUseDocument<ContactDoc>(props.selfId)
@@ -220,7 +221,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     return false
   }
 
-  log('render')
+  console.log('render')
   if (!workspace) {
     return null
   }
@@ -277,12 +278,14 @@ export function create(_attrs: any, handle: DocHandle<any>) {
     // we should refactor not to require the DocumentId on the contact
     // but i don't want to pull that in scope right now
 
-    ContentTypes.create('thread', {  }, (threadUrl) => {
+    ContentTypes.create('thread', { title: "Ink & Switch" }, (threadUrl) => {
       handle.change((workspace) => {
+        console.log('setting it up')
         workspace.selfId = selfDocumentId
         workspace.contactIds = []
         workspace.currentDocUrl = threadUrl
         workspace.viewedDocUrls = [threadUrl]
+        console.log("done", workspace)
       })
     })
   })

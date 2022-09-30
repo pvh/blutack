@@ -1,8 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import Root from './components/Root'
-import './index.css'
 import './app.css'
+import './ibm-plex.css'
+import './vendor/line-awesome/css/line-awesome.min.css'
 
 import localforage from "localforage"
 
@@ -24,14 +25,16 @@ ContentTypes.setRepo(repo)
 
 const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
   let docId = new URLSearchParams(window.location.search).get(key);
-  
+
   // if (!docId) { docId = await localforage.getItem(key) }
   if (!docId) { 
-    console.log('initializing the document')
-    const rootHandle = repo.create()
-    docId = rootHandle.documentId
+    console.log('initializing document', key)
+    const workspaceHandle = repo.create()
+    docId = workspaceHandle.documentId
     if (key == "workspaceDocId") {
-      createWorkspace({}, rootHandle)
+      console.log('workspacing')
+      createWorkspace({}, workspaceHandle)
+      console.log(`?workspaceDocId=${docId}`)
     }
     // await localforage.setItem(key, docId)
   }  

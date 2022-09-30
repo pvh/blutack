@@ -1,41 +1,200 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Reset Styles: http://meyerweb.com/eric/tools/css/reset/ */
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol,
+ul {
+  list-style: none;
+}
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Variables */
+
+:root {
+  /* Colors */
+  --colorBlueBlack: #102542;
+  --colorBlack: var(--colorBlack);
+  --colorSecondaryGrey: #637389;
+  --colorPaleGrey: #d5dfe5;
+  --colorInputGrey: #e9edf0;
+  --colorOnline: #33ab77;
+  --colorOffline: lightgray;
+  --colorWarning: #ffbb33; /* material design warning */
+  --colorLink: #0645ad;
+  --colorDestructive: #f87060;
+
+  /* Sizing */
+  --cellSize: 20px;
+  --halfCellSize: 10px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Global */
+
+a {
+  cursor: pointer;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.hidden {
+  visibility: hidden;
 }
 
-.card {
-  padding: 2em;
+*[draggable='true'] {
+  cursor: grab;
 }
 
-.read-the-docs {
-  color: #888;
+/* App Styles */
+
+html,
+body,
+#app,
+[data-reactroot],
+.react-contextmenu-wrapper,
+.board {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: var(--cellSize);
+  -webkit-font-smoothing: antialiased;
+  height: calc(100% - 40px);
+  cursor: default;
+}
+
+input {
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: inherit;
+  color: var(--colorBlueBlack);
+  padding: 0 8px;
+  box-sizing: border-box;
+  background: transparent;
+  border: 0px;
+  outline: none;
+}
+
+strong {
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
 }
