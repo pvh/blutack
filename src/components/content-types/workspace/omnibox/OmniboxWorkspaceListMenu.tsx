@@ -23,7 +23,7 @@ import ListMenuSection from '../../../ui/ListMenuSection'
 import ListMenuItem from '../../../ui/ListMenuItem'
 import ListMenu from '../../../ui/ListMenu'
 import OmniboxWorkspaceListMenuSection from './OmniboxWorkspaceListMenuSection'
-import { Doc as WorkspaceDoc } from '../Workspace'
+import { WorkspaceDoc as WorkspaceDoc } from '../Workspace'
 
 import './OmniboxWorkspaceListMenu.css'
 import ActionListItem from './ActionListItem'

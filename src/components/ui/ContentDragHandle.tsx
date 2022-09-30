@@ -3,6 +3,8 @@ import './Heading.css'
 import mime from 'mime-types'
 import * as UriList from '../pushpin-code/UriList'
 import './ContentDragHandle.css'
+import { PushpinUrl } from '../pushpin-code/ShareLink'
+import { DocumentId } from 'automerge-repo-react-hooks'
 
 interface SimpleProps {
   url: PushpinUrl
@@ -11,7 +13,7 @@ interface SimpleProps {
 interface FileProps extends SimpleProps {
   filename: string
   extension: string
-  hyperfileUrl: HyperfileUrl
+  documentId: DocumentId
 }
 
 export type Props = SimpleProps | FileProps
@@ -19,8 +21,8 @@ export type Props = SimpleProps | FileProps
 export default function ContentDragHandle(props: Props) {
   const { url, children } = props
   const ref = useRef<HTMLSpanElement>(null)
-  const hyperfileUrl = 'hyperfileUrl' in props ? props.hyperfileUrl : null
-  const header = useHyperfileHeader(hyperfileUrl)
+  // const hyperfileUrl = 'hyperfileDocId' in props ? props.hyperfileDocId : null
+  // const header = useHyperfileHeader(hyperfileUrl)
 
   const onDragStart = (event: React.DragEvent<HTMLSpanElement>) => {
     if (ref.current) {
@@ -30,7 +32,7 @@ export default function ContentDragHandle(props: Props) {
     event.dataTransfer.setData(UriList.MIME_TYPE, url)
 
     // and we'll add a DownloadURL if we need to
-    if ('hyperfileUrl' in props && header) {
+    /* if ('hyperfileUrl' in props && header) {
       const { hyperfileUrl, filename, extension } = props
       const { mimeType } = header
 
@@ -38,7 +40,7 @@ export default function ContentDragHandle(props: Props) {
 
       const downloadUrl = `text:${filename}.${outputExtension}:${hyperfileUrl}`
       event.dataTransfer.setData('DownloadURL', downloadUrl)
-    }
+    } */
   }
 
   return (

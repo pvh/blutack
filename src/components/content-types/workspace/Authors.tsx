@@ -1,31 +1,31 @@
 import React, { useEffect } from 'react'
 import Debug from 'debug'
 
-import { HypermergeUrl, PushpinUrl, parseDocumentLink } from '../../pushpin-code/ShareLink'
-import { Doc as WorkspaceDoc } from './Workspace'
+import { PushpinUrl, parseDocumentLink } from '../../pushpin-code/ShareLink'
+import { WorkspaceDoc as WorkspaceDoc } from './Workspace'
 import Author from './Author'
 
 import './Authors.css'
-import { useDocument } from 'automerge-repo-react-hooks'
-import { useSelfId } from '../../../SelfHooks'
-import { usePresence } from '../../../PresenceHooks'
+import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { useSelfId } from '../../pushpin-code/SelfHooks'
+// import { usePresence } from '../../../PresenceHooks'
 
 const log = Debug('pushpin:authors')
 
 interface Props {
-  workspaceUrl: HypermergeUrl
+  workspaceDocId: DocumentId
   currentDocUrl: PushpinUrl
 }
 
 interface DocWithAuthors {
-  authorIds: HypermergeUrl[]
-  hypermergeUrl: HypermergeUrl
+  authorIds: DocumentId[]
+  hypermergeUrl: DocumentId
 }
 
-export default function Authors({ workspaceUrl, currentDocUrl }: Props) {
-  const authorIds = useAuthors(currentDocUrl, workspaceUrl)
-  const currentDocHypermergeUrl = parseDocumentLink(currentDocUrl).hypermergeUrl
-  const presence = usePresence(currentDocHypermergeUrl)
+export default function Authors({ workspaceDocId, currentDocUrl }: Props) {
+  const authorIds = useAuthors(currentDocUrl, workspaceDocId)
+  const currentDocId = parseDocumentLink(currentDocUrl).documentId
+  const presence: any[] = [] // usePresence(currentDocId)
 
   // Remove self from the authors list.
   const selfId = useSelfId()
@@ -41,21 +41,21 @@ export default function Authors({ workspaceUrl, currentDocUrl }: Props) {
 
 export function useAuthors(
   currentDocUrl: PushpinUrl,
-  workspaceUrl: HypermergeUrl
-): HypermergeUrl[] {
-  const { type, hypermergeUrl } = parseDocumentLink(currentDocUrl)
-  const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(workspaceUrl)
-  const [board, changeBoard] = useDocument<DocWithAuthors>(hypermergeUrl)
+  workspaceDocId: DocumentId
+): DocumentId[] {
+  const { type, documentId } = parseDocumentLink(currentDocUrl)
+  const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(workspaceDocId)
+  const [doc, changeDoc] = useDocument<DocWithAuthors>(documentId)
   const selfId = useSelfId()
 
   useEffect(() => {
-    if (!workspace || !board) {
+    if (!workspace || !doc) {
       return
     }
 
     log('updating workspace contacts')
 
-    const { authorIds = [] } = board
+    const { authorIds = [] } = doc
 
     // Add any never-before seen authors to our contacts.
     changeWorkspace(({ contactIds }) => {
@@ -65,26 +65,26 @@ export function useAuthors(
         contactIds.push(...newContactIds)
       }
     })
-  }, [selfId, board && board.authorIds])
+  }, [selfId, doc && doc.authorIds])
 
   useEffect(() => {
-    if (!workspace || !board || type === 'contact') {
+    if (!workspace || !doc || type === 'contact') {
       return
     }
 
     log('adding self to authors')
 
     // Add ourselves to the authors if we haven't yet.
-    changeBoard((board) => {
-      if (!board.authorIds) {
-        board.authorIds = []
+    changeDoc((doc) => {
+      if (!doc.authorIds) {
+        doc.authorIds = []
       }
 
-      if (selfId && !board.authorIds.includes(selfId)) {
-        board.authorIds.push(selfId)
+      if (selfId && !doc.authorIds.includes(selfId)) {
+        doc.authorIds.push(selfId)
       }
     })
-  }, [selfId, board ? board.authorIds : false])
+  }, [selfId, doc ? doc.authorIds : false])
 
-  return (board && board.authorIds) || []
+  return (doc && doc.authorIds) || []
 }

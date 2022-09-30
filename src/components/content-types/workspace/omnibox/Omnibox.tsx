@@ -5,11 +5,10 @@ import React, { useRef, useState, useCallback, useEffect } from 'react'
 import Debug from 'debug'
 import classNames from 'classnames'
 
-import { HypermergeUrl, parseDocumentLink, PushpinUrl } from '../../../../ShareLink'
-import { WorkspaceUrlsApi } from '../../../../WorkspaceHooks'
+import { parseDocumentLink, PushpinUrl } from '../../../pushpin-code/ShareLink'
 import OmniboxWorkspace from './OmniboxWorkspace'
 import './Omnibox.css'
-import { useEvent } from '../automerge-repo-react-hooks'
+import { useEvent } from '../../../pushpin-code/Hooks'
 import ListMenuSection from '../../../ui/ListMenuSection'
 
 const log = Debug('pushpin:omnibox')

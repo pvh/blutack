@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import Root from './components/Root'
 import './index.css'
+import './app.css'
 
 import localforage from "localforage"
 
@@ -9,6 +10,8 @@ import { Repo } from "automerge-repo"
 import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
 import { BroadcastChannelNetworkAdapter } from "automerge-repo-network-broadcastchannel"
 import { DocumentId, RepoContext } from 'automerge-repo-react-hooks'
+import * as ContentTypes from './components/pushpin-code/ContentTypes'
+import { create as createWorkspace } from './components/content-types/workspace/Workspace'
 
 const repo = await Repo({
     // storage: new LocalForageStorageAdapter(), <-- fix this alex
@@ -17,28 +20,32 @@ const repo = await Repo({
     ],
 })
 
+ContentTypes.setRepo(repo)
+
 const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
   let docId = new URLSearchParams(window.location.search).get(key);
   
-  if (!docId) { docId = await localforage.getItem(key) }
+  // if (!docId) { docId = await localforage.getItem(key) }
   if (!docId) { 
     console.log('initializing the document')
     const rootHandle = repo.create()
     docId = rootHandle.documentId
-    await localforage.setItem(key, docId)
+    if (key == "workspaceDocId") {
+      createWorkspace({}, rootHandle)
+    }
+    // await localforage.setItem(key, docId)
   }  
   return docId as DocumentId
 }
 
 // bootstrapping: first try the window location, then check indexedDB, then make one
 const workspaceDocId = await findOrMakeDoc("workspaceDocId")
-const selfDocId = await findOrMakeDoc("selfDocId")
 const deviceDocId = await findOrMakeDoc("deviceDocId")
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <RepoContext.Provider value={repo}>
-      <Root workspaceDocId={workspaceDocId} selfDocId={selfDocId} deviceDocId={deviceDocId}/>
+      <Root workspaceDocId={workspaceDocId} deviceDocId={deviceDocId}/>
     </RepoContext.Provider>
   </React.StrictMode>
 )

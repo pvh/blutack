@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { clipboard } from 'electron'
+import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
 
-import Omnibox from './omnibox/Omnibox'
+// import Omnibox from './omnibox/Omnibox'
 import Content from '../../Content'
 import Authors from './Authors'
-import { HypermergeUrl, PushpinUrl, createDocumentLink } from '../../pushpin-code/ShareLink'
+import { PushpinUrl, createDocumentLink } from '../../pushpin-code/ShareLink'
+import { useEvent } from '../../pushpin-code/Hooks'
 
 import './TitleBar.css'
-import { useDocument, useEvent } from 'automerge-repo-react-hooks'
-import { WorkspaceUrlsContext } from '../../../WorkspaceHooks'
-import { Doc as WorkspaceDoc } from './Workspace'
+import { WorkspaceDoc as WorkspaceDoc } from './Workspace'
 import Badge from '../../ui/Badge'
 
 export interface Props {
-  hypermergeUrl: HypermergeUrl
+  documentId: DocumentId
   openDoc: Function
   onContent: (url: PushpinUrl) => boolean
 }
@@ -22,7 +21,7 @@ export default function TitleBar(props: Props) {
   const [sessionHistory, setHistory] = useState<PushpinUrl[]>([])
   const [historyIndex, setIndex] = useState(0)
   const [activeOmnibox, setActive] = useState(false)
-  const [doc] = useDocument<WorkspaceDoc>(props.hypermergeUrl)
+  const [doc] = useDocument<WorkspaceDoc>(props.documentId)
 
   useEvent(document, 'keydown', (e) => {
     if (e.key === '/' && document.activeElement === document.body) {
@@ -77,7 +76,7 @@ export default function TitleBar(props: Props) {
 
   function copyLink(e: React.MouseEvent) {
     if (doc && doc.currentDocUrl) {
-      clipboard.writeText(doc.currentDocUrl)
+      // TODO: clipboard.writeText(doc.currentDocUrl)
     }
   }
 
@@ -122,7 +121,7 @@ export default function TitleBar(props: Props) {
         <Content url={doc.currentDocUrl} context="title-bar" editable />
       </div>
       <div className="CollaboratorsBar Inline">
-        <Authors currentDocUrl={doc.currentDocUrl} workspaceUrl={props.hypermergeUrl} />
+        <Authors currentDocUrl={doc.currentDocUrl} workspaceDocId={props.documentId} />
         <div className="TitleBar-self">
           <Content url={createDocumentLink('contact', doc.selfId)} context="title-bar" isPresent />
         </div>
@@ -135,17 +134,20 @@ export default function TitleBar(props: Props) {
         <i className="fa fa-clipboard" />
       </button>
 
-      <WorkspaceUrlsContext.Consumer>
+      <div>THE OMNIBOX GOES HERE</div>      
+    </div>
+  )
+}
+
+/* <WorkspaceContext.Consumer>
         {(workspaceUrlsContext) => (
           <Omnibox
             active={activeOmnibox}
-            hypermergeUrl={props.hypermergeUrl}
+            hypermergeUrl={props.documentId}
             omniboxFinished={hideOmnibox}
             onContent={props.onContent}
             workspaceUrlsContext={workspaceUrlsContext}
           />
         )}
       </WorkspaceUrlsContext.Consumer>
-    </div>
-  )
-}
+      */

@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 
 import { parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../pushpin-code/ShareLink'
 import Content, { ContentProps, ContentHandle } from '../../Content'
@@ -8,6 +8,7 @@ import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import SelfContext from '../../pushpin-code/SelfHooks'
 import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
+import { maybeUseDocument } from 'automerge-repo-react-hooks'
 import * as WebStreamLogic from '../../pushpin-code/WebStreamLogic'
 
 import './Workspace.css'
@@ -26,10 +27,11 @@ import WorkspaceInList from './WorkspaceInList'
 // import { importPlainText } from '../../../ImportData'
 // import * as DataUrl from '../../../../DataUrl'
 import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { DocHandle } from 'automerge-repo'
 
 const log = Debug('pushpin:workspace')
 
-export interface Doc {
+export interface WorkspaceDoc {
   selfId: DocumentId
   contactIds: DocumentId[]
   currentDocUrl: PushpinUrl
@@ -51,16 +53,21 @@ interface ClipperPayload {
 
 export default function Workspace(props: WorkspaceContentProps) {
   // const crypto = useCrypto()
-  const [workspace, changeWorkspace] = useDocument<Doc>(props.documentId)
+  const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(props.documentId)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
 
-  const selfId: DocumentId = workspace && workspace.selfId
-  const currentDocUrl =
+  console.log("WORKSPACE VALUE", workspace)
+  
+  const [self, changeSelf] = maybeUseDocument<ContactDoc>(props.selfId)
+
+  /*
+  const selfId: DocumentId | undefined = workspace && workspace.selfId
+   const currentDocUrl =
     workspace && workspace.currentDocUrl && parseDocumentLink(workspace.currentDocUrl).documentId
 
-  const [self, changeSelf] = useDocument<ContactDoc>(selfId)
+  const [self, changeSelf] = maybeUseDocument<ContactDoc>(selfId)
   const currentDeviceId = currentDeviceUrl
-    ? parseDocumentLink(currentDeviceUrl).DocumentId
+    ? parseDocumentLink(currentDeviceUrl).documentId
     : null
 
   useAllHeartbeats(selfId)
@@ -70,8 +77,9 @@ export default function Workspace(props: WorkspaceContentProps) {
 
   useDeviceOnlineStatus(currentDeviceId)
   useContactOnlineStatus(selfId)
+  */
 
-  const sendToSystem = useSystem(
+  /* const sendToSystem = useSystem(
     (msg) => {
       switch (msg.type) {
         case 'IncomingUrl':
@@ -92,31 +100,33 @@ export default function Workspace(props: WorkspaceContentProps) {
       }
     },
     [selfId]
-  )
+  ) 
 
   useEffect(() => {
     // For background debugging:
     if (currentDocUrl) sendToSystem({ type: 'Navigated', url: currentDocUrl })
   }, [currentDocUrl, sendToSystem])
+  */
 
   // Add devices if not already on doc.
   useEffect(() => {
-    if (!currentDeviceUrl || !self) {
+    if (!currentDeviceUrl || !self || !changeSelf) {
       return
     }
 
-    const { DocumentId } = parseDocumentLink(currentDeviceUrl)
-    if (!self.devices || !self.devices.includes(DocumentId)) {
+    const { documentId } = parseDocumentLink(currentDeviceUrl)
+    if (!self.devices || !self.devices.includes(documentId)) {
       changeSelf((doc: ContactDoc) => {
         if (!doc.devices) {
           doc.devices = []
         }
-        doc.devices.push(DocumentId)
+        doc.devices.push(documentId)
       })
     }
   }, [changeSelf, currentDeviceUrl, self])
 
   // Add encryption keys if not already on doc.
+  /*
   useEffect(() => {
     if (!workspace || !selfId || workspace.secretKey) return
 
@@ -141,6 +151,7 @@ export default function Workspace(props: WorkspaceContentProps) {
       })
     }
   }, [workspace, selfId, workspace && workspace.secretKey])
+  */
 
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {
@@ -162,7 +173,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     // Reset scroll position
     window.scrollTo(0, 0)
 
-    changeWorkspace((ws: Doc) => {
+    changeWorkspace((ws: WorkspaceDoc) => {
       ws.currentDocUrl = docUrl
 
       ws.viewedDocUrls = ws.viewedDocUrls.filter((url) => url !== docUrl)
@@ -174,7 +185,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     })
   }
 
-  function importClip(payload: ClipperPayload) {
+/*  function importClip(payload: ClipperPayload) {
     const creationCallback = (importedUrl) => {
       changeWorkspace((d) => {
         d.viewedDocUrls.unshift(importedUrl)
@@ -198,7 +209,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     } else {
       ContentTypes.createFrom(contentData, creationCallback)
     }
-  }
+  }*/
 
   const contentRef = useRef<ContentHandle>(null)
 
@@ -232,7 +243,7 @@ export default function Workspace(props: WorkspaceContentProps) {
   return (
     <SelfContext.Provider value={workspace.selfId}>
       <div className="Workspace">
-        <TitleBar DocumentId={props.documentId} openDoc={openDoc} onContent={onContent} />
+        <TitleBar documentId={props.documentId} openDoc={openDoc} onContent={onContent} />
         {content}
       </div>
     </SelfContext.Provider>
@@ -258,35 +269,20 @@ const WELCOME_TEXT = `Welcome to PushPin!
 
     To create links to boards or contacts, drag them from the title bar or the omnibox or press the 'place on board' (Shift + Enter) next to the corresponding object in the omnibox.`
 
-function create(_attrs: any, handle: Handle<Doc>) {
+// PVH: Todo
+export function create(_attrs: any, handle: DocHandle<any>) {
   ContentTypes.create('contact', {}, (selfContentUrl) => {
-    const selfDocumentId = parseDocumentLink(selfContentUrl).DocumentId
+    const selfDocumentId = parseDocumentLink(selfContentUrl).documentId
     // this is, uh, a nasty hack.
     // we should refactor not to require the DocumentId on the contact
     // but i don't want to pull that in scope right now
 
-    ContentTypes.create('board', { title: 'Home', selfId: selfDocumentId }, (boardUrl) => {
-      ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
-        const id = uuid() as CardId
-        ContentTypes.__getRepo().change(
-          parseDocumentLink(boardUrl).DocumentId,
-          (doc: BoardDoc) => {
-            doc.cards[id] = {
-              url: textDocUrl,
-              x: 20,
-              y: 20,
-              width: 320,
-              height: 540,
-            }
-          }
-        )
-
-        handle.change((workspace) => {
-          workspace.selfId = selfDocumentId
-          workspace.contactIds = []
-          workspace.currentDocUrl = boardUrl
-          workspace.viewedDocUrls = [boardUrl]
-        })
+    ContentTypes.create('thread', {  }, (threadUrl) => {
+      handle.change((workspace) => {
+        workspace.selfId = selfDocumentId
+        workspace.contactIds = []
+        workspace.currentDocUrl = threadUrl
+        workspace.viewedDocUrls = [threadUrl]
       })
     })
   })

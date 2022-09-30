@@ -12,8 +12,8 @@ import * as ContentTypes from './pushpin-code/ContentTypes'
 import { parseDocumentLink, PushpinUrl } from './pushpin-code/ShareLink'
 import Crashable from './Crashable'
 import { DocumentId } from 'automerge-repo-react-hooks'
+import { useSelfId } from './pushpin-code/SelfHooks'
 // import { useHeartbeat } from '../PresenceHooks'
-// import { useSelfId } from '../SelfHooks'
 
 // this is the interface imported by Content types
 export interface ContentProps {
@@ -43,7 +43,7 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
   const { context, url } = props
 
   const [isCrashed, setCrashed] = useState(false)
-  const selfId = "mario" // TODO: useSelfId()
+  const selfId = useSelfId()
   const onCatch = useCallback(() => setCrashed(true), [])
 
   const { type, documentId } = parseDocumentLink(url)
