@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { Doc } from 'automerge'
-import { PushpinUrl, parseDocumentLink, HypermergeUrl } from '../../pushpin-code/ShareLink'
-import { useDocument, ChangeFn } from 'automerge-repo-react-hooks'
+import { PushpinUrl, parseDocumentLink, createDocumentLink } from '../../pushpin-code/ShareLink'
+import { useDocument, Change, DocumentId } from 'automerge-repo-react-hooks'
 import Content from '../../Content'
 import ActionListItem from '../workspace/omnibox/ActionListItem'
 import { DeviceDoc } from '../workspace/Device'
@@ -9,27 +9,27 @@ import { StoragePeerDoc } from '../storage-peer'
 import './ContactEditor.css'
 
 export interface Props {
-  selfUrl: HypermergeUrl
-  deviceId: PushpinUrl
+  selfId: DocumentId
+  deviceId: DocumentId
   isCurrentDevice: boolean
-  onRemoveDevice: (url: PushpinUrl) => void
+  onRemoveDevice: (url: DocumentId) => void
 }
 
-export type OnRemoveDevice = (url: PushpinUrl) => void
+export type OnRemoveDevice = (documentId: DocumentId) => void
 
 export default function ContactEditorDevice(props: Props) {
-  const { selfUrl, deviceId, onRemoveDevice, isCurrentDevice } = props
-  const { hypermergeUrl: deviceHypermergeUrl } = parseDocumentLink(deviceId)
-  const [deviceDoc, changeDevice] = useDocument<DeviceDoc>(deviceHypermergeUrl)
+  const { selfId, deviceId, onRemoveDevice, isCurrentDevice } = props
+  const { documentId: deviceDocId } = parseDocumentLink(deviceId)
+  const [deviceDoc, changeDevice] = useDocument<DeviceDoc>(deviceDocId)
 
   const removeDevice = useCallback(() => {
     // XXX: We want to unregister from the storage peer when we remove it as a device.
     // We need a better way to do this, but for now just hack it here.
     if (isStoragePeer(deviceDoc)) {
-      unregisterFromStoragePeer(changeDevice as ChangeFn<StoragePeerDoc>, selfUrl)
+      unregisterFromStoragePeer(changeDevice as Change<StoragePeerDoc>, selfId)
     }
     onRemoveDevice(deviceId)
-  }, [deviceDoc, changeDevice, selfUrl, deviceId, onRemoveDevice])
+  }, [deviceDoc, changeDevice, selfId, deviceId, onRemoveDevice])
 
   if (!deviceDoc) {
     return null
@@ -50,7 +50,7 @@ export default function ContactEditorDevice(props: Props) {
 
   return (
     <ActionListItem
-      contentUrl={deviceId}
+      contentUrl={createDocumentLink('device', deviceId)}
       actions={isCurrentDevice ? [] : deviceActions}
       selected={false}
     >
@@ -64,8 +64,8 @@ function isStoragePeer(doc: unknown): doc is Doc<StoragePeerDoc> {
 }
 
 function unregisterFromStoragePeer(
-  changeStoragePeer: ChangeFn<StoragePeerDoc>,
-  contactUrl: HypermergeUrl
+  changeStoragePeer: Change<StoragePeerDoc>,
+  contactUrl: DocumentId
 ) {
   changeStoragePeer((doc) => {
     delete doc.registry[contactUrl]

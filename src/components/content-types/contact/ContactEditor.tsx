@@ -1,6 +1,5 @@
 import React, { useContext, useRef, Ref, ChangeEvent } from 'react'
 
-import Automerge from 'automerge'
 import {
   createDocumentLink,
   PushpinUrl,
@@ -10,15 +9,15 @@ import {
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 import { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
-import { FileDoc } from '../files'
+import { FileDoc, FileId } from '../files'
 
-import ColorPicker from '../../ui/ColorPicker'
-import { useDocument } from 'automerge-repo-react-hooks'
+import SwatchesPicker from 'react-color'
+import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
 import Heading from '../../ui/Heading'
 import SecondaryText from '../../ui/SecondaryText'
 
 import { CurrentDeviceContext } from '../workspace/Device'
-// import { importFileList } from '../../../ImportData'
+import { importFileList } from '../../pushpin-code/ImportData'
 import ConnectionStatusBadge from './ConnectionStatusBadge'
 // import { useConnectionStatus } from '../../../PresenceHooks'
 import Badge from '../../ui/Badge'
@@ -66,16 +65,15 @@ export default function ContactEditor(props: ContentProps) {
   // xxx: only allow images & only one
   const onFilesChanged = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
-    /* importFileList(e.target.files, (url) =>
+    importFileList(e.target.files, (url) =>
       changeDoc((doc) => {
         const { documentId } = parseDocumentLink(url)
         doc.avatarDocId = documentId
       })
-    )*/
+    )
   }
 
-  function removeDevice(url: PushpinUrl) {
-    const { documentId: deviceId } = parseDocumentLink(url)
+  function removeDevice(deviceId: DocumentId) {
     changeDoc((d) => {
       const devices = d.devices
       if (!devices) {
@@ -91,7 +89,7 @@ export default function ContactEditor(props: ContentProps) {
         <div className="ContactEditor-heading">
           <Heading>Edit Profile...</Heading>
         </div>
-        {renderNameEditor(props.hypermergeUrl)}
+        {renderNameEditor(props.documentId)}
         {renderAvatarEditor(avatarHyperfileUrl, onFilesChanged, hiddenFileInput, onImportClick)}
         {renderPresenceColorSelector(color, setColor)}
         {renderDevices(devices, status, selfUrl, removeDevice, currentDeviceId)}
@@ -101,16 +99,16 @@ export default function ContactEditor(props: ContentProps) {
   )
 }
 
-const renderNameEditor = (hypermergeUrl: HypermergeUrl) => (
+const renderNameEditor = (documentId: DocumentId) => (
   <ListMenuSection title="Display Name">
     <ListMenuItem>
-      <TitleEditor field="name" url={hypermergeUrl} />
+      <TitleEditor field="name" documentId={documentId} />
     </ListMenuItem>
   </ListMenuSection>
 )
 
 const renderAvatarEditor = (
-  avatarHyperfileUrl: HyperfileUrl | null,
+  avatarHyperfileUrl: FileId | null,
   onFilesChanged: (e: ChangeEvent<HTMLInputElement>) => void,
   hiddenFileInput: Ref<HTMLInputElement>,
   onImportClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
@@ -140,7 +138,7 @@ const renderAvatarEditor = (
 const renderPresenceColorSelector = (color: string, setColor: (color: { hex: string }) => void) => (
   <ListMenuSection title="Presence Color">
     <ListMenuItem>
-      <ColorPicker color={color} colors={Object.values(USER_COLORS)} onChangeComplete={setColor} />
+      <SwatchesPicker color={color} colors={Object.values(USER_COLORS)} onChangeComplete={setColor} />
     </ListMenuItem>
     <ListMenuItem>
       <SecondaryText>
@@ -152,21 +150,20 @@ const renderPresenceColorSelector = (color: string, setColor: (color: { hex: str
 )
 
 const renderDevices = (
-  devices: HypermergeUrl[] | undefined,
+  devices: DocumentId[] | undefined,
   status: string,
-  selfUrl: HypermergeUrl,
+  selfId: DocumentId,
   removeDevice: OnRemoveDevice,
-  currentDeviceId: PushpinUrl | null
+  currentDeviceId: DocumentId | null
 ) => {
   if (!devices) {
     return <SecondaryText>Something is wrong, you should always have a device!</SecondaryText>
   }
   const renderedDevices = devices
-    .map((deviceUrl: HypermergeUrl) => createDocumentLink('device', deviceUrl))
-    .map((deviceId: PushpinUrl) => (
+    .map((deviceId: DocumentId) => (
       <ContactEditorDevice
         key={deviceId}
-        selfUrl={selfUrl}
+        selfId={selfId}
         deviceId={deviceId}
         onRemoveDevice={removeDevice}
         isCurrentDevice={deviceId === currentDeviceId}

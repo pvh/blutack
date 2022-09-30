@@ -2,10 +2,10 @@ import React, { useRef, useState, memo } from 'react'
 import classNames from 'classnames'
 import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 
-import ColorPicker from '../../ui/ColorPicker'
+import SwatchesPicker from 'react-color'
 import './ContextMenu.css'
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import { importFileList } from '../../../ImportData'
+import { importFileList } from '../../pushpin-code/ImportData'
 import { BoardAction } from './Board'
 import { gridOffset, Position } from './BoardGrid'
 
@@ -86,7 +86,7 @@ function BoardContextMenu(props: Props) {
     })
   }
 
-  const onChangeComplete = (color) => props.dispatch({ type: 'ChangeBackgroundColor', color })
+  const onChangeComplete = (color: string) => props.dispatch({ type: 'ChangeBackgroundColor', color })
 
   return (
     <ContextMenu id="BoardMenu" onShow={onShowContextMenu} className="ContextMenu">
@@ -114,7 +114,7 @@ function BoardContextMenu(props: Props) {
         <h6>Board Color</h6>
         <div className="ContextMenu__divider" />
         <ContextMenuItem>
-          <ColorPicker
+          <SwatchesPicker
             color={props.backgroundColor}
             colors={props.backgroundColors}
             onChangeComplete={onChangeComplete}
