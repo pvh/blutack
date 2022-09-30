@@ -11,7 +11,7 @@ import Debug from 'debug'
 import { ContextMenuTrigger } from 'react-contextmenu'
 
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import * as ImportData from '../../../ImportData'
+import * as ImportData from '../../pushpin-code/ImportData'
 import { PushpinUrl } from '../../pushpin-code/ShareLink'
 import { ContentProps } from '../../Content'
 import { BoardDoc, BoardDocCard, CardId } from '.'
@@ -30,7 +30,7 @@ import {
 } from './BoardDocManipulation'
 
 import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN, MIMETYPE_BOARD_CARD_DATA } from '../../../constants'
-import { useDocumentReducer } from 'automerge-repo-react-hooks'
+import { useDocumentReducer } from '../../pushpin-code/Hooks'
 
 const log = Debug('pushpin:board')
 

@@ -35,15 +35,15 @@ import SharesSection from './SharesSection'
 import './ContactEditor.css'
 
 export default function ContactEditor(props: ContentProps) {
-  const [doc, changeDoc] = useDocument<ContactDoc>(props.hypermergeUrl)
-  const [avatarImageDoc] = useDocument<FileDoc>(doc && doc.avatarDocId)
-  const { hyperfileUrl: avatarHyperfileUrl = null } = avatarImageDoc || {}
+  const [doc, changeDoc] = useDocument<ContactDoc>(props.documentId)
+  const [avatarImageDoc] = useDocument<FileDoc>(doc ? doc.avatarDocId : undefined)
+  const { fileId: avatarHyperfileUrl = null } = avatarImageDoc || {}
 
   const currentDeviceId = useContext(CurrentDeviceContext)
   const hiddenFileInput = useRef<HTMLInputElement>(null)
-  const status = useConnectionStatus(props.hypermergeUrl)
+  const status = "offline" // useConnectionStatus(props.documentId)
 
-  const { hypermergeUrl: selfUrl } = props
+  const { documentId: selfUrl } = props
 
   if (!doc) {
     return null

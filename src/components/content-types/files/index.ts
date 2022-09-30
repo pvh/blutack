@@ -6,22 +6,20 @@ import * as ContentData from "../../pushpin-code/ContentData";
 import { DocHandle } from "automerge-repo";
 import { DocumentId } from "automerge-repo-react-hooks";
 
+export type FileId = string & { __fileId: true };
 export interface FileDoc {
   title: string; // names are editable and not an intrinsic part of the file
   extension: string;
-  documentId: DocumentId;
+  fileId: FileId;
   capturedAt: string;
 }
 
 // TODO: when is this ever called?
-function create(
-  { title, extension, documentId }: any,
-  handle: DocHandle<FileDoc>
-) {
+function create({ title, extension, fileId }: any, handle: DocHandle<any>) {
   handle.change((doc) => {
     doc.title = title;
     doc.extension = extension;
-    doc.documentId = documentId;
+    doc.fileId = fileId;
   });
 }
 
@@ -30,12 +28,12 @@ async function createFrom(
   handle: DocHandle<FileDoc>
 ) {
   const name = contentData.name || contentData.src || "Nameless File";
-  const documentId = await ContentData.toDocumentId(contentData);
+  const fileId = await ContentData.toFileId(contentData);
   const { capturedAt } = contentData;
 
   handle.change((doc: FileDoc) => {
     const parsed = path.parse(name);
-    doc.documentId = documentId;
+    doc.fileId = fileId;
     doc.title = parsed.name;
     doc.extension = parsed.ext.slice(1);
     if (capturedAt) {

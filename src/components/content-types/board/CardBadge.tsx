@@ -1,5 +1,4 @@
 import React from 'react'
-import { Doc } from 'hypermerge'
 import { parseDocumentLink, PushpinUrl } from '../../pushpin-code/ShareLink'
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import Badge from '../../ui/Badge'
@@ -13,8 +12,8 @@ interface Props {
 
 export default (props: Props) => {
   const { url, context } = props
-  const { type, hypermergeUrl } = parseDocumentLink(url)
-  const [doc] = useDocument<Doc<{ backgroundColor?: string }>>(hypermergeUrl)
+  const { type, documentId } = parseDocumentLink(url)
+  const [doc] = useDocument<{ backgroundColor?: string }>(documentId)
 
   if (!doc) {
     return null

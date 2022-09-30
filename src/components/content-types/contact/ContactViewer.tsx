@@ -1,6 +1,5 @@
 import React from 'react'
-// import { Swatch } from 'react-color/lib/components/common'
-const Swatch = () => <div>SWATCH</div>
+import { Swatch } from 'react-color/lib/components/common'
 
 import { createDocumentLink, PushpinUrl } from '../../pushpin-code/ShareLink'
 

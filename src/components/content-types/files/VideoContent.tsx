@@ -9,14 +9,14 @@ import './VideoContent.css'
 export default function VideoContent({ documentId }: ContentProps) {
   const [doc] = useDocument<FileDoc>(documentId)
 
-  if (!(doc && doc.hyperfileUrl)) {
+  if (!(doc && doc.fileId)) {
     return null
   }
 
-  return <video className="VideoContent" controls src={doc.hyperfileUrl} />
+  return <video className="VideoContent" controls src={doc.fileId} />
 }
 
-const supportsMimeType = (mimeType) =>
+const supportsMimeType = (mimeType: string) =>
   !!(mimeType.match('video/') || mimeType.match('application/ogg'))
 
 ContentTypes.register({

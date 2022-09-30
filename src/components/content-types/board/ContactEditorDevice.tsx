@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { Doc } from 'automerge'
 import { PushpinUrl, parseDocumentLink } from '../../pushpin-code/ShareLink'
-import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId, Change, useDocument } from 'automerge-repo-react-hooks'
 import Content from '../../Content'
 import ActionListItem from '../workspace/omnibox/ActionListItem'
 import { DeviceDoc } from '../workspace/Device'
@@ -64,10 +64,11 @@ function isStoragePeer(doc: unknown): doc is Doc<StoragePeerDoc> {
 }
 
 function unregisterFromStoragePeer(
-  changeStoragePeer: ChangeFn<StoragePeerDoc>,
-  contactUrl: HypermergeUrl
+  changeStoragePeer: Change<DeviceDoc>,
+  contactId: DocumentId
 ) {
   changeStoragePeer((doc) => {
-    delete doc.registry[contactUrl]
+    // the storage peer doc contains both sets of properties.
+    delete (doc as StoragePeerDoc).registry[contactId]
   })
 }

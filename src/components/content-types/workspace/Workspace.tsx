@@ -1,6 +1,8 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import * as uuid from 'uuid'
+import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { DocHandle } from 'automerge-repo'
 
 import { parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../pushpin-code/ShareLink'
 import Content, { ContentProps, ContentHandle } from '../../Content'
@@ -8,7 +10,6 @@ import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import SelfContext from '../../pushpin-code/SelfHooks'
 import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
-import { maybeUseDocument } from 'automerge-repo-react-hooks'
 import * as WebStreamLogic from '../../pushpin-code/WebStreamLogic'
 
 import './Workspace.css'
@@ -26,8 +27,6 @@ import { CurrentDeviceContext } from './Device'
 import WorkspaceInList from './WorkspaceInList'
 // import { importPlainText } from '../../../ImportData'
 // import * as DataUrl from '../../../../DataUrl'
-import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
-import { DocHandle } from 'automerge-repo'
 
 const log = Debug('pushpin:workspace')
 
@@ -51,22 +50,23 @@ interface ClipperPayload {
   capturedAt: string
 }
 
-export default function Workspace(props: WorkspaceContentProps) {
+export default function Workspace({ documentId, selfId }: WorkspaceContentProps) {
   // const crypto = useCrypto()
-  const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(props.documentId)
+  const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
 
-  console.log(props.documentId)
+  console.log(documentId)
   console.log("WORKSPACE VALUE", workspace)
   
-  const [self, changeSelf] = maybeUseDocument<ContactDoc>(props.selfId)
+  console.log("SelfID:", selfId)
+  const [self, changeSelf] = useDocument<ContactDoc>(selfId || undefined)
 
   /*
   const selfId: DocumentId | undefined = workspace && workspace.selfId
    const currentDocUrl =
     workspace && workspace.currentDocUrl && parseDocumentLink(workspace.currentDocUrl).documentId
 
-  const [self, changeSelf] = maybeUseDocument<ContactDoc>(selfId)
+  const [self, changeSelf] = useDocument<ContactDoc>(selfId)
   const currentDeviceId = currentDeviceUrl
     ? parseDocumentLink(currentDeviceUrl).documentId
     : null
@@ -162,7 +162,7 @@ export default function Workspace(props: WorkspaceContentProps) {
     const { type } = parseDocumentLink(docUrl)
     if (type === 'workspace') {
       // we're going to have to deal with this specially...
-      props.setWorkspaceUrl(docUrl)
+      // props.setWorkspaceUrl(docUrl)
       return
     }
 
@@ -244,7 +244,7 @@ export default function Workspace(props: WorkspaceContentProps) {
   return (
     <SelfContext.Provider value={workspace.selfId}>
       <div className="Workspace">
-        <TitleBar documentId={props.documentId} openDoc={openDoc} onContent={onContent} />
+        <TitleBar documentId={documentId} openDoc={openDoc} onContent={onContent} />
         {content}
       </div>
     </SelfContext.Provider>

@@ -1,19 +1,20 @@
 import React, { useEffect, useRef, useMemo } from 'react'
-import { Handle } from 'hypermerge'
 
 import Automerge from 'automerge'
 import Quill, { TextChangeHandler, QuillOptionsStatic } from 'quill'
 import Delta from 'quill-delta'
 import * as ContentTypes from '../pushpin-code/ContentTypes'
 import { ContentProps } from '../Content'
-import { useDocument, useStaticCallback } from '../../Hooks'
+import { useDocument } from 'automerge-repo-react-hooks'
+import { useStaticCallback } from '../pushpin-code/Hooks'
 import './TextContent.css'
 import Badge from '../ui/Badge'
-import * as ContentData from '../../ContentData'
-import * as WebStreamLogic from '../../../WebStreamLogic'
+import * as ContentData from '../pushpin-code/ContentData'
+import * as WebStreamLogic from '../pushpin-code/WebStreamLogic'
 import ListItem from '../ui/ListItem'
 import ContentDragHandle from '../ui/ContentDragHandle'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
+import { DocHandle } from 'automerge-repo'
 
 interface TextDoc {
   text: Automerge.Text
@@ -31,7 +32,7 @@ export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.documentId)
 
   const [ref] = useQuill({
-    text: doc && doc.text,
+    text: doc ? doc.text : null,
     change(fn) {
       changeDoc((doc: TextDoc) => fn(doc.text))
     },
@@ -155,7 +156,7 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
   })
 }
 
-async function createFrom(contentData: ContentData.ContentData, handle: Handle<TextDoc>) {
+async function createFrom(contentData: ContentData.ContentData, handle: DocHandle<TextDoc>) {
   const text = await WebStreamLogic.toString(contentData.data)
   handle.change((doc) => {
     doc.text = new Automerge.Text()
@@ -169,7 +170,8 @@ async function createFrom(contentData: ContentData.ContentData, handle: Handle<T
   })
 }
 
-function create({ text }, handle: Handle<TextDoc>) {
+
+function create({ text }: any, handle: DocHandle<any>) {
   handle.change((doc) => {
     doc.text = new Automerge.Text(text)
     if (!text || !text.endsWith('\n')) {
@@ -179,8 +181,8 @@ function create({ text }, handle: Handle<TextDoc>) {
 }
 
 function TextInList(props: ContentProps) {
-  const { hypermergeUrl, url } = props
-  const [doc] = useDocument<TextDoc>(hypermergeUrl)
+  const { documentId, url } = props
+  const [doc] = useDocument<TextDoc>(documentId)
   if (!doc) return null
 
   const lines = doc.text
@@ -199,14 +201,14 @@ function TextInList(props: ContentProps) {
       <TitleWithSubtitle
         title={title}
         subtitle={subtitle}
-        hypermergeUrl={hypermergeUrl}
+        documentId={documentId}
         editable={false}
       />
     </ListItem>
   )
 }
 
-const supportsMimeType = (mimeType) => !!mimeType.match('text/')
+const supportsMimeType = (mimeType: string) => !!mimeType.match('text/')
 
 ContentTypes.register({
   type: 'text',

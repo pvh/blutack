@@ -1,6 +1,6 @@
 import { Doc } from "automerge";
 import { DocCollection } from "automerge-repo";
-import { DocumentId, maybeUseDocument } from "automerge-repo-react-hooks";
+import { DocumentId, useDocument } from "automerge-repo-react-hooks";
 import {
   useEffect,
   useState,
@@ -17,11 +17,11 @@ export type ChangeFn<T> = (cb: (doc: T) => void) => void;
 type Cleanup = void | (() => void);
 
 export function useDocumentReducer<D, A>(
-  documentId: DocumentId | null,
+  documentId: DocumentId | undefined,
   reducer: (doc: D, action: A) => void,
   deps?: any[]
 ): [Doc<D> | null, (action: A) => void] {
-  const [doc, changeDoc] = maybeUseDocument<D>(documentId);
+  const [doc, changeDoc] = useDocument<D>(documentId);
 
   const dispatch = useCallback(
     (action: A) => {

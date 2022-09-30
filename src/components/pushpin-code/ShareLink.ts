@@ -52,8 +52,8 @@ export function parts(str: string) {
   const url = new URL(str);
 
   const protocol = url.protocol;
-  const scheme = protocol ? protocol.substr(0, protocol.length - 1) : "";
-  const documentId = (url.pathname || "").substr(1) as DocumentId;
+  const scheme = protocol ? protocol.substr(0, protocol.length - 1) : undefined;
+  const documentId = (url.pathname || "/").substr(1) as DocumentId;
 
   const params = new URLSearchParams(url.search);
   const type = params.get("type");

@@ -15,17 +15,20 @@ PresenceHooks
   useHeartbeat, useConnectionStatus, useDeviceOnlineStatus
 D&D stuff
   importFileList, importPlainText, importFromText, DataUrl
-Missing libraries
-  Swatch, CustomPicker (react-color both)
 base64 encoding in WebStreamLogic.ts
 Titlebar
   openDoc / onContent <- what are these even?
 encryption stuff! -> secretKey on workspace is a good entry
 importClip && the webclipper!
-import './ibm-plex.css'
 import 'line-awesome/css/line-awesome.min.css'
 useHyperfileHeader
 OmniboxWorkspaceListMenu -> InvitationsView { getDoc }
+review all the File types a
+
+HyperFiles
+ -> replace the existing hyperfile stuff with a service worker implementation
+ -> find the places we reference hyperfiles (now FileIds) and call a function to make them useful URLs
+ -> find the various import & ingestion places and fix those too
 
 To Replace
 ---
@@ -40,5 +43,5 @@ create() functions would benefit from better typing for DocHandle
 weird stuff around getRepo/setRepo
 workspace initialization <- calling create manually
 dark mode!
-get rid of maybeUseDocument?
 OmniboxWorkspaceListMenu v. complicated and old
+

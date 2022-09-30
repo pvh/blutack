@@ -135,7 +135,7 @@ export default function TitleBar(props: Props) {
       </button>
       <Omnibox
             active={activeOmnibox}
-            hypermergeUrl={props.documentId}
+            documentId={props.documentId}
             omniboxFinished={hideOmnibox}
             onContent={props.onContent}
         />

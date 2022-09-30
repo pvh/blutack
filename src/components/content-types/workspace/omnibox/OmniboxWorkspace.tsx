@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 // import { clipboard } from 'electron'
 import { createDocumentLink, PushpinUrl } from '../../../pushpin-code/ShareLink'
-import { DocumentId, maybeUseDocument, useDocument, useRepo } from 'automerge-repo-react-hooks'
+import { DocumentId, useDocument, useRepo } from 'automerge-repo-react-hooks'
 import Content from '../../../Content'
 import { WorkspaceDoc as WorkspaceDoc } from '../Workspace'
 import { ContactDoc } from '../../contact'
@@ -23,7 +23,7 @@ export interface Props {
 export default function OmniboxWorkspace(props: Props) {
   const { active, search, documentId, omniboxFinished, viewContents, onContent } = props
   const [workspaceDoc] = useDocument<WorkspaceDoc>(documentId)
-  const [selfDoc] = maybeUseDocument<ContactDoc>(workspaceDoc && workspaceDoc.selfId)
+  const [selfDoc] = useDocument<ContactDoc>(workspaceDoc ? workspaceDoc.selfId : undefined)
   const repo = useRepo()
 
   const onClickWorkspace = useCallback(
@@ -67,7 +67,7 @@ export default function OmniboxWorkspace(props: Props) {
           active={active}
           search={search}
           onContent={onContent}
-          hypermergeUrl={documentId}
+          documentId={documentId}
           omniboxFinished={omniboxFinished}
         />
       )}

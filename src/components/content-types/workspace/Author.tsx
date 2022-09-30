@@ -1,12 +1,12 @@
 import React from 'react'
 import Content from '../../Content'
-import { HypermergeUrl, createDocumentLink } from '../../pushpin-code/ShareLink'
-import { useDocument } from 'automerge-repo-react-hooks'
+import { createDocumentLink } from '../../pushpin-code/ShareLink'
+import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
 import { ContactDoc } from '../contact'
 import './Author.css'
 
 interface Props {
-  contactId: HypermergeUrl
+  contactId: DocumentId
   isPresent: boolean
 }
 
