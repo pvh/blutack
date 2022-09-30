@@ -11,7 +11,7 @@ import { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 import { FileDoc, FileId } from '../files'
 
-import SwatchesPicker from 'react-color'
+import { GithubPicker } from 'react-color'
 import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
 import Heading from '../../ui/Heading'
 import SecondaryText from '../../ui/SecondaryText'
@@ -138,7 +138,7 @@ const renderAvatarEditor = (
 const renderPresenceColorSelector = (color: string, setColor: (color: { hex: string }) => void) => (
   <ListMenuSection title="Presence Color">
     <ListMenuItem>
-      <SwatchesPicker color={color} colors={Object.values(USER_COLORS)} onChangeComplete={setColor} />
+      <GithubPicker color={color} colors={Object.values(USER_COLORS)} onChangeComplete={setColor} />
     </ListMenuItem>
     <ListMenuItem>
       <SecondaryText>
@@ -172,7 +172,7 @@ const renderDevices = (
 
   const title = (
     <>
-      <ConnectionStatusBadge size="small" hover={false} contactId={selfUrl} />
+      <ConnectionStatusBadge size="small" hover={false} contactId={selfId} />
       Devices
     </>
   )

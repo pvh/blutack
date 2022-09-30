@@ -2,7 +2,7 @@ import React, { useRef, useState, memo } from 'react'
 import classNames from 'classnames'
 import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 
-import SwatchesPicker from 'react-color'
+import { GithubPicker } from 'react-color'
 import './ContextMenu.css'
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import { importFileList } from '../../pushpin-code/ImportData'
@@ -20,7 +20,7 @@ interface Props {
 function BoardContextMenu(props: Props) {
   const [contextMenuPosition, setContextMenuPosition] = useState<Position>({ x: 0, y: 0 })
 
-  const addContent = (e, contentType) => {
+  const addContent = (e: Event, contentType: ContentTypes.LookupResult) => {
     e.stopPropagation()
 
     if (!contextMenuPosition) {
@@ -114,7 +114,7 @@ function BoardContextMenu(props: Props) {
         <h6>Board Color</h6>
         <div className="ContextMenu__divider" />
         <ContextMenuItem>
-          <SwatchesPicker
+          <GithubPicker
             color={props.backgroundColor}
             colors={props.backgroundColors}
             onChangeComplete={onChangeComplete}

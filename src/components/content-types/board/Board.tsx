@@ -29,7 +29,7 @@ import {
   BoardDocManipulationAction,
 } from './BoardDocManipulation'
 
-import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN, MIMETYPE_BOARD_CARD_DATA } from '../../../constants'
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN, MIMETYPE_BOARD_CARD_DATA } from '../../constants'
 import { useDocumentReducer } from '../../pushpin-code/Hooks'
 
 const log = Debug('pushpin:board')
@@ -234,9 +234,10 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
 
       const jsonData = e.clipboardData.getData(MIMETYPE_BOARD_CARD_DATA)
       if (jsonData) {
+        // this *should* be BoardDocCard data
         JSON.parse(jsonData)
-          .map((c) => ({ ...c, x: c.x + offset.x, y: c.y + offset.y }))
-          .forEach((card) => dispatch({ type: 'AddCardForContent', card }))
+          .map((c: BoardDocCard) => ({ ...c, x: c.x + offset.x, y: c.y + offset.y }))
+          .forEach((card: BoardDocCard) => dispatch({ type: 'AddCardForContent', card }))
         return
       }
 
@@ -252,7 +253,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
     [dispatch]
   )
 
-  const { cards = [] } = doc || {}
+  const cards: { [id: string]: BoardDocCard } = doc ? doc.cards : {}
 
   const onCopy = useCallback(
     (e: ClipboardEvent) => {
@@ -348,7 +349,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
         width={card.width}
         height={card.height}
         url={card.url}
-        boardUrl={props.hypermergeUrl}
+        boardId={props.documentId}
         selected={isSelected}
         uniquelySelected={uniquelySelected}
         dispatch={dispatch}
@@ -376,11 +377,15 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
         backgroundColor={backgroundColor}
         backgroundColors={BOARD_COLOR_VALUES}
       />
-      <ContextMenuTrigger holdToDisplay={-1} id="BoardMenu">
-        <div>{cardChildren}</div>
-      </ContextMenuTrigger>
+      
     </div>
   )
 }
 
 export default memo(Board)
+
+/*
+<ContextMenuTrigger holdToDisplay={-1} id="BoardMenu">
+  <div>{cardChildren}</div>
+</ContextMenuTrigger>
+*/

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Swatch } from 'react-color/lib/components/common'
+import { GithubPicker } from 'react-color'
 
 import { createDocumentLink, PushpinUrl } from '../../pushpin-code/ShareLink'
 
@@ -8,7 +8,7 @@ import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 import { FileDoc } from '../files'
 
-import { useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
 import Heading from '../../ui/Heading'
 import SecondaryText from '../../ui/SecondaryText'
 
@@ -25,8 +25,8 @@ import ListMenu from '../../ui/ListMenu'
 export default function ContactViewer(props: ContentProps) {
   const { documentId: contactId } = props
   const [doc] = useDocument<ContactDoc>(contactId)
-  const [avatarImageDoc] = useDocument<FileDoc>(doc.avatarDocId)
-  const avatarImageUrl = avatarImageDoc ? avatarImageDoc.avatarHyperfileUrl : DEFAULT_AVATAR_PATH
+  const [avatarImageDoc] = useDocument<FileDoc>(doc && doc.avatarDocId)
+  const avatarImageUrl = avatarImageDoc ? avatarImageDoc.fileId : DEFAULT_AVATAR_PATH
 
   if (!doc) {
     return null
@@ -49,12 +49,7 @@ export default function ContactViewer(props: ContentProps) {
         <ListMenuSection title="Presence Color">
           <ListMenuItem>
             <div className="ColorPicker__swatch">
-              <Swatch
-                color={doc.color}
-                hex={doc.color}
-                onClick={() => {}}
-                focusStyle={{ border: `0 0 4px ${doc.color}` }}
-              />
+              <div>TODO: COLOR SAMPLE HERE</div>
             </div>
           </ListMenuItem>
           <ListMenuItem>
@@ -64,19 +59,19 @@ export default function ContactViewer(props: ContentProps) {
             </SecondaryText>
           </ListMenuItem>
         </ListMenuSection>
-        {renderDevices(devices, contactUrl)}
+        {renderDevices(devices, contactId)}
         <SharesSection invites={invites} />
       </ListMenu>
     </CenteredStack>
   )
 }
 
-const renderDevices = (devices: HypermergeUrl[] | undefined, contactUrl: HypermergeUrl) => {
+const renderDevices = (devices: DocumentId[] | undefined, contactId: DocumentId) => {
   if (!devices) {
     return <SecondaryText>Something is wrong, you should always have a device!</SecondaryText>
   }
   const renderedDevices = devices
-    .map((deviceUrl: HypermergeUrl) => createDocumentLink('device', deviceUrl))
+    .map((deviceUrl: DocumentId) => createDocumentLink('device', deviceUrl))
     .map((deviceId: PushpinUrl) => (
       <ListMenuItem key={deviceId}>
         <Content context="list" url={deviceId} editable />

@@ -4,17 +4,17 @@ import mime from 'mime-types'
 
 import Content from '../../Content'
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import { parseDocumentLink, HypermergeUrl } from '../../pushpin-code/ShareLink'
+import { parseDocumentLink } from '../../pushpin-code/ShareLink'
 
 import { BoardDocCard, CardId } from '.'
 import { Position, Dimension } from './BoardGrid'
-import { useDocument } from 'automerge-repo-react-hooks'
-import { useSelf } from '../../../SelfHooks'
-import { usePresence } from '../../../PresenceHooks'
+import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { useSelf } from '../../pushpin-code/SelfHooks'
+// import { usePresence } from '../../../PresenceHooks'
 import './BoardCard.css'
-import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from '../../../constants'
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from '../..//constants'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
-import * as UriList from '../../../UriList'
+import * as UriList from '../../pushpin-code/UriList'
 
 interface CardClicked {
   type: 'CardClicked'
@@ -41,7 +41,7 @@ export type BoardCardAction = CardClicked | CardDoubleClicked | CardResized | Ca
 
 interface BoardCardProps extends BoardDocCard {
   id: CardId
-  boardUrl: HypermergeUrl
+  boardId: DocumentId
   selected: boolean
   uniquelySelected: boolean
 
@@ -56,7 +56,7 @@ function BoardCard(props: BoardCardProps) {
   const { dispatch, id, url, x, y, width, height } = props
 
   const [self] = useSelf()
-  const remotePresences = usePresence<Presence>(
+  const remotePresences: any[] = [] /* usePresence<Presence>(
     props.boardUrl,
     props.selected && self
       ? {
@@ -64,7 +64,7 @@ function BoardCard(props: BoardCardProps) {
         }
       : undefined,
     id
-  )
+  )*/
 
   const presence = remotePresences.find(
     (presence) => presence && presence.data && presence.data.color
@@ -85,8 +85,8 @@ function BoardCard(props: BoardCardProps) {
   const selectedCardsRef = useRef<NodeListOf<HTMLDivElement> | null>(null)
   const previousDistance = useRef<Position | null>(null)
 
-  const { hypermergeUrl } = parseDocumentLink(url)
-  const [doc] = useDocument<any>(hypermergeUrl)
+  const { documentId } = parseDocumentLink(url)
+  const [doc] = useDocument<any>(documentId)
 
   const {
     hyperfileUrl = null,
@@ -114,7 +114,7 @@ function BoardCard(props: BoardCardProps) {
     event.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
 
     // annotate the drag with the current board's URL so we can tell if this is where we came from
-    event.dataTransfer.setData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN, props.boardUrl)
+    event.dataTransfer.setData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN, props.boardId)
 
     event.dataTransfer.setData(UriList.MIME_TYPE, url)
 

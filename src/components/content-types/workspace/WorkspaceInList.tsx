@@ -11,8 +11,8 @@ import ContentDragHandle from '../../ui/ContentDragHandle'
 import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
 
 export default function WorkspaceListItem(props: ContentProps) {
-  const { url, hypermergeUrl } = props
-  const [doc] = useDocument<WorkspaceDoc>(hypermergeUrl)
+  const { url, documentId } = props
+  const [doc] = useDocument<WorkspaceDoc>(documentId)
   const [selfDoc] = useDocument<ContactDoc>(doc && doc.selfId)
 
   if (!doc || !selfDoc) {
@@ -31,7 +31,7 @@ export default function WorkspaceListItem(props: ContentProps) {
           <Content url={createDocumentLink('contact', selfId)} context="title-bar" />
         </div>
       </ContentDragHandle>
-      <TitleWithSubtitle title={title} subtitle={subtitle} hypermergeUrl={hypermergeUrl} />
+      <TitleWithSubtitle title={title} subtitle={subtitle} documentId={documentId} />
     </ListItem>
   )
 }

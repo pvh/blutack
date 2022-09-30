@@ -23,12 +23,14 @@ importClip && the webclipper!
 import 'line-awesome/css/line-awesome.min.css'
 useHyperfileHeader
 OmniboxWorkspaceListMenu -> InvitationsView { getDoc }
-review all the File types a
+review all the File types
+the react-contextmenu doesn't work in react 18 and is dead -> that's gonna be a project
 
 HyperFiles
  -> replace the existing hyperfile stuff with a service worker implementation
  -> find the places we reference hyperfiles (now FileIds) and call a function to make them useful URLs
  -> find the various import & ingestion places and fix those too
+"Module "path" has been externalized for browser compatibility. Cannot access "path.extname" in client code."
 
 To Replace
 ---
@@ -44,4 +46,6 @@ weird stuff around getRepo/setRepo
 workspace initialization <- calling create manually
 dark mode!
 OmniboxWorkspaceListMenu v. complicated and old
+we had a custom ColorPicker but the exports changed. I just replaced it with GithubPicker
+we had a Swatch used in the ContactEditor to show your color and it needs replacing
 
