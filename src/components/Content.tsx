@@ -48,7 +48,7 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
 
   const { type, documentId } = parseDocumentLink(url)
 
-  // useHeartbeat(['workspace'].includes(context) ? hypermergeUrl : null)
+  // useHeartbeat(['workspace'].includes(context) ? documentId : null)
 
   useEffect(() => {
     setCrashed(false)

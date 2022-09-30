@@ -1,8 +1,8 @@
 import React, { useRef } from 'react'
 import Content, { ContentProps } from '../../Content'
-import * as ContentTypes from '../../../ContentTypes'
-import { useDocument, useHyperfileHeader } from '../../../Hooks'
-import { createDocumentLink } from '../../../ShareLink'
+import * as ContentTypes from '../../pushpin-code/ContentTypes'
+import { useDocument, useHyperfileHeader } from 'automerge-repo-react-hooks'
+import { createDocumentLink } from '../../pushpin-code/ShareLink'
 import { FileDoc } from '.'
 
 import './FileContent.css'

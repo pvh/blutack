@@ -1,7 +1,7 @@
 import React from 'react'
 import { BoardDoc, icon } from '.'
 import { ContentProps } from '../../Content'
-import { useDocument } from '../../../Hooks'
+import { useDocument } from 'automerge-repo-react-hooks'
 import Badge, { Props as BadgeProps } from '../../ui/Badge'
 import ListItem from '../../ui/ListItem'
 import TitleWithSubtitle from '../../ui/TitleWithSubtitle'

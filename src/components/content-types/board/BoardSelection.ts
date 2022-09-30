@@ -1,34 +1,34 @@
-import { useStaticCallback, useSharedState } from '../../../Hooks'
+import { useStaticCallback, useSharedState } from "automerge-repo-react-hooks";
 
-export type Selection<T> = T[]
+export type Selection<T> = T[];
 
 /*
  * Selection manipulation functions
  * these functional control the currently selected set of cards
  */
-export function useSelection<T>(
-  id: string
-): {
-  selection: Selection<T>
-  selectToggle: (id: T) => void
-  selectOnly: (id: T) => void
-  selectNone: () => void
+export function useSelection<T>(id: string): {
+  selection: Selection<T>;
+  selectToggle: (id: T) => void;
+  selectOnly: (id: T) => void;
+  selectNone: () => void;
 } {
-  const [selection, setSelection] = useSharedState<T[]>(id, [])
+  const [selection, setSelection] = useSharedState<T[]>(id, []);
 
   const selectToggle = useStaticCallback((id: T) =>
     setSelection((selected: T[]) =>
-      selected.includes(id) ? selected.filter((filterId) => filterId !== id) : [...selected, id]
+      selected.includes(id)
+        ? selected.filter((filterId) => filterId !== id)
+        : [...selected, id]
     )
-  )
+  );
 
   const selectOnly = useStaticCallback((id: T) => {
-    setSelection([id])
-  })
+    setSelection([id]);
+  });
 
   const selectNone = useStaticCallback(() => {
-    setSelection([])
-  })
+    setSelection([]);
+  });
 
-  return { selection, selectOnly, selectToggle, selectNone }
+  return { selection, selectOnly, selectToggle, selectNone };
 }

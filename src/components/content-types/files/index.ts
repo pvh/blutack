@@ -15,7 +15,7 @@ export interface FileDoc {
 
 // TODO: when is this ever called?
 function create(
-  { title, extension, documentId }: CreateArgs,
+  { title, extension, documentId }: any,
   handle: DocHandle<FileDoc>
 ) {
   handle.change((doc) => {

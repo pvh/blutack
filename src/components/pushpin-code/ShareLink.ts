@@ -1,13 +1,13 @@
 import Base58 from "bs58";
-import * as url from "url";
-import * as querystring from "querystring";
 import { DocumentId } from "automerge-repo-react-hooks";
 
 export type PushpinUrl = string & { pushpin: true };
 
 export function isPushpinUrl(str: string): str is PushpinUrl {
-  const { protocol, query } = url.parse(str);
-  return protocol === "hypermerge:" && /^pushpinContentType=/.test(query || "");
+  const url = new URL(str);
+  const protocol = url.protocol;
+  const query = url.search;
+  return protocol === "pushpin:" && /^type=/.test(query || "");
 }
 
 export function createDocumentLink(
@@ -17,7 +17,7 @@ export function createDocumentLink(
   if (!type) {
     throw new Error("no type when creating URL");
   }
-  return `pushpin:/${id}?type=${type}` as PushpinUrl;
+  return `pushpin:/${docId}?type=${type}` as PushpinUrl;
 }
 
 interface Parts {
@@ -31,7 +31,7 @@ export function parseDocumentLink(link: string): Parts {
     throw new Error("Cannot parse an empty value as a link.");
   }
 
-  const { scheme, type, docId } = parts(link);
+  const { scheme, type, documentId } = parts(link);
 
   if (scheme !== "pushpin") {
     throw new Error(`Invalid url scheme: ${scheme} (expected pushpin)`);
@@ -41,22 +41,23 @@ export function parseDocumentLink(link: string): Parts {
     throw new Error(`Missing type in ${link}`);
   }
 
-  if (!docId) {
+  if (!documentId) {
     throw new Error(`Missing docId in ${link}`);
   }
-
-  const documentId = `${docId}` as DocumentId;
 
   return { scheme, type, documentId };
 }
 
 export function parts(str: string) {
-  const { protocol, pathname, query } = url.parse(str);
-  return {
-    scheme: protocol ? protocol.substr(0, protocol.length - 1) : "",
-    type: querystring.parse(query || "").pushpinContentType.toString(),
-    docId: (pathname || "").substr(1),
-  };
+  const url = new URL(str);
+
+  const protocol = url.protocol;
+  const scheme = protocol ? protocol.substr(0, protocol.length - 1) : "";
+  const documentId = (url.pathname || "").substr(1) as DocumentId;
+
+  const params = new URLSearchParams(url.search);
+  const type = params.get("type");
+  return { scheme, type, documentId };
 }
 
 export const encode = (str: string) => Base58.encode(hexToBuffer(str));

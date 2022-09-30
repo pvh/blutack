@@ -17,20 +17,28 @@ const repo = await Repo({
     ],
 })
 
-// bootstrapping: first try the window location, then check indexedDB, then make one
-let rootDocId: string | null = window.location.hash.replace(/^#/, "")
-if (!rootDocId) { rootDocId = await localforage.getItem("rootDocId") }
-if (!rootDocId) { 
-  console.log('initializing the document')
-  const rootHandle = repo.create()
-  rootDocId = rootHandle.documentId
-  await localforage.setItem("rootDocId", rootDocId)
+const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
+  let docId = new URLSearchParams(window.location.search).get(key);
+  
+  if (!docId) { docId = await localforage.getItem(key) }
+  if (!docId) { 
+    console.log('initializing the document')
+    const rootHandle = repo.create()
+    docId = rootHandle.documentId
+    await localforage.setItem(key, docId)
+  }  
+  return docId as DocumentId
 }
+
+// bootstrapping: first try the window location, then check indexedDB, then make one
+const workspaceDocId = await findOrMakeDoc("workspaceDocId")
+const selfDocId = await findOrMakeDoc("selfDocId")
+const deviceDocId = await findOrMakeDoc("deviceDocId")
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <RepoContext.Provider value={repo}>
-      <Root documentId={rootDocId as DocumentId}/>
+      <Root workspaceDocId={workspaceDocId} selfDocId={selfDocId} deviceDocId={deviceDocId}/>
     </RepoContext.Provider>
   </React.StrictMode>
 )

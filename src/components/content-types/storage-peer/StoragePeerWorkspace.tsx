@@ -1,5 +1,5 @@
 import React from 'react'
-import { createDocumentLink, HypermergeUrl } from '../../../ShareLink'
+import { createDocumentLink, HypermergeUrl } from '../../pushpin-code/ShareLink'
 import Content, { ContentProps } from '../../Content'
 import Heading from '../../ui/Heading'
 

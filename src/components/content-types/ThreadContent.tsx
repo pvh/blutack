@@ -9,6 +9,7 @@ import ContentDragHandle from '../ui/ContentDragHandle'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 import './ThreadContent.css'
 import { useDocument, DocumentId } from 'automerge-repo-react-hooks'
+import { DocHandle } from 'automerge-repo'
 
 interface Message {
   authorId: DocumentId
@@ -160,7 +161,7 @@ function groupBy<T, K extends keyof T>(items: T[], key: K): T[][] {
   return grouped
 }
 
-function create(unusedAttrs, handle) {
+function create(unusedAttrs: any, handle: DocHandle<any>) {
   handle.change((doc) => {
     doc.messages = []
   })

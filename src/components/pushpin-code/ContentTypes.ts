@@ -27,12 +27,6 @@ type Contexts = {
   [K in Context]?: Component;
 };
 
-type CreateArgs = {
-  title: string;
-  extension: string;
-  documentId: DocumentId;
-};
-
 interface ContentType {
   type: string;
   name: string;
@@ -40,13 +34,10 @@ interface ContentType {
   unlisted?: boolean;
   resizable?: boolean;
   contexts: Contexts;
-  create?: (
-    typeAttrs: CreateArgs,
-    handle: DocHandle<unknown>
-  ) => Promise<void> | void;
+  create?: (typeAttrs: any, handle: DocHandle<unknown>) => Promise<void> | void;
   createFrom?: (
     contentData: ContentData,
-    handle: DocHandle<unknown>
+    handle: DocHandle<any>
   ) => Promise<void> | void;
   supportsMimeType?: (type: string) => boolean;
 }
@@ -149,7 +140,7 @@ export function createFrom(
 ): void {
   // importFromText
   // TODO: the different content types should include mime type tests.
-  let contentType;
+  let contentType: string;
   if (contentData.mimeType === "text/html") {
     contentType = "url";
   } else if (contentData.mimeType.includes("text/")) {
@@ -160,30 +151,35 @@ export function createFrom(
   const entry = registry[contentType];
   if (!entry) return;
   if (!entry.createFrom) throw new Error("Cannot be created from file");
-  const url = __getRepo().create() as HypermergeUrl;
-  const handle = repo.open(url);
+  const handle = __getRepo().create() as DocHandle<unknown>;
   Promise.resolve(entry.createFrom(contentData, handle))
     .then(() => {
-      callback(createDocumentLink(contentType, url));
+      callback(
+        createDocumentLink(contentType, handle.documentId as DocumentId)
+      );
     })
     .catch(log);
 }
 
-export function create(type, attrs = {}, callback: CreateCallback): void {
+export function create(
+  type: string,
+  attrs = {},
+  callback: CreateCallback
+): void {
   const entry = registry[type];
   if (!entry) {
     return;
   }
 
-  const url = __getRepo().create() as HypermergeUrl;
-  const handle = __getRepo().open(url);
+  // ugh
+  const handle = __getRepo().create() as DocHandle<unknown>;
 
   if (!entry.create) {
     throw Error(`The ${type} content type cannot be created directly.`);
   }
   Promise.resolve(entry.create(attrs, handle))
     .then(() => {
-      callback(createDocumentLink(type, url));
+      callback(createDocumentLink(type, handle.documentId as DocumentId));
     })
     .catch(log);
 }

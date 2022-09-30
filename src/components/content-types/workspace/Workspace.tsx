@@ -1,41 +1,41 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import uuid from 'uuid'
-import { Handle, Crypto } from 'hypermerge'
 
-import { parseDocumentLink, PushpinUrl, HypermergeUrl, isPushpinUrl } from '../../../ShareLink'
+import { parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../pushpin-code/ShareLink'
 import Content, { ContentProps, ContentHandle } from '../../Content'
-import * as ContentTypes from '../../../ContentTypes'
-import SelfContext from '../../../SelfHooks'
+import * as ContentTypes from '../../pushpin-code/ContentTypes'
+import SelfContext from '../../pushpin-code/SelfHooks'
 import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
-import * as WebStreamLogic from '../../../../WebStreamLogic'
+import * as WebStreamLogic from '../../pushpin-code/WebStreamLogic'
 
 import './Workspace.css'
-import { useDocument, useCrypto } from '../../../Hooks'
-import {
+/* import {
   useAllHeartbeats,
   useHeartbeat,
   useContactOnlineStatus,
   useDeviceOnlineStatus,
-} from '../../../PresenceHooks'
+} from '../../../PresenceHooks' */
+
 import { BoardDoc, CardId } from '../board'
-import { useSystem } from '../../../System'
+// import { useSystem } from '../../../System'
 import { CurrentDeviceContext } from './Device'
 
 import WorkspaceInList from './WorkspaceInList'
-import { importPlainText } from '../../../ImportData'
-import * as DataUrl from '../../../../DataUrl'
+// import { importPlainText } from '../../../ImportData'
+// import * as DataUrl from '../../../../DataUrl'
+import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
 
 const log = Debug('pushpin:workspace')
 
 export interface Doc {
-  selfId: HypermergeUrl
-  contactIds: HypermergeUrl[]
+  selfId: DocumentId
+  contactIds: DocumentId[]
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
-  secretKey?: Crypto.SignedMessage<Crypto.EncodedSecretEncryptionKey>
+  // secretKey?: Crypto.SignedMessage<Crypto.EncodedSecretEncryptionKey>
 }
 
 interface WorkspaceContentProps extends ContentProps {
@@ -50,17 +50,17 @@ interface ClipperPayload {
 }
 
 export default function Workspace(props: WorkspaceContentProps) {
-  const crypto = useCrypto()
-  const [workspace, changeWorkspace] = useDocument<Doc>(props.hypermergeUrl)
+  // const crypto = useCrypto()
+  const [workspace, changeWorkspace] = useDocument<Doc>(props.documentId)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
 
-  const selfId = workspace && workspace.selfId
+  const selfId: DocumentId = workspace && workspace.selfId
   const currentDocUrl =
-    workspace && workspace.currentDocUrl && parseDocumentLink(workspace.currentDocUrl).hypermergeUrl
+    workspace && workspace.currentDocUrl && parseDocumentLink(workspace.currentDocUrl).documentId
 
   const [self, changeSelf] = useDocument<ContactDoc>(selfId)
   const currentDeviceId = currentDeviceUrl
-    ? parseDocumentLink(currentDeviceUrl).hypermergeUrl
+    ? parseDocumentLink(currentDeviceUrl).DocumentId
     : null
 
   useAllHeartbeats(selfId)
@@ -105,13 +105,13 @@ export default function Workspace(props: WorkspaceContentProps) {
       return
     }
 
-    const { hypermergeUrl } = parseDocumentLink(currentDeviceUrl)
-    if (!self.devices || !self.devices.includes(hypermergeUrl)) {
+    const { DocumentId } = parseDocumentLink(currentDeviceUrl)
+    if (!self.devices || !self.devices.includes(DocumentId)) {
       changeSelf((doc: ContactDoc) => {
         if (!doc.devices) {
           doc.devices = []
         }
-        doc.devices.push(hypermergeUrl)
+        doc.devices.push(DocumentId)
       })
     }
   }, [changeSelf, currentDeviceUrl, self])
@@ -132,7 +132,7 @@ export default function Workspace(props: WorkspaceContentProps) {
       if (!workspace || !selfId || workspace.secretKey) return
       const encryptionKeyPair = await crypto.encryptionKeyPair()
       const signedPublicKey = await crypto.sign(selfId, encryptionKeyPair.publicKey)
-      const signedSecretKey = await crypto.sign(props.hypermergeUrl, encryptionKeyPair.secretKey)
+      const signedSecretKey = await crypto.sign(props.documentId, encryptionKeyPair.secretKey)
       changeSelf((doc: ContactDoc) => {
         doc.encryptionKey = signedPublicKey
       })
@@ -232,7 +232,7 @@ export default function Workspace(props: WorkspaceContentProps) {
   return (
     <SelfContext.Provider value={workspace.selfId}>
       <div className="Workspace">
-        <TitleBar hypermergeUrl={props.hypermergeUrl} openDoc={openDoc} onContent={onContent} />
+        <TitleBar DocumentId={props.documentId} openDoc={openDoc} onContent={onContent} />
         {content}
       </div>
     </SelfContext.Provider>
@@ -260,16 +260,16 @@ const WELCOME_TEXT = `Welcome to PushPin!
 
 function create(_attrs: any, handle: Handle<Doc>) {
   ContentTypes.create('contact', {}, (selfContentUrl) => {
-    const selfHypermergeUrl = parseDocumentLink(selfContentUrl).hypermergeUrl
+    const selfDocumentId = parseDocumentLink(selfContentUrl).DocumentId
     // this is, uh, a nasty hack.
-    // we should refactor not to require the hypermergeUrl on the contact
+    // we should refactor not to require the DocumentId on the contact
     // but i don't want to pull that in scope right now
 
-    ContentTypes.create('board', { title: 'Home', selfId: selfHypermergeUrl }, (boardUrl) => {
+    ContentTypes.create('board', { title: 'Home', selfId: selfDocumentId }, (boardUrl) => {
       ContentTypes.create('text', { text: WELCOME_TEXT }, (textDocUrl) => {
         const id = uuid() as CardId
         ContentTypes.__getRepo().change(
-          parseDocumentLink(boardUrl).hypermergeUrl,
+          parseDocumentLink(boardUrl).DocumentId,
           (doc: BoardDoc) => {
             doc.cards[id] = {
               url: textDocUrl,
@@ -282,7 +282,7 @@ function create(_attrs: any, handle: Handle<Doc>) {
         )
 
         handle.change((workspace) => {
-          workspace.selfId = selfHypermergeUrl
+          workspace.selfId = selfDocumentId
           workspace.contactIds = []
           workspace.currentDocUrl = boardUrl
           workspace.viewedDocUrls = [boardUrl]

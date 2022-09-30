@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import Fs from 'fs'
-import Os from 'os'
-import * as ContentTypes from '../../../ContentTypes'
-import { PushpinUrl } from '../../../ShareLink'
-import { DEVICE_URL_PATH } from '../../../constants'
+// import Fs from 'fs'
+// import Os from 'os'
+import * as ContentTypes from '../../pushpin-code/ContentTypes'
+import { PushpinUrl } from '../../pushpin-code/ShareLink'
 import { ContentProps } from '../../Content'
-import { useDocument } from '../../../Hooks'
+import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
 import Badge from '../../ui/Badge'
 import './Device.css'
-import { useDeviceOnlineStatus } from '../../../PresenceHooks'
+// import { useDeviceOnlineStatus } from '../../../PresenceHooks'
 import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
+import { DocHandle } from 'automerge-repo'
 
 export interface DeviceDoc {
   icon: string // fa-icon name
@@ -21,8 +21,8 @@ interface Props extends ContentProps {
 }
 
 function Device(props: Props) {
-  const [doc] = useDocument<DeviceDoc>(props.hypermergeUrl)
-  const isOnline = useDeviceOnlineStatus(props.hypermergeUrl)
+  const [doc] = useDocument<DeviceDoc>(props.documentId)
+  const isOnline = false // useDeviceOnlineStatus(props.documentId)
   if (!doc) return null
   const { icon = 'desktop', name } = doc
 
@@ -52,19 +52,19 @@ function Device(props: Props) {
             title={name}
             titleEditorField="name"
             editable={props.editable}
-            hypermergeUrl={props.hypermergeUrl}
+            documentId={props.documentId}
           />
         </div>
       )
   }
 }
 
-function create(deviceAttrs, handle) {
-  ;(navigator as any).getBattery().then((b) => {
+function create(deviceAttrs: any, handle: DocHandle<any>) {
+  ;(navigator as any).getBattery().then((b: any) => {
     const isLaptop = b.chargingTime !== 0
     const icon = isLaptop ? 'laptop' : 'desktop'
     handle.change((doc: DeviceDoc) => {
-      doc.name = Os.hostname()
+      doc.name = "computer" // Os.hostname()
       doc.icon = icon
     })
   })
@@ -85,38 +85,4 @@ ContentTypes.register({
   create,
 })
 
-function loadDeviceUrl(): PushpinUrl | null {
-  if (Fs.existsSync(DEVICE_URL_PATH)) {
-    const json = JSON.parse(Fs.readFileSync(DEVICE_URL_PATH, { encoding: 'utf-8' }))
-    if (json.deviceUrl) {
-      return json.deviceUrl
-    }
-  }
-  return null
-}
-
-function saveDeviceUrl(deviceUrl: PushpinUrl): void {
-  const deviceUrlData = { deviceUrl }
-  Fs.writeFileSync(DEVICE_URL_PATH, JSON.stringify(deviceUrlData))
-}
-
-// I might not want to export setDeviceUrl...
-export function useCurrentDeviceUrl(): PushpinUrl | null {
-  const [deviceUrl, setDeviceUrl] = useState<PushpinUrl | null>(null)
-
-  useEffect(() => {
-    const existingDeviceUrl = loadDeviceUrl()
-    if (existingDeviceUrl) {
-      setDeviceUrl(existingDeviceUrl)
-    } else {
-      ContentTypes.create('device', {}, (newDeviceUrl: PushpinUrl) => {
-        saveDeviceUrl(newDeviceUrl)
-        setDeviceUrl(newDeviceUrl)
-      })
-    }
-  })
-
-  return deviceUrl
-}
-
-export const CurrentDeviceContext = React.createContext<PushpinUrl | null>(null)
+export const CurrentDeviceContext = React.createContext<DocumentId | null>(null)

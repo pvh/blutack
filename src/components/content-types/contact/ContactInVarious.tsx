@@ -5,11 +5,11 @@ import classNames from 'classnames'
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
-import { createDocumentLink } from '../../../ShareLink'
-import { DEFAULT_AVATAR_PATH } from '../../../constants'
+import { createDocumentLink } from '../../pushpin-code/ShareLink'
+import { DEFAULT_AVATAR_PATH } from '../../constants'
 
 import './ContactInVarious.css'
-import { useDocument } from '../../../Hooks'
+import { useDocument } from 'automerge-repo-react-hooks'
 import ConnectionStatusBadge from './ConnectionStatusBadge'
 import ListItem from '../../ui/ListItem'
 import ContentDragHandle from '../../ui/ContentDragHandle'
@@ -27,7 +27,7 @@ export interface ContactProps extends ContentProps {
 }
 
 export default function ContactInVarious(props: ContactProps) {
-  const [contact] = useDocument<ContactDoc>(props.hypermergeUrl)
+  const [contact] = useDocument<ContactDoc>(props.documentId)
 
   const avatarDocId = contact ? contact.avatarDocId : null
   const name = contact ? contact.name : null
@@ -36,7 +36,7 @@ export default function ContactInVarious(props: ContactProps) {
     return null
   }
 
-  const { context, url, hypermergeUrl, isPresent } = props
+  const { context, url, documentId, isPresent } = props
   const { color } = contact
 
   const avatarImage = avatarDocId ? (
@@ -60,7 +60,7 @@ export default function ContactInVarious(props: ContactProps) {
         {avatarImage}
       </div>
       <div className="Contact-status">
-        <ConnectionStatusBadge contactId={props.hypermergeUrl} />
+        <ConnectionStatusBadge contactId={props.documentId} />
       </div>
     </div>
   )
@@ -70,7 +70,7 @@ export default function ContactInVarious(props: ContactProps) {
       return (
         <ListItem>
           <ContentDragHandle url={url}>{avatar}</ContentDragHandle>
-          <TitleWithSubtitle title={name || 'Unknown Contact'} hypermergeUrl={hypermergeUrl} />
+          <TitleWithSubtitle title={name || 'Unknown Contact'} documentId={documentId} />
         </ListItem>
       )
 

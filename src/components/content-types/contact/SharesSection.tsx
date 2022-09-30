@@ -1,7 +1,7 @@
 import React from 'react'
 import { DocUrl } from 'hypermerge'
 
-import { createDocumentLink } from '../../../ShareLink'
+import { createDocumentLink } from '../../pushpin-code/ShareLink'
 import Content from '../../Content'
 import Heading from '../../ui/Heading'
 import SecondaryText from '../../ui/SecondaryText'

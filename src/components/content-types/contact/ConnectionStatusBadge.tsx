@@ -1,15 +1,15 @@
-import React from 'react'
-import { HypermergeUrl } from '../../../ShareLink'
+import { DocumentId } from 'automerge-repo-react-hooks'
 import Badge, { BadgeSize } from '../../ui/Badge'
-import { useConnectionStatus } from '../../../PresenceHooks'
+// import { useConnectionStatus } from '../../../PresenceHooks'
 import './ConnectionStatusBadge.css'
 
 export interface Props {
-  contactId: HypermergeUrl
+  contactId: DocumentId
   size?: BadgeSize
   hover?: boolean
 }
 
+type ConnectionStatus = 'not-connected' | 'self-no-devices' | 'self-unreachable' | 'connected'
 const STATUS = {
   'not-connected': {
     /* nothing, we return null */
@@ -35,10 +35,12 @@ const STATUS = {
 }
 
 export default function ConnectionStatusBadge({ contactId, size = 'tiny', hover = true }: Props) {
-  const status = useConnectionStatus(contactId)
-  if (status === 'not-connected') {
+  const status: ConnectionStatus = 'connected' // useConnectionStatus(contactId)
+
+  /* TODO: if (status === 'not-connected') {
     return null
-  }
+  } */
+  
   return (
     <div className="OwnDevice-ConnectionStatus">
       <Badge

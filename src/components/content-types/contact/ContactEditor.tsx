@@ -1,31 +1,29 @@
 import React, { useContext, useRef, Ref, ChangeEvent } from 'react'
-import { HyperfileUrl } from 'hypermerge'
 
 import Automerge from 'automerge'
 import {
   createDocumentLink,
   PushpinUrl,
   parseDocumentLink,
-  HypermergeUrl,
-} from '../../../ShareLink'
+} from '../../pushpin-code/ShareLink'
 
-import { DEFAULT_AVATAR_PATH } from '../../../constants'
+import { DEFAULT_AVATAR_PATH } from '../../constants'
 import { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 import { FileDoc } from '../files'
 
 import ColorPicker from '../../ui/ColorPicker'
-import { useDocument } from '../../../Hooks'
+import { useDocument } from 'automerge-repo-react-hooks'
 import Heading from '../../ui/Heading'
 import SecondaryText from '../../ui/SecondaryText'
 
 import { CurrentDeviceContext } from '../workspace/Device'
-import { importFileList } from '../../../ImportData'
+// import { importFileList } from '../../../ImportData'
 import ConnectionStatusBadge from './ConnectionStatusBadge'
-import { useConnectionStatus } from '../../../PresenceHooks'
+// import { useConnectionStatus } from '../../../PresenceHooks'
 import Badge from '../../ui/Badge'
 import CenteredStack from '../../ui/CenteredStack'
-import { without } from '../../../Misc'
+import { without } from '../../pushpin-code/Misc'
 import ContactEditorDevice, { OnRemoveDevice } from './ContactEditorDevice'
 import ListMenuSection from '../../ui/ListMenuSection'
 import ListMenuItem from '../../ui/ListMenuItem'
@@ -68,22 +66,22 @@ export default function ContactEditor(props: ContentProps) {
   // xxx: only allow images & only one
   const onFilesChanged = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
-    importFileList(e.target.files, (url) =>
+    /* importFileList(e.target.files, (url) =>
       changeDoc((doc) => {
-        const { hypermergeUrl } = parseDocumentLink(url)
-        doc.avatarDocId = hypermergeUrl
+        const { documentId } = parseDocumentLink(url)
+        doc.avatarDocId = documentId
       })
-    )
+    )*/
   }
 
   function removeDevice(url: PushpinUrl) {
-    const { hypermergeUrl: deviceUrl } = parseDocumentLink(url)
+    const { documentId: deviceId } = parseDocumentLink(url)
     changeDoc((d) => {
-      const devices = d.devices as Automerge.List<HypermergeUrl>
+      const devices = d.devices
       if (!devices) {
         return
       }
-      without(deviceUrl, devices)
+      without(deviceId, devices)
     })
   }
 

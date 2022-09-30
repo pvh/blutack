@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import Debug from 'debug'
 
-import { HypermergeUrl, PushpinUrl, parseDocumentLink } from '../../../ShareLink'
+import { HypermergeUrl, PushpinUrl, parseDocumentLink } from '../../pushpin-code/ShareLink'
 import { Doc as WorkspaceDoc } from './Workspace'
 import Author from './Author'
 
 import './Authors.css'
-import { useDocument } from '../../../Hooks'
+import { useDocument } from 'automerge-repo-react-hooks'
 import { useSelfId } from '../../../SelfHooks'
 import { usePresence } from '../../../PresenceHooks'
 

@@ -20,7 +20,7 @@ export interface ContactDoc {
   encryptionKey?: null; // Crypto.SignedMessage<Crypto.EncodedPublicEncryptionKey>;
 }
 
-function create(_typeAttrs, handle: DocHandle<ContactDoc>) {
+function create(_typeAttrs: any, handle: DocHandle<ContactDoc>) {
   handle.change((doc) => {
     doc.name = "Someone";
     const USER_COLOR_VALUES = Object.values(USER_COLORS);

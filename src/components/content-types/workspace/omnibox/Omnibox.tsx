@@ -9,7 +9,7 @@ import { HypermergeUrl, parseDocumentLink, PushpinUrl } from '../../../../ShareL
 import { WorkspaceUrlsApi } from '../../../../WorkspaceHooks'
 import OmniboxWorkspace from './OmniboxWorkspace'
 import './Omnibox.css'
-import { useEvent } from '../../../../Hooks'
+import { useEvent } from '../automerge-repo-react-hooks'
 import ListMenuSection from '../../../ui/ListMenuSection'
 
 const log = Debug('pushpin:omnibox')

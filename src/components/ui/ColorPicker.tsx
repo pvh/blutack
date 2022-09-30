@@ -1,7 +1,10 @@
 import React from 'react'
 
-import { CustomPicker } from 'react-color'
-import { Swatch } from 'react-color/lib/components/common'
+// import { CustomPicker } from 'react-color'
+// import { Swatch } from 'react-color/lib/components/common'
+const Swatch = (args: any) => <div>SWATCHYSWATCH</div>
+const CustomPicker = (args: any) => args
+
 import './ColorPicker.css'
 
 interface Props {

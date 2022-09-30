@@ -1,9 +1,9 @@
 import React from 'react'
 import { Doc } from 'hypermerge'
-import { parseDocumentLink, PushpinUrl } from '../../../ShareLink'
-import * as ContentTypes from '../../../ContentTypes'
+import { parseDocumentLink, PushpinUrl } from '../../pushpin-code/ShareLink'
+import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import Badge from '../../ui/Badge'
-import { useDocument } from '../../../Hooks'
+import { useDocument } from 'automerge-repo-react-hooks'
 import ContentDragHandle from '../../ui/ContentDragHandle'
 
 interface Props {

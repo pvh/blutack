@@ -1,14 +1,15 @@
 import React from 'react'
-import { Swatch } from 'react-color/lib/components/common'
+// import { Swatch } from 'react-color/lib/components/common'
+const Swatch = () => <div>SWATCH</div>
 
-import { createDocumentLink, PushpinUrl, HypermergeUrl } from '../../../ShareLink'
+import { createDocumentLink, PushpinUrl } from '../../pushpin-code/ShareLink'
 
-import { DEFAULT_AVATAR_PATH } from '../../../constants'
+import { DEFAULT_AVATAR_PATH } from '../../constants'
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 import { FileDoc } from '../files'
 
-import { useDocument } from '../../../Hooks'
+import { useDocument } from 'automerge-repo-react-hooks'
 import Heading from '../../ui/Heading'
 import SecondaryText from '../../ui/SecondaryText'
 
@@ -23,10 +24,10 @@ import './ContactEditor.css'
 import ListMenu from '../../ui/ListMenu'
 
 export default function ContactViewer(props: ContentProps) {
-  const { hypermergeUrl: contactUrl } = props
-  const [doc] = useDocument<ContactDoc>(contactUrl)
-  const [avatarImageDoc] = useDocument<FileDoc>(doc && doc.avatarDocId)
-  const { hyperfileUrl: avatarHyperfileUrl = null } = avatarImageDoc || {}
+  const { documentId: contactId } = props
+  const [doc] = useDocument<ContactDoc>(contactId)
+  const [avatarImageDoc] = useDocument<FileDoc>(doc.avatarDocId)
+  const avatarImageUrl = avatarImageDoc ? avatarImageDoc.avatarHyperfileUrl : DEFAULT_AVATAR_PATH
 
   if (!doc) {
     return null
@@ -43,7 +44,7 @@ export default function ContactViewer(props: ContentProps) {
         </ListMenuSection>
         <ListMenuSection title="Avatar">
           <ListMenuItem>
-            <Badge img={avatarHyperfileUrl || DEFAULT_AVATAR_PATH} />
+            <Badge img={avatarImageUrl} />
           </ListMenuItem>
         </ListMenuSection>
         <ListMenuSection title="Presence Color">

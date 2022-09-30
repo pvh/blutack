@@ -1,3 +1,4 @@
+import { DocumentId } from "automerge-repo-react-hooks";
 import mime from "mime-types";
 import * as WebStreamLogic from "./WebStreamLogic";
 
@@ -27,8 +28,10 @@ export function fromString(str: string, mimeType: string = "text/plain") {
   };
 }
 
-export async function toDocumentId(contentData: ContentData): Promise<FileUrl> {
+export async function toDocumentId(
+  contentData: ContentData
+): Promise<DocumentId> {
   // const header = await Hyperfile.write(contentData.data, contentData.mimeType);
   // return header.url;
-  return "a hyperfile url" as FileUrl;
+  return "a hyperfile url" as DocumentId;
 }

@@ -12,7 +12,7 @@ import { ContextMenuTrigger } from 'react-contextmenu'
 
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import * as ImportData from '../../../ImportData'
-import { PushpinUrl } from '../../../ShareLink'
+import { PushpinUrl } from '../../pushpin-code/ShareLink'
 import { ContentProps } from '../../Content'
 import { BoardDoc, BoardDocCard, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
@@ -30,7 +30,7 @@ import {
 } from './BoardDocManipulation'
 
 import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN, MIMETYPE_BOARD_CARD_DATA } from '../../../constants'
-import { useDocumentReducer } from '../../../Hooks'
+import { useDocumentReducer } from 'automerge-repo-react-hooks'
 
 const log = Debug('pushpin:board')
 
@@ -208,13 +208,13 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
 
       // If we have an origin board, and it's us, this is a move operation.
       const originBoard = e.dataTransfer.getData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN)
-      if (originBoard === props.hypermergeUrl) {
+      if (originBoard === props.documentId) {
         onDropInternal(e)
       } else {
         onDropExternal(e)
       }
     },
-    [onDropExternal, props.hypermergeUrl]
+    [onDropExternal, props.documentId]
   )
 
   const onPaste = useCallback(

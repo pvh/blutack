@@ -7,7 +7,7 @@ import { IpcMessageEvent } from 'electron'
 
 import { Handle, HyperfileUrl } from 'hypermerge'
 import * as Hyperfile from '../../hyperfile'
-import * as ContentTypes from '../../ContentTypes'
+import * as ContentTypes from '../pushpin-code/ContentTypes'
 import { ContentProps } from '../Content'
 import { ChangeFn, useDocument, useEvent } from '../../Hooks'
 import './UrlContent.css'

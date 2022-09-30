@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ContentProps } from '../../Content'
 import { BoardDoc, icon } from '.'
-import { useDocument } from '../../../Hooks'
+import { useDocument } from 'automerge-repo-react-hooks'
 import './BoardInBoard.css'
 import Badge from '../../ui/Badge'
 import SecondaryText from '../../ui/SecondaryText'

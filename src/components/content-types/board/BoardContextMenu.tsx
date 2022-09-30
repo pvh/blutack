@@ -4,7 +4,7 @@ import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
 
 import ColorPicker from '../../ui/ColorPicker'
 import './ContextMenu.css'
-import * as ContentTypes from '../../../ContentTypes'
+import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import { importFileList } from '../../../ImportData'
 import { BoardAction } from './Board'
 import { gridOffset, Position } from './BoardGrid'

@@ -1,7 +1,7 @@
 import React from 'react'
 import Content from '../../Content'
-import { HypermergeUrl, createDocumentLink } from '../../../ShareLink'
-import { useDocument } from '../../../Hooks'
+import { HypermergeUrl, createDocumentLink } from '../../pushpin-code/ShareLink'
+import { useDocument } from 'automerge-repo-react-hooks'
 import { ContactDoc } from '../contact'
 import './Author.css'
 
