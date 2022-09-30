@@ -5,28 +5,28 @@ import React, { useRef, useState, useCallback, useEffect } from 'react'
 import Debug from 'debug'
 import classNames from 'classnames'
 
-import { parseDocumentLink, PushpinUrl } from '../../../pushpin-code/ShareLink'
+import { createDocumentLink, parseDocumentLink, PushpinUrl } from '../../../pushpin-code/ShareLink'
 import OmniboxWorkspace from './OmniboxWorkspace'
 import './Omnibox.css'
 import { useEvent } from '../../../pushpin-code/Hooks'
 import ListMenuSection from '../../../ui/ListMenuSection'
+import { DocumentId } from 'automerge-repo-react-hooks'
 
 const log = Debug('pushpin:omnibox')
 
 export interface Props {
   active: boolean
-  hypermergeUrl: HypermergeUrl
+  documentId: DocumentId
   omniboxFinished: Function
-  workspaceUrlsContext: WorkspaceUrlsApi | null
   onContent: (url: PushpinUrl) => boolean
 }
 
 export default function Omnibox(props: Props) {
-  const { active, workspaceUrlsContext, omniboxFinished, onContent } = props
+  const { active, documentId, omniboxFinished, onContent } = props
   const omniboxInput = useRef<HTMLInputElement>(null)
   const [search, setSearch] = useState('')
 
-  const onInputChange = useCallback((e) => {
+  const onInputChange = useCallback((e: any /* FIXME */ ) => {
     setSearch(e.target.value)
   }, [])
 
@@ -59,11 +59,9 @@ export default function Omnibox(props: Props) {
 
   log('render')
 
-  if (!workspaceUrlsContext) {
-    return null
-  }
-
-  const { workspaceUrls } = workspaceUrlsContext
+  // TODO: we had support for multiple workspace URLs in the omnibox
+  // but i haven't wired that up and maybe we don't want to have it really
+  const workspaceUrls = [ createDocumentLink("workspace", documentId) ]
 
   return (
     <div
@@ -83,14 +81,14 @@ export default function Omnibox(props: Props) {
       </div>
       <div className="Omnibox-Workspaces">
         {workspaceUrls.slice(0, 1).map((url, i) => {
-          const { hypermergeUrl } = parseDocumentLink(url)
+          const { documentId } = parseDocumentLink(url)
           return (
             <OmniboxWorkspace
               key={url}
               viewContents
               onContent={onContent}
               omniboxFinished={omniboxFinished}
-              hypermergeUrl={hypermergeUrl}
+              documentId={documentId}
               search={search}
               active={active}
             />
@@ -99,14 +97,14 @@ export default function Omnibox(props: Props) {
         {workspaceUrls.length > 1 ? (
           <ListMenuSection title="Other Accounts">
             {workspaceUrls.slice(1).map((url, i) => {
-              const { hypermergeUrl } = parseDocumentLink(url)
+              const { documentId } = parseDocumentLink(url)
               return (
                 <OmniboxWorkspace
                   key={url}
                   viewContents={false}
                   onContent={onContent}
                   omniboxFinished={omniboxFinished}
-                  hypermergeUrl={hypermergeUrl}
+                  documentId={documentId}
                   search={search}
                   active={active}
                 />

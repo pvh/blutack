@@ -1,19 +1,20 @@
 import React from 'react'
 import Badge from '../../../ui/Badge'
 import ListItem from '../../../ui/ListItem'
-import { PushpinUrl, HypermergeUrl } from '../../../../ShareLink'
+import { PushpinUrl } from '../../../pushpin-code/ShareLink'
 import ContentDragHandle from '../../../ui/ContentDragHandle'
 import TitleWithSubtitle from '../../../ui/TitleWithSubtitle'
+import { DocumentId } from 'automerge-repo-react-hooks'
 
 export interface Props {
   url: PushpinUrl
-  hypermergeUrl: HypermergeUrl
+  documentId: DocumentId
   invitation: any
   selected?: boolean
 }
 
 export default function InvitationListItem(props: Props) {
-  const { invitation, url, hypermergeUrl } = props
+  const { invitation, url, documentId } = props
 
   const title = invitation.doc.title || 'Untitled'
   const subtitle = `From ${invitation.sender.name}`
@@ -23,7 +24,7 @@ export default function InvitationListItem(props: Props) {
       <ContentDragHandle url={url}>
         <Badge icon="envelope" backgroundColor={invitation.doc && invitation.doc.backgroundColor} />
       </ContentDragHandle>
-      <TitleWithSubtitle title={title} subtitle={subtitle} hypermergeUrl={hypermergeUrl} />
+      <TitleWithSubtitle title={title} subtitle={subtitle} documentId={documentId} />
     </ListItem>
   )
 }

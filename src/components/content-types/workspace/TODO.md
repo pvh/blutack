@@ -25,6 +25,7 @@ importClip && the webclipper!
 import './ibm-plex.css'
 import 'line-awesome/css/line-awesome.min.css'
 useHyperfileHeader
+OmniboxWorkspaceListMenu -> InvitationsView { getDoc }
 
 To Replace
 ---
@@ -37,4 +38,7 @@ To improve
 ----
 create() functions would benefit from better typing for DocHandle
 weird stuff around getRepo/setRepo
-workspace initialization <- calling create weirdly
+workspace initialization <- calling create manually
+dark mode!
+get rid of maybeUseDocument?
+OmniboxWorkspaceListMenu v. complicated and old

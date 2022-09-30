@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react'
-import { DocUrl } from 'hypermerge'
-import { clipboard } from 'electron'
-import { createDocumentLink, PushpinUrl } from '../../../../ShareLink'
-import { useDocument, useRepo } from '../automerge-repo-react-hooks'
+// import { clipboard } from 'electron'
+import { createDocumentLink, PushpinUrl } from '../../../pushpin-code/ShareLink'
+import { DocumentId, maybeUseDocument, useDocument, useRepo } from 'automerge-repo-react-hooks'
 import Content from '../../../Content'
 import { WorkspaceDoc as WorkspaceDoc } from '../Workspace'
 import { ContactDoc } from '../../contact'
@@ -16,29 +15,29 @@ export interface Props {
   viewContents: boolean
   active: boolean
   search: string
-  hypermergeUrl: DocUrl
+  documentId: DocumentId
   omniboxFinished: Function
   onContent: (url: PushpinUrl) => boolean
 }
 
 export default function OmniboxWorkspace(props: Props) {
-  const { active, search, hypermergeUrl, omniboxFinished, viewContents, onContent } = props
-  const [workspaceDoc] = useDocument<WorkspaceDoc>(hypermergeUrl)
-  const [selfDoc] = useDocument<ContactDoc>(workspaceDoc && workspaceDoc.selfId)
+  const { active, search, documentId, omniboxFinished, viewContents, onContent } = props
+  const [workspaceDoc] = useDocument<WorkspaceDoc>(documentId)
+  const [selfDoc] = maybeUseDocument<ContactDoc>(workspaceDoc && workspaceDoc.selfId)
   const repo = useRepo()
 
   const onClickWorkspace = useCallback(
-    (e) => {
+    () => {
       omniboxFinished()
     },
     [omniboxFinished]
   )
 
   const onClickWorkspaceCopy = useCallback(
-    (e) => {
-      clipboard.writeText(createDocumentLink('workspace', hypermergeUrl))
+    () => {
+      // clipboard.writeText(createDocumentLink('workspace', hypermergeUrl))
     },
-    [hypermergeUrl]
+    [documentId]
   )
 
   if (!selfDoc || !workspaceDoc) {
@@ -51,7 +50,7 @@ export default function OmniboxWorkspace(props: Props) {
   return (
     <div className="OmniboxWorkspace" onClick={onClickWorkspace}>
       <ListMenuHeader>
-        <a href={createDocumentLink('workspace', hypermergeUrl)} className="OmniboxWorkspace-name">
+        <a href={createDocumentLink('workspace', documentId)} className="OmniboxWorkspace-name">
           {name}&apos;s Documents
         </a>
         <div className="OmniboxWorkspace-badge" key="contact">
@@ -68,7 +67,7 @@ export default function OmniboxWorkspace(props: Props) {
           active={active}
           search={search}
           onContent={onContent}
-          hypermergeUrl={hypermergeUrl}
+          hypermergeUrl={documentId}
           omniboxFinished={omniboxFinished}
         />
       )}

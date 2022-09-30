@@ -4,17 +4,14 @@
 import React from 'react'
 import Debug from 'debug'
 
-import { Handle, Doc, DocUrl, RepoFrontend } from 'hypermerge'
-
 import {
   createDocumentLink,
   parseDocumentLink,
-  HypermergeUrl,
   PushpinUrl,
-} from '../../../../ShareLink'
-import { getDoc } from '../../../../Misc'
+} from '../../../pushpin-code/ShareLink'
+// import { getDoc } from '../../../../Misc'
 
-import InvitationsView from '../../../../InvitationsView'
+// import InvitationsView from '../../../../InvitationsView'
 import { ContactDoc } from '../../contact'
 import Badge from '../../../ui/Badge'
 import './Omnibox.css'
@@ -28,14 +25,17 @@ import { WorkspaceDoc as WorkspaceDoc } from '../Workspace'
 import './OmniboxWorkspaceListMenu.css'
 import ActionListItem from './ActionListItem'
 import Heading from '../../../ui/Heading'
+import { DocumentId } from 'automerge-repo-react-hooks'
+import { DocCollection, DocHandle, DocHandleEventArg } from 'automerge-repo'
+import { Doc } from 'automerge'
 
 const log = Debug('pushpin:omnibox')
 
 export interface Props {
   active: boolean
   search: string
-  hypermergeUrl: DocUrl
-  repo: RepoFrontend // this is not a great interface, but beats window.repo
+  documentId: DocumentId
+  repo: DocCollection // this is not a great interface, but beats window.repo
   omniboxFinished: Function
   onContent: (url: PushpinUrl) => boolean
 }
@@ -46,6 +46,16 @@ interface State {
   viewedDocs: { [docUrl: string]: Doc<any> } // PushpinUrl
   contacts: { [contactId: string]: Doc<ContactDoc> } // HypermergeUrl
   doc?: Doc<WorkspaceDoc>
+}
+
+interface MenuAction {
+  name: string,
+  faIcon: string,
+  label: string,
+  shortcut: string,
+  destructive?: boolean,
+  keysForActionPressed: (e: KeyboardEvent) => boolean
+  callback: (url: PushpinUrl) => () => void,
 }
 
 interface SectionIndex {
@@ -83,9 +93,9 @@ export interface Action {
 
 export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props, State> {
   omniboxInput = React.createRef<HTMLInputElement>()
-  handle?: Handle<WorkspaceDoc>
-  viewedDocHandles: { [docUrl: string]: Handle<any> }
-  contactHandles: { [contactId: string]: Handle<ContactDoc> }
+  handle?: DocHandle<WorkspaceDoc>
+  viewedDocHandles: { [docUrl: string]: DocHandle<any> }
+  contactHandles: { [contactId: string]: DocHandle<ContactDoc> }
   invitationsView: any
 
   state: State = {
@@ -95,7 +105,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     contacts: {},
   }
 
-  constructor(props) {
+  constructor(props: any /* TODO */) {
     super(props)
     this.viewedDocHandles = {}
     this.contactHandles = {}
@@ -103,36 +113,40 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
 
   componentDidMount = () => {
     log('componentDidMount')
-    this.refreshHandle(this.props.hypermergeUrl)
+    this.refreshHandle(this.props.documentId)
     document.addEventListener('keydown', this.handleCommandKeys)
-    this.invitationsView = new InvitationsView(
+    /*this.invitationsView = new InvitationsView(
       this.props.repo,
       this.props.hypermergeUrl,
       this.onInvitationsChange
-    )
+    )*/
   }
 
   componentWillUnmount = () => {
     log('componentWillUnmount')
-    this.handle && this.handle.close()
+    // TODO: might want to do this
+    /* this.handle && this.handle.close()
     document.removeEventListener('keydown', this.handleCommandKeys)
 
     Object.values(this.viewedDocHandles).forEach((handle) => handle.close())
-    Object.values(this.contactHandles).forEach((handle) => handle.close())
+    Object.values(this.contactHandles).forEach((handle) => handle.close()) 
+    */
   }
 
   componentDidUpdate = (prevProps: Props) => {
     log('componentDidUpdate')
-    if (prevProps.hypermergeUrl !== this.props.hypermergeUrl) {
-      this.refreshHandle(this.props.hypermergeUrl)
+    if (prevProps.documentId !== this.props.documentId) {
+      this.refreshHandle(this.props.documentId)
     }
   }
 
-  refreshHandle = (hypermergeUrl: HypermergeUrl) => {
+  refreshHandle = (documentId: DocumentId) => {
     if (this.handle) {
-      this.handle.close()
+      // TODO FIXME: yikes 
+      // this.handle.close()
     }
-    this.handle = this.props.repo.watch(hypermergeUrl, (doc) => this.onChange(doc))
+    this.handle = this.props.repo.find(documentId)
+    this.handle.addListener("change", e => this.onChange(e))
   }
 
   onInvitationsChange = (invitations: any) => {
@@ -140,17 +154,19 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     this.setState({ invitations }, () => this.forceUpdate())
   }
 
-  onChange = (doc: Doc<WorkspaceDoc>) => {
+  onChange = ({ doc }: DocHandleEventArg<WorkspaceDoc>) => {
     log('onChange', doc)
+    if (!this) { throw new Error("c'mon man")}
     this.setState({ doc }, () => {
       this.state.doc &&
         this.state.doc.viewedDocUrls.forEach((url) => {
           // create a handle for this document
           if (!this.viewedDocHandles[url]) {
-            const { hypermergeUrl } = parseDocumentLink(url)
+            const { documentId } = parseDocumentLink(url)
             // when it changes, stick the contents of the document
             // into this.state.viewedDocs[url]
-            const handle = this.props.repo.watch(hypermergeUrl, (doc) => {
+            const handle = this.props.repo.find(documentId)
+            handle.addListener('change', ({ doc }: DocHandleEventArg<unknown>) => {
               this.setState((state) => {
                 return { viewedDocs: { ...state.viewedDocs, [url]: doc } }
               })
@@ -165,7 +181,8 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
           if (!this.contactHandles[contactId]) {
             // when it changes, put it into this.state.contacts[contactId]
 
-            const handle = this.props.repo.watch<ContactDoc>(contactId, (doc) => {
+            const handle = this.props.repo.find<ContactDoc>(contactId)
+            handle.addListener("change", ({doc}: DocHandleEventArg<ContactDoc>) => {
               this.setState((state) => {
                 return { contacts: { ...state.contacts, [contactId]: doc } }
               })
@@ -215,7 +232,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     }
   }
 
-  setSelection = (newIndex) => {
+  setSelection = (newIndex: number) => {
     this.setState({ selectedIndex: newIndex })
   }
 
@@ -246,7 +263,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     const sectionIndices: { [section: string]: SectionRange } = {}
     const { search } = this.props
 
-    let searchRegEx
+    let searchRegEx: RegExp | null
     // if we have an invalid regex, shortcircuit out of here
     try {
       searchRegEx = new RegExp(search, 'i')
@@ -302,7 +319,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     return { items, sectionIndices }
   }
 
-  sectionItems = (name) => {
+  sectionItems = (name: string) => {
     const { items, sectionIndices } = this.menuSections()
     const sectionRange = sectionIndices[name]
 
@@ -314,7 +331,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   /* begin actions */
-  view = {
+  view: MenuAction = {
     name: 'view',
     faIcon: 'fa-compass',
     label: 'View',
@@ -323,7 +340,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     callback: (url) => () => this.navigate(url),
   }
 
-  invite = {
+  invite: MenuAction = {
     name: 'invite',
     faIcon: 'fa-share-alt',
     label: 'Invite',
@@ -332,7 +349,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     callback: (url) => () => this.offerDocumentToIdentity(url),
   }
 
-  archive = {
+  archive: MenuAction = {
     name: 'archive',
     destructive: true,
     faIcon: 'fa-trash',
@@ -342,7 +359,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     callback: (url) => () => this.archiveDocument(url),
   }
 
-  unarchive = {
+  unarchive: MenuAction = {
     name: 'unarchive',
     faIcon: 'fa-trash-restore',
     label: 'Unarchive',
@@ -351,7 +368,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     callback: (url) => () => this.unarchiveDocument(url),
   }
 
-  place = {
+  place: MenuAction = {
     name: 'place',
     faIcon: 'fa-download',
     label: 'Place',
@@ -435,13 +452,15 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
         Object.entries(this.state.contacts)
           .filter(([id, doc]) => doc.name)
           .filter(([id, doc]) => doc.name.match(new RegExp(props.search, 'i')))
-          .map(([id, doc]) => ({ url: createDocumentLink('contact', id as HypermergeUrl) })),
+          .map(([id, doc]) => ({ url: createDocumentLink('contact', id as DocumentId) })),
     },
   ]
   /* end sections */
 
-  navigate = (url) => {
-    window.location = url
+  navigate = (url: PushpinUrl) => {
+    // this weird typecast is to work around a typescript bug,
+    // maybe try removing it and see if it's better.
+    (window as Window).location = url as string
     this.props.omniboxFinished()
   }
 
@@ -457,7 +476,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     }
 
     // XXX out of scope RN but consider if we should change the key for consistency?
-    const { type, hypermergeUrl: recipientUrl } = parseDocumentLink(recipientPushpinUrl)
+    const { type, documentId: recipientId } = parseDocumentLink(recipientPushpinUrl)
     const { doc: workspace } = this.state
 
     if (!workspace || !workspace.selfId) {
@@ -470,15 +489,18 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       )
     }
 
-    const senderSecretKey =
+    alert("Sharing is broken")
+
+    /*const senderSecretKey =
       workspace.secretKey &&
       (await this.props.repo.crypto.verifiedMessage(this.props.hypermergeUrl, workspace.secretKey))
     if (!senderSecretKey) {
       throw new Error(
         'Workspace is missing encryption key. Sharing is disabled until the workspace is migrated to support encrypted sharing. Open the workspace on the device on which it was first created to migrate the workspace.'
       )
-    }
+    }*/
 
+    /*
     const recipient = await getDoc<ContactDoc>(this.props.repo, recipientUrl)
     const recipientPublicKey =
       recipient.encryptionKey &&
@@ -492,8 +514,10 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       recipientPublicKey,
       workspace.currentDocUrl
     )
+    */
 
-    this.props.repo.change(workspace.selfId, (s: ContactDoc) => {
+    const handle = this.props.repo.find<ContactDoc>(workspace.selfId)
+    handle.change((s: ContactDoc) => {
       if (!s.invites) {
         s.invites = {}
       }
@@ -501,16 +525,17 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       // XXX right now this code leaks identity documents and document URLs to
       //     every single person who knows you
       // TODO: encrypt identity
-      if (!s.invites[recipientUrl]) {
-        s.invites[recipientUrl] = []
+      if (!s.invites[recipientId]) {
+        s.invites[recipientId] = []
       }
 
       // TODO: prevent duplicate shares.
-      s.invites[recipientUrl].push(box)
+      // should be "box" we push
+      s.invites[recipientId].push(workspace.currentDocUrl)
     })
   }
 
-  archiveDocument = (url) => {
+  archiveDocument = (url: PushpinUrl) => {
     this.handle &&
       this.handle.change((doc) => {
         if (!doc.archivedDocUrls) {
@@ -559,7 +584,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       const invitation = item.object
 
       const url = invitation.documentUrl
-      const { hypermergeUrl } = parseDocumentLink(url)
+      const { documentId } = parseDocumentLink(url)
 
       return (
         <ActionListItem
@@ -569,7 +594,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
           actions={actions}
           selected={item.selected}
         >
-          <InvitationListItem invitation={invitation} url={url} hypermergeUrl={hypermergeUrl} />
+          <InvitationListItem invitation={invitation} url={url} documentId={documentId} />
         </ActionListItem>
       )
     })
@@ -590,7 +615,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       return null
     }
 
-    if (!this.props.hypermergeUrl) {
+    if (!this.props.documentId) {
       return null
     }
 

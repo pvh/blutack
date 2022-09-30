@@ -7,9 +7,10 @@ import { USER_COLORS } from "./Constants";
 import "./Avatar.css";
 import { DocumentId } from "automerge-repo-react-hooks";
 import { DocHandle } from "automerge-repo";
+import { PushpinUrl } from "../../pushpin-code/ShareLink";
 
 export type ContactDocInvites = {
-  /* [url: string]: Crypto.Box[] */
+  [url: string]: PushpinUrl[] /* Crypto.Box[] */;
 };
 export interface ContactDoc {
   name: string;
@@ -20,7 +21,7 @@ export interface ContactDoc {
   encryptionKey?: null; // Crypto.SignedMessage<Crypto.EncodedPublicEncryptionKey>;
 }
 
-function create(_typeAttrs: any, handle: DocHandle<ContactDoc>) {
+function create(_typeAttrs: any, handle: DocHandle<any>) {
   handle.change((doc) => {
     doc.name = "Someone";
     const USER_COLOR_VALUES = Object.values(USER_COLORS);

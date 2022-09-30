@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
 
-// import Omnibox from './omnibox/Omnibox'
+import Omnibox from './omnibox/Omnibox'
 import Content from '../../Content'
 import Authors from './Authors'
 import { PushpinUrl, createDocumentLink } from '../../pushpin-code/ShareLink'
@@ -133,21 +133,13 @@ export default function TitleBar(props: Props) {
       >
         <i className="fa fa-clipboard" />
       </button>
-
-      <div>THE OMNIBOX GOES HERE</div>      
-    </div>
-  )
-}
-
-/* <WorkspaceContext.Consumer>
-        {(workspaceUrlsContext) => (
-          <Omnibox
+      <Omnibox
             active={activeOmnibox}
             hypermergeUrl={props.documentId}
             omniboxFinished={hideOmnibox}
             onContent={props.onContent}
-            workspaceUrlsContext={workspaceUrlsContext}
-          />
-        )}
-      </WorkspaceUrlsContext.Consumer>
-      */
+        />
+     
+    </div>
+  )
+}
