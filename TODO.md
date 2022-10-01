@@ -48,4 +48,4 @@ dark mode!
 OmniboxWorkspaceListMenu v. complicated and old
 we had a custom ColorPicker but the exports changed. I just replaced it with GithubPicker
 we had a Swatch used in the ContactEditor to show your color and it needs replacing
-
+from alex: I notice that ContentTypes.create creates a new handle, ignoring the one passed in to createWorkSpace

@@ -15,9 +15,9 @@ import * as ContentTypes from './components/pushpin-code/ContentTypes'
 import { create as createWorkspace } from './components/content-types/workspace/Workspace'
 
 const repo = await Repo({
-    // storage: new LocalForageStorageAdapter(),
+    storage: new LocalForageStorageAdapter(),
     network: [
-      // new BroadcastChannelNetworkAdapter(),
+      new BroadcastChannelNetworkAdapter(),
     ],
 })
 
@@ -26,7 +26,7 @@ ContentTypes.setRepo(repo)
 const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
   let docId = new URLSearchParams(window.location.search).get(key);
 
-  // if (!docId) { docId = await localforage.getItem(key) }
+  if (!docId) { docId = await localforage.getItem(key) }
   if (!docId) { 
     console.log('initializing document', key)
     const workspaceHandle = repo.create()
@@ -36,7 +36,7 @@ const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
       createWorkspace({}, workspaceHandle)
       console.log(`?workspaceDocId=${docId}`)
     }
-    // await localforage.setItem(key, docId)
+    await localforage.setItem(key, docId)
   }  
   return docId as DocumentId
 }
