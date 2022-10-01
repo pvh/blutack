@@ -12,6 +12,10 @@ import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
 import * as WebStreamLogic from '../../pushpin-code/WebStreamLogic'
 
+// TODO: the navigation API is only available in newish chromes
+// we should track down a type for it
+declare var navigation: any
+
 import './Workspace.css'
 /* import {
   useAllHeartbeats,
@@ -54,12 +58,23 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
   // const crypto = useCrypto()
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
-
-  console.log(documentId)
-  console.log("WORKSPACE VALUE", workspace)
-  
-  console.log("SelfID:", selfId)
   const [self, changeSelf] = useDocument<ContactDoc>(selfId || undefined)
+
+  console.log(navigation)
+  navigation.addEventListener('navigate', (navigateEvent: any) => {
+    // Exit early if this navigation shouldn't be intercepted.
+    // The properties to look at are discussed later in the article.
+    //if (shouldNotIntercept(navigateEvent)) return;
+  
+    console.log(navigateEvent)
+
+    const url = new URL(navigateEvent.destination.url);
+    console.log(navigateEvent.destination.url)
+  
+    if (url.pathname.match('pushpin')) {
+      navigateEvent.intercept({handler: openDoc(url.toString())});
+    }
+  });
 
   /*
   const selfId: DocumentId | undefined = workspace && workspace.selfId

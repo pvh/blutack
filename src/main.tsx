@@ -15,9 +15,9 @@ import * as ContentTypes from './components/pushpin-code/ContentTypes'
 import { create as createWorkspace } from './components/content-types/workspace/Workspace'
 
 const repo = await Repo({
-    // storage: new LocalForageStorageAdapter(), <-- fix this alex
+    // storage: new LocalForageStorageAdapter(),
     network: [
-      new BroadcastChannelNetworkAdapter(),
+      // new BroadcastChannelNetworkAdapter(),
     ],
 })
 

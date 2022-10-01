@@ -1,13 +1,11 @@
-import Base58 from "bs58";
 import { DocumentId } from "automerge-repo-react-hooks";
 
 export type PushpinUrl = string & { pushpin: true };
 
 export function isPushpinUrl(str: string): str is PushpinUrl {
-  const url = new URL(str);
-  const protocol = url.protocol;
-  const query = url.search;
-  return protocol === "pushpin:" && /^type=/.test(query || "");
+  const url = new URL(str, document.URL);
+  const { scheme, type, documentId } = parts(str);
+  return scheme === "pushpin" && type !== undefined;
 }
 
 export function createDocumentLink(
@@ -17,7 +15,7 @@ export function createDocumentLink(
   if (!type) {
     throw new Error("no type when creating URL");
   }
-  return `pushpin:/${docId}?type=${type}` as PushpinUrl;
+  return `pushpin/${type}/${docId}` as PushpinUrl;
 }
 
 interface Parts {
@@ -49,23 +47,11 @@ export function parseDocumentLink(link: string): Parts {
 }
 
 export function parts(str: string) {
-  const url = new URL(str);
+  console.log(str);
+  const url = new URL(str, document.URL);
 
-  const protocol = url.protocol;
-  const scheme = protocol ? protocol.substr(0, protocol.length - 1) : undefined;
-  const documentId = (url.pathname || "/").substr(1) as DocumentId;
+  const [, /* leading */ scheme, type, documentId] = url.pathname.split("/");
 
   const params = new URLSearchParams(url.search);
-  const type = params.get("type");
-  return { scheme, type, documentId };
+  return { scheme, type, documentId: documentId as DocumentId };
 }
-
-export const encode = (str: string) => Base58.encode(hexToBuffer(str));
-
-export const decode = (str: string) => bufferToHex(Base58.decode(str));
-
-export const hexToBuffer = (key: string | Buffer) =>
-  Buffer.isBuffer(key) ? key : Buffer.from(key, "hex");
-
-export const bufferToHex = (key: Buffer | string) =>
-  Buffer.isBuffer(key) ? key.toString("hex") : key;
