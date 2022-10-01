@@ -12,6 +12,7 @@
     "automerge": "*",
     "automerge-repo": "*",
     "automerge-repo-network-broadcastchannel": "^0.0.11",
+    "automerge-repo-network-websocket": "^0.0.11",
     "automerge-repo-react-hooks": "^0.0.11",
     "automerge-repo-storage-localforage": "^0.0.11",
     "bs58": "^5.0.0",

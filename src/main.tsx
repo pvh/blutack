@@ -13,11 +13,27 @@ import { BroadcastChannelNetworkAdapter } from "automerge-repo-network-broadcast
 import { DocumentId, RepoContext } from 'automerge-repo-react-hooks'
 import * as ContentTypes from './components/pushpin-code/ContentTypes'
 import { create as createWorkspace } from './components/content-types/workspace/Workspace'
+import { BrowserWebSocketClientAdapter } from 'automerge-repo-network-websocket'
 
+/* disabled to make debugging simpler.
+// find this at chrome://inspect#workers, then hit inspect
+new SharedWorker(
+  new URL("./shared-worker.js", import.meta.url),
+  { type: "module", name: "automerge-repo-shared-worker" }
+)
+*/
+
+// sync-server instructions: 
+// $ cd automerge-repo/packages/automerge-repo-sync-server
+// $ yarn
+// $ mkdir .amrg
+// $ yarn start
+const url = "ws://localhost:3030"
 const repo = await Repo({
     storage: new LocalForageStorageAdapter(),
     network: [
-      new BroadcastChannelNetworkAdapter(),
+      // new BroadcastChannelNetworkAdapter(), // disabled while debugging sync
+      new BrowserWebSocketClientAdapter(url),
     ],
 })
 
