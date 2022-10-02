@@ -61,6 +61,7 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
   const [self, changeSelf] = useDocument<ContactDoc>(selfId || undefined)
 
   console.log(navigation)
+  
   navigation.addEventListener('navigate', (navigateEvent: any) => {
     // Exit early if this navigation shouldn't be intercepted.
     // The properties to look at are discussed later in the article.
@@ -71,9 +72,9 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
     const url = new URL(navigateEvent.destination.url);
     console.log(navigateEvent.destination.url)
   
-    if (url.pathname.match('pushpin')) {
-      navigateEvent.intercept({handler: openDoc(url.toString())});
-    }
+    navigateEvent.intercept({handler: async () => {
+      openDoc(url.pathname)
+    }});
   });
 
   /*
@@ -190,6 +191,7 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
     window.scrollTo(0, 0)
 
     changeWorkspace((ws: WorkspaceDoc) => {
+      console.log("before", ws)
       ws.currentDocUrl = docUrl
 
       ws.viewedDocUrls = ws.viewedDocUrls.filter((url) => url !== docUrl)
@@ -198,6 +200,7 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
       if (ws.archivedDocUrls) {
         ws.archivedDocUrls = ws.archivedDocUrls.filter((url) => url !== docUrl)
       }
+      console.log("after", ws)
     })
   }
 
@@ -253,6 +256,8 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
       </div>
     )
   }
+
+  console.log('rendering content', workspace.currentDocUrl)
 
   const content = renderContent(workspace.currentDocUrl)
 

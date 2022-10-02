@@ -9,7 +9,6 @@ import {
   parseDocumentLink,
   PushpinUrl,
 } from '../../../pushpin-code/ShareLink'
-// import { getDoc } from '../../../../Misc'
 
 // import InvitationsView from '../../../../InvitationsView'
 import { ContactDoc } from '../../contact'
