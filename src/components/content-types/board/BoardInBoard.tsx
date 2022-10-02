@@ -16,8 +16,8 @@ BoardInBoard.maxWidth = 9
 BoardInBoard.maxHeight = 10
 
 export default function BoardInBoard(props: ContentProps) {
-  const { hypermergeUrl } = props
-  const [doc] = useDocument<BoardDoc>(hypermergeUrl)
+  const { documentId } = props
+  const [doc] = useDocument<BoardDoc>(documentId)
 
   if (!doc) {
     return null

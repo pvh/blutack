@@ -1,12 +1,13 @@
 import React, { useCallback } from 'react'
 import { Doc } from 'automerge'
 import { PushpinUrl, parseDocumentLink } from '../../pushpin-code/ShareLink'
-import { DocumentId, Change, useDocument } from 'automerge-repo-react-hooks'
+import { Change, useDocument } from 'automerge-repo-react-hooks'
 import Content from '../../Content'
 import ActionListItem from '../workspace/omnibox/ActionListItem'
 import { DeviceDoc } from '../workspace/Device'
 import { StoragePeerDoc } from '../storage-peer'
 import './ContactEditor.css'
+import { DocumentId } from 'automerge-repo'
 
 export interface Props {
   selfUrl: DocumentId

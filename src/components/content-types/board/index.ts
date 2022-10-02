@@ -1,5 +1,4 @@
-import { DocHandle } from "automerge-repo";
-import { DocumentId } from "automerge-repo-react-hooks";
+import { DocumentId, DocHandle } from "automerge-repo";
 import * as ContentTypes from "../../pushpin-code/ContentTypes";
 import { PushpinUrl } from "../../pushpin-code/ShareLink";
 

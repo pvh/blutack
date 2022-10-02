@@ -8,13 +8,14 @@ import { parseDocumentLink } from '../../pushpin-code/ShareLink'
 
 import { BoardDocCard, CardId } from '.'
 import { Position, Dimension } from './BoardGrid'
-import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { useDocument } from 'automerge-repo-react-hooks'
 import { useSelf } from '../../pushpin-code/SelfHooks'
 // import { usePresence } from '../../../PresenceHooks'
 import './BoardCard.css'
 import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from '../..//constants'
 import { boundDimension, boundSizeByType } from './BoardBoundary'
 import * as UriList from '../../pushpin-code/UriList'
+import { DocumentId } from 'automerge-repo'
 
 interface CardClicked {
   type: 'CardClicked'
