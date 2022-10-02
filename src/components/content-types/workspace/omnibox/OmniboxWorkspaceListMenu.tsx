@@ -24,8 +24,7 @@ import { WorkspaceDoc as WorkspaceDoc } from '../Workspace'
 import './OmniboxWorkspaceListMenu.css'
 import ActionListItem from './ActionListItem'
 import Heading from '../../../ui/Heading'
-import { DocumentId } from 'automerge-repo-react-hooks'
-import { DocCollection, DocHandle, DocHandleEventArg } from 'automerge-repo'
+import { DocCollection, DocHandle, DocHandleEventArg, DocumentId } from 'automerge-repo'
 import { Doc } from 'automerge'
 
 const log = Debug('pushpin:omnibox')
@@ -123,10 +122,10 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
 
   componentWillUnmount = () => {
     log('componentWillUnmount')
-    // TODO: might want to do this
-    /* this.handle && this.handle.close()
     document.removeEventListener('keydown', this.handleCommandKeys)
 
+    /*this.handle && this.handle.close()
+    
     Object.values(this.viewedDocHandles).forEach((handle) => handle.close())
     Object.values(this.contactHandles).forEach((handle) => handle.close()) 
     */
@@ -139,12 +138,14 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     }
   }
 
-  refreshHandle = (documentId: DocumentId) => {
+  refreshHandle = async (documentId: DocumentId) => {
+    console.log("refresh handle")
     if (this.handle) {
       // TODO FIXME: yikes 
       // this.handle.close()
     }
     this.handle = this.props.repo.find(documentId)
+    this.onChange( { doc: await this.handle.value(), handle: this.handle, documentId: this.handle.documentId, changes: [] })
     this.handle.addListener("change", e => this.onChange(e))
   }
 
@@ -157,6 +158,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     log('onChange', doc)
     if (!this) { throw new Error("c'mon man")}
     this.setState({ doc }, () => {
+      console.log(doc, this.state)
       this.state.doc &&
         this.state.doc.viewedDocUrls.forEach((url) => {
           // create a handle for this document
@@ -214,6 +216,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
 
     const { selectedIndex } = this.state
     const { items } = this.menuSections()
+
     const selected = items[selectedIndex]
     if (!selected) {
       return
@@ -394,6 +397,10 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
               !state.doc.archivedDocUrls ||
               !state.doc.archivedDocUrls.includes(url as PushpinUrl)
           )
+          .map(i => {console.log(i); return i})
+          /* lol, i wish i'd documented what this does better.
+           * the basic idea is to filter the list based on contents
+           * but i don't remember what's going on with that board business below
           .filter(
             ([_url, doc]) =>
               doc &&
@@ -413,7 +420,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
             },
             [[], []] as [any[], any[]]
           )
-          .flat()
+          .flat()*/
           .map(([url, _doc]) => ({ url: url as PushpinUrl })),
     },
     {
@@ -610,6 +617,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   render = () => {
+    console.log("rendering", this.state, this.props)
     if (!this.state.doc) {
       return null
     }
@@ -618,6 +626,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       return null
     }
 
+    console.log("sectionitems", this.sectionItems)
     return (
       <ListMenu>
         {this.renderInvitationsSection()}

@@ -85,7 +85,7 @@ export default function Omnibox(props: Props) {
           return (
             <OmniboxWorkspace
               key={url}
-              viewContents
+              viewContents={true}
               onContent={onContent}
               omniboxFinished={omniboxFinished}
               documentId={documentId}

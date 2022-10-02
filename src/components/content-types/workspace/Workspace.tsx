@@ -1,8 +1,8 @@
 import React, { useEffect, useContext, useRef } from 'react'
 import Debug from 'debug'
 import * as uuid from 'uuid'
-import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
-import { DocHandle } from 'automerge-repo'
+import { useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId, DocHandle } from 'automerge-repo'
 
 import { parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../pushpin-code/ShareLink'
 import Content, { ContentProps, ContentHandle } from '../../Content'
@@ -29,7 +29,7 @@ import { BoardDoc, CardId } from '../board'
 import { CurrentDeviceContext } from './Device'
 
 import WorkspaceInList from './WorkspaceInList'
-// import { importPlainText } from '../../../ImportData'
+import { importPlainText } from '../../pushpin-code/ImportData'
 // import * as DataUrl from '../../../../DataUrl'
 
 const log = Debug('pushpin:workspace')
