@@ -12,8 +12,8 @@ interface Props extends ContentProps {
 }
 
 export default function BoardInList(props: Props) {
-  const { hypermergeUrl, url, editable } = props
-  const [doc] = useDocument<BoardDoc>(hypermergeUrl)
+  const { documentId, url, editable } = props
+  const [doc] = useDocument<BoardDoc>(documentId)
 
   if (!doc) {
     return null
@@ -37,7 +37,7 @@ export default function BoardInList(props: Props) {
       <TitleWithSubtitle
         title={title}
         subtitle={subtitle}
-        hypermergeUrl={hypermergeUrl}
+        documentId={documentId}
         editable={editable}
       />
     </ListItem>

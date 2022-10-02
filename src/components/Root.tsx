@@ -1,11 +1,7 @@
-import React from 'react'
-
 import Content from './Content'
-import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
 import { CurrentDeviceContext } from './content-types/workspace/Device'
-import SelfContext from './pushpin-code/SelfHooks'
 import { createDocumentLink } from './pushpin-code/ShareLink'
-import * as ContentTypes from './pushpin-code/ContentTypes'
 
 // We load these modules here so that the content registry will have them.
 import './content-types/workspace/Workspace'
@@ -14,7 +10,7 @@ import './content-types/workspace/Workspace'
 import './content-types/defaults/DefaultInList'
 
 // board in various contexts
-// import './content-types/board'
+import './content-types/board'
 import './content-types/contact'
 // import './content-types/files'
 // import './content-types/storage-peer'

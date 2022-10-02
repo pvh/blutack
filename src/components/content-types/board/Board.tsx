@@ -16,7 +16,7 @@ import { PushpinUrl } from '../../pushpin-code/ShareLink'
 import { ContentProps } from '../../Content'
 import { BoardDoc, BoardDocCard, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
-import BoardContextMenu from './BoardContextMenu'
+// import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
 import { gridOffset, GRID_SIZE } from './BoardGrid'
 import { useSelection } from './BoardSelection'
@@ -370,13 +370,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
       onDrop={onDrop}
       role="presentation"
     >
-      <BoardContextMenu
-        boardTitle={docTitle}
-        contentTypes={contentTypes}
-        dispatch={dispatch}
-        backgroundColor={backgroundColor}
-        backgroundColors={BOARD_COLOR_VALUES}
-      />
+
       
     </div>
   )
@@ -385,6 +379,13 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
 export default memo(Board)
 
 /*
+      <BoardContextMenu
+        boardTitle={docTitle}
+        contentTypes={contentTypes}
+        dispatch={dispatch}
+        backgroundColor={backgroundColor}
+        backgroundColors={BOARD_COLOR_VALUES}
+      />
 <ContextMenuTrigger holdToDisplay={-1} id="BoardMenu">
   <div>{cardChildren}</div>
 </ContextMenuTrigger>

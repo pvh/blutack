@@ -3,7 +3,7 @@
 
 import { BOARD_HEIGHT, BOARD_WIDTH } from "./Board";
 import { Dimension, Position, gridCellsToPixels } from "./BoardGrid";
-import { PushpinUrl, parseDocumentLink } from "../../../ShareLink";
+import { PushpinUrl, parseDocumentLink } from "../../pushpin-code/ShareLink";
 import * as ContentTypes from "../../pushpin-code/ContentTypes";
 
 export const boundPosition = (

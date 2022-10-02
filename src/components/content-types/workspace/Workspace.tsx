@@ -190,6 +190,11 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
     // Reset scroll position
     window.scrollTo(0, 0)
 
+    if (docUrl === workspace.currentDocUrl) {
+      log('Attempted to navigate to the same place we already are...')
+      return
+    }
+
     changeWorkspace((ws: WorkspaceDoc) => {
       console.log("before", ws)
       ws.currentDocUrl = docUrl
@@ -256,9 +261,7 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
       </div>
     )
   }
-
-  console.log('rendering content', workspace.currentDocUrl)
-
+  
   const content = renderContent(workspace.currentDocUrl)
 
   return (
@@ -270,27 +273,6 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
     </SelfContext.Provider>
   )
 }
-
-const WELCOME_TEXT = `Welcome to PushPin!
-
-    We've created your first text card for you.
-    You can edit it, or make more by double-clicking the background.
-
-    You can drag or paste images, text, PDFs, audio, video, and URLs onto the board. They'll be stored for offline usage.
-
-    Right-clicking on the board opens a menu that allows you to insert any kind of card. You can also make new boards from the right-click menu or with Ctrl-N.
-
-    There's a Chrome plugin that can capture webpages for you. You can find it at github.com/pvh/pushpin-clipper.
-
-    You can edit a card's title (visible in the titlebar when the card is selected) by clicking on it and typing.
-
-    Quick travel around your workspace by clicking the magnifying glass icon in the title bar– this opens the omnibox. Typing part of a name will show you corresponding people and boards. The omnibox can also be opened with '/'.
-
-    To share a board with another person, click the clipboard in the upper-right corner, then have them paste that value into the omnibox (will open your board in their workspace) or onto a board (will link your board to their current board).
-
-    To create links to boards or contacts, drag them from the title bar or the omnibox or press the 'place on board' (Shift + Enter) next to the corresponding object in the omnibox.`
-
-// PVH: Todo
 export function create(_attrs: any, handle: DocHandle<any>) {
   ContentTypes.create('contact', {}, (selfContentUrl) => {
     const selfDocumentId = parseDocumentLink(selfContentUrl).documentId
@@ -298,13 +280,13 @@ export function create(_attrs: any, handle: DocHandle<any>) {
     // we should refactor not to require the DocumentId on the contact
     // but i don't want to pull that in scope right now
 
-    ContentTypes.create('thread', { title: "Ink & Switch" }, (threadUrl) => {
+    ContentTypes.create('board', { title: "Ink & Switch" }, (boardUrl) => {
       handle.change((workspace) => {
         console.log('setting it up')
         workspace.selfId = selfDocumentId
         workspace.contactIds = []
-        workspace.currentDocUrl = threadUrl
-        workspace.viewedDocUrls = [threadUrl]
+        workspace.currentDocUrl = boardUrl
+        workspace.viewedDocUrls = [boardUrl]
         console.log("done", workspace)
       })
     })

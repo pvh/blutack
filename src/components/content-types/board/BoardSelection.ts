@@ -1,4 +1,4 @@
-import { useStaticCallback, useSharedState } from "automerge-repo-react-hooks";
+import { useStaticCallback, useSharedState } from "../../pushpin-code/Hooks";
 
 export type Selection<T> = T[];
 

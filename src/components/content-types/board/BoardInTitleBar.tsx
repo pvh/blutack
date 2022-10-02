@@ -16,9 +16,9 @@ interface Props extends ContentProps {
 type KeyedCard = [CardId, BoardDocCard]
 
 export default function BoardInTitleBar(props: Props) {
-  const { hypermergeUrl } = props
-  const [doc] = useDocument<BoardDoc>(hypermergeUrl)
-  const { selection } = useSelection<CardId>(hypermergeUrl)
+  const { documentId } = props
+  const [doc] = useDocument<BoardDoc>(documentId)
+  const { selection } = useSelection<CardId>(documentId)
 
   if (!doc) {
     return null
@@ -35,7 +35,7 @@ const selectedCards = <K extends string, V>(
 ): [K, V][] => (Object.entries(cards) as [K, V][]).filter(([id]) => selection.includes(id))
 
 const Board = (
-  { url, hypermergeUrl, editable }: Props,
+  { url, documentId, editable }: Props,
   { title, backgroundColor, cards }: BoardDoc
 ) => {
   const items = Object.entries(cards)
@@ -48,7 +48,7 @@ const Board = (
       <TitleWithSubtitle
         title={title}
         subtitle={subtitle}
-        hypermergeUrl={hypermergeUrl}
+        documentId={documentId}
         editable={editable}
       />
     </ListItem>
@@ -56,8 +56,8 @@ const Board = (
 }
 
 export const BoardBadge = (props: Props) => {
-  const { hypermergeUrl, url } = props
-  const [doc] = useDocument<BoardDoc>(hypermergeUrl)
+  const { documentId, url } = props
+  const [doc] = useDocument<BoardDoc>(documentId)
 
   if (!doc) {
     return null
@@ -76,7 +76,7 @@ const BoardSelection = (props: Props, doc: BoardDoc, selectedCards: KeyedCard[])
     : SelectedBoardItems(props, doc, selectedCards)
 
 const ActiveBoardItem = (
-  { url, hypermergeUrl, editable }: Props,
+  { url, documentId, editable }: Props,
   { title, backgroundColor }: BoardDoc,
   [id, card]: KeyedCard
 ) => {
@@ -93,7 +93,7 @@ const ActiveBoardItem = (
 }
 
 const SelectedBoardItems = (
-  { url, hypermergeUrl, editable, context }: Props,
+  { url, documentId, editable, context }: Props,
   { title, backgroundColor }: BoardDoc,
   selectedCards: KeyedCard[]
 ) => {
@@ -113,7 +113,7 @@ const SelectedBoardItems = (
       <TitleWithSubtitle
         title={title}
         subtitle={subtitle}
-        hypermergeUrl={hypermergeUrl}
+        documentId={documentId}
         editable={editable}
       />
     </ListItem>

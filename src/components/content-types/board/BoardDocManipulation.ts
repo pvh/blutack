@@ -1,5 +1,5 @@
 import { BoardDoc, CardId, BoardDocCard } from ".";
-import { parseDocumentLink } from "../../../ShareLink";
+import { parseDocumentLink } from "../../pushpin-code/ShareLink";
 import * as ContentTypes from "../../pushpin-code/ContentTypes";
 import {
   gridCellsToPixels,
@@ -10,15 +10,14 @@ import {
 } from "./BoardGrid";
 import { boundPosition } from "./BoardBoundary";
 import { Selection } from "./BoardSelection";
-
-import uuid = require("uuid");
+import * as uuid from "uuid";
 
 /*
  * Card manipulation functions
  * all the functions in this section call changeDoc
  */
 export const addCardForContent = (b: BoardDoc, card: BoardDocCard) => {
-  const id = uuid() as CardId; // ehhhhh
+  const id = uuid.v4() as CardId; // ehhhhh
   const { url } = card;
 
   const { type } = parseDocumentLink(url);
