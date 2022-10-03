@@ -76,7 +76,7 @@ export default function TitleBar(props: Props) {
 
   function copyLink(e: React.MouseEvent) {
     if (doc && doc.currentDocUrl) {
-      // TODO: clipboard.writeText(doc.currentDocUrl)
+      navigator.clipboard.writeText(doc.currentDocUrl)
     }
   }
 
@@ -139,7 +139,7 @@ export default function TitleBar(props: Props) {
             omniboxFinished={hideOmnibox}
             onContent={props.onContent}
         />
-     
+
     </div>
   )
 }

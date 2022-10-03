@@ -7,10 +7,10 @@ import './vendor/line-awesome/css/line-awesome.min.css'
 
 import localforage from "localforage"
 
-import { Repo } from "automerge-repo"
+import { DocumentId, Repo } from "automerge-repo"
 import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
 import { BroadcastChannelNetworkAdapter } from "automerge-repo-network-broadcastchannel"
-import { DocumentId, RepoContext } from 'automerge-repo-react-hooks'
+import {  RepoContext } from 'automerge-repo-react-hooks'
 import * as ContentTypes from './components/pushpin-code/ContentTypes'
 import { create as createWorkspace } from './components/content-types/workspace/Workspace'
 import { BrowserWebSocketClientAdapter } from 'automerge-repo-network-websocket'
@@ -23,7 +23,7 @@ new SharedWorker(
 )
 */
 
-// sync-server instructions: 
+// sync-server instructions:
 // $ cd automerge-repo/packages/automerge-repo-sync-server
 // $ yarn
 // $ mkdir .amrg
@@ -43,7 +43,7 @@ const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
   let docId = new URLSearchParams(window.location.search).get(key);
 
   if (!docId) { docId = await localforage.getItem(key) }
-  if (!docId) { 
+  if (!docId) {
     console.log('initializing document', key)
     const workspaceHandle = repo.create()
     docId = workspaceHandle.documentId
@@ -53,7 +53,7 @@ const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
       console.log(`?workspaceDocId=${docId}`)
     }
     await localforage.setItem(key, docId)
-  }  
+  }
   return docId as DocumentId
 }
 
