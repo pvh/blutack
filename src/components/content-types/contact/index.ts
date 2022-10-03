@@ -5,7 +5,7 @@ import ContactInVarious from "./ContactInVarious";
 import { USER_COLORS } from "./Constants";
 
 import "./Avatar.css";
-import { DocumentId } from "automerge-repo-react-hooks";
+import { DocumentId } from "automerge-repo";
 import { DocHandle } from "automerge-repo";
 import { PushpinUrl } from "../../pushpin-code/ShareLink";
 

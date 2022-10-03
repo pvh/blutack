@@ -1,6 +1,6 @@
 import { Doc } from "automerge";
-import { DocCollection } from "automerge-repo";
-import { DocumentId, useDocument } from "automerge-repo-react-hooks";
+import { DocumentId, DocCollection } from "automerge-repo";
+import { useDocument } from "automerge-repo-react-hooks";
 import {
   useEffect,
   useState,
@@ -20,7 +20,7 @@ export function useDocumentReducer<D, A>(
   documentId: DocumentId | undefined,
   reducer: (doc: D, action: A) => void,
   deps?: any[]
-): [Doc<D> | null, (action: A) => void] {
+): [Doc<D> | undefined, (action: A) => void] {
   const [doc, changeDoc] = useDocument<D>(documentId);
 
   const dispatch = useCallback(
@@ -35,8 +35,9 @@ export function useDocumentReducer<D, A>(
   return [doc, dispatch];
 }
 
+/* 
 export function useMessaging<M>(
-  url: HypermergeUrl | null,
+  url: DocumentId | null,
   onMsg: (msg: M) => void
 ): (msg: M) => void {
   const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({
@@ -91,6 +92,7 @@ export function useHyperfileHeader(url: HyperfileUrl | null): Header | null {
 
   return header;
 }
+*/
 
 export function useInterval(ms: number, cb: () => void, deps: any[]) {
   useEffect(() => {

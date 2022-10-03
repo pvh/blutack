@@ -92,7 +92,7 @@ function useQuill({
     const onChange: TextChangeHandler = (changeDelta, _oldContents, source) => {
       if (source !== 'user') return
 
-      makeChange((content) => applyDeltaToText(content, changeDelta))
+      makeChange((content) => applyDeltaToText(content, changeDelta as any))
     }
 
     function onKeyDown(e: KeyboardEvent) {
@@ -126,7 +126,7 @@ function useQuill({
     if (!textString || !quill.current) return
 
     const delta = new Delta().insert(textString)
-    const diff = quill.current.getContents().diff(delta)
+    const diff = quill.current.getContents().diff(delta as any)
 
     quill.current.updateContents(diff)
   }, [textString])
@@ -142,7 +142,7 @@ function stopPropagation(e: React.SyntheticEvent) {
 function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
   let i = 0
   delta.forEach((op, idx) => {
-    if (op.retain) {
+    if (op.retain && typeof op.retain == "number") {
       i += op.retain
     }
 
@@ -188,7 +188,7 @@ function TextInList(props: ContentProps) {
   const lines = doc.text
     .join('')
     .split('\n')
-    .filter((l) => l.length > 0)
+    .filter((l: string[]) => l.length > 0)
 
   const title = lines.shift() || '[empty text note]'
   const subtitle = lines.slice(0, 2).join('\n')

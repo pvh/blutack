@@ -8,7 +8,9 @@ import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 import { FileDoc } from '../files'
 
-import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
+import { useDocument } from 'automerge-repo-react-hooks'
+
 import Heading from '../../ui/Heading'
 import SecondaryText from '../../ui/SecondaryText'
 
@@ -80,7 +82,7 @@ const renderDevices = (devices: DocumentId[] | undefined, contactId: DocumentId)
 
   const title = (
     <>
-      <ConnectionStatusBadge size="small" hover={false} contactId={contactUrl} />
+      <ConnectionStatusBadge size="small" hover={false} contactId={contactId} />
       Devices
     </>
   )

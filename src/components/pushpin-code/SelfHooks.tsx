@@ -1,5 +1,7 @@
 import { Doc } from 'automerge'
-import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
+import { useDocument } from 'automerge-repo-react-hooks'
+
 import React, { useContext } from 'react'
 import { ContactDoc } from '../content-types/contact'
 

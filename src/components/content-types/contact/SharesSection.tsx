@@ -1,5 +1,5 @@
 import React from 'react'
-import { DocUrl } from 'hypermerge'
+import { DocumentId } from 'automerge-repo'
 
 import { createDocumentLink } from '../../pushpin-code/ShareLink'
 import Content from '../../Content'
@@ -20,7 +20,7 @@ export default function SharesSection(props: Props) {
       {invites ? (
         Object.entries(invites).map(([contact, shares]) => (
           <ListMenuItem key={contact}>
-            <Content context="list" url={createDocumentLink('contact', contact as DocUrl)} />
+            <Content context="list" url={createDocumentLink('contact', contact as DocumentId)} />
             <SecondaryText>{shares.length} items shared</SecondaryText>
           </ListMenuItem>
         ))

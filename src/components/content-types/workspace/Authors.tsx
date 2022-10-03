@@ -6,7 +6,9 @@ import { WorkspaceDoc as WorkspaceDoc } from './Workspace'
 import Author from './Author'
 
 import './Authors.css'
-import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
+import { useDocument } from 'automerge-repo-react-hooks'
+
 import { useSelfId } from '../../pushpin-code/SelfHooks'
 // import { usePresence } from '../../../PresenceHooks'
 

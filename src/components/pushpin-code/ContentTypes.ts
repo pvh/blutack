@@ -2,7 +2,7 @@ import Debug from "debug";
 import { ComponentType } from "react";
 import { createDocumentLink, PushpinUrl } from "./ShareLink";
 import { ContentData } from "./ContentData";
-import { DocumentId } from "automerge-repo-react-hooks";
+import { DocumentId } from "automerge-repo";
 import { DocCollection, DocHandle } from "automerge-repo";
 
 const log = Debug("pushpin:content-types");

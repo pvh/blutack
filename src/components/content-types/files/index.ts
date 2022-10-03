@@ -3,8 +3,7 @@ import * as ContentTypes from "../../pushpin-code/ContentTypes";
 import FileContent from "./FileContent";
 
 import * as ContentData from "../../pushpin-code/ContentData";
-import { DocHandle } from "automerge-repo";
-import { DocumentId } from "automerge-repo-react-hooks";
+import { DocumentId, DocHandle } from "automerge-repo";
 
 export type FileId = string & { __fileId: true };
 export interface FileDoc {

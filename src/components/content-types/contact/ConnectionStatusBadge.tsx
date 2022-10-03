@@ -1,4 +1,4 @@
-import { DocumentId } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
 import Badge, { BadgeSize } from '../../ui/Badge'
 // import { useConnectionStatus } from '../../../PresenceHooks'
 import './ConnectionStatusBadge.css'

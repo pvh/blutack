@@ -4,7 +4,7 @@ import ListItem from '../../../ui/ListItem'
 import { PushpinUrl } from '../../../pushpin-code/ShareLink'
 import ContentDragHandle from '../../../ui/ContentDragHandle'
 import TitleWithSubtitle from '../../../ui/TitleWithSubtitle'
-import { DocumentId } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
 
 export interface Props {
   url: PushpinUrl

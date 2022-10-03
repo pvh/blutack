@@ -30,7 +30,7 @@ export default function DefaultInList(props: ContentProps) {
       <ContentDragHandle url={url}>
         <Badge icon={icon} />
       </ContentDragHandle>
-      <TitleWithSubtitle title={doc.title || name} hypermergeUrl={hypermergeUrl} />
+      <TitleWithSubtitle title={doc.title || name} documentId={documentId} />
     </ListItem>
   )
 }

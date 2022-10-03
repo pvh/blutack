@@ -29,7 +29,7 @@ export default function AudioContent({ documentId }: ContentProps) {
     (presence) => presence && presence.data && presence.data.time
   ) */
   const [doc] = useDocument<FileDoc>(documentId)
-  if (!(doc && doc.hyperfileUrl)) {
+  if (!(doc && doc.fileId)) {
     return null
   }
 
@@ -77,7 +77,7 @@ export default function AudioContent({ documentId }: ContentProps) {
   return (
     <div className="audioWrapper">
       <audio
-        src={doc.hyperfileUrl}
+        src={doc.fileId}
         ref={audioElement}
         onTimeUpdate={handleAudioProgress}
         onEnded={handleEnd}

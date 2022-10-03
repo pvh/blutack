@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import Content, { ContentProps } from '../../Content'
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import { useDocument, useHyperfileHeader } from 'automerge-repo-react-hooks'
+import { useDocument, /* useHyperfileHeader */ } from 'automerge-repo-react-hooks'
 import { createDocumentLink } from '../../pushpin-code/ShareLink'
 import { FileDoc } from '.'
 
@@ -23,15 +23,15 @@ interface Props extends ContentProps {
   editable: boolean
 }
 
-export default function FileContent({ hypermergeUrl, context, editable, url }: Props) {
-  const [doc] = useDocument<FileDoc>(hypermergeUrl)
+export default function FileContent({ documentId, context, editable, url }: Props) {
+  const [doc] = useDocument<FileDoc>(documentId)
   const badgeRef = useRef<HTMLDivElement>(null)
 
-  const { title = '', extension, hyperfileUrl } = doc || {}
+  const { title = '', extension, fileId } = doc || {}
 
-  const header = useHyperfileHeader(hyperfileUrl || null)
+  const header = null // useHyperfileHeader(hyperfileUrl || null)
 
-  if (!hyperfileUrl || !header) {
+  if (!fileId || !header) {
     return null
   }
   const { size, mimeType } = header
@@ -46,14 +46,14 @@ export default function FileContent({ hypermergeUrl, context, editable, url }: P
               url={url}
               filename={title}
               extension={extension}
-              hyperfileUrl={hyperfileUrl}
+              fileId={fileId}
             >
               <Badge shape="square" icon="file-o" />
             </ContentDragHandle>
             <TitleWithSubtitle
               title={title}
               subtitle={subtitle}
-              hypermergeUrl={hypermergeUrl}
+              documentId={documentId}
               editable={editable}
             />
           </ListItem>
@@ -77,7 +77,7 @@ export default function FileContent({ hypermergeUrl, context, editable, url }: P
       <Content
         context={context}
         editable={editable}
-        url={createDocumentLink(contentType.type, hypermergeUrl)}
+        url={createDocumentLink(contentType.type, documentId)}
       />
     )
   }

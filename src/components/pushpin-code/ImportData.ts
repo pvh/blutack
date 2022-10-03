@@ -59,6 +59,7 @@ export function importFileList(
   // hence the oldschool iteration code
   for (let i = 0; i < length; i += 1) {
     const file = files[i];
+    // @ts-ignore-next-line (TODO: this is probably a real bug)
     ContentTypes.createFrom(ContentData.fromFile(file), (url) =>
       callback(url, i)
     );

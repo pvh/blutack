@@ -1,4 +1,3 @@
-import { DocumentId } from "automerge-repo-react-hooks";
 import mime from "mime-types";
 import { FileId } from "../content-types/files";
 import * as WebStreamLogic from "./WebStreamLogic";

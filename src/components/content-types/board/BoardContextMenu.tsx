@@ -1,6 +1,13 @@
 import React, { useRef, useState, memo } from 'react'
 import classNames from 'classnames'
 import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
+declare module 'react-contextmenu' {
+  interface ContextMenuProps {
+    children?: React.ReactNode
+  }interface MenuItemProps {
+    children?: React.ReactNode
+  }
+}
 
 import { GithubPicker } from 'react-color'
 import './ContextMenu.css'
@@ -20,7 +27,7 @@ interface Props {
 function BoardContextMenu(props: Props) {
   const [contextMenuPosition, setContextMenuPosition] = useState<Position>({ x: 0, y: 0 })
 
-  const addContent = (e: Event, contentType: ContentTypes.LookupResult) => {
+  const addContent = (e: any, contentType: ContentTypes.LookupResult) => {
     e.stopPropagation()
 
     if (!contextMenuPosition) {
@@ -86,7 +93,7 @@ function BoardContextMenu(props: Props) {
     })
   }
 
-  const onChangeComplete = (color: string) => props.dispatch({ type: 'ChangeBackgroundColor', color })
+  const onChangeComplete = (color: any) => props.dispatch({ type: 'ChangeBackgroundColor', color })
 
   return (
     <ContextMenu id="BoardMenu" onShow={onShowContextMenu} className="ContextMenu">

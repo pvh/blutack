@@ -9,10 +9,10 @@ import {
 import { DEFAULT_AVATAR_PATH } from '../../constants'
 import { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
-import { FileDoc, FileId } from '../files'
 
 import { GithubPicker } from 'react-color'
-import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
+import { useDocument } from 'automerge-repo-react-hooks'
 import Heading from '../../ui/Heading'
 import SecondaryText from '../../ui/SecondaryText'
 
@@ -32,10 +32,13 @@ import ListMenu from '../../ui/ListMenu'
 import { USER_COLORS } from './Constants'
 import SharesSection from './SharesSection'
 import './ContactEditor.css'
+import { FileId } from '../files'
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.documentId)
-  const [avatarImageDoc] = useDocument<FileDoc>(doc ? doc.avatarDocId : undefined)
+
+  // XXX: fixme: we have removed files, for now
+  const [avatarImageDoc] = useDocument<any>(doc ? doc.avatarDocId : undefined)
   const { fileId: avatarHyperfileUrl = null } = avatarImageDoc || {}
 
   const currentDeviceId = useContext(CurrentDeviceContext)

@@ -8,7 +8,9 @@ import Badge from '../ui/Badge'
 import ContentDragHandle from '../ui/ContentDragHandle'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 import './ThreadContent.css'
-import { useDocument, DocumentId } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
+import { useDocument } from 'automerge-repo-react-hooks'
+
 import { DocHandle } from 'automerge-repo'
 
 interface Message {

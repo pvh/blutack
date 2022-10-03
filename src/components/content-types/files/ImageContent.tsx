@@ -22,11 +22,11 @@ export default function ImageContent({ documentId }: ContentProps) {
   if (!doc) {
     return null
   }
-  if (!doc.hyperfileUrl) {
+  if (!doc.fileId) {
     return null
   }
 
-  return <img className="Image" alt="" src={doc.hyperfileUrl} />
+  return <img className="Image" alt="" src={doc.fileId} />
 }
 
 interface Props extends ContentProps {
@@ -37,10 +37,10 @@ function ImageInList(props: Props) {
   const { documentId, editable, url } = props
   const [doc] = useDocument<FileDoc>(documentId)
 
-  const { title = '', hyperfileUrl = null, extension } = doc || {}
+  const { title = '', fileId = null, extension } = doc || {}
   const header = { size: 666 } // TODO: useHyperfileHeader(hyperfileUrl)
 
-  if (!hyperfileUrl) {
+  if (!fileId) {
     return null
   }
 
@@ -54,12 +54,12 @@ function ImageInList(props: Props) {
         url={url}
         filename={title}
         extension={extension}
-        hyperfileUrl={hyperfileUrl}
+        fileId={fileId}
       >
         <Badge
           shape="square"
           icon={size ? undefined : 'file-image-o'}
-          img={size ? hyperfileUrl : undefined}
+          img={size ? fileId : undefined}
         />
       </ContentDragHandle>
       <TitleWithSubtitle

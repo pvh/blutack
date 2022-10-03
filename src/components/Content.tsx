@@ -11,7 +11,7 @@ import React, {
 import * as ContentTypes from './pushpin-code/ContentTypes'
 import { parseDocumentLink, PushpinUrl } from './pushpin-code/ShareLink'
 import Crashable from './Crashable'
-import { DocumentId } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
 import { useSelfId } from './pushpin-code/SelfHooks'
 // import { useHeartbeat } from '../PresenceHooks'
 

@@ -1,4 +1,6 @@
-import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
+import { useDocument } from 'automerge-repo-react-hooks'
+
 import React, { useRef } from 'react'
 
 import './TitleEditor.css'

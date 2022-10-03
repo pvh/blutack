@@ -1,4 +1,4 @@
-import { DocumentId } from "automerge-repo-react-hooks";
+import { DocumentId } from "automerge-repo";
 
 export type PushpinUrl = string & { pushpin: true };
 

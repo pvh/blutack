@@ -10,7 +10,7 @@ import OmniboxWorkspace from './OmniboxWorkspace'
 import './Omnibox.css'
 import { useEvent } from '../../../pushpin-code/Hooks'
 import ListMenuSection from '../../../ui/ListMenuSection'
-import { DocumentId } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
 
 const log = Debug('pushpin:omnibox')
 

@@ -8,7 +8,13 @@ import React, {
   FunctionComponent,
 } from 'react'
 import Debug from 'debug'
+
 import { ContextMenuTrigger } from 'react-contextmenu'
+declare module 'react-contextmenu' {
+  interface ContextMenuTriggerProps {
+    children?: React.ReactNode
+  }
+}
 
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import * as ImportData from '../../pushpin-code/ImportData'

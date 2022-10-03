@@ -1,7 +1,9 @@
 import React from 'react'
 import Content from '../../Content'
 import { createDocumentLink } from '../../pushpin-code/ShareLink'
-import { DocumentId, useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
+import { useDocument } from 'automerge-repo-react-hooks'
+
 import { ContactDoc } from '../contact'
 import './Author.css'
 

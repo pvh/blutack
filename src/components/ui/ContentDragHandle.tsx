@@ -4,7 +4,8 @@ import mime from 'mime-types'
 import * as UriList from '../pushpin-code/UriList'
 import './ContentDragHandle.css'
 import { PushpinUrl } from '../pushpin-code/ShareLink'
-import { DocumentId } from 'automerge-repo-react-hooks'
+import { DocumentId } from 'automerge-repo'
+import { FileId } from '../content-types/files'
 
 interface SimpleProps {
   url: PushpinUrl
@@ -12,8 +13,8 @@ interface SimpleProps {
 }
 interface FileProps extends SimpleProps {
   filename: string
-  extension: string
-  documentId: DocumentId
+  extension?: string
+  fileId: FileId
 }
 
 export type Props = SimpleProps | FileProps
