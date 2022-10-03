@@ -64,12 +64,12 @@ function BoardContextMenu(props: Props) {
   ))
 
   const hiddenFileInput = useRef<HTMLInputElement>(null)
-  const onImportClick = (e) => {
+  const onImportClick = () => {
     if (hiddenFileInput.current) {
       hiddenFileInput.current.click()
     }
   }
-  const onFilesChanged = (e) => {
+  const onFilesChanged = (e: any) => {
     importFileList(e.target.files, (url, i) => {
       const position = gridOffset(contextMenuPosition, i)
       props.dispatch({
@@ -79,7 +79,7 @@ function BoardContextMenu(props: Props) {
     })
   }
 
-  const onShowContextMenu = (e) => {
+  const onShowContextMenu = (e: any) => {
     setContextMenuPosition({
       x: e.detail.position.x - e.detail.target.parentElement.offsetTop,
       y: e.detail.position.y - e.detail.target.parentElement.offsetLeft,

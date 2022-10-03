@@ -32,8 +32,8 @@ const url = "ws://localhost:3030"
 const repo = await Repo({
     storage: new LocalForageStorageAdapter(),
     network: [
-      // new BroadcastChannelNetworkAdapter(), // disabled while debugging sync
-      new BrowserWebSocketClientAdapter(url),
+      new BroadcastChannelNetworkAdapter(), // disabled while debugging sync
+      // new BrowserWebSocketClientAdapter(url),
     ],
 })
 

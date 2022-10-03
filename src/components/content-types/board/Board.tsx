@@ -16,7 +16,7 @@ import { PushpinUrl } from '../../pushpin-code/ShareLink'
 import { ContentProps } from '../../Content'
 import { BoardDoc, BoardDocCard, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
-// import BoardContextMenu from './BoardContextMenu'
+import BoardContextMenu from './BoardContextMenu'
 import './Board.css'
 import { gridOffset, GRID_SIZE } from './BoardGrid'
 import { useSelection } from './BoardSelection'
@@ -370,15 +370,6 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
       onDrop={onDrop}
       role="presentation"
     >
-
-      
-    </div>
-  )
-}
-
-export default memo(Board)
-
-/*
       <BoardContextMenu
         boardTitle={docTitle}
         contentTypes={contentTypes}
@@ -386,7 +377,16 @@ export default memo(Board)
         backgroundColor={backgroundColor}
         backgroundColors={BOARD_COLOR_VALUES}
       />
-<ContextMenuTrigger holdToDisplay={-1} id="BoardMenu">
-  <div>{cardChildren}</div>
-</ContextMenuTrigger>
-*/
+
+      <ContextMenuTrigger holdToDisplay={-1} id="BoardMenu">
+        <div>{cardChildren}</div>
+      </ContextMenuTrigger>
+    </div>
+  )
+}
+
+// TODO: pvh hacked ContextMenuTrigger to include 
+// children?: React.ReactNode
+// in the props in the type since it's required in react18+
+
+export default memo(Board)

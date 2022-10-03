@@ -16,7 +16,7 @@ import './content-types/contact'
 // import './content-types/storage-peer'
 
 // other single-context components
-// import './content-types/TextContent'
+import './content-types/TextContent'
 import './content-types/ThreadContent'
 // import './content-types/UrlContent'
 // import './content-types/files/ImageContent'
