@@ -29,7 +29,7 @@ new SharedWorker(
 // $ mkdir .amrg
 // $ yarn start
 let host = new URLSearchParams(window.location.search).get('host') || "localhost:3030";
-const url = `ws://${host}`
+const url = `wss://${host}`
 const repo = await Repo({
     storage: new LocalForageStorageAdapter(),
     network: [
