@@ -33,9 +33,10 @@ const url = `wss://${host}`
 const repo = await Repo({
     storage: new LocalForageStorageAdapter(),
     network: [
-      new BroadcastChannelNetworkAdapter(), // disabled while debugging sync
+      new BroadcastChannelNetworkAdapter(),
       new BrowserWebSocketClientAdapter(url),
     ],
+    sharePolicy: (peerId) => peerId.includes("storage-server"),
 })
 
 ContentTypes.setRepo(repo)

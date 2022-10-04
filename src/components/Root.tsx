@@ -21,6 +21,7 @@ interface RootArgs {
   workspaceDocId: DocumentId
   deviceDocId: DocumentId
 }
+
 export default function Root({ workspaceDocId, deviceDocId }: RootArgs) {
   return (
       <CurrentDeviceContext.Provider value={deviceDocId}>
