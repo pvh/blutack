@@ -60,22 +60,22 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
   const [self, changeSelf] = useDocument<ContactDoc>(selfId || undefined)
 
-  console.log(navigation)
-  
-  navigation.addEventListener('navigate', (navigateEvent: any) => {
-    // Exit early if this navigation shouldn't be intercepted.
-    // The properties to look at are discussed later in the article.
-    //if (shouldNotIntercept(navigateEvent)) return;
-  
-    console.log(navigateEvent)
+  if ("navigation" in window) {
+    navigation.addEventListener('navigate', (navigateEvent: any) => {
+      // Exit early if this navigation shouldn't be intercepted.
+      // The properties to look at are discussed later in the article.
+      //if (shouldNotIntercept(navigateEvent)) return;
+    
+      console.log(navigateEvent)
 
-    const url = new URL(navigateEvent.destination.url);
-    console.log(navigateEvent.destination.url)
-  
-    navigateEvent.intercept({handler: async () => {
-      openDoc(url.pathname)
-    }});
-  });
+      const url = new URL(navigateEvent.destination.url);
+      console.log(navigateEvent.destination.url)
+    
+      navigateEvent.intercept({handler: async () => {
+        openDoc(url.pathname)
+      }});
+    });
+  }
 
   /*
   const selfId: DocumentId | undefined = workspace && workspace.selfId
