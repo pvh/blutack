@@ -4,7 +4,7 @@ import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
-  base: "blutack",
+  base: "/blutack/",
   plugins: [topLevelAwait(), react(), wasm()],
 
   optimizeDeps: {
@@ -13,5 +13,10 @@ export default defineConfig({
     // wrapper has a module level variable to track JS side heap
     // allocations, initializing this twice causes horrible breakage
     exclude: ["automerge-wasm"],
+  },
+  server: {
+    fs: {
+      strict: false,
+    },
   },
 });
