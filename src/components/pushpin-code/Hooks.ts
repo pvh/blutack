@@ -1,4 +1,4 @@
-import { Doc } from "automerge";
+import { Doc } from "@automerge/automerge";
 import { DocumentId, DocCollection } from "automerge-repo";
 import { useDocument } from "automerge-repo-react-hooks";
 import {
