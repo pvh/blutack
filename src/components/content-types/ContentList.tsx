@@ -1,12 +1,9 @@
 import React, { useContext, useRef, Ref, ChangeEvent, useState } from 'react'
 
 import {
-  createDocumentLink,
   PushpinUrl,
-  parseDocumentLink,
 } from '../pushpin-code/ShareLink'
 
-import { DEFAULT_AVATAR_PATH } from '../constants'
 import Content, { ContentProps } from '../Content'
 import * as ContentTypes from '../pushpin-code/ContentTypes'
 

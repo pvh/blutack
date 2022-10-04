@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react'
 
-import * as Automerge from 'automerge'
+import * as Automerge from '@automerge/automerge'
 import Quill, { TextChangeHandler, QuillOptionsStatic } from 'quill'
 import Delta from 'quill-delta'
 import * as ContentTypes from '../pushpin-code/ContentTypes'

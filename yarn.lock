@@ -10,6 +10,19 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
+"@automerge/automerge-wasm@0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@automerge/automerge-wasm/-/automerge-wasm-0.1.7.tgz#59efb15310d25e6ea64507d562291d404b59cf31"
+  integrity sha512-uTVJZFlN9o2JDlIUjtXG2lgPDAJL4hfYjqR2tWFpl9cgxmqHwGh+L4aJaON4iLBxO3D1pJT6+/3dytCaF3Di5g==
+
+"@automerge/automerge@*":
+  version "2.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@automerge/automerge/-/automerge-2.0.0-alpha.1.tgz#af2bf3edd9fe7d81d6ebdd8c433a4dfca22dbcc3"
+  integrity sha512-VJSkKb+DK6Craqi7Anzufd7Y6YOvCUuwdrfE4tuMJROlVVqjWbu9Iku0dx4mkH2sJRf3fxr3fTFfx3PzxSGAzA==
+  dependencies:
+    "@automerge/automerge-wasm" "0.1.7"
+    uuid "^8.3"
+
 "@babel/code-frame@^7.18.6":
   version "7.18.6"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.18.6.tgz#3b25d38c89600baa2dcc219edfa88a74eb2c427a"
@@ -787,21 +800,6 @@ automerge-wasm-pack@^0.1.2:
   dependencies:
     automerge-types "0.1.5"
 
-automerge@*:
-  version "0.14.2"
-  resolved "https://registry.yarnpkg.com/automerge/-/automerge-0.14.2.tgz#47503df1772fe3d917b80226e074589d9fb5f549"
-  integrity sha512-shiwuJHCbNRI23WZyIECLV4Ovf3WiAFJ7P9BH4l5gON1In/UUbjcSJKRygtIirObw2UQumeYxp3F2XBdSvQHnA==
-  dependencies:
-    immutable "^3.8.2"
-    transit-immutable-js "^0.7.0"
-    transit-js "^0.8.861"
-    uuid "^3.4.0"
-
-base-x@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/base-x/-/base-x-4.0.0.tgz#d0e3b7753450c73f8ad2389b5c018a4af7b2224a"
-  integrity sha512-FuwxlW4H5kh37X/oW59pwTzzTKRzfrrQwhmyspRM7swOEZcHtDZSCt45U6oKgtuFE+WYPblePMVIPR4RZrh/hw==
-
 braces@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/braces/-/braces-3.0.2.tgz#3454e1a462ee8d599e236df336cd9ea4f8afe107"
@@ -818,13 +816,6 @@ browserslist@^4.21.3:
     electron-to-chromium "^1.4.251"
     node-releases "^2.0.6"
     update-browserslist-db "^1.0.9"
-
-bs58@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/bs58/-/bs58-5.0.0.tgz#865575b4d13c09ea2a84622df6c8cbeb54ffc279"
-  integrity sha512-r+ihvQJvahgYT50JD05dyJNKlmmSlMoOGwn1lCcEzanPglg7TxYjioQUYehQ9mAR/+hOSd2jRc/Z2y5UxBymvQ==
-  dependencies:
-    base-x "^4.0.0"
 
 call-bind@^1.0.2:
   version "1.0.2"
@@ -1281,11 +1272,6 @@ immediate@~3.0.5:
   resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.0.6.tgz#9db1dbd0faf8de6fbe0f5dd5e56bb606280de69b"
   integrity sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==
 
-immutable@^3.8.2:
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/immutable/-/immutable-3.8.2.tgz#c2439951455bb39913daf281376f1530e104adf3"
-  integrity sha512-15gZoQ38eYjEjxkorfbcgBKBL6R7T459OuK+CpcWt7O3KF4uPCx2tD0uFETlUDIyo+1789crbMhTvQBSR5yBMg==
-
 is-arguments@^1.0.4:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/is-arguments/-/is-arguments-1.1.1.tgz#15b3f88fda01f2a97fec84ca761a560f123efa9b"
@@ -1736,16 +1722,6 @@ to-regex-range@^5.0.1:
   dependencies:
     is-number "^7.0.0"
 
-transit-immutable-js@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/transit-immutable-js/-/transit-immutable-js-0.7.0.tgz#993e25089b6311ff402140f556276d6d253005d9"
-  integrity sha512-Qga6EDAmVVoDwzPZ2fBvi3aj5E0V6NLy/spCFvspVd4BfY2/3Jr5yyynbSTC2SAEipkJ4MHVH75xNcTOlz9UaQ==
-
-transit-js@^0.8.861:
-  version "0.8.874"
-  resolved "https://registry.yarnpkg.com/transit-js/-/transit-js-0.8.874.tgz#37b27d6632bd796567c359220297c862e3988bbb"
-  integrity sha512-IDJJGKRzUbJHmN0P15HBBa05nbKor3r2MmG6aSt0UxXIlJZZKcddTk67/U7WyAeW9Hv/VYI02IqLzolsC4sbPA==
-
 ts-node@^10.9.1:
   version "10.9.1"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-10.9.1.tgz#e73de9102958af9e1f0b168a6ff320e25adcff4b"
@@ -1789,11 +1765,6 @@ update-browserslist-db@^1.0.9:
   dependencies:
     escalade "^3.1.1"
     picocolors "^1.0.0"
-
-uuid@^3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
-  integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
 
 uuid@^8.3, uuid@^8.3.2:
   version "8.3.2"
