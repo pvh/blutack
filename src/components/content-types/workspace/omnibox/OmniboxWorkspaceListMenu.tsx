@@ -25,7 +25,7 @@ import './OmniboxWorkspaceListMenu.css'
 import ActionListItem from './ActionListItem'
 import Heading from '../../../ui/Heading'
 import { DocCollection, DocHandle, DocHandleEventArg, DocumentId } from 'automerge-repo'
-import { Doc } from 'automerge'
+import { Doc } from '@automerge/automerge'
 
 const log = Debug('pushpin:omnibox')
 

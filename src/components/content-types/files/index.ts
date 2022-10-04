@@ -1,4 +1,4 @@
-import path from "path";
+import pathParse from "path-parse"
 import * as ContentTypes from "../../pushpin-code/ContentTypes";
 import FileContent from "./FileContent";
 
@@ -31,7 +31,7 @@ async function createFrom(
   const { capturedAt } = contentData;
 
   handle.change((doc: FileDoc) => {
-    const parsed = path.parse(name);
+    const parsed = pathParse(name);
     doc.fileId = fileId;
     doc.title = parsed.name;
     doc.extension = parsed.ext.slice(1);

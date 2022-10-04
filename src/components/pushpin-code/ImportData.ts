@@ -1,4 +1,4 @@
-import { isPushpinUrl, PushpinUrl } from "./ShareLink";
+import { isPushpinUrl, parseDocumentLink, PushpinUrl } from "./ShareLink";
 import * as ContentTypes from "./ContentTypes";
 import * as ContentData from "./ContentData";
 import * as URIList from "./UriList";
@@ -98,7 +98,9 @@ export function importPlainText(
   callback: ContentTypes.CreateCallback
 ) {
   if (isPushpinUrl(plainText)) {
-    callback(plainText);
+    const { documentId } = parseDocumentLink(plainText)
+    const handle = ContentTypes.__getRepo().find(documentId)
+    callback(plainText, handle);
   } else if (isUrl(plainText)) {
     importUrl(plainText, callback);
   } else {

@@ -28,7 +28,7 @@ new SharedWorker(
 // $ yarn
 // $ mkdir .amrg
 // $ yarn start
-let host = new URLSearchParams(window.location.search).get('host') || "localhost:3030";
+let host = new URLSearchParams(window.location.search).get('host') || "automerge-repo-sync-server.fly.dev";
 const url = `wss://${host}`
 const repo = await Repo({
     storage: new LocalForageStorageAdapter(),

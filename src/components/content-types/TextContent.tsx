@@ -76,6 +76,7 @@ function useQuill({
 }: QuillOpts): [React.Ref<HTMLDivElement>, Quill | null] {
   const ref = useRef<HTMLDivElement>(null)
   const quill = useRef<Quill | null>(null)
+  // @ts-ignore-next-line
   const textString = useMemo(() => text && text.join(''), [text])
   const makeChange = useStaticCallback(change)
 
@@ -186,6 +187,7 @@ function TextInList(props: ContentProps) {
   if (!doc) return null
 
   const lines = doc.text
+  //  @ts-ignore-next-line
     .join('')
     .split('\n')
     .filter((l: string[]) => l.length > 0)

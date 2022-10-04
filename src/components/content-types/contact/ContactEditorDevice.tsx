@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { Doc } from 'automerge'
+import { Doc } from '@automerge/automerge'
 import { PushpinUrl, parseDocumentLink, createDocumentLink } from '../../pushpin-code/ShareLink'
 import { DocumentId } from 'automerge-repo'
 import { useDocument, Change } from 'automerge-repo-react-hooks'
