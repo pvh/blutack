@@ -30,6 +30,7 @@ import { CurrentDeviceContext } from './Device'
 
 import WorkspaceInList from './WorkspaceInList'
 import { importPlainText } from '../../pushpin-code/ImportData'
+import { ContentListDoc } from '../ContentList'
 // import * as DataUrl from '../../../../DataUrl'
 
 const log = Debug('pushpin:workspace')
@@ -280,14 +281,18 @@ export function create(_attrs: any, handle: DocHandle<any>) {
     // we should refactor not to require the DocumentId on the contact
     // but i don't want to pull that in scope right now
 
-    ContentTypes.create('board', { title: "Ink & Switch" }, (boardUrl) => {
-      handle.change((workspace) => {
-        console.log('setting it up')
-        workspace.selfId = selfDocumentId
-        workspace.contactIds = []
-        workspace.currentDocUrl = boardUrl
-        workspace.viewedDocUrls = [boardUrl]
-        console.log("done", workspace)
+    ContentTypes.create('contentlist', { title: "Ink & Switch" }, (listUrl, listHandle) => {
+      ContentTypes.create('thread', { title: "#default" }, (threadUrl, threadHandle) => {
+        listHandle.change((doc) => {
+            (doc as ContentListDoc).content.push(threadUrl)
+        })
+        handle.change((workspace) => {
+          workspace.selfId = selfDocumentId
+          workspace.contactIds = []
+          workspace.currentDocUrl = listUrl
+          workspace.viewedDocUrls = [listUrl]
+          console.log("done", workspace)
+        })
       })
     })
   })

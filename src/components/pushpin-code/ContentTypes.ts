@@ -132,7 +132,10 @@ export function mimeTypeToContentType(mimeType: string | null): ContentType {
   return supportingType;
 }
 
-export type CreateCallback = (url: PushpinUrl) => void;
+export type CreateCallback = (
+  url: PushpinUrl,
+  handle: DocHandle<unknown>
+) => void;
 
 export function createFrom(
   contentData: ContentData,
@@ -155,7 +158,8 @@ export function createFrom(
   Promise.resolve(entry.createFrom(contentData, handle))
     .then(() => {
       callback(
-        createDocumentLink(contentType, handle.documentId as DocumentId)
+        createDocumentLink(contentType, handle.documentId as DocumentId),
+        handle // unclear if this is a good idea but YOLOing a bit for demo
       );
     })
     .catch(log);
@@ -179,7 +183,10 @@ export function create(
   }
   Promise.resolve(entry.create(attrs, handle))
     .then(() => {
-      callback(createDocumentLink(type, handle.documentId as DocumentId));
+      callback(
+        createDocumentLink(type, handle.documentId as DocumentId),
+        handle // unclear if this is a good idea but YOLOing a bit for demo
+      );
     })
     .catch(log);
 }

@@ -17,6 +17,8 @@ import './content-types/contact'
 import './content-types/TextContent'
 import './content-types/ThreadContent'
 
+import './content-types/ContentList'
+
 interface RootArgs {
   workspaceDocId: DocumentId
   deviceDocId: DocumentId
