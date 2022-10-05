@@ -15,7 +15,8 @@ export default function BoardInList(props: Props) {
   const { documentId, url, editable } = props
   const [doc] = useDocument<BoardDoc>(documentId)
 
-  if (!doc) {
+  // TODO: something is awry ... i'm getting a document ... but with no contents for a moment
+  if (!doc || !doc.cards) {
     return null
   }
 

@@ -11,6 +11,8 @@ import './Omnibox.css'
 import { useEvent } from '../../../pushpin-code/Hooks'
 import ListMenuSection from '../../../ui/ListMenuSection'
 import { DocumentId } from 'automerge-repo'
+import { useRepo } from 'automerge-repo-react-hooks'
+import OmniboxWorkspaceListMenu from './OmniboxWorkspaceListMenu'
 
 const log = Debug('pushpin:omnibox')
 
@@ -57,6 +59,8 @@ export default function Omnibox(props: Props) {
     e.nativeEvent.stopImmediatePropagation()
   }, [])
 
+  const repo = useRepo()
+
   log('render')
 
   return (
@@ -76,13 +80,13 @@ export default function Omnibox(props: Props) {
         />
       </div>
       <div className="Omnibox-Workspace">
-        <OmniboxWorkspace
-          key={documentId}
-          onContent={onContent}
-          omniboxFinished={omniboxFinished}
-          documentId={documentId}
-          search={search}
+        <OmniboxWorkspaceListMenu
+          repo={repo}
           active={active}
+          search={search}
+          onContent={onContent}
+          documentId={documentId}
+          omniboxFinished={omniboxFinished}
         />
       </div>
     </div>

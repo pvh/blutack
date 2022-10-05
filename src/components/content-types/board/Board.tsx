@@ -339,7 +339,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
    * at long last, render begins here
    */
   log('render')
-  if (!doc) {
+  if (!doc || !doc.cards) {
     return null
   }
 

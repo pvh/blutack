@@ -46,13 +46,10 @@ const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
 
   if (!docId) { docId = await localforage.getItem(key) }
   if (!docId) {
-    console.log('initializing document', key)
     const workspaceHandle = repo.create()
     docId = workspaceHandle.documentId
     if (key == "workspaceDocId") {
-      console.log('workspacing')
       createWorkspace({}, workspaceHandle)
-      console.log(`?workspaceDocId=${docId}`)
     }
     await localforage.setItem(key, docId)
   }

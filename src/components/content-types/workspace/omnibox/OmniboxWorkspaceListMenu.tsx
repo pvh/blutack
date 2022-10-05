@@ -139,7 +139,6 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   refreshHandle = async (documentId: DocumentId) => {
-    console.log("refresh handle")
     if (this.handle) {
       // TODO FIXME: yikes 
       // this.handle.close()
@@ -158,7 +157,6 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     log('onChange', doc)
     if (!this) { throw new Error("c'mon man")}
     this.setState({ doc }, () => {
-      console.log(doc, this.state)
       this.state.doc &&
         this.state.doc.viewedDocUrls.forEach((url) => {
           // create a handle for this document
@@ -397,21 +395,17 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
               !state.doc.archivedDocUrls ||
               !state.doc.archivedDocUrls.includes(url as PushpinUrl)
           )
-          .map(i => {console.log(i); return i})
-          /* lol, i wish i'd documented what this does better.
-           * the basic idea is to filter the list based on contents
-           * but i don't remember what's going on with that board business below
           .filter(
             ([_url, doc]) =>
               doc &&
               ((doc.title && doc.title.match(new RegExp(props.search, 'i'))) ||
                 (doc.text && doc.text.join('').match(new RegExp(props.search, 'i'))) ||
-                (doc.content && doc.content.match(new RegExp(props.search, 'i'))) ||
+                //(doc.content && doc.content.match(new RegExp(props.search, 'i'))) ||
                 (doc.data && doc.data.text && doc.data.text.match(new RegExp(props.search, 'i'))))
           )
           .reduce(
             (prev, current) => {
-              if (current[0].match('board')) {
+              if (current[0].match('board|contentlist')) {
                 prev[0].push(current)
               } else {
                 prev[1].push(current)
@@ -420,7 +414,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
             },
             [[], []] as [any[], any[]]
           )
-          .flat()*/
+          .flat()
           .map(([url, _doc]) => ({ url: url as PushpinUrl })),
     },
     {
@@ -617,7 +611,6 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   render = () => {
-    console.log("rendering", this.state, this.props)
     if (!this.state.doc) {
       return null
     }
@@ -626,7 +619,6 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       return null
     }
 
-    console.log("sectionitems", this.sectionItems)
     return (
       <ListMenu>
         {this.renderInvitationsSection()}

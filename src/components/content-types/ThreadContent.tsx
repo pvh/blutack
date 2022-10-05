@@ -44,7 +44,7 @@ export default function ThreadContent(props: ContentProps) {
   const [message, setMessage] = useState('')
   const [doc, changeDoc] = useDocument<Doc>(props.documentId)
 
-  if (!doc) {
+  if (!doc || !doc.messages) {
     return null
   }
 
@@ -99,7 +99,7 @@ export default function ThreadContent(props: ContentProps) {
 export function ThreadInList(props: ContentProps) {
   const { documentId, url } = props
   const [doc] = useDocument<Doc>(documentId)
-  if (!doc) return null
+  if (!doc || !doc.messages) return null
 
   const title = doc.title != null && doc.title !== '' ? doc.title : 'Untitled conversation'
   const subtitle = (doc.messages[doc.messages.length - 1] || { content: '' }).content
