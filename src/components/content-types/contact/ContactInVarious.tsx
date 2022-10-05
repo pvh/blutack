@@ -6,7 +6,8 @@ import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
 import { createDocumentLink } from '../../pushpin-code/ShareLink'
-import { DEFAULT_AVATAR_PATH } from '../../constants'
+import DEFAULT_AVATAR_PATH from '../../../images/default-avatar.png'
+
 
 import './ContactInVarious.css'
 import { useDocument } from 'automerge-repo-react-hooks'

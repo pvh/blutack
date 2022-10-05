@@ -3,7 +3,7 @@ import { GithubPicker } from 'react-color'
 
 import { createDocumentLink, PushpinUrl } from '../../pushpin-code/ShareLink'
 
-import { DEFAULT_AVATAR_PATH } from '../../constants'
+import DEFAULT_AVATAR_PATH from '../../../images/default-avatar.png'
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 import { FileDoc } from '../files'

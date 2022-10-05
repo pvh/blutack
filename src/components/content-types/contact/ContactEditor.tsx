@@ -6,7 +6,7 @@ import {
   parseDocumentLink,
 } from '../../pushpin-code/ShareLink'
 
-import { DEFAULT_AVATAR_PATH } from '../../constants'
+import DEFAULT_AVATAR_PATH from '../../../images/default-avatar.png'
 import { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
