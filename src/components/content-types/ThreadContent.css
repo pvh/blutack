@@ -68,6 +68,7 @@
   bottom: 1px;
   background-color: white;
   padding: 8px;
+  min-height: 3rem;
 }
 
 .messageInput {
