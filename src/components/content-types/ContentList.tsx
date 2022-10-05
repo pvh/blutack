@@ -21,6 +21,7 @@ import ListItem from '../ui/ListItem'
 import ListMenuSection from '../ui/ListMenuSection'
 import classNames from 'classnames'
 import ActionListItem from './workspace/omnibox/ActionListItem'
+import CenteredStackRowItem from '../ui/CenteredStackRowItem'
 
 export interface ContentListDoc {
   title: string
@@ -54,7 +55,7 @@ export default function ContentList({documentId}: ContentProps) {
     changeDoc(doc => {
       const index = doc.content.findIndex(v => v === url)
       if (index > 0) {
-        doc.content.splice(index, 1) 
+        doc.content.splice(index, 1)
       }
     })
   }
@@ -82,43 +83,42 @@ export default function ContentList({documentId}: ContentProps) {
 
   return (
     <CenteredStack direction='row' centerText={false}>
-    <CenteredStack centerText={false}>
-      <ListMenu>
-        <ListMenuHeader>
-          <TitleEditor documentId={documentId} placeholder="Untitled"/>
-        </ListMenuHeader>
-        {content.map(url =>
-            <ActionListItem
-                    key={url}
-                    contentUrl={url}
-                    defaultAction={actions[0]}
-                    actions={actions}
-                    selected={url === currentContent}
-                  >
-                    <Content context="list" url={url} editable={false}/>
-            </ActionListItem>
-        )}
-        <ListMenuSection>
-          <ListMenuHeader>
-            Create new item...
-          </ListMenuHeader>
-          { contentTypes.map((contentType) => (
-            <ListMenuItem onClick={() => addContent(contentType)} key={contentType.type}>
-              <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-                <i className={classNames('fa', `fa-${contentType.icon}`)} />
-              </div>
-              <span className="ContextMenu__label">{contentType.name}</span>
-            </ListMenuItem>))
-          }
-        </ListMenuSection>
-      </ListMenu>
-    </CenteredStack>
-    {
-      (currentContent) ?
-        <Content context="workspace" url={currentContent}/>
-      :
-        <div>Select something from the side I guess????</div>
-    }
+      <CenteredStackRowItem size={{mode: "fixed", width: "20%"}}>
+          <ListMenu>
+            {content.map(url =>
+              <ActionListItem
+                key={url}
+                contentUrl={url}
+                defaultAction={actions[0]}
+                actions={actions}
+                selected={url === currentContent}
+              >
+                <Content context="list" url={url} editable={false}/>
+              </ActionListItem>
+            )}
+            <ListMenuSection>
+              <ListMenuHeader>
+                + Create new item
+              </ListMenuHeader>
+              { contentTypes.map((contentType) => (
+                <ListMenuItem onClick={() => addContent(contentType)} key={contentType.type}>
+                  <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
+                    <i className={classNames('fa', `fa-${contentType.icon}`)} />
+                  </div>
+                  <span className="ContextMenu__label">{contentType.name}</span>
+                </ListMenuItem>))
+              }
+            </ListMenuSection>
+          </ListMenu>
+      </CenteredStackRowItem>
+      <CenteredStackRowItem size={{mode: "auto"}}>
+      {
+          (currentContent) ?
+            <Content context="workspace" url={currentContent}/>
+          :
+            <div>Select something from the side I guess????</div>
+        }
+      </CenteredStackRowItem>
     </CenteredStack>
   )
 }

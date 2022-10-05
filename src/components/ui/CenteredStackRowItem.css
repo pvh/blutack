@@ -1,0 +1,13 @@
+.CenteredStackRowItem {
+  overflow: scroll;
+  height: 100%;
+}
+
+.CenteredStackRowItem--fixed {
+  flex: 0 0 auto;
+}
+
+.CenteredStackRowItem--auto {
+  flex: 1 1 auto;
+}
+
