@@ -105,7 +105,7 @@ export default function TitleBar(props: Props) {
         >
           <i className="fa fa-angle-left" />
         </button>
-        <button type="button" onClick={showOmnibox} className="TitleBar-menuItem">
+        <button type="button" onClick={(e) => { showOmnibox(); e.stopPropagation()}} className="TitleBar-menuItem">
           <Badge icon="search" backgroundColor="#00000000" />
         </button>
 
