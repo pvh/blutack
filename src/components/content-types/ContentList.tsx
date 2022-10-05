@@ -15,14 +15,16 @@ import ListMenuItem from '../ui/ListMenuItem'
 import ListMenu from '../ui/ListMenu'
 import './ContentList.css'
 import DefaultInList from './defaults/DefaultInList'
+import ListMenuHeader from '../ui/ListMenuHeader'
+import TitleEditor from '../TitleEditor'
 
 export interface ContentListDoc {
   title: string
   content: PushpinUrl[]
 }
 
-export default function ContentList(props: ContentProps) {
-  const [doc, changeDoc] = useDocument<ContentListDoc>(props.documentId)
+export default function ContentList({documentId}: ContentProps) {
+  const [doc, changeDoc] = useDocument<ContentListDoc>(documentId)
   const [currentContent, changeContent] = useState<PushpinUrl | undefined>()
 
   if (!doc) {
@@ -53,12 +55,15 @@ export default function ContentList(props: ContentProps) {
 
 
   return (
-    <CenteredStack direction='row'>
+    <CenteredStack direction='row' centerText={false}>
     <CenteredStack centerText={false}>
       <ListMenu>
+        <ListMenuHeader>
+          <TitleEditor documentId={documentId} placeholder="Untitled"/>
+        </ListMenuHeader>
         {content.map(c =>
-          <ListMenuItem onClick={() => changeContent(c)}>
-            <Content context="list" url={c}/>
+          <ListMenuItem onClick={() => changeContent(c)} key={c} selected={c === currentContent} >
+            <Content context="list" url={c} editable={false}/>
           </ListMenuItem>
         )}
       </ListMenu>
@@ -68,7 +73,7 @@ export default function ContentList(props: ContentProps) {
     {
       (currentContent) ?
         <div className="ContentList-content-wrapper">
-        <Content context="workspace" url={currentContent}/>
+          <Content context="board" url={currentContent}/>
         </div>
       :
         <div>Select something from the side I guess????</div>
