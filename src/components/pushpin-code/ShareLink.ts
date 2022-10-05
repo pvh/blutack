@@ -19,9 +19,9 @@ export function createDocumentLink(
 }
 
 interface Parts {
-  scheme: string | null;
-  type: string | null;
-  documentId: DocumentId | null;
+  scheme: string;
+  type: string;
+  documentId: DocumentId;
 }
 
 export function parseDocumentLink(link: string): Parts {
@@ -39,14 +39,14 @@ export function parseDocumentLink(link: string): Parts {
     throw new Error(`Missing type in ${link}`);
   }
 
-  if (!documentId) {
+  if (!documentId === undefined) {
     throw new Error(`Missing docId in ${link}`);
   }
 
-  return { scheme, type, documentId };
+  return { scheme, type, documentId: documentId as DocumentId };
 }
 
-export function parts(str: string): Parts {
+export function parts(str: string) {
   const url = new URL(str, document.URL);
 
   const scheme = url.searchParams.get("scheme");
@@ -54,5 +54,5 @@ export function parts(str: string): Parts {
   const documentId = url.searchParams.get("documentId");
 
   const params = new URLSearchParams(url.search);
-  return { scheme, type, documentId: documentId as DocumentId };
+  return { scheme, type, documentId };
 }
