@@ -83,7 +83,7 @@ export default function ContentList({documentId}: ContentProps) {
 
   return (
     <CenteredStack direction='row' centerText={false}>
-      <CenteredStackRowItem size={{mode: "fixed", width: "20%"}}>
+      <CenteredStackRowItem size={{mode: "fixed", width: "20%"}} style={{ borderRight: "solid thin #ddd"}}>
           <ListMenu>
             {content.map(url =>
               <ActionListItem

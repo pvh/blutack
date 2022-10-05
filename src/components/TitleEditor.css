@@ -1,6 +1,7 @@
 .TitleEditor {
   font-size: 1.25em;
   padding: 0px; /* someone (me?) put padding on all inputs */
+  cursor: inherit;
 }
 
 /* use hidden text to cause title editor
