@@ -1,5 +1,6 @@
 .TitleEditor {
-  font-size: 1.25em;
+  font-size: 1.1em;
+  font-weight: 500;
   padding: 0px; /* someone (me?) put padding on all inputs */
   cursor: inherit;
 }

@@ -1,7 +1,7 @@
 .Heading {
-  font-size: 14px;
+  font-size: 1.1em;
   line-height: 20px;
-  font-weight: 400;
+  font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
