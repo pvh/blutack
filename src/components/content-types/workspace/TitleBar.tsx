@@ -26,6 +26,8 @@ export default function TitleBar(props: Props) {
   const [sessionHistory, setHistory] = useState<PushpinUrl[]>([])
   const [historyIndex, setIndex] = useState(0)
   const [activeOmnibox, setActive] = useState(false)
+  const [showCreateMenu, setShowCreateMenu] = useState(false)
+
   const [doc] = useDocument<WorkspaceDoc>(props.documentId)
 
   useEvent(document, "keydown", (e) => {

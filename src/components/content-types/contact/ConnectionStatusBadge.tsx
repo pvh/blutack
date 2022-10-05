@@ -1,6 +1,6 @@
 import { DocumentId } from "automerge-repo"
 import Badge, { BadgeSize } from "../../ui/Badge"
-// import { useConnectionStatus } from '../../../PresenceHooks'
+import { useConnectionStatus } from "../../pushpin-code/PresenceHooks"
 import "./ConnectionStatusBadge.css"
 
 export interface Props {
@@ -43,11 +43,11 @@ export default function ConnectionStatusBadge({
   size = "tiny",
   hover = true,
 }: Props) {
-  const status: ConnectionStatus = "connected" // useConnectionStatus(contactId)
+  const status: ConnectionStatus = useConnectionStatus(contactId)
 
-  /* TODO: if (status === 'not-connected') {
+  if (status === "not-connected") {
     return null
-  } */
+  }
 
   return (
     <div className="OwnDevice-ConnectionStatus">

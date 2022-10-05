@@ -1,8 +1,19 @@
 .CenteredStack {
   display: flex;
+}
+
+.CenteredStack--start {
+  align-items: flex-start;
+}
+
+.CenteredStack--center {
   align-items: center;
   width: 100%;
   height: 100%;
+}
+
+.CenteredStack--end {
+  align-items: flex-end;
 }
 
 .CenteredStack--centerText {
@@ -11,8 +22,10 @@
 
 .CenteredStack--column {
   flex-direction: column;
+  width: 100%;
 }
 
 .CenteredStack--row {
   flex-direction: row;
+  height: 100%;
 }
