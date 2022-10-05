@@ -7,3 +7,7 @@
   border-bottom: 1px solid var(--colorPaleGrey);
   margin-bottom: 8px;
 }
+
+.ContentList-content-wrapper {
+  border: solid thin grey;
+}

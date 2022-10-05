@@ -7,18 +7,11 @@ import {
 import Content, { ContentProps } from '../Content'
 import * as ContentTypes from '../pushpin-code/ContentTypes'
 
-import { GithubPicker } from 'react-color'
 import { DocHandle, DocumentId } from 'automerge-repo'
 import { useDocument } from 'automerge-repo-react-hooks'
-import Heading from '../ui/Heading'
-import SecondaryText from '../ui/SecondaryText'
 
-import Badge from '../ui/Badge'
 import CenteredStack from '../ui/CenteredStack'
-import ListMenuSection from '../ui/ListMenuSection'
 import ListMenuItem from '../ui/ListMenuItem'
-import TitleEditor from '../TitleEditor'
-import ListItem from '../ui/ListItem'
 import ListMenu from '../ui/ListMenu'
 import './ContentList.css'
 import DefaultInList from './defaults/DefaultInList'
@@ -46,7 +39,15 @@ export default function ContentList(props: ContentProps) {
     ContentTypes.create('thread', {}, (threadUrl) =>{
       changeDoc(doc => {
         doc.content.push(threadUrl)
-      })      
+      })
+    })
+  }
+
+  const createText = () => {
+    ContentTypes.create('text', {}, (textUrl) =>{
+      changeDoc(doc => {
+        doc.content.push(textUrl)
+      })
     })
   }
 
@@ -61,12 +62,15 @@ export default function ContentList(props: ContentProps) {
           </ListMenuItem>
         )}
       </ListMenu>
-      <button onClick={createThread}>Make a thread</button>
+      <button onClick={createThread}>Add chat channel</button>
+      <button onClick={createText}>Add text doc</button>
     </CenteredStack>
-    { 
+    {
       (currentContent) ?
+        <div className="ContentList-content-wrapper">
         <Content context="workspace" url={currentContent}/>
-      : 
+        </div>
+      :
         <div>Select something from the side I guess????</div>
     }
     </CenteredStack>
