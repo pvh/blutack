@@ -31,6 +31,7 @@ export interface ContentListDoc {
 export default function ContentList({documentId}: ContentProps) {
   const [doc, changeDoc] = useDocument<ContentListDoc>(documentId)
   const [currentContent, selectContent] = useState<PushpinUrl | undefined>()
+  const [addingNewItem, setAddingNewItem] = useState(false)
   const contentTypes = useMemo(() => ContentTypes.list({ context: 'board' }), [])
 
   if (!doc) {
@@ -96,19 +97,24 @@ export default function ContentList({documentId}: ContentProps) {
                 <Content context="list" url={url} editable={false}/>
               </ActionListItem>
             )}
-            <ListMenuSection>
-              <ListMenuHeader>
+              <ListMenuItem onClick={() => setAddingNewItem(prev => !prev)}>
                 + Create new item
-              </ListMenuHeader>
+              </ListMenuItem>
+              {addingNewItem && (
+              <ListMenuSection>
               { contentTypes.map((contentType) => (
-                <ListMenuItem onClick={() => addContent(contentType)} key={contentType.type}>
+                <ListMenuItem onClick={() => {
+                  addContent(contentType);
+                  setAddingNewItem(false)}
+                } key={contentType.type}>
                   <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
                     <i className={classNames('fa', `fa-${contentType.icon}`)} />
                   </div>
                   <span className="ContextMenu__label">{contentType.name}</span>
                 </ListMenuItem>))
               }
-            </ListMenuSection>
+              </ListMenuSection>)}
+
           </ListMenu>
       </CenteredStackRowItem>
       <CenteredStackRowItem size={{mode: "auto"}}>
