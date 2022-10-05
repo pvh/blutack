@@ -1,6 +1,6 @@
 import { Doc } from "@automerge/automerge"
 import { DocumentId, DocCollection, DocHandle } from "automerge-repo"
-import { useDocument, useRepo } from "automerge-repo-react-hooks"
+import { useDocument, useHandle, useRepo } from "automerge-repo-react-hooks"
 import {
   useEffect,
   useState,
@@ -148,6 +148,68 @@ export function useDocumentReducer<D, A>(
 
   return [doc, dispatch]
 }
+
+export function useMessaging<M>(
+  documentId: DocumentId | undefined,
+  onMsg: (msg: M) => void
+): (msg: M) => void {
+  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({
+    send() {},
+  })
+
+  // Without this ref, we'd close over the `onMsg` passed during the very first render.
+  // Instead, we close over the ref object and can be sure we're always reading
+  // the latest onMsg callback.
+  const onMsgRef = useRef(onMsg)
+  onMsgRef.current = onMsg
+
+  // TODO: need a use-effect to handle the unsubscribe here...
+  if (!documentId) {
+    return () => {}
+  }
+
+  const handle = useHandle(documentId)
+  handle.on("message", (msg: M) => onMsgRef.current(msg))
+  setSend(handle.sendMessage)
+
+  return () => {
+    onMsgRef.current = () => {}
+    setSend({ send() {} })
+  }
+}
+
+/*
+export function useHyperfile(
+  url: HyperfileUrl | null
+): [Header, Readable] | [null, null] {
+  const [header, setHeader] = useState<[Header, Readable] | [null, null]>([
+    null,
+    null,
+  ]);
+
+  useEffect(() => {
+    header && setHeader([null, null]);
+    url &&
+      Hyperfile.fetch(url).then(([header, readable]) =>
+        setHeader([header, readable])
+      );
+  }, [url]);
+
+  return header;
+}
+
+export function useHyperfileHeader(url: HyperfileUrl | null): Header | null {
+  const [header, setHeader] = useState<Header | null>(null);
+  const { files } = useRepo();
+
+  useEffect(() => {
+    header && setHeader(null);
+    url && files.header(url).then(setHeader);
+  }, [url]);
+
+  return header;
+}
+*/
 
 export function useInterval(ms: number, cb: () => void, deps: any[]) {
   useEffect(() => {
