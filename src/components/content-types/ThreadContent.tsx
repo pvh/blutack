@@ -108,12 +108,11 @@ export function ThreadInList(props: ContentProps) {
   return (
     <ListItem>
       <ContentDragHandle url={url}>
-        <Badge icon={icon} />
+        <Badge size="medium" icon={icon} />
       </ContentDragHandle>
       <TitleWithSubtitle
         titleEditorField="title"
         title={title}
-        subtitle={subtitle}
         documentId={documentId}
         editable={editable}
       />

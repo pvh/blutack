@@ -198,11 +198,10 @@ function TextInList(props: ContentProps) {
   return (
     <ListItem>
       <ContentDragHandle url={url}>
-        <Badge icon="sticky-note" />
+        <Badge icon="sticky-note" size="medium" />
       </ContentDragHandle>
       <TitleWithSubtitle
         title={title}
-        subtitle={subtitle}
         documentId={documentId}
         editable={false}
       />

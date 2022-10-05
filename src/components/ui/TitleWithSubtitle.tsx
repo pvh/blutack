@@ -34,7 +34,7 @@ export default function TitleWithSubtitle(props: Props) {
       ) : (
         <Heading wrap={wrapTitle}>{title}</Heading>
       )}
-      <SecondaryText>{href ? <a href={href}>{subtitle}</a> : subtitle}</SecondaryText>
+      {subtitle && <SecondaryText>{href ? <a href={href}>{subtitle}</a> : subtitle}</SecondaryText>}
     </div>
   )
 }
