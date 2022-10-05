@@ -57,7 +57,6 @@ export default function ContentList({documentId}: ContentProps) {
         doc.content.splice(index, 1) 
       }
     })
-
   }
 
   // XXX: Would be better to not recreate this every render.

@@ -73,7 +73,7 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
       console.log(navigateEvent.destination.url)
     
       navigateEvent.intercept({handler: async () => {
-        openDoc(url.pathname)
+        openDoc(url.toString())
       }});
     });
   }
@@ -133,7 +133,7 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
     }
 
     const { documentId } = parseDocumentLink(currentDeviceUrl)
-    if (!self.devices || !self.devices.includes(documentId)) {
+    if (documentId && (!self.devices || !self.devices.includes(documentId))) {
       changeSelf((doc: ContactDoc) => {
         if (!doc.devices) {
           doc.devices = []

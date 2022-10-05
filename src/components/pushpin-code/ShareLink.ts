@@ -15,12 +15,13 @@ export function createDocumentLink(
   if (!type) {
     throw new Error("no type when creating URL");
   }
-  return `/${type}/${docId}` as PushpinUrl;
+  return `?scheme=pushpin&type=${type}&documentId=${docId}` as PushpinUrl;
 }
 
 interface Parts {
-  type: string;
-  documentId: DocumentId;
+  scheme: string | null;
+  type: string | null;
+  documentId: DocumentId | null;
 }
 
 export function parseDocumentLink(link: string): Parts {
@@ -28,7 +29,11 @@ export function parseDocumentLink(link: string): Parts {
     throw new Error("Cannot parse an empty value as a link.");
   }
 
-  const { type, documentId } = parts(link);
+  const { scheme, type, documentId } = parts(link);
+
+  if (scheme !== "pushpin") {
+    throw new Error(`Missing the pushpin scheme in ${link}`);
+  }
 
   if (!type) {
     throw new Error(`Missing type in ${link}`);
@@ -38,14 +43,16 @@ export function parseDocumentLink(link: string): Parts {
     throw new Error(`Missing docId in ${link}`);
   }
 
-  return { type, documentId };
+  return { scheme, type, documentId };
 }
 
 export function parts(str: string): Parts {
   const url = new URL(str, document.URL);
 
-  const [, /* leading */ type, documentId] = url.pathname.split("/");
+  const scheme = url.searchParams.get("scheme");
+  const type = url.searchParams.get("type");
+  const documentId = url.searchParams.get("documentId");
 
   const params = new URLSearchParams(url.search);
-  return { type, documentId: documentId as DocumentId };
+  return { scheme, type, documentId: documentId as DocumentId };
 }
