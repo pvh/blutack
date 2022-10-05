@@ -1,8 +1,6 @@
 import React, { useContext, useRef, Ref, ChangeEvent } from 'react'
 
 import {
-  createDocumentLink,
-  PushpinUrl,
   parseDocumentLink,
 } from '../../pushpin-code/ShareLink'
 

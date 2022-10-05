@@ -10,7 +10,7 @@ TODO: vendor the woff2 files into the repo and remove @ibm/plex from package.jso
   font-style: normal;
   font-weight: 400;
   src: local('IBM Plex Mono'), local('IBMPlexMono'),
-    url('../../node_modules/@ibm/plex/IBM-Plex-Mono/fonts/complete/woff2/IBMPlexMono-Regular.woff2')
+    url('./fonts/IBMPlexMono-Regular.woff2')
       format('woff2');
 }
 
@@ -19,7 +19,7 @@ TODO: vendor the woff2 files into the repo and remove @ibm/plex from package.jso
   font-style: normal;
   font-weight: 700;
   src: local('IBM Plex Mono Bold'), local('IBMPlexMono-Bold'),
-    url('../../node_modules/@ibm/plex/IBM-Plex-Mono/fonts/complete/woff2/IBMPlexMono-Bold.woff2')
+    url('./fonts/IBMPlexMono-Bold.woff2')
       format('woff2');
 }
 
@@ -28,7 +28,7 @@ TODO: vendor the woff2 files into the repo and remove @ibm/plex from package.jso
   font-style: normal;
   font-weight: 400;
   src: local('IBM Plex Sans'), local('IBMPlexSans'),
-    url('../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/complete/woff2/IBMPlexSans-Regular.woff2')
+    url('./fonts/IBMPlexSans-Regular.woff2')
       format('woff2');
 }
 
@@ -37,9 +37,9 @@ TODO: vendor the woff2 files into the repo and remove @ibm/plex from package.jso
   font-style: normal;
   font-weight: 500;
   src: local('IBM Plex Sans Medium'), local('IBMPlexSans-Medium'),
-    url('../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/complete/woff2/IBMPlexSans-Medium.woff2')
+    url('./fonts/IBMPlexSans-Medium.woff2')
       format('woff2'),
-    url('../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/complete/woff/IBMPlexSans-Medium.woff')
+    url('./fonts/IBMPlexSans-Medium.woff')
       format('woff');
 }
 
@@ -48,7 +48,7 @@ TODO: vendor the woff2 files into the repo and remove @ibm/plex from package.jso
   font-style: normal;
   font-weight: 600;
   src: local('IBM Plex Sans SemiBold'), local('IBMPlexSans-SemiBold'),
-    url('../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/complete/woff2/IBMPlexSans-SemiBold.woff2')
+    url('./fonts/IBMPlexSans-SemiBold.woff2')
       format('woff2');
 }
 
@@ -57,7 +57,7 @@ TODO: vendor the woff2 files into the repo and remove @ibm/plex from package.jso
   font-style: normal;
   font-weight: 700;
   src: local('IBM Plex Sans Bold'), local('IBMPlexSans-Bold'),
-    url('../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/complete/woff2/IBMPlexSans-Bold.woff2')
+    url('./fonts/IBMPlexSans-Bold.woff2')
       format('woff2');
 }
 
@@ -66,6 +66,6 @@ TODO: vendor the woff2 files into the repo and remove @ibm/plex from package.jso
   font-style: italic;
   font-weight: 400;
   src: local('IBM Plex Sans Italic'), local('IBMPlexSans-Italic'),
-    url('../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/complete/woff2/IBMPlexSans-Italic.woff2')
+    url('./fonts/IBMPlexSans-Italic.woff2')
       format('woff2');
 }
