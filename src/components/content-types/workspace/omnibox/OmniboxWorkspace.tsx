@@ -12,7 +12,6 @@ import Badge from '../../../ui/Badge'
 import './OmniboxWorkspace.css'
 
 export interface Props {
-  viewContents: boolean
   active: boolean
   search: string
   documentId: DocumentId
@@ -21,9 +20,8 @@ export interface Props {
 }
 
 export default function OmniboxWorkspace(props: Props) {
-  const { active, search, documentId, omniboxFinished, viewContents, onContent } = props
+  const { active, search, documentId, omniboxFinished, onContent } = props
   const [workspaceDoc] = useDocument<WorkspaceDoc>(documentId)
-  const [selfDoc] = useDocument<ContactDoc>(workspaceDoc ? workspaceDoc.selfId : undefined)
   const repo = useRepo()
 
   const onClickWorkspace = useCallback(
@@ -33,35 +31,12 @@ export default function OmniboxWorkspace(props: Props) {
     [omniboxFinished]
   )
 
-  const onClickWorkspaceCopy = useCallback(
-    () => {
-      // clipboard.writeText(createDocumentLink('workspace', hypermergeUrl))
-    },
-    [documentId]
-  )
-
-  if (!selfDoc || !workspaceDoc) {
+  if (!workspaceDoc) {
     return null
   }
 
-  const { selfId } = workspaceDoc
-  const { name = [] } = selfDoc
-
   return (
     <div className="OmniboxWorkspace" onClick={onClickWorkspace}>
-      <ListMenuHeader>
-        <a href={createDocumentLink('workspace', documentId)} className="OmniboxWorkspace-name">
-          {name}&apos;s Documents
-        </a>
-        <div className="OmniboxWorkspace-badge" key="contact">
-          <Content context="title-bar" url={createDocumentLink('contact', selfId)} />
-        </div>
-
-        <div className="OmniboxWorkspace-badge" key="copy" onClick={onClickWorkspaceCopy}>
-          <Badge shape="circle" icon="clipboard" size="large" />
-        </div>
-      </ListMenuHeader>
-      {!viewContents ? null : (
         <OmniboxWorkspaceListMenu
           repo={repo}
           active={active}
@@ -70,7 +45,6 @@ export default function OmniboxWorkspace(props: Props) {
           documentId={documentId}
           omniboxFinished={omniboxFinished}
         />
-      )}
     </div>
   )
 }

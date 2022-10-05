@@ -59,10 +59,6 @@ export default function Omnibox(props: Props) {
 
   log('render')
 
-  // TODO: we had support for multiple workspace URLs in the omnibox
-  // but i haven't wired that up and maybe we don't want to have it really
-  const workspaceUrls = [ createDocumentLink("workspace", documentId) ]
-
   return (
     <div
       className={classNames(`Omnibox`, active ? 'Omnibox--active' : 'Omnibox--inactive')}
@@ -79,39 +75,15 @@ export default function Omnibox(props: Props) {
           placeholder="Search..."
         />
       </div>
-      <div className="Omnibox-Workspaces">
-        {workspaceUrls.slice(0, 1).map((url, i) => {
-          const { documentId } = parseDocumentLink(url)
-          return (
-            <OmniboxWorkspace
-              key={url}
-              viewContents={true}
-              onContent={onContent}
-              omniboxFinished={omniboxFinished}
-              documentId={documentId}
-              search={search}
-              active={active}
-            />
-          )
-        })}
-        {workspaceUrls.length > 1 ? (
-          <ListMenuSection title="Other Accounts">
-            {workspaceUrls.slice(1).map((url, i) => {
-              const { documentId } = parseDocumentLink(url)
-              return (
-                <OmniboxWorkspace
-                  key={url}
-                  viewContents={false}
-                  onContent={onContent}
-                  omniboxFinished={omniboxFinished}
-                  documentId={documentId}
-                  search={search}
-                  active={active}
-                />
-              )
-            })}
-          </ListMenuSection>
-        ) : null}
+      <div className="Omnibox-Workspace">
+        <OmniboxWorkspace
+          key={documentId}
+          onContent={onContent}
+          omniboxFinished={omniboxFinished}
+          documentId={documentId}
+          search={search}
+          active={active}
+        />
       </div>
     </div>
   )

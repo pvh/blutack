@@ -16,8 +16,6 @@ interface Props {
   children?: React.ReactNode
 }
 
-/* This class is adapted from the react-color TwitterPicker
-   by stripping out most of the functionality and just leaving swatches */
 export default function Actions(props: Props) {
   function onActionClick(e: React.MouseEvent, callback: () => void) {
     e.stopPropagation()
