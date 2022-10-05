@@ -1,18 +1,14 @@
-/* eslint-disable react/sort-comp */
-// this component has a bunch of weird pseudo-members that make eslint sad
-
 import React, { useRef, useState, useCallback, useEffect } from 'react'
 import Debug from 'debug'
 import classNames from 'classnames'
 
-import { createDocumentLink, parseDocumentLink, PushpinUrl } from '../../../pushpin-code/ShareLink'
-import OmniboxWorkspace from './OmniboxWorkspace'
-import './Omnibox.css'
+import { PushpinUrl } from '../../../pushpin-code/ShareLink'
 import { useEvent } from '../../../pushpin-code/Hooks'
-import ListMenuSection from '../../../ui/ListMenuSection'
 import { DocumentId } from 'automerge-repo'
 import { useRepo } from 'automerge-repo-react-hooks'
 import OmniboxWorkspaceListMenu from './OmniboxWorkspaceListMenu'
+
+import './Omnibox.css'
 
 const log = Debug('pushpin:omnibox')
 
