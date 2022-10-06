@@ -4,7 +4,7 @@ import * as Automerge from '@automerge/automerge'
 import Quill, { TextChangeHandler, QuillOptionsStatic } from 'quill'
 import Delta from 'quill-delta'
 import * as ContentTypes from '../pushpin-code/ContentTypes'
-import { ContentProps } from '../Content'
+import { ContentProps, EditableContentProps } from '../Content'
 import { useDocument } from 'automerge-repo-react-hooks'
 import { useStaticCallback } from '../pushpin-code/Hooks'
 import './TextContent.css'
@@ -17,6 +17,7 @@ import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 import { DocHandle } from 'automerge-repo'
 
 interface TextDoc {
+  title: string
   text: Automerge.Text
 }
 
@@ -181,8 +182,8 @@ function create({ text }: any, handle: DocHandle<any>) {
   })
 }
 
-function TextInList(props: ContentProps) {
-  const { documentId, url } = props
+function TextInList(props: EditableContentProps) {
+  const { documentId, url, editable } = props
   const [doc] = useDocument<TextDoc>(documentId)
   if (!doc || !doc.text) return null
 
@@ -192,7 +193,7 @@ function TextInList(props: ContentProps) {
     .split('\n')
     .filter((l: string[]) => l.length > 0)
 
-  const title = lines.shift() || '[empty text note]'
+  const title = doc.title || lines.shift() || '[empty text note]'
   const subtitle = lines.slice(0, 2).join('\n')
 
   return (
@@ -203,7 +204,7 @@ function TextInList(props: ContentProps) {
       <TitleWithSubtitle
         title={title}
         documentId={documentId}
-        editable={false}
+        editable={editable}
       />
     </ListItem>
   )

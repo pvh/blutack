@@ -399,9 +399,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
             ([_url, doc]) =>
               doc &&
               ((doc.title && doc.title.match(new RegExp(props.search, 'i'))) ||
-                (doc.text && doc.text.join('').match(new RegExp(props.search, 'i'))) ||
-                //(doc.content && doc.content.match(new RegExp(props.search, 'i'))) ||
-                (doc.data && doc.data.text && doc.data.text.match(new RegExp(props.search, 'i'))))
+                (doc.text && doc.text.join('').match(new RegExp(props.search, 'i'))))
           )
           .reduce(
             (prev, current) => {

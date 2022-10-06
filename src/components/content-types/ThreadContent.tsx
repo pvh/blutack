@@ -97,13 +97,12 @@ export default function ThreadContent(props: ContentProps) {
 }
 
 export function ThreadInList(props: ContentProps) {
-  const { documentId, url } = props
+  const { documentId, url, editable } = props
   const [doc] = useDocument<Doc>(documentId)
   if (!doc || !doc.messages) return null
 
   const title = doc.title != null && doc.title !== '' ? doc.title : 'Untitled conversation'
   const subtitle = (doc.messages[doc.messages.length - 1] || { content: '' }).content
-  const editable = true
 
   return (
     <ListItem>

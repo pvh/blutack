@@ -25,6 +25,11 @@ export interface ContentProps {
   contentRef?: Ref<ContentHandle>
 }
 
+// I don't think this is a good longterm solution but it'll do for now.
+export interface EditableContentProps extends ContentProps {
+  editable: boolean
+}
+
 // These are the props the generic Content wrapper receives
 interface Props {
   url: PushpinUrl

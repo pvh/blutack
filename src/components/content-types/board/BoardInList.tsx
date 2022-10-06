@@ -7,15 +7,11 @@ import ListItem from '../../ui/ListItem'
 import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
 import ContentDragHandle from '../../ui/ContentDragHandle'
 
-interface Props extends ContentProps {
-  editable: boolean
-}
 
-export default function BoardInList(props: Props) {
+export default function BoardInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
   const [doc] = useDocument<BoardDoc>(documentId)
 
-  // TODO: something is awry ... i'm getting a document ... but with no contents for a moment
   if (!doc || !doc.cards) {
     return null
   }

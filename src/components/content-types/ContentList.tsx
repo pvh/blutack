@@ -4,7 +4,7 @@ import {
   PushpinUrl,
 } from '../pushpin-code/ShareLink'
 
-import Content, { ContentProps } from '../Content'
+import Content, { ContentProps, EditableContentProps } from '../Content'
 import * as ContentTypes from '../pushpin-code/ContentTypes'
 
 import { DocHandle, DocumentId } from 'automerge-repo'
@@ -97,7 +97,7 @@ export default function ContentList({documentId}: ContentProps) {
                 actions={actions}
                 selected={url === currentContent}
               >
-                <Content context="list" url={url} editable={false}/>
+                <Content context="list" url={url} editable={true}/>
               </ActionListItem>
             )}
               <ListMenuItem onClick={() => setAddingNewItem(prev => !prev)}>
@@ -134,15 +134,14 @@ export default function ContentList({documentId}: ContentProps) {
 
 const icon = "list"
 
-export function ContentListInList(props: ContentProps) {
-  const { documentId, url } = props
+export function ContentListInList(props: EditableContentProps) {
+  const { documentId, url, editable } = props
   const [doc] = useDocument<ContentListDoc>(documentId)
   if (!doc || !doc.content) return null
 
   const title = doc.title != null && doc.title !== '' ? doc.title : 'Untitled List'
   const items = doc.content.length
   const subtitle = `${items} item${items !== 1 ? 's' : ''}`
-  const editable = true
 
   return (
     <ListItem>
