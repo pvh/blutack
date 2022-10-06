@@ -89,17 +89,14 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
       // The properties to look at are discussed later in the article.
       //if (shouldNotIntercept(navigateEvent)) return;
     
-      console.log(navigateEvent)
-
-      const search = (navigateEvent.destination.url as URL).search;
-      console.log(search)
-      if (isPushpinUrl(search)) {
+      const destination = new URL(navigateEvent.destination.url).searchParams.get("document")
+      if (isPushpinUrl(destination)) {
         navigateEvent.intercept({handler: async () => {
-          openDoc(search)
+          openDoc(destination)
         }});  
       }
       else { 
-        console.log("weird URL:", search)
+        console.log("weird URL:", navigateEvent.destination.url)
       }
     
     });

@@ -191,7 +191,7 @@ function TextInList(props: EditableContentProps) {
   //  @ts-ignore-next-line
     .join('')
     .split('\n')
-    .filter((l: string[]) => l.length > 0)
+    .filter((l: string) => l.length > 0)
 
   const title = doc.title || lines.shift() || '[empty text note]'
   const subtitle = lines.slice(0, 2).join('\n')
