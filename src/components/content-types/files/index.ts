@@ -1,4 +1,4 @@
-import pathParse from "path-parse"
+import pathParse from "path-parse";
 import * as ContentTypes from "../../pushpin-code/ContentTypes";
 import FileContent from "./FileContent";
 
@@ -13,7 +13,6 @@ export interface FileDoc {
   capturedAt: string;
 }
 
-// TODO: when is this ever called?
 function create({ title, extension, fileId }: any, handle: DocHandle<any>) {
   handle.change((doc) => {
     doc.title = title;

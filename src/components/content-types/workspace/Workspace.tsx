@@ -1,6 +1,5 @@
-import React, { useEffect, useContext, useRef, useState } from 'react'
+import { useEffect, useContext, useRef, useState } from 'react'
 import Debug from 'debug'
-import * as uuid from 'uuid'
 import { useDocument } from 'automerge-repo-react-hooks'
 import { DocumentId, DocHandle } from 'automerge-repo'
 
@@ -10,11 +9,6 @@ import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import SelfContext from '../../pushpin-code/SelfHooks'
 import TitleBar from './TitleBar'
 import { ContactDoc } from '../contact'
-import * as WebStreamLogic from '../../pushpin-code/WebStreamLogic'
-
-// TODO: the navigation API is only available in newish chromes
-// we should track down a type for it
-declare var navigation: any
 
 import './Workspace.css'
 /* import {
@@ -84,7 +78,7 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
 
 
   if ("navigation" in window) {
-    navigation.addEventListener('navigate', (navigateEvent: any) => {
+    window.navigation.addEventListener('navigate', (navigateEvent: any) => {
       // Exit early if this navigation shouldn't be intercepted.
       // The properties to look at are discussed later in the article.
       //if (shouldNotIntercept(navigateEvent)) return;

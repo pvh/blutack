@@ -391,8 +391,4 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
   )
 }
 
-// TODO: pvh hacked ContextMenuTrigger to include 
-// children?: React.ReactNode
-// in the props in the type since it's required in react18+
-
 export default memo(Board)

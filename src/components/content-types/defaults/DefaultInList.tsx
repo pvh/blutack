@@ -24,7 +24,6 @@ export default function DefaultInList(props: ContentProps) {
 
   const { icon = 'question', name = `Unidentified type: ${type}` } = contentType || {}
 
-  // TODO: pick background color based on url
   return (
     <ListItem>
       <ContentDragHandle url={url}>
