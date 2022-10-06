@@ -24,6 +24,7 @@ export default function BoardInList(props: EditableContentProps) {
   const badgeProps: BadgeProps = {
     icon,
     backgroundColor,
+    size: "medium" 
   }
 
   return (
