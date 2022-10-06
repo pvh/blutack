@@ -22,6 +22,9 @@ import ListMenuSection from '../ui/ListMenuSection'
 import classNames from 'classnames'
 import ActionListItem from './workspace/omnibox/ActionListItem'
 import CenteredStackRowItem from '../ui/CenteredStackRowItem'
+import ContentDragHandle from '../ui/ContentDragHandle'
+import Badge from '../ui/Badge'
+import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 
 export interface ContentListDoc {
   title: string
@@ -129,6 +132,34 @@ export default function ContentList({documentId}: ContentProps) {
   )
 }
 
+const icon = "list"
+
+export function ContentListInList(props: ContentProps) {
+  const { documentId, url } = props
+  const [doc] = useDocument<ContentListDoc>(documentId)
+  if (!doc || !doc.content) return null
+
+  const title = doc.title != null && doc.title !== '' ? doc.title : 'Untitled List'
+  const items = doc.content.length
+  const subtitle = `${items} item${items !== 1 ? 's' : ''}`
+  const editable = true
+
+  return (
+    <ListItem>
+      <ContentDragHandle url={url}>
+        <Badge size="medium" icon={icon} />
+      </ContentDragHandle>
+      <TitleWithSubtitle
+        titleEditorField="title"
+        title={title}
+        subtitle={subtitle}
+        documentId={documentId}
+        editable={editable}
+      />
+    </ListItem>
+  )
+}
+
 function create(unusedAttrs: any, handle: DocHandle<any>) {
   handle.change((doc: ContentListDoc) => {
     doc.content = []
@@ -137,14 +168,14 @@ function create(unusedAttrs: any, handle: DocHandle<any>) {
 
 ContentTypes.register({
   type: 'contentlist',
-  name: 'Content List',
+  name: 'List',
   icon: 'sticky-note',
   contexts: {
     root: ContentList,
     board: ContentList,
     workspace: ContentList,
-    list: DefaultInList,
-    'title-bar': DefaultInList,
+    list: ContentListInList,
+    'title-bar': ContentListInList,
   },
   create,
 })
