@@ -1,6 +1,3 @@
-import React from 'react'
-import { GithubPicker } from 'react-color'
-
 import { createDocumentLink, PushpinUrl } from '../../pushpin-code/ShareLink'
 
 import DEFAULT_AVATAR_PATH from '../../../images/default-avatar.png'
@@ -20,6 +17,9 @@ import CenteredStack from '../../ui/CenteredStack'
 import ListMenuSection from '../../ui/ListMenuSection'
 import ListMenuItem from '../../ui/ListMenuItem'
 import SharesSection from './SharesSection'
+
+// @ts-ignore-next-line
+import { Swatch } from 'react-color/lib/components/common/Swatch'
 
 import './ContactEditor.css'
 import ListMenu from '../../ui/ListMenu'
@@ -51,8 +51,14 @@ export default function ContactViewer(props: ContentProps) {
         <ListMenuSection title="Presence Color">
           <ListMenuItem>
             <div className="ColorPicker__swatch">
-              <div>TODO: COLOR SAMPLE HERE</div>
+              <Swatch
+                color={doc.color}
+                hex={doc.color}
+                onClick={() => {}}
+                focusStyle={{ border: `0 0 4px ${doc.color}` }}
+              />
             </div>
+
           </ListMenuItem>
           <ListMenuItem>
             <SecondaryText>

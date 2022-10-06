@@ -9,12 +9,12 @@ declare module 'react-contextmenu' {
   }
 }
 
-import { GithubPicker } from 'react-color'
 import './ContextMenu.css'
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import { importFileList } from '../../pushpin-code/ImportData'
 import { BoardAction } from './Board'
 import { gridOffset, Position } from './BoardGrid'
+import ColorPicker from '../../ui/ColorPicker'
 
 interface Props {
   contentTypes: ContentTypes.LookupResult[]
@@ -93,6 +93,8 @@ function BoardContextMenu(props: Props) {
     })
   }
 
+  const colors = props.backgroundColors
+
   const onChangeComplete = (color: any) => props.dispatch({ type: 'ChangeBackgroundColor', color })
 
   return (
@@ -121,9 +123,10 @@ function BoardContextMenu(props: Props) {
         <h6>Board Color</h6>
         <div className="ContextMenu__divider" />
         <ContextMenuItem>
-          <GithubPicker
+          <ColorPicker
             color={props.backgroundColor}
             colors={props.backgroundColors}
+            onChange={() => {}}
             onChangeComplete={onChangeComplete}
           />
         </ContextMenuItem>

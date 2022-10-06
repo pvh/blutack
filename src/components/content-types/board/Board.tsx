@@ -18,7 +18,7 @@ declare module 'react-contextmenu' {
 
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import * as ImportData from '../../pushpin-code/ImportData'
-import { PushpinUrl } from '../../pushpin-code/ShareLink'
+import { createWebLink, PushpinUrl } from '../../pushpin-code/ShareLink'
 import { ContentProps } from '../../Content'
 import { BoardDoc, BoardDocCard, CardId } from '.'
 import BoardCard, { BoardCardAction } from './BoardCard'
@@ -153,7 +153,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
   const onCardDoubleClicked = (doc: BoardDoc, id: CardId, e: React.MouseEvent) => {
     const card = doc.cards[id]
     if (card && card.url) {
-      window.location.href = card.url as string
+      window.location.href = createWebLink(window.location, card.url)
     }
     e.stopPropagation()
   }

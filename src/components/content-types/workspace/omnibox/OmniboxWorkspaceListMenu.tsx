@@ -6,6 +6,7 @@ import Debug from 'debug'
 
 import {
   createDocumentLink,
+  createWebLink,
   parseDocumentLink,
   PushpinUrl,
 } from '../../../pushpin-code/ShareLink'
@@ -458,7 +459,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   navigate = (url: PushpinUrl) => {
     // this weird typecast is to work around a typescript bug,
     // maybe try removing it and see if it's better.
-    (window as Window).location = url as string
+    window.location.href = createWebLink(window.location, url)
     this.props.omniboxFinished()
   }
 

@@ -8,7 +8,6 @@ import DEFAULT_AVATAR_PATH from '../../../images/default-avatar.png'
 import { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
-import { GithubPicker } from 'react-color'
 import { DocumentId } from 'automerge-repo'
 import { useDocument } from 'automerge-repo-react-hooks'
 import Heading from '../../ui/Heading'
@@ -31,6 +30,7 @@ import { USER_COLORS } from './Constants'
 import SharesSection from './SharesSection'
 import './ContactEditor.css'
 import { FileId } from '../files'
+import ColorPicker from '../../ui/ColorPicker'
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.documentId)
@@ -139,7 +139,7 @@ const renderAvatarEditor = (
 const renderPresenceColorSelector = (color: string, setColor: (color: { hex: string }) => void) => (
   <ListMenuSection title="Presence Color">
     <ListMenuItem>
-      <GithubPicker color={color} colors={Object.values(USER_COLORS)} onChangeComplete={setColor} />
+      <ColorPicker color={color} colors={Object.values(USER_COLORS)} onChange={()=>{}} onChangeComplete={setColor} />
     </ListMenuItem>
     <ListMenuItem>
       <SecondaryText>
@@ -186,9 +186,7 @@ const renderDevices = (
           <ListItem>
             <Badge backgroundColor="#00000000" size="medium" icon="cloud" />
             <SecondaryText>
-              Consider adding{' '}
-              <a href="https://github.com/mjtognetti/pushpin-peer">a storage peer</a> to keep your
-              data online when PushPin is offline or closed.
+              You aren't currently synchronizing to any other devices identified by this user ID.
             </SecondaryText>
           </ListItem>
         </ListMenuItem>
