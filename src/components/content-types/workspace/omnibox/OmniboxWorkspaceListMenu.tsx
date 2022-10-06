@@ -20,13 +20,19 @@ import { WorkspaceDoc as WorkspaceDoc } from "../Workspace"
 import "./OmniboxWorkspaceListMenu.css"
 import ActionListItem from "./ActionListItem"
 import Heading from "../../../ui/Heading"
-import { DocCollection, DocumentId } from "automerge-repo"
+import {
+  DocCollection,
+  DocHandle,
+  DocHandleChangeEventArg,
+  DocumentId,
+} from "automerge-repo"
 import { Doc } from "@automerge/automerge"
 import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import { useDocumentIds, useDocuments } from "../../../pushpin-code/Hooks"
 import Content from "../../../Content"
 import { useSelfId } from "../../../pushpin-code/SelfHooks"
 import useInvitations, { Invitation } from "./InvitationsHook"
+import "./OmniboxWorkspaceListMenu.css"
 
 const log = Debug("pushpin:omnibox")
 

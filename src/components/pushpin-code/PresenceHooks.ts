@@ -70,7 +70,8 @@ export function useAllHeartbeats(contact: DocumentId | undefined) {
             data: myPresence[url],
           };
           // we can't use DocumentId as a key in heartbeats, so we do this bad thing
-          repo.message(url as DocumentId, msg);
+          //repo.broadcast(url as DocumentId, msg);
+          throw new Error("NOT IMPLEMENTED");
         } else {
           depart(url as DocumentId);
           delete heartbeats[url];
@@ -87,7 +88,8 @@ export function useAllHeartbeats(contact: DocumentId | undefined) {
         device,
         departing: true,
       };
-      repo.message(url, departMessage);
+      // repo.message(url, departMessage);
+      throw new Error("NOT IMPLEMENTED");
     }
 
     return () => {
