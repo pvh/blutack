@@ -184,7 +184,7 @@ function create({ text }: any, handle: DocHandle<any>) {
 function TextInList(props: ContentProps) {
   const { documentId, url } = props
   const [doc] = useDocument<TextDoc>(documentId)
-  if (!doc) return null
+  if (!doc || !doc.text) return null
 
   const lines = doc.text
   //  @ts-ignore-next-line

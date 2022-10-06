@@ -2,10 +2,14 @@ import { DocumentId } from "automerge-repo";
 
 export type PushpinUrl = string & { pushpin: true };
 
-export function isPushpinUrl(str: string): str is PushpinUrl {
-  const url = new URL(str, document.URL);
-  const { type, documentId } = parts(str);
-  return type !== undefined && documentId !== undefined;
+export function isPushpinUrl(str?: string | null): str is PushpinUrl {
+  if (!str) {
+    return false;
+  }
+  const { scheme, type, documentId } = parts(str);
+  return (
+    scheme === "web+pushpin" && type !== undefined && documentId !== undefined
+  );
 }
 
 export function createDocumentLink(
@@ -15,8 +19,12 @@ export function createDocumentLink(
   if (!type) {
     throw new Error("no type when creating URL");
   }
-  return `?scheme=pushpin&type=${type}&documentId=${docId}` as PushpinUrl;
+  return `web+pushpin://${type}/${docId}` as PushpinUrl;
 }
+
+// const url = "?document=web%2Bpushpin%3A%2F%2Fcontentlist%2Ffcfb63f5-777e-469b-a9bd-9f093d1ba2b7"
+// const url = "web+pushpin://contentlist/fcfb63f5-777e-469b-a9bd-9f093d1ba2b7"
+// isPushpinUrl(url) === true
 
 interface Parts {
   scheme: string;
@@ -31,7 +39,7 @@ export function parseDocumentLink(link: string): Parts {
 
   const { scheme, type, documentId } = parts(link);
 
-  if (scheme !== "pushpin") {
+  if (scheme !== "web+pushpin") {
     throw new Error(`Missing the pushpin scheme in ${link}`);
   }
 
@@ -49,9 +57,8 @@ export function parseDocumentLink(link: string): Parts {
 export function parts(str: string) {
   const url = new URL(str, document.URL);
 
-  const scheme = url.searchParams.get("scheme");
-  const type = url.searchParams.get("type");
-  const documentId = url.searchParams.get("documentId");
+  const scheme = url.protocol.slice(0, -1);
+  const [, , type, documentId] = url.pathname.split("/");
 
   const params = new URLSearchParams(url.search);
   return { scheme, type, documentId };

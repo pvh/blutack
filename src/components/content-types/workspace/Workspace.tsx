@@ -1,10 +1,10 @@
-import React, { useEffect, useContext, useRef } from 'react'
+import React, { useEffect, useContext, useRef, useState } from 'react'
 import Debug from 'debug'
 import * as uuid from 'uuid'
 import { useDocument } from 'automerge-repo-react-hooks'
 import { DocumentId, DocHandle } from 'automerge-repo'
 
-import { parseDocumentLink, PushpinUrl, isPushpinUrl } from '../../pushpin-code/ShareLink'
+import { parseDocumentLink, PushpinUrl, isPushpinUrl, createDocumentLink } from '../../pushpin-code/ShareLink'
 import Content, { ContentProps, ContentHandle } from '../../Content'
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import SelfContext from '../../pushpin-code/SelfHooks'
@@ -61,6 +61,24 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
   const [self, changeSelf] = useDocument<ContactDoc>(selfId || undefined)
 
+  const [once, setOnce] = useState<boolean>(false)
+  if (workspace?.currentDocUrl && !once) {
+    setOnce(true)
+    const maybePushpinUrl = new URLSearchParams(window.location.search).get("document")
+    console.log('mpu', maybePushpinUrl)
+    if (isPushpinUrl(maybePushpinUrl)) {
+      // this is just to sanitize out any other bits of the URL
+      const { scheme, type, documentId } = parseDocumentLink(maybePushpinUrl)
+      const docLink = createDocumentLink(type, documentId)
+      const currentDocUrl = workspace?.currentDocUrl
+      console.log('incoming ', docLink, 'current', currentDocUrl)
+      if (docLink !== currentDocUrl) {
+        openDoc(docLink)
+      }
+    }
+  }
+
+
   if ("navigation" in window) {
     navigation.addEventListener('navigate', (navigateEvent: any) => {
       // Exit early if this navigation shouldn't be intercepted.
@@ -69,12 +87,17 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
     
       console.log(navigateEvent)
 
-      const url = new URL(navigateEvent.destination.url);
-      console.log(navigateEvent.destination.url)
+      const search = (navigateEvent.destination.url as URL).search;
+      console.log(search)
+      if (isPushpinUrl(search)) {
+        navigateEvent.intercept({handler: async () => {
+          openDoc(search)
+        }});  
+      }
+      else { 
+        console.log("weird URL:", search)
+      }
     
-      navigateEvent.intercept({handler: async () => {
-        openDoc(url.toString())
-      }});
     });
   }
 

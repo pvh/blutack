@@ -34,7 +34,7 @@ export default function ContentList({documentId}: ContentProps) {
   const [addingNewItem, setAddingNewItem] = useState(false)
   const contentTypes = useMemo(() => ContentTypes.list({ context: 'board' }), [])
 
-  if (!doc) {
+  if (!doc || !doc.content) {
     return null
   }
 

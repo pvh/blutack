@@ -78,7 +78,7 @@ export default function TitleBar(props: Props) {
 
   function copyLink(e: React.MouseEvent) {
     if (doc && doc.currentDocUrl) {
-      navigator.clipboard.writeText(doc.currentDocUrl)
+      navigator.clipboard.writeText("https://localhost:5173?document=" + encodeURIComponent(doc.currentDocUrl))
     }
   }
 
