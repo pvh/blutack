@@ -38,7 +38,7 @@ export default function ContentList({documentId}: ContentProps) {
     return null
   }
 
-  if (!currentContent) {
+  if (!currentContent && doc.content.length > 0) {
     selectContent(doc.content[0])
   }
 
@@ -122,7 +122,7 @@ export default function ContentList({documentId}: ContentProps) {
           (currentContent) ?
             <Content context="workspace" url={currentContent}/>
           :
-            <div>Select something from the side I guess????</div>
+            <div style={{padding: "10px"}}>Select something from the side</div>
         }
       </CenteredStackRowItem>
     </CenteredStack>
