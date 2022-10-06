@@ -159,7 +159,7 @@ export function createFrom(
     .then(() => {
       callback(
         createDocumentLink(contentType, handle.documentId as DocumentId),
-        handle // unclear if this is a good idea but YOLOing a bit for demo
+        handle // TODO: unclear if this is a good idea but YOLOing a bit for demo
       );
     })
     .catch(log);

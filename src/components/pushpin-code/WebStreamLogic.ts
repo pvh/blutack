@@ -4,8 +4,6 @@
  * https://developer.mozilla.org/en-US/docs/Web/API/Streams_API
  */
 
-// import base64 from 'base64-js'
-
 export class DecodeUriComponentStream extends window.TransformStream {
   constructor() {
     super({
@@ -44,11 +42,3 @@ export function fromString(str: string): ReadableStream<Uint8Array> {
     },
   }).pipeThrough(new window.TextEncoderStream());
 }
-
-/* export function fromBase64(b64: string): ReadableStream<Uint8Array> {
-  const byteArray = base64.toByteArray(b64)
-  // TODO(matt): Consider making our own readable stream instead of using
-  // blob.
-  const blob = new Blob([byteArray])
-  return blob.stream()
-} */

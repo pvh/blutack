@@ -12,7 +12,6 @@ ListMenuItem.defaultProps = {
   selected: false,
 }
 
-// TODO: item highlighting
 export default function ListMenuItem(props: Props) {
   const { children, onClick, selected } = props
   const [content, actions] = React.Children.toArray(children)
