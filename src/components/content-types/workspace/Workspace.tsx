@@ -15,13 +15,17 @@ import SelfContext from "../../pushpin-code/SelfHooks"
 import TitleBar from "./TitleBar"
 import { ContactDoc } from "../contact"
 
+// TODO: the navigation API is only available in newish chromes
+// we should track down a type for it
+declare var navigation: any
+
 import "./Workspace.css"
-/* import {
+import {
   useAllHeartbeats,
   useHeartbeat,
   useContactOnlineStatus,
   useDeviceOnlineStatus,
-} from '../../../PresenceHooks' */
+} from "../../pushpin-code/PresenceHooks"
 
 import { BoardDoc, CardId } from "../board"
 import { CurrentDeviceContext } from "./Device"
@@ -45,16 +49,13 @@ interface WorkspaceContentProps extends ContentProps {
   createWorkspace: () => void
 }
 
-export default function Workspace({ documentId }: WorkspaceContentProps) {
+export default function Workspace({
+  documentId,
+  selfId,
+}: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDeviceId = useContext(CurrentDeviceContext)
-
-  // we can't get the selfId as a prop for this document because it *stores* the selfId
-  // and passes it down through the rest of the system via a selfId prop on Content
-  // this isn't ideal: it means only the workspace can sit at the root of the application
-  // and it's hard to detect structurally because all the hooks need to support missing values
-  const selfId: DocumentId | undefined = workspace && workspace.selfId
-  const [self, changeSelf] = useDocument<ContactDoc>(selfId)
+  const [self, changeSelf] = useDocument<ContactDoc>(selfId || undefined)
 
   const [once, setOnce] = useState<boolean>(false)
 
@@ -97,15 +98,18 @@ export default function Workspace({ documentId }: WorkspaceContentProps) {
     })
   }
 
-  /*
-  useAllHeartbeats(selfId)
-  useHeartbeat(selfId)
-  useHeartbeat(currentDeviceId)
-  useHeartbeat(currentDocUrl)
+  const currentDocUrl =
+    workspace &&
+    workspace.currentDocUrl &&
+    parseDocumentLink(workspace.currentDocUrl).documentId
 
-  useDeviceOnlineStatus(currentDeviceId)
-  useContactOnlineStatus(selfId)
-  */
+  // useAllHeartbeats(selfId)
+  // useHeartbeat(selfId)
+  // useHeartbeat(currentDeviceId)
+  // useHeartbeat(currentDocUrl)
+
+  // useDeviceOnlineStatus(currentDeviceId)
+  // useContactOnlineStatus(selfId)
 
   // Add devices if not already on doc.
   useEffect(() => {
@@ -113,11 +117,7 @@ export default function Workspace({ documentId }: WorkspaceContentProps) {
       return
     }
 
-    console.log("SELF devices:", self.devices)
-    if (
-      currentDeviceId &&
-      (!self.devices || !self.devices.includes(currentDeviceId))
-    ) {
+    if (documentId && (!self.devices || !self.devices.includes(documentId))) {
       changeSelf((doc: ContactDoc) => {
         if (!doc.devices) {
           doc.devices = []
