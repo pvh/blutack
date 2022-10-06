@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import * as ContentTypes from '../pushpin-code/ContentTypes'
-import Content, { ContentProps } from '../Content'
+import Content, { ContentProps, EditableContentProps } from '../Content'
 import { createDocumentLink } from '../pushpin-code/ShareLink'
 import ListItem from '../ui/ListItem'
 import Badge from '../ui/Badge'
@@ -96,7 +96,7 @@ export default function ThreadContent(props: ContentProps) {
   )
 }
 
-export function ThreadInList(props: ContentProps) {
+export function ThreadInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
   const [doc] = useDocument<Doc>(documentId)
   if (!doc || !doc.messages) return null
