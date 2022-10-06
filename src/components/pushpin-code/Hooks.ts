@@ -167,8 +167,9 @@ export function useMessaging<M>(
   }
 
   const handle = useHandle(documentId)
-  handle.on("message", ({ message }) => onMsgRef.current(message))
-  setSend((message: M) => handle.sendMessage(message))
+  // TODO: we're doing sketchy things with the types here
+  handle.on("message", ({ handle, message }) => onMsgRef.current(message as M))
+  setSend((message: M) => handle.broadcast(message as Record<string, unknown>))
 
   return send
 }
