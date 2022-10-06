@@ -6,7 +6,7 @@ import { useDocument } from 'automerge-repo-react-hooks'
 import Omnibox from './omnibox/Omnibox'
 import Content from '../../Content'
 import Authors from './Authors'
-import { PushpinUrl, createDocumentLink } from '../../pushpin-code/ShareLink'
+import { PushpinUrl, createDocumentLink, createWebLink } from '../../pushpin-code/ShareLink'
 import { useEvent } from '../../pushpin-code/Hooks'
 
 import './TitleBar.css'
@@ -78,7 +78,7 @@ export default function TitleBar(props: Props) {
 
   function copyLink(e: React.MouseEvent) {
     if (doc && doc.currentDocUrl) {
-      navigator.clipboard.writeText("https://localhost:5173?document=" + encodeURIComponent(doc.currentDocUrl))
+      navigator.clipboard.writeText(createWebLink(window.location, doc.currentDocUrl))
     }
   }
 

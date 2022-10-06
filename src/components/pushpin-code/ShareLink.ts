@@ -22,6 +22,14 @@ export function createDocumentLink(
   return `web+pushpin://${type}/${docId}` as PushpinUrl;
 }
 
+export function createWebLink(
+  windowLocation: Location,
+  pushPinUrl: PushpinUrl
+) {
+  var url = windowLocation.href.split("?")[0];
+  return `${url}?document=${encodeURIComponent(pushPinUrl)}`;
+}
+
 // const url = "?document=web%2Bpushpin%3A%2F%2Fcontentlist%2Ffcfb63f5-777e-469b-a9bd-9f093d1ba2b7"
 // const url = "web+pushpin://contentlist/fcfb63f5-777e-469b-a9bd-9f093d1ba2b7"
 // isPushpinUrl(url) === true

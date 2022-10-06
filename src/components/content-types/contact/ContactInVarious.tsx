@@ -5,7 +5,7 @@ import classNames from 'classnames'
 import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
-import { createDocumentLink } from '../../pushpin-code/ShareLink'
+import { createDocumentLink, createWebLink } from '../../pushpin-code/ShareLink'
 import DEFAULT_AVATAR_PATH from '../../../images/default-avatar.png'
 
 
@@ -47,7 +47,7 @@ export default function ContactInVarious(props: ContactProps) {
   )
 
   const onDoubleClick = (e: React.MouseEvent) => {
-    window.location.href = url as string
+    window.location.href = createWebLink(window.location, url) as string
     e.stopPropagation()
   }
 

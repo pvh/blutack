@@ -62,6 +62,10 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
   const [self, changeSelf] = useDocument<ContactDoc>(selfId || undefined)
 
   const [once, setOnce] = useState<boolean>(false)
+
+  var baseUrl = window.location.href.split('?')[0];
+  navigator.registerProtocolHandler("web+pushpin", `${baseUrl}?document=%s`);
+  
   if (workspace?.currentDocUrl && !once) {
     setOnce(true)
     const maybePushpinUrl = new URLSearchParams(window.location.search).get("document")
