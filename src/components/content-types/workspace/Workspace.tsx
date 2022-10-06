@@ -111,6 +111,7 @@ export default function Workspace({
   // useDeviceOnlineStatus(currentDeviceId)
   // useContactOnlineStatus(selfId)
 
+  // TODO: this is so grody
   // Add devices if not already on doc.
   useEffect(() => {
     if (!currentDeviceId || !self || !changeSelf) {
@@ -127,34 +128,6 @@ export default function Workspace({
     }
   }, [changeSelf, currentDeviceId, self])
 
-  // Add encryption keys if not already on doc.
-  /*
-  useEffect(() => {
-    if (!workspace || !selfId || workspace.secretKey) return
-
-    try {
-      migrateEncryptionKeys()
-    } catch {
-      console.log(
-        'Unable to set encryption keys on workspace. Must be on the device which created the workspace.'
-      )
-    }
-
-    async function migrateEncryptionKeys() {
-      if (!workspace || !selfId || workspace.secretKey) return
-      const encryptionKeyPair = await crypto.encryptionKeyPair()
-      const signedPublicKey = await crypto.sign(selfId, encryptionKeyPair.publicKey)
-      const signedSecretKey = await crypto.sign(props.documentId, encryptionKeyPair.secretKey)
-      changeSelf((doc: ContactDoc) => {
-        doc.encryptionKey = signedPublicKey
-      })
-      changeWorkspace((doc: Doc) => {
-        doc.secretKey = signedSecretKey
-      })
-    }
-  }, [workspace, selfId, workspace && workspace.secretKey])
-  */
-
   function openDoc(docUrl: string) {
     if (!isPushpinUrl(docUrl)) {
       return
@@ -163,7 +136,7 @@ export default function Workspace({
     const { type } = parseDocumentLink(docUrl)
     if (type === "workspace") {
       // we're going to have to deal with this specially...
-      // props.setWorkspaceUrl(docUrl)
+      throw new Error("workspace switching isn't supported at the moment")
       return
     }
 
@@ -183,7 +156,6 @@ export default function Workspace({
     }
 
     changeWorkspace((ws: WorkspaceDoc) => {
-      console.log("before", ws)
       ws.currentDocUrl = docUrl
 
       ws.viewedDocUrls = ws.viewedDocUrls.filter((url) => url !== docUrl)
@@ -192,7 +164,6 @@ export default function Workspace({
       if (ws.archivedDocUrls) {
         ws.archivedDocUrls = ws.archivedDocUrls.filter((url) => url !== docUrl)
       }
-      console.log("after", ws)
     })
   }
 

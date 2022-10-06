@@ -11,13 +11,13 @@ import { useDocument, useRepo } from "automerge-repo-react-hooks";
  * heartbeats are an accumulated list of the URLs we have "open" and so should
  * report heartbeats (and forward our "presence data") to.
  */
-const heartbeats: { [url: string]: number } = {}; // url: DocumentId
+const heartbeats: { [url: DocumentId]: number } = {};
 
 /**
  * myPresence is the data (per-url) that we send to our peers
  */
 const myPresence: {
-  [url: string /* DocumentId */]: { [key: string]: any };
+  [documentId: DocumentId]: { [key: string]: unknown };
 } = {};
 
 const HEARTBEAT_INTERVAL = 5000; // ms
@@ -61,20 +61,21 @@ export function useAllHeartbeats(contact: DocumentId | undefined) {
     const interval = setInterval(() => {
       // Post a presence heartbeat on documents currently considered
       // to be open, allowing any kind of card to render a list of "present" folks.
-      Object.entries(heartbeats).forEach(([url, count]) => {
+      Object.entries(heartbeats).forEach(([documentId, count]) => {
+        // NB: casts below are because Object.entries gives us string-flavored keys
         if (count > 0) {
           const msg: HeartbeatMessage = {
             contact,
             device,
             heartbeat: true,
-            data: myPresence[url],
+            data: myPresence[documentId as DocumentId],
           };
-          // we can't use DocumentId as a key in heartbeats, so we do this bad thing
-          //repo.broadcast(url as DocumentId, msg);
-          throw new Error("NOT IMPLEMENTED");
+          const handle = repo.find(documentId as DocumentId);
+          handle.broadcast(msg);
+          console.log("");
         } else {
-          depart(url as DocumentId);
-          delete heartbeats[url];
+          depart(documentId as DocumentId);
+          delete heartbeats[documentId as DocumentId];
         }
       });
     }, HEARTBEAT_INTERVAL);
@@ -134,6 +135,7 @@ export function usePresence<P>(
       [remotePresenceToLookupKey(presence)]: { ...presence },
     }));
   };
+
   const [bumpTimeout, depart] = useTimeouts(
     HEARTBEAT_INTERVAL * 2,
     (key: string) => {
@@ -185,15 +187,15 @@ export function useOnlineDevicesForContact(
   contactId?: DocumentId
 ): DocumentId[] {
   const selfId = useSelfId();
-  const selfDeviceUrl = useContext(CurrentDeviceContext);
+  const selfDeviceId = useContext(CurrentDeviceContext);
 
   const onlineRemotes = usePresence(contactId).filter(
     (p) => p.contact === contactId
   );
   const remoteDevices = onlineRemotes.map((presence) => presence.device);
 
-  if (selfId === contactId && selfDeviceUrl) {
-    remoteDevices.unshift(selfDeviceUrl);
+  if (selfId === contactId && selfDeviceId) {
+    remoteDevices.unshift(selfDeviceId);
   }
   return remoteDevices;
 }
@@ -226,6 +228,7 @@ export function useConnectionStatus(contactId?: DocumentId): ConnectionStatus {
   const [contact] = useDocument<ContactDoc>(contactId);
   const selfId = useSelfId();
   const onlineDevices = useOnlineDevicesForContact(contactId);
+
   if (selfId !== contactId) {
     return onlineDevices.length > 0 ? "connected" : "not-connected";
   }

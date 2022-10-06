@@ -153,7 +153,9 @@ export function useMessaging<M>(
   documentId: DocumentId | undefined,
   onMsg: (msg: M) => void
 ): (msg: M) => void {
-  const [send, setSend] = useState<(msg: M) => void>(() => {})
+  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({
+    send() {},
+  })
 
   // Without this ref, we'd close over the `onMsg` passed during the very first render.
   // Instead, we close over the ref object and can be sure we're always reading
@@ -161,17 +163,17 @@ export function useMessaging<M>(
   const onMsgRef = useRef(onMsg)
   onMsgRef.current = onMsg
 
-  // TODO: need a use-effect to handle the unsubscribe here...
-  if (!documentId) {
-    throw new Error("gotta have a docid pal")
-  }
-
   const handle = useHandle(documentId)
-  // TODO: we're doing sketchy things with the types here
-  handle.on("message", ({ handle, message }) => onMsgRef.current(message as M))
-  setSend((message: M) => handle.broadcast(message as Record<string, unknown>))
+  if (handle) {
+    handle.on("message", (msg: M) => onMsgRef.current(msg))
+    // setSend({ send: handle.broadcast });
 
-  return send
+    return () => {
+      onMsgRef.current = () => {}
+      setSend({ send() {} })
+    }
+  }
+  return sendObj.send
 }
 
 /*
