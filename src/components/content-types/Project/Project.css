@@ -1,0 +1,126 @@
+.ProjectGrid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ProjectComponentVersion {
+  font-weight: bold;
+  font-style: italic;
+  text-align: right;
+}
+
+.ProjectContainer {
+  background-color: #eee;
+  padding: 20px;
+  height: 100%;
+  margin: 10px;
+  flex-grow: 1;
+}
+
+.Project {
+  max-width: 700px;
+}
+
+.ProjectTitle {
+  font-weight: bold;
+  font-size: 20px;
+  color: #6b4884;
+  margin: 10px 0;
+}
+
+.Task {
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.v3--Task {
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 10px 0;
+  width: 100%;
+}
+
+.TaskTitle {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.v3--EditableText {
+  border: none;
+  height: 40px;
+  font-family: inherit;
+  font-size: inherit;
+  margin: 0 15px;
+  resize: none;
+}
+
+.v3--TaskTitle {
+  font-weight: bold;
+  width: 180px;
+} 
+
+.v3--TaskDescription {
+  width: 250px;
+}
+
+.v3--StatusDropdown {
+  margin-top: 10px;
+  vertical-align: top;
+  border: none;
+  font-size: 14px;
+  font-family: inherit;
+  height: 30px;
+}
+
+.v3--StatusDropdown.done {
+  color: #aaa;
+}
+
+.v4--ArchiveButton {
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  margin: 15px;
+  vertical-align: top;
+  visibility: hidden;
+}
+
+.v3--Task:hover .v4--ArchiveButton {
+  visibility: visible;
+}
+
+.v4--ArchiveButton:hover {
+  background: #ddd;
+}
+
+.v4--ArchiveButton:active {
+  background: #aaa;
+}
+
+.v4--ArchivedHeading {
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.complete {
+  text-decoration: line-through;
+  color: #aaa;
+}
+
+.AddTaskButton {
+  font-size: 14px;
+  padding: 10px;
+  background-color: #a675f5;
+  border-radius: 5px;
+  color: white;
+}
+
+.debug {
+  border-top: solid thin #ddd;
+  font-size: 14px;
+  margin-top: 30px;
+  padding-top: 30px;
+}

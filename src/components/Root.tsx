@@ -19,6 +19,10 @@ import './content-types/ThreadContent'
 
 import './content-types/ContentList'
 
+import './content-types/Project/index'
+import './content-types/Task/index'
+
+
 interface RootArgs {
   workspaceDocId: DocumentId
   deviceDocId: DocumentId

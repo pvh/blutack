@@ -67,6 +67,8 @@ export function register(contentType: ContentType) {
 
   log("register", entry);
 
+  console.log("registering", entry)
+
   if (registry[type]) {
     // Allow re-registration to support HMR
     log(`Replacing '${type}' content type.`);

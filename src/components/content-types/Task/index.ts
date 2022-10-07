@@ -1,7 +1,7 @@
 import { Task } from "./Task";
 import { PushpinUrl } from "../../pushpin-code/ShareLink";
 import { DocHandle } from "automerge-repo";
-import * as ContentTypes from "../ContentList";
+import * as ContentTypes from "../../pushpin-code/ContentTypes";
 
 export interface TaskDoc {
   title: string;
@@ -13,7 +13,7 @@ export interface TaskDoc {
   assignee: PushpinUrl | null;
 }
 
-function create(unusedAttrs: unknown, handle: DocHandle<TaskDoc>) {
+function create(unusedAttrs: any, handle: DocHandle<any>) {
   handle.change((doc: TaskDoc) => {
     const newDoc: TaskDoc = {
       title: "",
@@ -22,6 +22,7 @@ function create(unusedAttrs: unknown, handle: DocHandle<TaskDoc>) {
       archived: false,
       tags: [],
       assignee: null,
+      authors: []
     };
     Object.assign(doc, newDoc);
   });
@@ -32,8 +33,9 @@ ContentTypes.register({
   name: "Task",
   icon: "sticky-note",
   contexts: {
-    workspace: Task,
+    // workspace: Task,
     list: Task,
+    // board: Task,
   },
   create,
 });

@@ -34,7 +34,7 @@ const TaskTitle = styled.input`
   font-size: 16px;
   resize: none;
   font-weight: 500;
-  max-width: 30%;
+  width: 50%;
   ${(status: string) =>
     status === 'done' &&
     `
@@ -75,12 +75,6 @@ const ArchiveButton = styled.button`
     background: #ddd;
   }
 `
-
-const ShowDebugLink = styled.a`
-  font-size: 10px;
-  color: #aaa;
-`
-
 const AssigneeDropdown = styled.div`
   display: inline-block;
   vertical-align: top;
@@ -106,7 +100,6 @@ const Unassigned = styled.div`
 export function Task(props: ContentProps) {
   const { documentId } = props
   const [doc, changeDoc] = useDocument<TaskDoc>(documentId)
-  const [showDebug, setShowDebug] = useState(false)
 
   const toggleArchived = () => {
     changeDoc((doc: TaskDoc) => {
@@ -204,20 +197,20 @@ export function Task(props: ContentProps) {
           onChange={(e: any /* TODO */) => updateTitle(e.target.value)}
         />
 
-        <AssigneeDropdown>
+        {/* <AssigneeDropdown>
           <Select
             values={[
               doc.assignee ? { label: doc.assignee, value: doc.assignee } : unassignedOption,
             ]}
             options={assigneeOptions}
-            onChange={(values: any /* TODO */) => {
+            onChange={(values: any) => {
               updateAssignee(values[0].value)
             }}
             itemRenderer={customItemRenderer}
             contentRenderer={customContentRenderer}
             style={{ border: 'none' }}
           />
-        </AssigneeDropdown>
+        </AssigneeDropdown> */}
       </MainRow>
       <DetailsRow>
         <TaskDescription
@@ -226,13 +219,6 @@ export function Task(props: ContentProps) {
           onChange={(e: any /* TODO */) => updateDescription(e.target.value)}
         />
       </DetailsRow>
-      <ShowDebugLink
-        onClick={() => {
-          setShowDebug(!showDebug)
-        }}
-      >
-        {showDebug ? 'Hide document' : 'Show document'}
-      </ShowDebugLink>
     </TaskBox>
   )
 }
