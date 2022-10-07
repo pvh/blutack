@@ -2,6 +2,7 @@ import { Task } from "./Task";
 import { PushpinUrl } from "../../pushpin-code/ShareLink";
 import { DocHandle } from "automerge-repo";
 import * as ContentTypes from "../../pushpin-code/ContentTypes";
+import { Tag } from "react-tag-autocomplete";
 
 export interface TaskDoc {
   title: string;
@@ -9,7 +10,7 @@ export interface TaskDoc {
   description: string;
   status: string;
   archived: boolean;
-  tags: string[];
+  tags: Tag[];
   assignee: PushpinUrl | null;
 }
 
@@ -22,7 +23,7 @@ function create(unusedAttrs: any, handle: DocHandle<any>) {
       archived: false,
       tags: [],
       assignee: null,
-      authors: []
+      authors: [],
     };
     Object.assign(doc, newDoc);
   });

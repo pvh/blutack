@@ -35,7 +35,7 @@ const TaskTitle = styled.input`
   resize: none;
   font-weight: 500;
   width: 50%;
-  ${(status: string) =>
+  ${(status: any) =>
     status === 'done' &&
     `
       text-decoration: line-through;
@@ -52,7 +52,7 @@ const TaskDescription = styled.textarea`
   resize: none;
   width: 350px;
   vertical-align: top;
-  ${(status: string) =>
+  ${(status: any) =>
     status === 'done' &&
     `
       text-decoration: line-through;
@@ -149,7 +149,7 @@ export function Task(props: ContentProps) {
 
   interface AssigneeProps {
     assignee: string | null
-    onClick: (e: Event) => void
+    onClick: (e: any) => void
   }
   const Assignee = ({ assignee, onClick }: AssigneeProps) => {
     return (

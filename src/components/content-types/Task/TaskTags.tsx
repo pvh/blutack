@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import ReactTags from 'react-tag-autocomplete'
+import ReactTags, { Tag } from 'react-tag-autocomplete'
 
 import { TaskDoc } from '.'
 
@@ -22,7 +22,7 @@ export function TaskTags(props: TaskTagsProps) {
   )
 
   const handleAddition = useCallback(
-    (tag: string) => {
+    (tag: Tag) => {
       changeDoc((doc: TaskDoc) => {
         doc.tags.push(tag)
       })

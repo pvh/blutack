@@ -9,7 +9,6 @@ import './Project.css'
 // We specify versions in the import path, but give non-versioned names in code.
 // To change versions in the future, we only need to change this one spot.
 import {ProjectDoc} from '.'
-import { createDocumentLink } from '../../../ShareLink'
 
 const ProjectTitle = styled.input`
   font-weight: bold;
@@ -77,7 +76,7 @@ export default function Project({documentId}: ContentProps) {
     })
   }, [changeDoc])
 
-  if (!doc) return <></>
+  if (!doc || !doc.tasks) return <></>
 
   return (
     <div className="ProjectContainer">
