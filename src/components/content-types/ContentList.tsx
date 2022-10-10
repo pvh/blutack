@@ -54,16 +54,10 @@ export default function ContentList({ documentId }: ContentProps) {
   }, [])
 
   const onDragLeave = useCallback((e: React.DragEvent, index: number) => {
-
-    console.log('dragLeave')
-
     setDraggedOverIndex(undefined)
   }, [])
 
   const onDrop = useCallback((e: React.DragEvent) => {
-
-    console.log('dragDrop')
-
     if (draggedOverIndex === undefined) {
       return
     }
