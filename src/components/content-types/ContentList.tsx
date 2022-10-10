@@ -40,7 +40,10 @@ export default function ContentList({ documentId }: ContentProps) {
   const [draggedOverIndex, setDraggedOverIndex] = useState<number | undefined>()
 
   const onDragOver = useCallback((e: React.DragEvent, index: number) => {
-    setDraggedOverIndex(index)
+    const element = e.target as Element;
+    const percentage = (e.clientY - element.getBoundingClientRect().top) / element.clientHeight
+
+    setDraggedOverIndex(percentage > 0.5 ? index + 1 : index)
 
     e.preventDefault()
     e.stopPropagation()
@@ -51,16 +54,26 @@ export default function ContentList({ documentId }: ContentProps) {
   }, [])
 
   const onDragLeave = useCallback((e: React.DragEvent, index: number) => {
+
+    console.log('dragLeave')
+
     setDraggedOverIndex(undefined)
   }, [])
 
   const onDrop = useCallback((e: React.DragEvent) => {
+
+    console.log('dragDrop')
+
     if (draggedOverIndex === undefined) {
       return
     }
 
     const deleteIndex = parseInt(e.dataTransfer.getData(MIMETYPE_CONTENT_LIST_INDEX), 10)
-    const insertIndex = draggedOverIndex
+    const insertIndex = (
+      (!isNaN(deleteIndex) && deleteIndex < draggedOverIndex)
+      ? draggedOverIndex - 1
+      : draggedOverIndex
+    )
 
     setDraggedOverIndex(undefined)
 
@@ -153,6 +166,11 @@ export default function ContentList({ documentId }: ContentProps) {
               </ActionListItem>
             </div>
           )}
+          <div
+            className={classNames({
+              'ContentListItem--insertTop': draggedOverIndex === content.length
+            })}
+          />
           <ListMenuItem onClick={() => setAddingNewItem(prev => !prev)}>
             + Create new item
           </ListMenuItem>
