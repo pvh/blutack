@@ -193,7 +193,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
         return
       }
 
-      // Otherwise consttruct the drop point and import the data.
+      // Otherwise construct the drop point and import the data.
       const { pageX, pageY } = e
       const dropPosition = {
         x: pageX - boardRef.current.offsetLeft,

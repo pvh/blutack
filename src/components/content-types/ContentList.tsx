@@ -1,5 +1,4 @@
-import React, { useContext, useRef, Ref, ChangeEvent, useState, useMemo } from 'react'
-
+import React, { useContext, useRef, Ref, ChangeEvent, useState, useMemo, useCallback } from 'react'
 import {
   PushpinUrl,
 } from '../pushpin-code/ShareLink'
@@ -25,17 +24,60 @@ import CenteredStackRowItem from '../ui/CenteredStackRowItem'
 import ContentDragHandle from '../ui/ContentDragHandle'
 import Badge from '../ui/Badge'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
+import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants";
+import * as ImportData from "../pushpin-code/ImportData";
 
 export interface ContentListDoc {
   title: string
   content: PushpinUrl[]
 }
 
-export default function ContentList({documentId}: ContentProps) {
+export default function ContentList({ documentId }: ContentProps) {
   const [doc, changeDoc] = useDocument<ContentListDoc>(documentId)
   const [currentContent, selectContent] = useState<PushpinUrl | undefined>()
   const [addingNewItem, setAddingNewItem] = useState(false)
   const contentTypes = useMemo(() => ContentTypes.list({ context: 'board' }), [])
+  const [draggedOverIndex, setDraggedOverIndex] = useState<number | undefined>()
+
+  const onDragOver = useCallback((e: React.DragEvent, index: number) => {
+    setDraggedOverIndex(index)
+
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
+
+  const onDragStart = useCallback((e: React.DragEvent, index: number) => {
+    e.dataTransfer.setData(MIMETYPE_CONTENT_LIST_INDEX, index.toString())
+  }, [])
+
+  const onDragLeave = useCallback((e: React.DragEvent, index: number) => {
+    setDraggedOverIndex(undefined)
+  }, [])
+
+  const onDrop = useCallback((e: React.DragEvent) => {
+    if (draggedOverIndex === undefined) {
+      return
+    }
+
+    const deleteIndex = parseInt(e.dataTransfer.getData(MIMETYPE_CONTENT_LIST_INDEX), 10)
+    const insertIndex = draggedOverIndex
+
+    setDraggedOverIndex(undefined)
+
+    if (!isNaN(deleteIndex)) {
+      changeDoc((doc) => {
+        doc?.content.splice(deleteIndex, 1)
+      })
+    }
+
+    ImportData.importDataTransfer(e.dataTransfer, (url) => {
+      changeDoc((doc) => {
+        doc.content.splice(insertIndex, 0, url)
+      })
+    })
+
+  }, [draggedOverIndex])
+
 
   if (!doc || !doc.content) {
     return null
@@ -48,7 +90,7 @@ export default function ContentList({documentId}: ContentProps) {
   const { content } = doc
 
   const addContent = (contentType: ContentTypes.LookupResult) => {
-    ContentTypes.create(contentType.type, {}, (contentUrl) =>{
+    ContentTypes.create(contentType.type, {}, (contentUrl) => {
       changeDoc(doc => {
         doc.content.push(contentUrl)
       })
@@ -87,9 +129,19 @@ export default function ContentList({documentId}: ContentProps) {
 
   return (
     <CenteredStack direction='row' centerText={false}>
-      <CenteredStackRowItem size={{mode: "fixed", width: "250px"}} style={{ borderRight: "solid thin #ddd"}}>
-          <ListMenu>
-            {content.map(url =>
+      <CenteredStackRowItem size={{ mode: "fixed", width: "250px" }} style={{ borderRight: "solid thin #ddd" }}>
+        <ListMenu>
+          {content.map((url, index) =>
+            <div
+              className={classNames({
+                'ContentListItem--insertTop': draggedOverIndex === index
+              })}
+              onDragStart={(evt) => onDragStart(evt, index)}
+              onDragOver={(evt) => onDragOver(evt, index)}
+              onDragEnter={(evt) => onDragOver(evt, index)}
+              onDragLeave={(evt) => onDragLeave(evt, index)}
+              onDrop={(evt) => onDrop(evt)}
+            >
               <ActionListItem
                 key={url}
                 contentUrl={url}
@@ -97,18 +149,20 @@ export default function ContentList({documentId}: ContentProps) {
                 actions={actions}
                 selected={url === currentContent}
               >
-                <Content context="list" url={url} editable={true}/>
+                <Content context="list" url={url} editable={true} />
               </ActionListItem>
-            )}
-              <ListMenuItem onClick={() => setAddingNewItem(prev => !prev)}>
-                + Create new item
-              </ListMenuItem>
-              {addingNewItem && (
-              <ListMenuSection>
-              { contentTypes.map((contentType) => (
+            </div>
+          )}
+          <ListMenuItem onClick={() => setAddingNewItem(prev => !prev)}>
+            + Create new item
+          </ListMenuItem>
+          {addingNewItem && (
+            <ListMenuSection>
+              {contentTypes.map((contentType) => (
                 <ListMenuItem onClick={() => {
                   addContent(contentType);
-                  setAddingNewItem(false)}
+                  setAddingNewItem(false)
+                }
                 } key={contentType.type}>
                   <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
                     <i className={classNames('fa', `fa-${contentType.icon}`)} />
@@ -116,16 +170,16 @@ export default function ContentList({documentId}: ContentProps) {
                   <span className="ContextMenu__label">{contentType.name}</span>
                 </ListMenuItem>))
               }
-              </ListMenuSection>)}
+            </ListMenuSection>)}
 
-          </ListMenu>
+        </ListMenu>
       </CenteredStackRowItem>
-      <CenteredStackRowItem size={{mode: "auto"}}>
-      {
+      <CenteredStackRowItem size={{ mode: "auto" }}>
+        {
           (currentContent) ?
-            <Content context="workspace" url={currentContent}/>
-          :
-            <div style={{padding: "10px"}}>Select something from the side</div>
+            <Content context="workspace" url={currentContent} />
+            :
+            <div style={{ padding: "10px" }}>Select something from the side</div>
         }
       </CenteredStackRowItem>
     </CenteredStack>
