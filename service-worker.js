@@ -1,8 +1,6 @@
-export {}
+const STORE = {};
 
-const STORE : any = {};
-
-self.addEventListener('fetch', function(event : any) {
+self.addEventListener('fetch', function(event) {
   const url = new URL(event.request.url)
   const match = url.pathname.match(/^\/blutack\/src\/binary\/(.*)$/)
 
@@ -44,5 +42,5 @@ self.addEventListener("message", (event) => {
 })
 
 self.addEventListener("install", () => {
-  (self as any).skipWaiting()
+  self.skipWaiting()
 });
