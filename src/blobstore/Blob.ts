@@ -77,9 +77,9 @@ async function loadBinaryData(binaryDataId: BinaryDataId): Promise<[BinaryDataHe
 
     myPort.addEventListener("message", e => {
       console.log("heard back from the service worker", e)
-      const { mimeType } = e.data
-      console.log( mimeType )
-      resolve([{ size: 666 /* TODO */, mimeType }, new ReadableStream() /* todo */])
+      const { mimeType, binary } = e.data
+      console.log( mimeType, binary )
+      resolve([{ size: 666 /* TODO */, mimeType }, binary])
     })
     myPort.start()
 
