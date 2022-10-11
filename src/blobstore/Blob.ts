@@ -55,10 +55,26 @@ export async function storeBinaryData(binary: ReadableStream, mimeType?: string)
 }
 
 // TODO: implement correct responses...
-export async function useBinaryDataHeader(binaryDataId?: BinaryDataId): Promise<BinaryDataHeader | undefined> {
+export function useBinaryDataHeader(binaryDataId?: BinaryDataId): BinaryDataHeader | undefined {
   if (!binaryDataId) { return }
+  return { size: 666, mimeType: "image/pdf" }
+}
 
-/*
+export function useBinaryDataContents(binaryDataId?: BinaryDataId): ReadableStream | undefined {
+  const [stream, setStream] = useState<ReadableStream | undefined>()
+  useEffect(() => {
+    binaryDataId && loadBinaryData(binaryDataId).then((readable) => setStream(readable))
+  }, [binaryDataId])
+  return stream
+}
+
+async function loadBinaryData(binaryDataId: BinaryDataId): Promise<ReadableStream> {
+  // TODO: go get this from the serviceworker
+  return new ReadableStream()
+}
+
+async function loadBinaryDataHeader(binaryDataId: BinaryDataId): Promise<BinaryDataHeader> {
+  /*
   const [header, setHeader] = useState<BinaryDataHeader | undefined>()
 
   navigator.serviceWorker.controller!.postMessage({
@@ -66,8 +82,7 @@ export async function useBinaryDataHeader(binaryDataId?: BinaryDataId): Promise<
     data: { binaryDataId }
   })
   // TODO: there's no way for it to reply yet so just make up something convenient...
-*/
-  return { size: 666, mimeType: "image/png" }
+  */
 }
 
 /*

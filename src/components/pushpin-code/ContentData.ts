@@ -34,7 +34,7 @@ export async function storeContentData({data, mimeType}: ContentData): Promise<B
 }
 
 // for our bad protocol implementation and our bad pdf implementation
-function streamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffer> {
+export async function streamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffer> {
   return new Promise((res, rej) => {
     const buffers: Buffer[] = []
     stream

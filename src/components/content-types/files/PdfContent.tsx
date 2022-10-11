@@ -8,6 +8,8 @@ import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import { ContentProps } from '../../Content'
 import './PdfContent.css'
 import { useBinaryDataHeader } from '../../../blobstore/Blob'
+import { useConfirmableInput } from '../../pushpin-code/Hooks'
+import { streamToBuffer } from '../../pushpin-code/ContentData'
 
 interface PdfDoc extends FileDoc {
   content: string
@@ -15,7 +17,7 @@ interface PdfDoc extends FileDoc {
 
 export default function PdfContent(props: ContentProps) {
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
-  const [, /* fileHeader */ fileStream] = useBinaryDataFile(pdf && pdf.binaryDataId)
+  const fileStream = useBinaryDataContents(pdf && pdf.binaryDataId)
   const [buffer, setBuffer] = useState<Buffer | null>(null)
   useEffect(() => {
     if (!fileStream) {
@@ -146,14 +148,15 @@ ContentTypes.register({
   supportsMimeType,
 })
 
-const getPageText = async (pdf, pageNo: number): Promise<string> => {
+//TODO: any types
+const getPageText = async (pdf: any, pageNo: number): Promise<string> => {
   const page = await pdf.getPage(pageNo)
   const tokenizedText = await page.getTextContent()
-  const pageText = tokenizedText.items.map((token) => token.str).join('')
+  const pageText = tokenizedText.items.map((token: any) => token.str).join('')
   return pageText
 }
 
-export const getPDFText = async (pdf): Promise<string> => {
+export const getPDFText = async (pdf: any): Promise<string> => {
   const maxPages = pdf.numPages
   const pageTextPromises: Promise<string>[] = []
   for (let pageNo = 1; pageNo <= maxPages; pageNo += 1) {
@@ -162,3 +165,5 @@ export const getPDFText = async (pdf): Promise<string> => {
   const pageTexts = await Promise.all(pageTextPromises)
   return pageTexts.join(' ')
 }
+
+
