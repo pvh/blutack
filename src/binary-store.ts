@@ -24,14 +24,11 @@ export {}
 })();
 
 
-export async function storeBinary (key: string, value: any) {
-  console.log('sw: store')
-
+export async function storeBinary (name: string, binary: any, mimeType?: string) {
   await navigator.serviceWorker.ready
 
-  console.log("sw: do set")
-
   navigator.serviceWorker.controller!.postMessage({
-    type: "set", key, value,
+    type: "set",
+    data: { name, mimeType, binary }
   })
 }

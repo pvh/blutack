@@ -3,38 +3,48 @@ const STORE = {};
 
 self.addEventListener('fetch', function(event) {
   const url = new URL(event.request.url)
-  const match = url.pathname.match(/^\/src\/binary\/(.*)$/)
+  const match = url.pathname.match(/^\/blutack\/src\/binary\/(.*)$/)
 
 
   if (match) {
-    const [,blobName] = match
+    const [, name] = match
 
-    const value = STORE[blobName]
+    const entry = STORE[name]
 
-    console.log('sw: my store', 'store', STORE)
+    console.log("sw: lookup", STORE, name)
 
-    if (value) {
+    if (!entry) {
       event.respondWith(
-        new Response(value, {
-          headers: {'Content-Type': 'text/plain'}
+        new Response("Not found", {
+          status: 404,
+          headers: {'Content-Type': "text/plain"}
         })
       )
+
+      return
     }
+
+    event.respondWith(
+      new Response(entry.binary, {
+        headers: {'Content-Type': entry.mimeType}
+      })
+    )
   }
 });
 
 
-self.addEventListener("message", ({data}) => {
+self.addEventListener("message", (event) => {
+  const message = event.data
 
-  switch (data.type) {
+  switch (message.type) {
     case "set":
-      STORE[data.key] = data.value
+      const { name, mimeType, binary } = message.data
+
+      STORE[name] = { mimeType, binary }
       break
   }
 })
 
-self.addEventListener("install", (event) => {
-  console.log('sw: install')
-
+self.addEventListener("install", () => {
   self.skipWaiting()
 });

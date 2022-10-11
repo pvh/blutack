@@ -6,7 +6,8 @@ import Content, { ContentProps } from '../../Content'
 import { ContactDoc } from '.'
 
 import { createDocumentLink, createWebLink } from '../../pushpin-code/ShareLink'
-import DEFAULT_AVATAR_PATH from '../../../images/default-avatar.png'
+// import DEFAULT_AVATAR_PATH from '../../../images/default-avatar.png'
+const DEFAULT_AVATAR_PATH = '/blutack/src/binary/avatar.png'
 
 
 import './ContactInVarious.css'
