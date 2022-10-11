@@ -21,10 +21,9 @@ function parts(id: BinaryDataId): Parts {
   const url = new URL(id)
   const protocol = url.protocol
   const pathname = url.pathname
-  console.log(url, pathname)
   return {
     scheme: protocol ? protocol.substr(0, protocol.length - 1) : '',
-    id: (pathname || '/').substr(1),
+    id: (pathname || '//').substr(2),
   }
 }
 
@@ -38,7 +37,7 @@ export function parseBinaryDataId(binaryDataId: BinaryDataId) {
 
 export function createBinaryDataUrl(binaryDataId: BinaryDataId): string {
   const { id } = parts(binaryDataId)
-  return `/src/binary/${id}`
+  return `/blutack/src/binary/${id}`
 }
 
 export async function storeBinaryData(binary: Uint8Array, mimeType?: string): Promise<BinaryDataId> {

@@ -29,7 +29,7 @@ async function createFrom(
   const { capturedAt } = contentData;
 
   handle.change((doc: FileDoc) => {
-    const parsed = { name: "TODO" } // pathParse(name);
+    const parsed = { name: "TODO", ext: "" } // pathParse(name);
     doc.binaryDataId = binaryDataId;
     doc.title = parsed.name;
     doc.extension = parsed.ext.slice(1);
