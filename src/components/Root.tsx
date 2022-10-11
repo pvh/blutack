@@ -22,7 +22,7 @@ import './content-types/ContentList'
 import './content-types/Project/index'
 import './content-types/Task/index'
 import React from "react";
-import fileDialog from 'file-dialog'
+import { fileDialog } from 'file-select-dialog'
 import { storeBinary } from "../binary-store";
 
 

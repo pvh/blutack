@@ -1,17 +1,15 @@
-const STORE = {};
+export {}
 
+const STORE : any = {};
 
-self.addEventListener('fetch', function(event) {
+self.addEventListener('fetch', function(event : any) {
   const url = new URL(event.request.url)
   const match = url.pathname.match(/^\/blutack\/src\/binary\/(.*)$/)
-
 
   if (match) {
     const [, name] = match
 
     const entry = STORE[name]
-
-    console.log("sw: lookup", STORE, name)
 
     if (!entry) {
       event.respondWith(
@@ -46,5 +44,5 @@ self.addEventListener("message", (event) => {
 })
 
 self.addEventListener("install", () => {
-  self.skipWaiting()
+  (self as any).skipWaiting()
 });

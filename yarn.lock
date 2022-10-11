@@ -673,6 +673,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-tag-autocomplete@^6.3.0":
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/@types/react-tag-autocomplete/-/react-tag-autocomplete-6.3.0.tgz#0a7ade3b48981b096f0960d175e8a860041c742c"
+  integrity sha512-WxAVFlcotjeQKh1UDEjAQwP4dCOtKFrCnSHODhSmBZqDFbjNhhw9QwtZ9wSfKkJ4z2mu5kgC8OD96hNUYtjZ1Q==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react@*", "@types/react@^18.0.17":
   version "18.0.21"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.21.tgz#b8209e9626bb00a34c76f55482697edd2b43cc67"
@@ -1149,6 +1156,11 @@ fast-diff@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.2.0.tgz#73ee11982d86caaf7959828d519cfe927fac5f03"
   integrity sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==
+
+file-select-dialog@^1.5.4:
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/file-select-dialog/-/file-select-dialog-1.5.4.tgz#71c774401bf3bb6217ddf8fdbafbb1ec1163ebc1"
+  integrity sha512-KrutaoxLbYGx8WSBsKJEVysGU+us9uXzvzUcOY9RkegS21RUgoRvtQIm42qJosS3jJrFqJ5ZHyi0Dw/frpDmgw==
 
 find-root@^1.1.0:
   version "1.1.0"
