@@ -1,6 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react'
 
-// import { Document, Page } from 'react-pdf/dist/entry.webpack'
+import { Document, Page, pdfjs } from 'react-pdf'
+
+// TODO: see if we can find a better way to load this file;
+// some ideas: https://github.com/wojtekmaj/react-pdf/issues/97
+pdfjs.GlobalWorkerOptions.workerSrc = `/src/assets/pdf.worker.js`;
+
 import { useDocument } from 'automerge-repo-react-hooks'
 import { FileDoc } from '.'
 
@@ -15,16 +20,26 @@ interface PdfDoc extends FileDoc {
   content: string
 }
 
-export default function PdfContent(props: ContentProps) {
-  const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
-  const fileStream = useBinaryDataContents(pdf && pdf.binaryDataId)
-  const [buffer, setBuffer] = useState<Buffer | null>(null)
+export default function PdfContent() {
+  // const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
+  // const fileStream = useBinaryDataContents(pdf && pdf.binaryDataId)
+  // const fileStream = new ReadableStream()
+  const [buffer, setBuffer] = useState<ArrayBuffer | null>(null)
+  // useEffect(() => {
+  //   if (!fileStream) {
+  //     return
+  //   }
+  //   streamToBuffer(fileStream).then((buffer) => setBuffer(buffer))
+  // }, [fileStream])
+
+  // For now: Fetch a PDF from the internet and return it as an arraybuffer
   useEffect(() => {
-    if (!fileStream) {
-      return
-    }
-    streamToBuffer(fileStream).then((buffer) => setBuffer(buffer))
-  }, [fileStream])
+    fetch('/blutack/src/assets/test.pdf')
+      .then((res) => res.arrayBuffer())
+      .then((buffer) => setBuffer(buffer))
+
+    setNumPages(138)
+  }, [])
 
   const [pageNum, setPageNum] = useState(1)
   const [numPages, setNumPages] = useState(0)
@@ -47,39 +62,40 @@ export default function PdfContent(props: ContentProps) {
     }
   }
 
-  const onDocumentLoadSuccess = useCallback(
-    (result: any) => {
-      const { numPages } = result
+  // const onDocumentLoadSuccess = useCallback(
+  //   (result: any) => {
+  //     const { numPages } = result
 
-      setNumPages(numPages)
+  //     setNumPages(numPages)
 
-      result.getMetadata().then((metadata: any) => {
-        const { info = {} } = metadata
-        const { Title } = info
+  //     result.getMetadata().then((metadata: any) => {
+  //       const { info = {} } = metadata
+  //       const { Title } = info
 
-        if (Title && pdf && !pdf.title) {
-          changePdf((doc) => {
-            doc.title = Title
-          })
-        }
-      })
+  //       if (Title && pdf && !pdf.title) {
+  //         changePdf((doc) => {
+  //           doc.title = Title
+  //         })
+  //       }
+  //     })
 
-      if (pdf && !pdf.content) {
-        getPDFText(result).then((content) => {
-          changePdf((doc) => {
-            doc.content = content
-          })
-        })
-      }
-    },
-    [changePdf, pdf]
-  )
+  //     if (pdf && !pdf.content) {
+  //       getPDFText(result).then((content) => {
+  //         changePdf((doc) => {
+  //           doc.content = content
+  //         })
+  //       })
+  //     }
+  //   },
+  //   [changePdf, pdf]
+  // )
 
-  if (!pdf) {
-    return null
-  }
+  // if (!pdf) {
+  //   return null
+  // }
 
-  const { context } = props
+  // const { context } = props
+  const context = 'workspace'
 
   const forwardDisabled = pageNum >= numPages
   const backDisabled = pageNum <= 1
@@ -120,7 +136,7 @@ export default function PdfContent(props: ContentProps) {
     <>
       {header}
       {buffer ? (
-        <Document file={{ data: buffer }} onLoadSuccess={onDocumentLoadSuccess}>
+        <Document file={{ data: buffer }} onLoadSuccess={() => {}}>
           <Page
             loading=""
             pageNumber={pageNum}
@@ -140,7 +156,7 @@ ContentTypes.register({
   type: 'pdf',
   name: 'PDF',
   icon: 'file-pdf-o',
-  unlisted: true,
+  // unlisted: true,
   contexts: {
     workspace: PdfContent,
     board: PdfContent,
