@@ -25,6 +25,7 @@ import './content-types/Task/index'
 import './content-types/files/index'
 import './content-types/files/FileContent'
 import './content-types/files/ImageContent'
+import './content-types/files/PdfContent'
 // import './content-types/files/AudioContent'
 // import './content-types/files/VideoContent'
 interface RootArgs {
