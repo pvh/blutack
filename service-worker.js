@@ -13,7 +13,7 @@ self.addEventListener('fetch', function(event) {
 
     const entry = STORE[name]
 
-    console.log("STORE", STORE, name)
+    console.log("entry", entry)
 
     if (!entry) {
       event.respondWith(
@@ -42,9 +42,9 @@ self.addEventListener("message", (event) => {
 
   switch (message.type) {
     case "set":
-      const { name, mimeType, binary } = message.data
+      const { binaryDataId, mimeType, binary } = message.data
 
-      STORE[name] = { mimeType, binary }
+      STORE[binaryDataId] = { mimeType, binary }
       break
   }
 })

@@ -9,7 +9,6 @@ export interface BinaryDataHeader {
   mimeType: string;
 }
 
-// web+pushpin://type/docId
 // web+binarydata://docId
 
 interface Parts {
@@ -40,40 +39,51 @@ export function createBinaryDataUrl(binaryDataId: BinaryDataId): string {
   return `/blutack/src/binary/${id}`
 }
 
-export async function storeBinaryData(binary: Uint8Array, mimeType?: string): Promise<BinaryDataId> {
+export async function storeBinaryData(binary: ReadableStream, mimeType?: string): Promise<BinaryDataId> {
   await navigator.serviceWorker.ready
 
-  const name = `web+binarydata://${v4()}` as BinaryDataId
+  const binaryDataId = `web+binarydata://${v4()}` as BinaryDataId
   
   navigator.serviceWorker.controller!.postMessage({
     type: "set",
-    data: { name, mimeType, binary }
+    data: { binaryDataId, mimeType, binary }
     // this extra array sends the binary via the TransferList
     // see docs for Worker.postMessage
-  }, [binary])
+  }, [binary as any])
 
-  return name
+  return binaryDataId
 }
 
 // TODO: implement correct responses...
-export function useBinaryDataHeader(binaryDataId?: BinaryDataId): BinaryDataHeader | undefined {
+export async function useBinaryDataHeader(binaryDataId?: BinaryDataId): Promise<BinaryDataHeader | undefined> {
   if (!binaryDataId) { return }
-  return { size: 666, mimeType: "application/octet-stream" }
+
+/*
+  const [header, setHeader] = useState<BinaryDataHeader | undefined>()
+
+  navigator.serviceWorker.controller!.postMessage({
+    type: "get",
+    data: { binaryDataId }
+  })
+  // TODO: there's no way for it to reply yet so just make up something convenient...
+*/
+  return { size: 666, mimeType: "image/png" }
 }
 
-/* TODO: useful for when you need file metadata in your renderer / frontend
-
-export function useHyperfile(url: HyperfileUrl | null): [Header, Readable] | [null, null] {
-  const [header, setHeader] = useState<[Header, Readable] | [null, null]>([null, null])
+/*
+export function useBinaryDataFile(binaryDataId?: BinaryDataId): [BinaryDataHeader, ReadableStream] | [null, null] {
+  const [header, setHeader] = useState<[BinaryDataHeader, ReadableStream] | [null, null]>([null, null])
 
   useEffect(() => {
     header && setHeader([null, null])
-    url && Hyperfile.fetch(url).then(([header, readable]) => setHeader([header, readable]))
+    binaryDataId && loadBinaryData(binaryDataId).then(([header, readable]) => setHeader([header, readable]))
   }, [url])
 
   return header
 }
+*/
 
+/*
 export function useHyperfileHeader(url: HyperfileUrl | null): Header | null {
   const [header, setHeader] = useState<Header | null>(null)
   const { files } = useRepo()
