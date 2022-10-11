@@ -56,24 +56,25 @@ export async function storeBinaryData(binary: ReadableStream, mimeType?: string)
 
 // TODO: implement correct responses...
 export function useBinaryDataHeader(binaryDataId?: BinaryDataId): BinaryDataHeader | undefined {
-  if (!binaryDataId) { return }
-  return { size: 666, mimeType: "image/pdf" }
+  const [header, setHeader] = useState<BinaryDataHeader | undefined>()
+  useEffect(() => {
+    binaryDataId && loadBinaryData(binaryDataId).then(([header, ]) => setHeader(header))
+  }, [binaryDataId])
+  return header
 }
 
 export function useBinaryDataContents(binaryDataId?: BinaryDataId): ReadableStream | undefined {
   const [stream, setStream] = useState<ReadableStream | undefined>()
   useEffect(() => {
-    binaryDataId && loadBinaryData(binaryDataId).then((readable) => setStream(readable))
+    binaryDataId && loadBinaryData(binaryDataId).then(([, readable]) => setStream(readable))
   }, [binaryDataId])
   return stream
 }
 
-async function loadBinaryData(binaryDataId: BinaryDataId): Promise<ReadableStream> {
+async function loadBinaryData(binaryDataId: BinaryDataId): Promise<[BinaryDataHeader, ReadableStream]> {
   // TODO: go get this from the serviceworker
-  return new ReadableStream()
+  return [ { size: 666, mimeType: "image/pdf" }, new ReadableStream()]
 }
-
-async function loadBinaryDataHeader(binaryDataId: BinaryDataId): Promise<BinaryDataHeader> {
   /*
   const [header, setHeader] = useState<BinaryDataHeader | undefined>()
 
@@ -84,33 +85,6 @@ async function loadBinaryDataHeader(binaryDataId: BinaryDataId): Promise<BinaryD
   // TODO: there's no way for it to reply yet so just make up something convenient...
   */
 }
-
-/*
-export function useBinaryDataFile(binaryDataId?: BinaryDataId): [BinaryDataHeader, ReadableStream] | [null, null] {
-  const [header, setHeader] = useState<[BinaryDataHeader, ReadableStream] | [null, null]>([null, null])
-
-  useEffect(() => {
-    header && setHeader([null, null])
-    binaryDataId && loadBinaryData(binaryDataId).then(([header, readable]) => setHeader([header, readable]))
-  }, [url])
-
-  return header
-}
-*/
-
-/*
-export function useHyperfileHeader(url: HyperfileUrl | null): Header | null {
-  const [header, setHeader] = useState<Header | null>(null)
-  const { files } = useRepo()
-
-  useEffect(() => {
-    header && setHeader(null)
-    url && files.header(url).then(setHeader)
-  }, [url])
-
-  return header
-}
-*/
 
 export async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
