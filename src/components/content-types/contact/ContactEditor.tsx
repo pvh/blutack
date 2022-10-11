@@ -29,15 +29,14 @@ import ListMenu from '../../ui/ListMenu'
 import { USER_COLORS } from './Constants'
 import SharesSection from './SharesSection'
 import './ContactEditor.css'
-import { FileId } from '../files'
 import ColorPicker from '../../ui/ColorPicker'
+import { BinaryDataId, createBinaryDataUrl } from '../../../blobstore/Blob'
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.documentId)
 
-  // XXX: fixme: we have removed files, for now
   const [avatarImageDoc] = useDocument<any>(doc ? doc.avatarDocId : undefined)
-  const { fileId: avatarHyperfileUrl = null } = avatarImageDoc || {}
+  const { binaryDataId: avatarBinaryId } = avatarImageDoc || {}
 
   const currentDeviceId = useContext(CurrentDeviceContext)
   const hiddenFileInput = useRef<HTMLInputElement>(null)
@@ -91,7 +90,7 @@ export default function ContactEditor(props: ContentProps) {
           <Heading>Edit Profile...</Heading>
         </div>
         {renderNameEditor(props.documentId)}
-        {renderAvatarEditor(avatarHyperfileUrl, onFilesChanged, hiddenFileInput, onImportClick)}
+        {renderAvatarEditor(avatarBinaryId, onFilesChanged, hiddenFileInput, onImportClick)}
         {renderPresenceColorSelector(color, setColor)}
         {renderDevices(devices, status, selfUrl, removeDevice, currentDeviceId)}
         <SharesSection invites={invites} />
@@ -109,7 +108,7 @@ const renderNameEditor = (documentId: DocumentId) => (
 )
 
 const renderAvatarEditor = (
-  avatarHyperfileUrl: FileId | null,
+  avatarBinaryId: BinaryDataId | null,
   onFilesChanged: (e: ChangeEvent<HTMLInputElement>) => void,
   hiddenFileInput: Ref<HTMLInputElement>,
   onImportClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
@@ -117,7 +116,7 @@ const renderAvatarEditor = (
   return (
     <ListMenuSection title="Avatar">
       <ListMenuItem>
-        <Badge img={avatarHyperfileUrl || DEFAULT_AVATAR_PATH} />
+        <Badge img={ avatarBinaryId ? createBinaryDataUrl(avatarBinaryId) : DEFAULT_AVATAR_PATH} />
         <CenteredStack direction="row">
           <input
             type="file"
@@ -125,7 +124,6 @@ const renderAvatarEditor = (
             accept="image/*"
             onChange={onFilesChanged}
             ref={hiddenFileInput}
-            style={{ display: 'none' }}
           />
           <button type="button" onClick={onImportClick}>
             Choose from file...

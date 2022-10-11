@@ -17,7 +17,6 @@
     "automerge-repo-storage-localforage": "^0.0.11",
     "classnames": "^2.3.2",
     "debug": "^4.3.4",
-    "file-select-dialog": "^1.5.4",
     "localforage": "^1.10.0",
     "mime-types": "^2.1.35",
     "path-parse": "^1.0.7",

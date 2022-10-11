@@ -5,7 +5,7 @@ import * as UriList from '../pushpin-code/UriList'
 import './ContentDragHandle.css'
 import { PushpinUrl } from '../pushpin-code/ShareLink'
 import { DocumentId } from 'automerge-repo'
-import { FileId } from '../content-types/files'
+import { BinaryDataId, useBinaryDataHeader } from '../../blobstore/Blob'
 
 interface SimpleProps {
   url: PushpinUrl
@@ -14,7 +14,7 @@ interface SimpleProps {
 interface FileProps extends SimpleProps {
   filename: string
   extension?: string
-  fileId: FileId
+  binaryDataId: BinaryDataId
 }
 
 export type Props = SimpleProps | FileProps
@@ -22,9 +22,10 @@ export type Props = SimpleProps | FileProps
 export default function ContentDragHandle(props: Props) {
   const { url, children } = props
   const ref = useRef<HTMLSpanElement>(null)
-  // const hyperfileUrl = 'hyperfileDocId' in props ? props.hyperfileDocId : null
-  // const header = useHyperfileHeader(hyperfileUrl)
+  const binaryDataId = 'binaryDataId' in props ? props.binaryDataId : undefined
+  const header = useBinaryDataHeader(binaryDataId)
 
+  // TODO: get this working later
   const onDragStart = (event: React.DragEvent<HTMLSpanElement>) => {
     if (ref.current) {
       event.dataTransfer.setDragImage(ref.current, 0, 0)
@@ -33,7 +34,7 @@ export default function ContentDragHandle(props: Props) {
     event.dataTransfer.setData(UriList.MIME_TYPE, url)
 
     // and we'll add a DownloadURL if we need to
-    /* if ('hyperfileUrl' in props && header) {
+    if ('hyperfileUrl' in props && header) {
       const { hyperfileUrl, filename, extension } = props
       const { mimeType } = header
 
@@ -41,7 +42,7 @@ export default function ContentDragHandle(props: Props) {
 
       const downloadUrl = `text:${filename}.${outputExtension}:${hyperfileUrl}`
       event.dataTransfer.setData('DownloadURL', downloadUrl)
-    } */
+    }
   }
 
   return (

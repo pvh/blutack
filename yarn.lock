@@ -1157,11 +1157,6 @@ fast-diff@1.2.0:
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.2.0.tgz#73ee11982d86caaf7959828d519cfe927fac5f03"
   integrity sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==
 
-file-select-dialog@^1.5.4:
-  version "1.5.4"
-  resolved "https://registry.yarnpkg.com/file-select-dialog/-/file-select-dialog-1.5.4.tgz#71c774401bf3bb6217ddf8fdbafbb1ec1163ebc1"
-  integrity sha512-KrutaoxLbYGx8WSBsKJEVysGU+us9uXzvzUcOY9RkegS21RUgoRvtQIm42qJosS3jJrFqJ5ZHyi0Dw/frpDmgw==
-
 find-root@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/find-root/-/find-root-1.1.0.tgz#abcfc8ba76f708c42a97b3d685b7e9450bfb9ce4"

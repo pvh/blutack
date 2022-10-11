@@ -9,12 +9,13 @@ TODO:
 - some kind of authentication plan
 
 ----
+----
 
 - re-build PDF / HTML import (URLContent/PDFContent) ... maybe?
 - invitation / sharing / encryption redesign
 
-----
 - support multiple frameworks simultaneously
+- motif sync
 - self-hosting progammableness(???)
 
 next

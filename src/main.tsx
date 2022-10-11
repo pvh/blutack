@@ -15,6 +15,10 @@ import * as ContentTypes from './components/pushpin-code/ContentTypes'
 import { create as createWorkspace } from './components/content-types/workspace/Workspace'
 import { BrowserWebSocketClientAdapter } from 'automerge-repo-network-websocket'
 
+import { registerServiceWorker } from './blobstore/Blob'
+
+
+registerServiceWorker()
 /* disabled to make debugging simpler.
 // find this at chrome://inspect#workers, then hit inspect
 new SharedWorker(

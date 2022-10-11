@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import Content, { ContentProps } from '../../Content'
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import { useDocument, /* useHyperfileHeader */ } from 'automerge-repo-react-hooks'
+import { useDocument } from 'automerge-repo-react-hooks'
 import { createDocumentLink } from '../../pushpin-code/ShareLink'
 import { FileDoc } from '.'
 
@@ -13,6 +13,7 @@ import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
 import CenteredStack from '../../ui/CenteredStack'
 import SecondaryText from '../../ui/SecondaryText'
 import Heading from '../../ui/Heading'
+import { useBinaryDataHeader } from '../../../blobstore/Blob'
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
@@ -23,15 +24,27 @@ interface Props extends ContentProps {
   editable: boolean
 }
 
+/*
+VVV editable VVV
+{ name: "Malleable Software (Tchernowski)",
+  created: Date.now(),
+  creator: <Paul's contactID>
+  fileId: <pointertoFileId>
+}
+
+VVV permanent and unchanging (and required to render) VVV
+fileId: { "mimetype": "binary/pdf", length: 8000, "extension": "PDF"}
+*/
+
 export default function FileContent({ documentId, context, editable, url }: Props) {
   const [doc] = useDocument<FileDoc>(documentId)
   const badgeRef = useRef<HTMLDivElement>(null)
 
-  const { title = '', extension, fileId } = doc || {}
+  const { title = '', extension, binaryDataId } = doc || {}
 
-  const header = null // useHyperfileHeader(hyperfileUrl || null)
+  const header = useBinaryDataHeader(binaryDataId)
 
-  if (!fileId || !header) {
+  if (!binaryDataId || !header) {
     return null
   }
   const { size, mimeType } = header
@@ -46,7 +59,7 @@ export default function FileContent({ documentId, context, editable, url }: Prop
               url={url}
               filename={title}
               extension={extension}
-              fileId={fileId}
+              binaryDataId={binaryDataId}
             >
               <Badge shape="square" icon="file-o" />
             </ContentDragHandle>

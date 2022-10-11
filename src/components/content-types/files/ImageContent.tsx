@@ -10,6 +10,7 @@ import ListItem from '../../ui/ListItem'
 import ContentDragHandle from '../../ui/ContentDragHandle'
 import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
 import { useDocument } from 'automerge-repo-react-hooks'
+import { createBinaryDataUrl, useBinaryDataHeader } from '../../../blobstore/Blob'
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
@@ -22,11 +23,11 @@ export default function ImageContent({ documentId }: ContentProps) {
   if (!doc) {
     return null
   }
-  if (!doc.fileId) {
+  if (!doc.binaryDataId) {
     return null
   }
 
-  return <img className="Image" alt="" src={doc.fileId} />
+  return <img className="Image" alt="" src={createBinaryDataUrl(doc.binaryDataId)} />
 }
 
 interface Props extends ContentProps {
@@ -37,10 +38,10 @@ function ImageInList(props: Props) {
   const { documentId, editable, url } = props
   const [doc] = useDocument<FileDoc>(documentId)
 
-  const { title = '', fileId = null, extension } = doc || {}
-  const header = { size: 666 } // TODO: useHyperfileHeader(hyperfileUrl)
+  const { title = '', binaryDataId, extension } = doc || {}
+  const header = useBinaryDataHeader(binaryDataId)
 
-  if (!fileId) {
+  if (!binaryDataId) {
     return null
   }
 
@@ -54,12 +55,12 @@ function ImageInList(props: Props) {
         url={url}
         filename={title}
         extension={extension}
-        fileId={fileId}
+        binaryDataId={binaryDataId}
       >
         <Badge
           shape="square"
           icon={size ? undefined : 'file-image-o'}
-          img={size ? fileId : undefined}
+          img={size ? createBinaryDataUrl(binaryDataId) : undefined}
         />
       </ContentDragHandle>
       <TitleWithSubtitle

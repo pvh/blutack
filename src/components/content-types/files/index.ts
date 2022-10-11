@@ -4,20 +4,20 @@ import FileContent from "./FileContent";
 
 import * as ContentData from "../../pushpin-code/ContentData";
 import { DocumentId, DocHandle } from "automerge-repo";
+import { BinaryDataId } from "../../../blobstore/Blob";
 
-export type FileId = string & { __fileId: true };
 export interface FileDoc {
   title: string; // names are editable and not an intrinsic part of the file
   extension: string;
-  fileId: FileId;
+  binaryDataId: BinaryDataId;
   capturedAt: string;
 }
 
-function create({ title, extension, fileId }: any, handle: DocHandle<any>) {
+function create({ title, extension, binaryDataId }: any, handle: DocHandle<any>) {
   handle.change((doc) => {
     doc.title = title;
     doc.extension = extension;
-    doc.fileId = fileId;
+    doc.binaryDataId = binaryDataId;
   });
 }
 
@@ -26,12 +26,12 @@ async function createFrom(
   handle: DocHandle<FileDoc>
 ) {
   const name = contentData.name || contentData.src || "Nameless File";
-  const fileId = await ContentData.toFileId(contentData);
+  const binaryDataId = await ContentData.storeContentData(contentData);
   const { capturedAt } = contentData;
 
   handle.change((doc: FileDoc) => {
     const parsed = pathParse(name);
-    doc.fileId = fileId;
+    doc.binaryDataId = binaryDataId;
     doc.title = parsed.name;
     doc.extension = parsed.ext.slice(1);
     if (capturedAt) {

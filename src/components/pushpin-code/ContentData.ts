@@ -1,6 +1,6 @@
 import mime from "mime-types";
-import { FileId } from "../content-types/files";
 import * as WebStreamLogic from "./WebStreamLogic";
+import { BinaryDataId, storeBinaryData } from "../../blobstore/Blob";
 
 export type FileUrl = string & { __fileUrl: false };
 
@@ -28,8 +28,18 @@ export function fromString(str: string, mimeType: string = "text/plain") {
   };
 }
 
-export async function toFileId(contentData: ContentData): Promise<FileId> {
-  // const header = await Hyperfile.write(contentData.data, contentData.mimeType);
-  // return header.url;
-  return "a file identifer" as FileId;
+export async function storeContentData({data, mimeType}: ContentData): Promise<BinaryDataId> {
+  const url = await storeBinaryData(data, mimeType);
+  return url;
+}
+
+// for our bad protocol implementation and our bad pdf implementation
+function streamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffer> {
+  return new Promise((res, rej) => {
+    const buffers: Buffer[] = []
+    stream
+      .on('data', (data: Buffer) => buffers.push(data))
+      .on('error', (err: any) => rej(err))
+      .on('end', () => res(Buffer.concat(buffers)))
+  })
 }
