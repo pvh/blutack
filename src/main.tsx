@@ -14,6 +14,8 @@ import {  RepoContext } from 'automerge-repo-react-hooks'
 import * as ContentTypes from './components/pushpin-code/ContentTypes'
 import { create as createWorkspace } from './components/content-types/workspace/Workspace'
 import { BrowserWebSocketClientAdapter } from 'automerge-repo-network-websocket'
+import {storeBinary} from "./binary-store";
+
 
 /* disabled to make debugging simpler.
 // find this at chrome://inspect#workers, then hit inspect
@@ -22,6 +24,14 @@ new SharedWorker(
   { type: "module", name: "automerge-repo-shared-worker" }
 )
 */
+
+storeBinary("answer", "42").then(() => {
+  fetch('/src/binary/answer')
+    .then((res) => res.text())
+    .then(text => console.log('sw: ANSWER:', text))
+})
+
+
 
 // sync-server instructions:
 // $ cd automerge-repo/packages/automerge-repo-sync-server
