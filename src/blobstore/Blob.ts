@@ -72,18 +72,22 @@ export function useBinaryDataContents(binaryDataId?: BinaryDataId): ReadableStre
 }
 
 async function loadBinaryData(binaryDataId: BinaryDataId): Promise<[BinaryDataHeader, ReadableStream]> {
-  // TODO: go get this from the serviceworker
-  return [ { size: 666, mimeType: "image/pdf" }, new ReadableStream()]
-}
-  /*
-  const [header, setHeader] = useState<BinaryDataHeader | undefined>()
+  return new Promise((resolve, reject) => {
+    const { port1: myPort, port2: theirPort } = new MessageChannel()
 
-  navigator.serviceWorker.controller!.postMessage({
-    type: "get",
-    data: { binaryDataId }
+    myPort.addEventListener("message", e => {
+      console.log("heard back from the service worker", e)
+      const { mimeType } = e.data
+      console.log( mimeType )
+      resolve([{ size: 666 /* TODO */, mimeType }, new ReadableStream() /* todo */])
+    })
+    myPort.start()
+
+    navigator.serviceWorker.controller!.postMessage({
+      type: "get",
+      data: { binaryDataId, replyPort: theirPort }
+    }, [theirPort])
   })
-  // TODO: there's no way for it to reply yet so just make up something convenient...
-  */
 }
 
 export async function registerServiceWorker() {

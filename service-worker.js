@@ -34,6 +34,23 @@ self.addEventListener('fetch', function(event) {
   }
 });
 
+function handleSetMessage(message) {
+  const { binaryDataId, mimeType, binary } = message.data
+  STORE[binaryDataId] = { mimeType, binary }
+}
+
+function handleGetMessage(message) {
+  const { binaryDataId, replyPort } = message.data
+  if (!STORE[binaryDataId]) {
+    throw new Error("Tried to get missing data")
+  }
+
+  const { mimeType, binary } = STORE[binaryDataId]
+
+  replyPort.postMessage({
+    binaryDataId, mimeType
+  })
+}
 
 self.addEventListener("message", (event) => {
   console.log("MESSAGE", event, STORE)
@@ -42,9 +59,10 @@ self.addEventListener("message", (event) => {
 
   switch (message.type) {
     case "set":
-      const { binaryDataId, mimeType, binary } = message.data
-
-      STORE[binaryDataId] = { mimeType, binary }
+      handleSetMessage(message)
+      break
+    case "get":
+      handleGetMessage(message)
       break
   }
 })
