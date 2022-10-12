@@ -5,6 +5,7 @@ import { ContentProps } from '../../Content'
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import { useDocument } from 'automerge-repo-react-hooks'
 import './AudioContent.css'
+import { createBinaryDataUrl } from '../../../blobstore/Blob'
 // import { usePresence } from '../../../PresenceHooks'
 
 interface AudioState {
@@ -77,7 +78,7 @@ export default function AudioContent({ documentId }: ContentProps) {
   return (
     <div className="audioWrapper">
       <audio
-        src={doc.binaryDataId}
+        src={createBinaryDataUrl(doc.binaryDataId)}
         ref={audioElement}
         onTimeUpdate={handleAudioProgress}
         onEnded={handleEnd}

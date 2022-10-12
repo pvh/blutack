@@ -5,15 +5,16 @@ import { ContentProps } from '../../Content'
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
 import { useDocument } from 'automerge-repo-react-hooks'
 import './VideoContent.css'
+import { createBinaryDataUrl } from '../../../blobstore/Blob'
 
 export default function VideoContent({ documentId }: ContentProps) {
   const [doc] = useDocument<FileDoc>(documentId)
 
-  if (!(doc && doc.fileId)) {
+  if (!(doc && doc.binaryDataId)) {
     return null
   }
 
-  return <video className="VideoContent" controls src={doc.fileId} />
+  return <video className="VideoContent" controls src={createBinaryDataUrl(doc.binaryDataId)} />
 }
 
 const supportsMimeType = (mimeType: string) =>
