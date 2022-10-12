@@ -19,9 +19,6 @@ import "./content-types/ThreadContent"
 
 import "./content-types/ContentList"
 
-import "./content-types/Project/index"
-import "./content-types/Task/index"
-
 import "./content-types/files/index"
 import "./content-types/files/FileContent"
 import "./content-types/files/ImageContent"
