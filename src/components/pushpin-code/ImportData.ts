@@ -1,50 +1,50 @@
-import { isPushpinUrl, parseDocumentLink, PushpinUrl } from "./ShareLink";
-import * as ContentTypes from "./ContentTypes";
-import * as ContentData from "./ContentData";
-import * as URIList from "./UriList";
+import { isPushpinUrl, parseDocumentLink, PushpinUrl } from "./ShareLink"
+import * as ContentTypes from "./ContentTypes"
+import * as ContentData from "./ContentData"
+import * as URIList from "./UriList"
 
 // TODO: Convert these functions to be async rather than accepting a callback.
 export type CreatedContentCallback = (
   contentUrl: PushpinUrl,
   index: number
-) => void;
+) => void
 
 export async function importDataTransfer(
   dataTransfer: DataTransfer,
   callback: CreatedContentCallback
 ) {
-  const url = dataTransfer.getData("application/pushpin-url");
+  const url = dataTransfer.getData("application/pushpin-url")
   if (url) {
-    callback(url as PushpinUrl, 0);
-    return;
+    callback(url as PushpinUrl, 0)
+    return
   }
 
   // this is Old Magick from the early web, but we use it to move around
   // multiple cards at a time
-  const uriList = dataTransfer.getData(URIList.MIME_TYPE);
+  const uriList = dataTransfer.getData(URIList.MIME_TYPE)
   if (uriList) {
-    const uris = URIList.parse(uriList);
+    const uris = URIList.parse(uriList)
     uris.forEach((uri, i) =>
       importPlainText(uri, (contentUrl: PushpinUrl) => callback(contentUrl, i))
-    );
+    )
   }
 
   if (dataTransfer.files.length > 0) {
-    importFileList(dataTransfer.files, callback);
-    return;
+    importFileList(dataTransfer.files, callback)
+    return
   }
   // If we can identify html that's a simple image, import the image.
-  const html = dataTransfer.getData("text/html");
+  const html = dataTransfer.getData("text/html")
   if (html) {
-    if (importImagesFromHTML(html, callback)) return;
+    if (importImagesFromHTML(html, callback)) return
   }
 
   // If we can't get the item as a bunch of files, let's hope it works as plaintext.
-  const plainText = dataTransfer.getData("text/plain");
+  const plainText = dataTransfer.getData("text/plain")
   if (plainText) {
     importPlainText(plainText, (contentUrl: PushpinUrl) =>
       callback(contentUrl, 0)
-    );
+    )
   }
 }
 
@@ -54,35 +54,35 @@ export function importFileList(
 ) {
   /* Adapted from:
     https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
-  const { length } = files;
+  const { length } = files
   // fun fact: as of this writing, onDrop dataTransfer doesn't support iterators, but onPaste does
   // hence the oldschool iteration code
   for (let i = 0; i < length; i += 1) {
-    const file = files[i];
+    const file = files[i]
     // @ts-ignore-next-line (TODO: this is probably a real bug)
     ContentTypes.createFrom(ContentData.fromFile(file), (url) =>
       callback(url, i)
-    );
+    )
   }
 }
 
 function importImagesFromHTML(html: string, callback: CreatedContentCallback) {
-  const iframe = document.createElement("iframe");
-  iframe.setAttribute("sandbox", "");
+  const iframe = document.createElement("iframe")
+  iframe.setAttribute("sandbox", "")
   try {
-    document.body.appendChild(iframe);
-    iframe.contentDocument!.documentElement.innerHTML = html;
-    const images = iframe.contentDocument!.getElementsByTagName("img");
+    document.body.appendChild(iframe)
+    iframe.contentDocument!.documentElement.innerHTML = html
+    const images = iframe.contentDocument!.getElementsByTagName("img")
     if (images.length > 0) {
       importUrl(images[0].src, (contentUrl: PushpinUrl) =>
         callback(contentUrl, 0)
-      );
-      return true;
+      )
+      return true
     }
   } finally {
-    iframe.remove();
+    iframe.remove()
   }
-  return false;
+  return false
 }
 
 /**
@@ -100,21 +100,21 @@ export function importPlainText(
   if (isPushpinUrl(plainText)) {
     const { documentId } = parseDocumentLink(plainText)
     const handle = ContentTypes.__getRepo().find(documentId)
-    callback(plainText, handle);
+    callback(plainText, handle)
   } else if (isUrl(plainText)) {
-    importUrl(plainText, callback);
+    importUrl(plainText, callback)
   } else {
-    ContentTypes.createFrom(ContentData.fromString(plainText), callback);
+    ContentTypes.createFrom(ContentData.fromString(plainText), callback)
   }
 }
 
 function isUrl(str: string) {
   try {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const url = new URL(str);
-    return true;
+    const url = new URL(str)
+    return true
   } catch {
-    return false;
+    return false
   }
 }
 
@@ -128,30 +128,30 @@ function isUrl(str: string) {
  * That should be happening in ContentTypes.createFrom.
  */
 async function importUrl(url: string, callback: ContentTypes.CreateCallback) {
-  const response = await fetchOk(url);
+  const response = await fetchOk(url)
   if (!response) {
-    ContentTypes.create("url", { url }, callback);
-    return;
+    ContentTypes.create("url", { url }, callback)
+    return
   }
   const mimeType =
-    response.headers.get("Content-Type") || "application/octet-stream";
+    response.headers.get("Content-Type") || "application/octet-stream"
   if (mimeType.includes("text/html")) {
-    ContentTypes.create("url", { url }, callback);
-    return;
+    ContentTypes.create("url", { url }, callback)
+    return
   }
   const contentData: ContentData.ContentData = {
     name: url, // XXX: This mimics the legacy behavior of creating a blob and file.
     mimeType,
     data: response.body!, // XXX: I believe this is ok. I think response.body is only null if !response.ok
-  };
-  ContentTypes.createFrom(contentData, callback);
+  }
+  ContentTypes.createFrom(contentData, callback)
 }
 
 async function fetchOk(url: string): Promise<Response | null> {
   try {
-    const response = await fetch(url);
-    return response.ok ? response : null;
+    const response = await fetch(url)
+    return response.ok ? response : null
   } catch {
-    return null;
+    return null
   }
 }

@@ -6,13 +6,13 @@ import React, {
   Ref,
   memo,
   ForwardRefRenderFunction,
-} from 'react'
+} from "react"
 
-import * as ContentTypes from './pushpin-code/ContentTypes'
-import { parseDocumentLink, PushpinUrl } from './pushpin-code/ShareLink'
-import Crashable from './Crashable'
-import { DocumentId } from 'automerge-repo'
-import { useSelfId } from './pushpin-code/SelfHooks'
+import * as ContentTypes from "./pushpin-code/ContentTypes"
+import { parseDocumentLink, PushpinUrl } from "./pushpin-code/ShareLink"
+import Crashable from "./Crashable"
+import { DocumentId } from "automerge-repo"
+import { useSelfId } from "./pushpin-code/SelfHooks"
 // import { useHeartbeat } from '../PresenceHooks'
 
 // this is the interface imported by Content types
@@ -90,7 +90,8 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
 function renderError(type: string) {
   return (
     <div>
-      <i className="fa fa-exclamation-triangle" />A &quot;{type}&quot; threw an error during render.
+      <i className="fa fa-exclamation-triangle" />A &quot;{type}&quot; threw an
+      error during render.
     </div>
   )
 }
@@ -99,7 +100,8 @@ function renderMissingType(type: string, context: ContentTypes.Context) {
   return (
     <div>
       <i className="fa fa-exclamation-triangle" />
-      Component of type &quot;{type}&quot; in context &quot;{context}&quot; not found.
+      Component of type &quot;{type}&quot; in context &quot;{context}&quot; not
+      found.
     </div>
   )
 }

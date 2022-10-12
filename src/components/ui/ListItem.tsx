@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react'
-import './ListItem.css'
+import React, { ReactNode } from "react"
+import "./ListItem.css"
 
 export interface Props {
   children: ReactNode

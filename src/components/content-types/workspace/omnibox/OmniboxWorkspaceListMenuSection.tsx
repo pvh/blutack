@@ -1,8 +1,8 @@
-import React from 'react'
-import ActionListItem from './ActionListItem'
-import ListMenuSection from '../../../ui/ListMenuSection'
-import { Action, Item } from './OmniboxWorkspaceListMenu'
-import Content from '../../../Content'
+import React from "react"
+import ActionListItem from "./ActionListItem"
+import ListMenuSection from "../../../ui/ListMenuSection"
+import { Action, Item } from "./OmniboxWorkspaceListMenu"
+import Content from "../../../Content"
 
 interface Props {
   name: string
@@ -11,7 +11,12 @@ interface Props {
   items: Item[]
 }
 
-export default function OmniboxWorkspaceListMenuSection({ name, label, actions, items }: Props) {
+export default function OmniboxWorkspaceListMenuSection({
+  name,
+  label,
+  actions,
+  items,
+}: Props) {
   if (items.length === 0) {
     return null
   }

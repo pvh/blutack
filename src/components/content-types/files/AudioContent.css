@@ -21,7 +21,7 @@
   position: relative;
 }
 .progressBar::after {
-  content: '';
+  content: "";
   width: var(--halfCellSize);
   height: var(--halfCellSize);
   background-color: white;

@@ -1,23 +1,37 @@
-import React, { useState, useCallback, useEffect, useRef, PointerEventHandler, useMemo } from 'react'
-import { getStroke, StrokePoint } from 'perfect-freehand'
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  PointerEventHandler,
+  useMemo,
+} from "react"
+import { getStroke, StrokePoint } from "perfect-freehand"
 
-import { Document, Page, pdfjs } from 'react-pdf'
+import { Document, Page, pdfjs } from "react-pdf"
 
 // TODO: see if we can find a better way to load this file;
 // some ideas: https://github.com/wojtekmaj/react-pdf/issues/97
-pdfjs.GlobalWorkerOptions.workerSrc = `/src/assets/pdf.worker.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `/src/assets/pdf.worker.js`
 
-import { useDocument } from 'automerge-repo-react-hooks'
-import { FileDoc } from '.'
+import { useDocument } from "automerge-repo-react-hooks"
+import { FileDoc } from "."
 
-import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import Content, { ContentProps } from '../../Content'
-import './PdfContent.css'
-import { useBinaryDataContents, useBinaryDataHeader } from '../../../blobstore/Blob'
-import { useConfirmableInput } from '../../pushpin-code/Hooks'
-import { createDocumentLink, parseDocumentLink, PushpinUrl } from "../../pushpin-code/ShareLink";
-import ContentList, { ContentListDoc, ContentListInList } from "../ContentList";
-import { DocHandle, DocumentId } from "automerge-repo";
+import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import Content, { ContentProps } from "../../Content"
+import "./PdfContent.css"
+import {
+  useBinaryDataContents,
+  useBinaryDataHeader,
+} from "../../../blobstore/Blob"
+import { useConfirmableInput } from "../../pushpin-code/Hooks"
+import {
+  createDocumentLink,
+  parseDocumentLink,
+  PushpinUrl,
+} from "../../pushpin-code/ShareLink"
+import ContentList, { ContentListDoc, ContentListInList } from "../ContentList"
+import { DocHandle, DocumentId } from "automerge-repo"
 
 export interface PdfAnnotationDoc {
   stroke: number[][]
@@ -26,9 +40,9 @@ export interface PdfAnnotationDoc {
 }
 
 ContentTypes.register({
-  type: 'pdfannotation',
-  name: 'PDF Annotation',
-  icon: 'highlighter-line',
+  type: "pdfannotation",
+  name: "PDF Annotation",
+  icon: "highlighter-line",
   contexts: {},
   create: createAnnotation,
 })
@@ -77,45 +91,54 @@ function getSvgPathFromStroke(stroke: Point[]) {
 export default function PdfContent(props: ContentProps) {
   const [points, setPoints] = React.useState<Point[]>([])
 
-  const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback((e: any) => {
-    const bounds = e.target.getBoundingClientRect();
-    const x = ((e.clientX - bounds.left) / bounds.width) * PAGE_WIDTH
-    const y = ((e.clientY - bounds.top) / bounds.height) * PAGE_HEIGHT
+  const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback(
+    (e: any) => {
+      const bounds = e.target.getBoundingClientRect()
+      const x = ((e.clientX - bounds.left) / bounds.width) * PAGE_WIDTH
+      const y = ((e.clientY - bounds.top) / bounds.height) * PAGE_HEIGHT
 
-    e.target.setPointerCapture(e.pointerId)
+      e.target.setPointerCapture(e.pointerId)
 
-    setPoints([[x, y, e.pressure]])
-  }, [points])
+      setPoints([[x, y, e.pressure]])
+    },
+    [points]
+  )
 
-  const handlePointerMove: PointerEventHandler<SVGSVGElement> = useCallback((e: any) => {
-    if (e.buttons !== 1) return
+  const handlePointerMove: PointerEventHandler<SVGSVGElement> = useCallback(
+    (e: any) => {
+      if (e.buttons !== 1) return
 
-    const bounds = e.target.getBoundingClientRect();
-    const x = ((e.clientX - bounds.left) / bounds.width) * PAGE_WIDTH
-    const y = ((e.clientY - bounds.top) / bounds.height) * PAGE_HEIGHT
+      const bounds = e.target.getBoundingClientRect()
+      const x = ((e.clientX - bounds.left) / bounds.width) * PAGE_WIDTH
+      const y = ((e.clientY - bounds.top) / bounds.height) * PAGE_HEIGHT
 
-    setPoints([...points, [x, y, e.pressure]])
-  }, [points])
+      setPoints([...points, [x, y, e.pressure]])
+    },
+    [points]
+  )
 
+  const handlePointerUp: PointerEventHandler<SVGSVGElement> =
+    useCallback(() => {
+      if (points.length !== 0) {
+        ContentTypes.create(
+          "pdfannotation",
+          {
+            stroke: getStroke(points, STROKE_PARAMS),
+            pdfDocUrl: createDocumentLink("pdf", props.documentId),
+            page: pageNum,
+          },
+          (pdfAnnotationUrl) => {
+            changeAnnotationList((annotationsList) => {
+              annotationsList.content.push(pdfAnnotationUrl)
+            })
 
-  const handlePointerUp: PointerEventHandler<SVGSVGElement> = useCallback(() => {
-    if (points.length !== 0) {
-      ContentTypes.create("pdfannotation", {
-        stroke: getStroke(points, STROKE_PARAMS),
-        pdfDocUrl: createDocumentLink("pdf", props.documentId),
-        page: pageNum
-      }, (pdfAnnotationUrl) => {
-        changeAnnotationList((annotationsList) => {
-          annotationsList.content.push(pdfAnnotationUrl)
-        })
+            setPoints([])
+          }
+        )
 
-        setPoints([])
-      })
-
-      getStroke(points, STROKE_PARAMS)
-    }
-  }, [points])
-
+        getStroke(points, STROKE_PARAMS)
+      }
+    }, [points])
 
   const stroke = getStroke(points, STROKE_PARAMS)
 
@@ -124,17 +147,21 @@ export default function PdfContent(props: ContentProps) {
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
   const [annotationList, changeAnnotationList] = useDocument<ContentListDoc>(
     pdf && pdf.annotationListUrl
-      ? parseDocumentLink(pdf.annotationListUrl).documentId : undefined
+      ? parseDocumentLink(pdf.annotationListUrl).documentId
+      : undefined
   )
 
   const buffer = useBinaryDataContents(pdf && pdf.binaryDataId)
   const [pageNum, setPageNum] = useState(1)
   const [numPages, setNumPages] = useState(0)
-  const [pageInputValue, onPageInput] = useConfirmableInput(String(pageNum), (str) => {
-    const nextPageNum = Number.parseInt(str, 10)
+  const [pageInputValue, onPageInput] = useConfirmableInput(
+    String(pageNum),
+    (str) => {
+      const nextPageNum = Number.parseInt(str, 10)
 
-    setPageNum(Math.min(numPages, Math.max(1, nextPageNum)))
-  })
+      setPageNum(Math.min(numPages, Math.max(1, nextPageNum)))
+    }
+  )
 
   function goForward() {
     if (pageNum < numPages) {
@@ -176,9 +203,12 @@ export default function PdfContent(props: ContentProps) {
     [changePdf, pdf]
   )
 
-  const param = useMemo(() => ({
-    data: buffer
-  }), [buffer])
+  const param = useMemo(
+    () => ({
+      data: buffer,
+    }),
+    [buffer]
+  )
 
   if (!pdf) {
     return null
@@ -187,13 +217,16 @@ export default function PdfContent(props: ContentProps) {
   // todo: annotationList initation shouldn't happen in view
 
   if (!pdf.annotationListUrl) {
-    ContentTypes.create("contentlist", { title: "annotations" }, (annotationListUrl) => {
-      changePdf(pdf => {
-        pdf.annotationListUrl = annotationListUrl
-      })
-    })
+    ContentTypes.create(
+      "contentlist",
+      { title: "annotations" },
+      (annotationListUrl) => {
+        changePdf((pdf) => {
+          pdf.annotationListUrl = annotationListUrl
+        })
+      }
+    )
   }
-
 
   const { context } = props
 
@@ -252,22 +285,25 @@ export default function PdfContent(props: ContentProps) {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         viewBox="0 0 1600 2070"
-        width={PAGE_WIDTH} height={PAGE_HEIGHT}
+        width={PAGE_WIDTH}
+        height={PAGE_HEIGHT}
         style={{
           position: "absolute",
           top: 0,
           width: "100%",
-          height: "auto"
+          height: "auto",
         }}
       >
-        { // TODO: we should be using Content here, but I need to pass the selectedPage to the view
+        {
+          // TODO: we should be using Content here, but I need to pass the selectedPage to the view
           annotationList?.content.map((annotationUrl) => (
-          <PdfAnnotationOverlayView
-            key={annotationUrl}
-            selectedPage={pageNum}
-            documentId={parseDocumentLink(annotationUrl).documentId}
-          />
-        ))}
+            <PdfAnnotationOverlayView
+              key={annotationUrl}
+              selectedPage={pageNum}
+              documentId={parseDocumentLink(annotationUrl).documentId}
+            />
+          ))
+        }
 
         {points && <path d={pathData} opacity={0.5} fill="#fdd835" />}
       </svg>
@@ -275,30 +311,36 @@ export default function PdfContent(props: ContentProps) {
   )
 }
 
-function PdfAnnotationOverlayView ({ selectedPage, documentId } : {
-  selectedPage: number,
-  documentId : DocumentId
+function PdfAnnotationOverlayView({
+  selectedPage,
+  documentId,
+}: {
+  selectedPage: number
+  documentId: DocumentId
 }) {
-  const [pdfAnnotation, changePdfAnnotation] = useDocument<PdfAnnotationDoc>(documentId)
+  const [pdfAnnotation, changePdfAnnotation] =
+    useDocument<PdfAnnotationDoc>(documentId)
 
-  if (!pdfAnnotation || !pdfAnnotation.stroke || pdfAnnotation.page !== selectedPage) {
+  if (
+    !pdfAnnotation ||
+    !pdfAnnotation.stroke ||
+    pdfAnnotation.page !== selectedPage
+  ) {
     return null
   }
 
   const pathData = getSvgPathFromStroke(pdfAnnotation?.stroke)
 
-  return (
-    <path d={pathData} opacity={0.5} fill="#fdd835" />
-  )
+  return <path d={pathData} opacity={0.5} fill="#fdd835" />
 }
 
-
-const supportsMimeType = (mimeType: string) => !!mimeType.match('application/pdf')
+const supportsMimeType = (mimeType: string) =>
+  !!mimeType.match("application/pdf")
 
 ContentTypes.register({
-  type: 'pdf',
-  name: 'PDF',
-  icon: 'file-pdf-o',
+  type: "pdf",
+  name: "PDF",
+  icon: "file-pdf-o",
   unlisted: true,
   contexts: {
     workspace: PdfContent,
@@ -311,7 +353,7 @@ ContentTypes.register({
 const getPageText = async (pdf: any, pageNo: number): Promise<string> => {
   const page = await pdf.getPage(pageNo)
   const tokenizedText = await page.getTextContent()
-  const pageText = tokenizedText.items.map((token: any) => token.str).join('')
+  const pageText = tokenizedText.items.map((token: any) => token.str).join("")
   return pageText
 }
 
@@ -322,7 +364,5 @@ export const getPDFText = async (pdf: any): Promise<string> => {
     pageTextPromises.push(getPageText(pdf, pageNo))
   }
   const pageTexts = await Promise.all(pageTextPromises)
-  return pageTexts.join(' ')
+  return pageTexts.join(" ")
 }
-
-

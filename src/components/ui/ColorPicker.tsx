@@ -1,14 +1,14 @@
-import React from 'react'
+import React from "react"
 
-import { CustomPicker } from 'react-color'
+import { CustomPicker } from "react-color"
 // @ts-ignore-next-line
-import { Swatch } from 'react-color/lib/components/common/Swatch'
-import './ColorPicker.css'
+import { Swatch } from "react-color/lib/components/common/Swatch"
+import "./ColorPicker.css"
 
 interface Props {
   color?: string
   colors: string[]
-  onChange(color: { hex: string; source: 'hex' }, e: React.MouseEvent): void
+  onChange(color: { hex: string; source: "hex" }, e: React.MouseEvent): void
 }
 
 ColorPicker.defaultProps = {
@@ -23,22 +23,23 @@ function ColorPicker(props: Props) {
     props.onChange(
       {
         hex: hexcode,
-        source: 'hex',
+        source: "hex",
       },
       e
     )
   }
 
   const swatches = props.colors.map((c) => {
-    const isSelected = props.color && c.toLowerCase() === props.color.toLowerCase()
-    const borderStyle = { border: '1px solid #333' }
+    const isSelected =
+      props.color && c.toLowerCase() === props.color.toLowerCase()
+    const borderStyle = { border: "1px solid #333" }
     return (
       <div key={c} className="ColorPicker__swatch">
         <Swatch
           color={c}
           hex={c}
           onClick={handleChange}
-          style={isSelected ? borderStyle : { border: '1px solid transparent' }}
+          style={isSelected ? borderStyle : { border: "1px solid transparent" }}
           focusStyle={borderStyle}
         />
       </div>

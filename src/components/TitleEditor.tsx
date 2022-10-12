@@ -1,9 +1,9 @@
-import { DocumentId } from 'automerge-repo'
-import { useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId } from "automerge-repo"
+import { useDocument } from "automerge-repo-react-hooks"
 
-import React, { useRef } from 'react'
+import React, { useRef } from "react"
 
-import './TitleEditor.css'
+import "./TitleEditor.css"
 
 interface AnyDoc {
   [field: string]: string
@@ -21,10 +21,10 @@ interface Props {
 export default function TitleEditor(props: Props) {
   const [doc, changeDoc] = useDocument<AnyDoc>(props.documentId)
   const input = useRef<HTMLInputElement>(null)
-  const { field = 'title', preventDrag = false, placeholder = '' } = props
+  const { field = "title", preventDrag = false, placeholder = "" } = props
 
   function onKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' || e.key === 'Escape') {
+    if (e.key === "Enter" || e.key === "Escape") {
       input.current && input.current.blur()
     }
   }

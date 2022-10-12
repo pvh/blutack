@@ -1,34 +1,39 @@
 /* eslint-disable react/sort-comp */
 // this component has a bunch of weird pseudo-members that make eslint sad
 
-import React from 'react'
-import Debug from 'debug'
+import React from "react"
+import Debug from "debug"
 
 import {
   createDocumentLink,
   createWebLink,
   parseDocumentLink,
   PushpinUrl,
-} from '../../../pushpin-code/ShareLink'
+} from "../../../pushpin-code/ShareLink"
 
 // import InvitationsView from '../../../../InvitationsView'
-import { ContactDoc } from '../../contact'
-import Badge from '../../../ui/Badge'
-import './Omnibox.css'
-import InvitationListItem from './InvitationListItem'
-import ListMenuSection from '../../../ui/ListMenuSection'
-import ListMenuItem from '../../../ui/ListMenuItem'
-import ListMenu from '../../../ui/ListMenu'
-import OmniboxWorkspaceListMenuSection from './OmniboxWorkspaceListMenuSection'
-import { WorkspaceDoc as WorkspaceDoc } from '../Workspace'
+import { ContactDoc } from "../../contact"
+import Badge from "../../../ui/Badge"
+import "./Omnibox.css"
+import InvitationListItem from "./InvitationListItem"
+import ListMenuSection from "../../../ui/ListMenuSection"
+import ListMenuItem from "../../../ui/ListMenuItem"
+import ListMenu from "../../../ui/ListMenu"
+import OmniboxWorkspaceListMenuSection from "./OmniboxWorkspaceListMenuSection"
+import { WorkspaceDoc as WorkspaceDoc } from "../Workspace"
 
-import './OmniboxWorkspaceListMenu.css'
-import ActionListItem from './ActionListItem'
-import Heading from '../../../ui/Heading'
-import { DocCollection, DocHandle, DocHandleEventArg, DocumentId } from 'automerge-repo'
-import { Doc } from '@automerge/automerge'
+import "./OmniboxWorkspaceListMenu.css"
+import ActionListItem from "./ActionListItem"
+import Heading from "../../../ui/Heading"
+import {
+  DocCollection,
+  DocHandle,
+  DocHandleEventArg,
+  DocumentId,
+} from "automerge-repo"
+import { Doc } from "@automerge/automerge"
 
-const log = Debug('pushpin:omnibox')
+const log = Debug("pushpin:omnibox")
 
 export interface Props {
   active: boolean
@@ -48,13 +53,13 @@ interface State {
 }
 
 interface MenuAction {
-  name: string,
-  faIcon: string,
-  label: string,
-  shortcut: string,
-  destructive?: boolean,
+  name: string
+  faIcon: string
+  label: string
+  shortcut: string
+  destructive?: boolean
   keysForActionPressed: (e: KeyboardEvent) => boolean
-  callback: (url: PushpinUrl) => () => void,
+  callback: (url: PushpinUrl) => () => void
 }
 
 interface SectionIndex {
@@ -90,7 +95,10 @@ export interface Action {
   keysForActionPressed: (e: any) => boolean
 }
 
-export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props, State> {
+export default class OmniboxWorkspaceListMenu extends React.PureComponent<
+  Props,
+  State
+> {
   omniboxInput = React.createRef<HTMLInputElement>()
   handle?: DocHandle<WorkspaceDoc>
   viewedDocHandles: { [docUrl: string]: DocHandle<any> }
@@ -111,9 +119,9 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   componentDidMount = () => {
-    log('componentDidMount')
+    log("componentDidMount")
     this.refreshHandle(this.props.documentId)
-    document.addEventListener('keydown', this.handleCommandKeys)
+    document.addEventListener("keydown", this.handleCommandKeys)
     /*this.invitationsView = new InvitationsView(
       this.props.repo,
       this.props.hypermergeUrl,
@@ -122,8 +130,8 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   componentWillUnmount = () => {
-    log('componentWillUnmount')
-    document.removeEventListener('keydown', this.handleCommandKeys)
+    log("componentWillUnmount")
+    document.removeEventListener("keydown", this.handleCommandKeys)
 
     /*this.handle && this.handle.close()
     
@@ -133,7 +141,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   componentDidUpdate = (prevProps: Props) => {
-    log('componentDidUpdate')
+    log("componentDidUpdate")
     if (prevProps.documentId !== this.props.documentId) {
       this.refreshHandle(this.props.documentId)
     }
@@ -141,22 +149,29 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
 
   refreshHandle = async (documentId: DocumentId) => {
     if (this.handle) {
-      // TODO FIXME: yikes 
+      // TODO FIXME: yikes
       // this.handle.close()
     }
     this.handle = this.props.repo.find(documentId)
-    this.onChange( { doc: await this.handle.value(), handle: this.handle, documentId: this.handle.documentId, changes: [] })
-    this.handle.addListener("change", e => this.onChange(e))
+    this.onChange({
+      doc: await this.handle.value(),
+      handle: this.handle,
+      documentId: this.handle.documentId,
+      changes: [],
+    })
+    this.handle.addListener("change", (e) => this.onChange(e))
   }
 
   onInvitationsChange = (invitations: any) => {
-    log('invitations change')
+    log("invitations change")
     this.setState({ invitations }, () => this.forceUpdate())
   }
 
   onChange = ({ doc }: DocHandleEventArg<WorkspaceDoc>) => {
-    log('onChange', doc)
-    if (!this) { throw new Error("c'mon man")}
+    log("onChange", doc)
+    if (!this) {
+      throw new Error("c'mon man")
+    }
     this.setState({ doc }, () => {
       this.state.doc &&
         this.state.doc.viewedDocUrls.forEach((url) => {
@@ -166,11 +181,14 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
             // when it changes, stick the contents of the document
             // into this.state.viewedDocs[url]
             const handle = this.props.repo.find(documentId)
-            handle.addListener('change', ({ doc }: DocHandleEventArg<unknown>) => {
-              this.setState((state) => {
-                return { viewedDocs: { ...state.viewedDocs, [url]: doc } }
-              })
-            })
+            handle.addListener(
+              "change",
+              ({ doc }: DocHandleEventArg<unknown>) => {
+                this.setState((state) => {
+                  return { viewedDocs: { ...state.viewedDocs, [url]: doc } }
+                })
+              }
+            )
             this.viewedDocHandles[url] = handle
           }
         })
@@ -182,11 +200,14 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
             // when it changes, put it into this.state.contacts[contactId]
 
             const handle = this.props.repo.find<ContactDoc>(contactId)
-            handle.addListener("change", ({doc}: DocHandleEventArg<ContactDoc>) => {
-              this.setState((state) => {
-                return { contacts: { ...state.contacts, [contactId]: doc } }
-              })
-            })
+            handle.addListener(
+              "change",
+              ({ doc }: DocHandleEventArg<ContactDoc>) => {
+                this.setState((state) => {
+                  return { contacts: { ...state.contacts, [contactId]: doc } }
+                })
+              }
+            )
             this.contactHandles[contactId] = handle
           }
         })
@@ -203,12 +224,12 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       return
     }
 
-    if (e.key === 'ArrowDown') {
+    if (e.key === "ArrowDown") {
       e.preventDefault()
       this.moveDown()
     }
 
-    if (e.key === 'ArrowUp') {
+    if (e.key === "ArrowUp") {
       e.preventDefault()
       this.moveUp()
     }
@@ -267,9 +288,9 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     let searchRegEx: RegExp | null
     // if we have an invalid regex, shortcircuit out of here
     try {
-      searchRegEx = new RegExp(search, 'i')
+      searchRegEx = new RegExp(search, "i")
     } catch (e) {
-      items.push({ type: 'nothingFound', actions: [] })
+      items.push({ type: "nothingFound", actions: [] })
       sectionIndices.nothingFound = { start: 0, end: 1 }
       return { items, sectionIndices }
     }
@@ -277,15 +298,20 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     // invitations are sort of a pseudo-section right now with lots of weird behaviour
     const invitationItems = (this.state.invitations || [])
       .filter((i) => !doc.viewedDocUrls.some((url) => url === i.documentUrl))
-      .filter((invitation) => (invitation.doc.title || 'Loading...').match(searchRegEx))
+      .filter((invitation) =>
+        (invitation.doc.title || "Loading...").match(searchRegEx)
+      )
       .map((invitation) => ({
-        type: 'invitation',
+        type: "invitation",
         object: invitation,
         url: invitation.documentUrl,
         actions: [this.view],
       }))
 
-    sectionIndices.invitations = { start: items.length, end: invitationItems.length }
+    sectionIndices.invitations = {
+      start: items.length,
+      end: invitationItems.length,
+    }
     items = items.concat(invitationItems)
 
     // add each section definition's items to the output
@@ -309,7 +335,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     // just put in an "empty results" pseudosection
     // we could, uh, do better here too
     if (items.length === 0) {
-      items.push({ type: 'nothingFound', actions: [] })
+      items.push({ type: "nothingFound", actions: [] })
       sectionIndices.nothingFound = { start: 0, end: 1 }
     }
 
@@ -333,48 +359,50 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
 
   /* begin actions */
   view: MenuAction = {
-    name: 'view',
-    faIcon: 'fa-compass',
-    label: 'View',
-    shortcut: '⏎',
-    keysForActionPressed: (e) => !e.shiftKey && e.key === 'Enter',
+    name: "view",
+    faIcon: "fa-compass",
+    label: "View",
+    shortcut: "⏎",
+    keysForActionPressed: (e) => !e.shiftKey && e.key === "Enter",
     callback: (url) => () => this.navigate(url),
   }
 
   invite: MenuAction = {
-    name: 'invite',
-    faIcon: 'fa-share-alt',
-    label: 'Invite',
-    shortcut: '⏎',
-    keysForActionPressed: (e) => !e.shiftKey && e.key === 'Enter',
+    name: "invite",
+    faIcon: "fa-share-alt",
+    label: "Invite",
+    shortcut: "⏎",
+    keysForActionPressed: (e) => !e.shiftKey && e.key === "Enter",
     callback: (url) => () => this.offerDocumentToIdentity(url),
   }
 
   archive: MenuAction = {
-    name: 'archive',
+    name: "archive",
     destructive: true,
-    faIcon: 'fa-trash',
-    label: 'Archive',
-    shortcut: '⌘+⌫',
-    keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
+    faIcon: "fa-trash",
+    label: "Archive",
+    shortcut: "⌘+⌫",
+    keysForActionPressed: (e) =>
+      (e.metaKey || e.ctrlKey) && e.key === "Backspace",
     callback: (url) => () => this.archiveDocument(url),
   }
 
   unarchive: MenuAction = {
-    name: 'unarchive',
-    faIcon: 'fa-trash-restore',
-    label: 'Unarchive',
-    shortcut: '⌘+⌫',
-    keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
+    name: "unarchive",
+    faIcon: "fa-trash-restore",
+    label: "Unarchive",
+    shortcut: "⌘+⌫",
+    keysForActionPressed: (e) =>
+      (e.metaKey || e.ctrlKey) && e.key === "Backspace",
     callback: (url) => () => this.unarchiveDocument(url),
   }
 
   place: MenuAction = {
-    name: 'place',
-    faIcon: 'fa-download',
-    label: 'Place',
-    shortcut: '⇧+⏎',
-    keysForActionPressed: (e) => e.shiftKey && e.key === 'Enter',
+    name: "place",
+    faIcon: "fa-download",
+    label: "Place",
+    shortcut: "⇧+⏎",
+    keysForActionPressed: (e) => e.shiftKey && e.key === "Enter",
     callback: (url) => () => {
       this.props.onContent(url)
     },
@@ -385,8 +413,8 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   /* sections begin */
   sectionDefinitions: Section[] = [
     {
-      name: 'viewedDocUrls',
-      label: 'Documents',
+      name: "viewedDocUrls",
+      label: "Documents",
       actions: [this.view, this.place, this.archive],
       items: (state, props) =>
         Object.entries(this.state.viewedDocs)
@@ -399,12 +427,13 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
           .filter(
             ([_url, doc]) =>
               doc &&
-              ((doc.title && doc.title.match(new RegExp(props.search, 'i'))) ||
-                (doc.text && doc.text.join('').match(new RegExp(props.search, 'i'))))
+              ((doc.title && doc.title.match(new RegExp(props.search, "i"))) ||
+                (doc.text &&
+                  doc.text.join("").match(new RegExp(props.search, "i"))))
           )
           .reduce(
             (prev, current) => {
-              if (current[0].match('board|contentlist')) {
+              if (current[0].match("board|contentlist")) {
                 prev[0].push(current)
               } else {
                 prev[1].push(current)
@@ -417,21 +446,27 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
           .map(([url, _doc]) => ({ url: url as PushpinUrl })),
     },
     {
-      name: 'archivedDocUrls',
-      label: 'Archived',
+      name: "archivedDocUrls",
+      label: "Archived",
       actions: [this.view, this.unarchive],
       items: (state, props) =>
-        props.search === '' || !state.doc
+        props.search === "" || !state.doc
           ? [] // don't show archived URLs unless there's a current search term
           : (state.doc.archivedDocUrls || [])
-              .map((url): [PushpinUrl, Doc<any>] => [url, this.state.viewedDocs[url]])
+              .map((url): [PushpinUrl, Doc<any>] => [
+                url,
+                this.state.viewedDocs[url],
+              ])
               .filter(
-                ([_url, doc]) => doc && doc.title && doc.title.match(new RegExp(props.search, 'i'))
+                ([_url, doc]) =>
+                  doc &&
+                  doc.title &&
+                  doc.title.match(new RegExp(props.search, "i"))
               )
               .map(([url, doc]) => ({ url })),
     },
     {
-      name: 'docUrls',
+      name: "docUrls",
       actions: [this.view],
       items: (state, props) => {
         // try parsing the "search" to see if it is a valid document URL
@@ -444,14 +479,16 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
       },
     },
     {
-      name: 'contacts',
-      label: 'Contacts',
+      name: "contacts",
+      label: "Contacts",
       actions: [this.invite, this.place],
       items: (state, props) =>
         Object.entries(this.state.contacts)
           .filter(([id, doc]) => doc.name)
-          .filter(([id, doc]) => doc.name.match(new RegExp(props.search, 'i')))
-          .map(([id, doc]) => ({ url: createDocumentLink('contact', id as DocumentId) })),
+          .filter(([id, doc]) => doc.name.match(new RegExp(props.search, "i")))
+          .map(([id, doc]) => ({
+            url: createDocumentLink("contact", id as DocumentId),
+          })),
     },
   ]
   /* end sections */
@@ -467,24 +504,25 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
     if (
       // eslint-disable-next-line
       !window.confirm(
-        'Are you sure you want to share the currently viewed document ' +
-          '(and all its linked documents) with this user?'
+        "Are you sure you want to share the currently viewed document " +
+          "(and all its linked documents) with this user?"
       )
     ) {
       return
     }
 
     // XXX out of scope RN but consider if we should change the key for consistency?
-    const { type, documentId: recipientId } = parseDocumentLink(recipientPushpinUrl)
+    const { type, documentId: recipientId } =
+      parseDocumentLink(recipientPushpinUrl)
     const { doc: workspace } = this.state
 
     if (!workspace || !workspace.selfId) {
       return
     }
 
-    if (type !== 'contact') {
+    if (type !== "contact") {
       throw new Error(
-        'Offer the current document to a contact by passing in the contact id document.'
+        "Offer the current document to a contact by passing in the contact id document."
       )
     }
 
@@ -561,13 +599,16 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   }
 
   renderNothingFound = () => {
-    const item = this.sectionItems('nothingFound')[0]
+    const item = this.sectionItems("nothingFound")[0]
 
     if (item) {
       return (
         <ListMenuSection title="Oops..." key="nothingFound">
           <ListMenuItem>
-            <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
+            <Badge
+              icon="question-circle"
+              backgroundColor="var(--colorPaleGrey)"
+            />
             <Heading>Nothing Found</Heading>
           </ListMenuItem>
         </ListMenuSection>
@@ -579,7 +620,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
   renderInvitationsSection = () => {
     const actions = [this.view, this.place, this.archive]
 
-    const invitations = this.sectionItems('invitations').map((item) => {
+    const invitations = this.sectionItems("invitations").map((item) => {
       const invitation = item.object
 
       const url = invitation.documentUrl
@@ -593,7 +634,11 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<Props,
           actions={actions}
           selected={item.selected}
         >
-          <InvitationListItem invitation={invitation} url={url} documentId={documentId} />
+          <InvitationListItem
+            invitation={invitation}
+            url={url}
+            documentId={documentId}
+          />
         </ActionListItem>
       )
     })

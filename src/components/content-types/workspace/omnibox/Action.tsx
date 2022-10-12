@@ -1,6 +1,6 @@
-import React from 'react'
-import SecondaryText from '../../../ui/SecondaryText'
-import './Action.css'
+import React from "react"
+import SecondaryText from "../../../ui/SecondaryText"
+import "./Action.css"
 
 interface Props {
   callback(e: React.MouseEvent): void
@@ -15,13 +15,15 @@ export default function Action(props: Props) {
     <div
       role="button"
       onClick={props.callback}
-      className={`Action ${props.destructive ? 'Action--destructive' : 'Action--primary'}`}
+      className={`Action ${
+        props.destructive ? "Action--destructive" : "Action--primary"
+      }`}
     >
       <span className="Action-icon">
         <i className={`fa ${props.faIcon}`} />
       </span>
       <div className="Action-label">
-        <SecondaryText style={{ color: 'inherit' }}>
+        <SecondaryText style={{ color: "inherit" }}>
           {props.label}
           <br />
           {props.shortcut}
@@ -33,5 +35,5 @@ export default function Action(props: Props) {
 
 Action.defaultProps = {
   destructive: false,
-  shortcut: '',
+  shortcut: "",
 }

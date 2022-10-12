@@ -1,44 +1,48 @@
-import React, { useState, useRef, memo } from 'react'
-import classNames from 'classnames'
-import mime from 'mime-types'
+import React, { useState, useRef, memo } from "react"
+import classNames from "classnames"
+import mime from "mime-types"
 
-import Content from '../../Content'
-import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import { parseDocumentLink } from '../../pushpin-code/ShareLink'
+import Content from "../../Content"
+import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import { parseDocumentLink } from "../../pushpin-code/ShareLink"
 
-import { BoardDocCard, CardId } from '.'
-import { Position, Dimension } from './BoardGrid'
-import { useDocument } from 'automerge-repo-react-hooks'
-import { useSelf } from '../../pushpin-code/SelfHooks'
+import { BoardDocCard, CardId } from "."
+import { Position, Dimension } from "./BoardGrid"
+import { useDocument } from "automerge-repo-react-hooks"
+import { useSelf } from "../../pushpin-code/SelfHooks"
 // import { usePresence } from '../../../PresenceHooks'
-import './BoardCard.css'
-import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from '../..//constants'
-import { boundDimension, boundSizeByType } from './BoardBoundary'
-import * as UriList from '../../pushpin-code/UriList'
-import { DocumentId } from 'automerge-repo'
+import "./BoardCard.css"
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from "../..//constants"
+import { boundDimension, boundSizeByType } from "./BoardBoundary"
+import * as UriList from "../../pushpin-code/UriList"
+import { DocumentId } from "automerge-repo"
 
 interface CardClicked {
-  type: 'CardClicked'
+  type: "CardClicked"
   cardId: CardId
   event: React.MouseEvent
 }
 interface CardDoubleClicked {
-  type: 'CardDoubleClicked'
+  type: "CardDoubleClicked"
   cardId: CardId
   event: React.MouseEvent
 }
 interface CardResized {
-  type: 'CardResized'
+  type: "CardResized"
   cardId: CardId
   dimension: Dimension
 }
 
 interface CardDragEnd {
-  type: 'CardDragEnd'
+  type: "CardDragEnd"
   distance: Position
 }
 
-export type BoardCardAction = CardClicked | CardDoubleClicked | CardResized | CardDragEnd
+export type BoardCardAction =
+  | CardClicked
+  | CardDoubleClicked
+  | CardResized
+  | CardDragEnd
 
 interface BoardCardProps extends BoardDocCard {
   id: CardId
@@ -91,28 +95,28 @@ function BoardCard(props: BoardCardProps) {
 
   const {
     hyperfileUrl = null,
-    title = 'untitled',
-    mimeType = 'application/octet',
+    title = "untitled",
+    mimeType = "application/octet",
     extension = null,
   } = doc || {}
 
   function onCardClicked(event: React.MouseEvent) {
-    dispatch({ type: 'CardClicked', cardId: id, event })
+    dispatch({ type: "CardClicked", cardId: id, event })
   }
 
   function onCardDoubleClicked(event: React.MouseEvent) {
-    dispatch({ type: 'CardDoubleClicked', cardId: id, event })
+    dispatch({ type: "CardDoubleClicked", cardId: id, event })
   }
 
   function onDragStart(event: React.DragEvent) {
     if (!selected) {
-      dispatch({ type: 'CardClicked', cardId: id, event })
+      dispatch({ type: "CardClicked", cardId: id, event })
     }
 
     setDragStart({ x: event.pageX, y: event.pageY })
 
     // when dragging on the board, we want to maintain the true card element
-    event.dataTransfer.setDragImage(document.createElement('img'), 0, 0)
+    event.dataTransfer.setDragImage(document.createElement("img"), 0, 0)
 
     // annotate the drag with the current board's URL so we can tell if this is where we came from
     event.dataTransfer.setData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN, props.boardId)
@@ -121,10 +125,10 @@ function BoardCard(props: BoardCardProps) {
 
     // and we'll add a DownloadURL
     if (hyperfileUrl) {
-      const outputExtension = extension || mime.extension(mimeType) || ''
+      const outputExtension = extension || mime.extension(mimeType) || ""
 
       const downloadUrl = `text:${title}.${outputExtension}:${hyperfileUrl}`
-      event.dataTransfer.setData('DownloadURL', downloadUrl)
+      event.dataTransfer.setData("DownloadURL", downloadUrl)
     }
   }
 
@@ -154,18 +158,23 @@ function BoardCard(props: BoardCardProps) {
     }
 
     // don't make CSS changes if we haven't moved position
-    if (previousDistance.current.x === distance.x && previousDistance.current.y === distance.y) {
+    if (
+      previousDistance.current.x === distance.x &&
+      previousDistance.current.y === distance.y
+    ) {
       return
     }
 
     previousDistance.current = distance
 
     // we want to skip expensive React recalculations, so we'll just update the style directly here
-    selectedCardsRef.current = document.querySelectorAll('.BoardCard--mySelected')
+    selectedCardsRef.current = document.querySelectorAll(
+      ".BoardCard--mySelected"
+    )
     if (selectedCardsRef.current) {
       selectedCardsRef.current.forEach((element) => {
-        element.style.setProperty('--drag-x', `${distance.x}px`)
-        element.style.setProperty('--drag-y', `${distance.y}px`)
+        element.style.setProperty("--drag-x", `${distance.x}px`)
+        element.style.setProperty("--drag-y", `${distance.y}px`)
       })
     }
 
@@ -179,21 +188,21 @@ function BoardCard(props: BoardCardProps) {
 
     const distance = { x: e.pageX - dragStart.x, y: e.pageY - dragStart.y }
 
-    dispatch({ type: 'CardDragEnd', distance })
+    dispatch({ type: "CardDragEnd", distance })
     setDragStart(null)
     previousDistance.current = null
 
     if (selectedCardsRef.current) {
       selectedCardsRef.current.forEach((element) => {
-        element.style.setProperty('--drag-x', '0px')
-        element.style.setProperty('--drag-y', '0px')
+        element.style.setProperty("--drag-x", "0px")
+        element.style.setProperty("--drag-y", "0px")
       })
     }
   }
 
   const resizePointerDown = (event: React.PointerEvent) => {
     if (!selected) {
-      dispatch({ type: 'CardClicked', cardId: id, event })
+      dispatch({ type: "CardClicked", cardId: id, event })
     }
 
     if (!cardRef.current) {
@@ -235,7 +244,7 @@ function BoardCard(props: BoardCardProps) {
   const resizePointerUp = (e: React.PointerEvent) => {
     ;(e.target as Element).releasePointerCapture(e.pointerId)
     if (resize) {
-      dispatch({ type: 'CardResized', cardId: id, dimension: resize })
+      dispatch({ type: "CardResized", cardId: id, dimension: resize })
     }
     setResizeStart(null)
     setResize(null)
@@ -244,16 +253,16 @@ function BoardCard(props: BoardCardProps) {
   }
 
   const style: React.CSSProperties = {
-    ['--highlight-color' as any]: highlightColor,
+    ["--highlight-color" as any]: highlightColor,
     width: resize ? resize.width : width,
     height: resize ? resize.height : height,
-    position: 'absolute',
-    willChange: selected ? 'transform' : '',
+    position: "absolute",
+    willChange: selected ? "transform" : "",
     transform: `translate(${x}px, ${y}px) translate(var(--drag-x, 0), var(--drag-y, 0))`,
   }
 
   const { type } = parseDocumentLink(url)
-  const context = 'board'
+  const context = "board"
   const contentType = ContentTypes.lookup({ type, context })
 
   return (
@@ -262,10 +271,10 @@ function BoardCard(props: BoardCardProps) {
       ref={cardRef}
       id={`card-${id}`}
       className={classNames(
-        'BoardCard',
-        'BoardCard--standard',
-        selected && 'BoardCard--selected',
-        mySelected && 'BoardCard--mySelected'
+        "BoardCard",
+        "BoardCard--standard",
+        selected && "BoardCard--selected",
+        mySelected && "BoardCard--mySelected"
       )}
       style={style}
       onClick={onCardClicked}
@@ -276,7 +285,11 @@ function BoardCard(props: BoardCardProps) {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
-      <Content context="board" url={url} uniquelySelected={props.uniquelySelected} />
+      <Content
+        context="board"
+        url={url}
+        uniquelySelected={props.uniquelySelected}
+      />
       {contentType && contentType.resizable !== false && (
         <span
           onPointerDown={resizePointerDown}

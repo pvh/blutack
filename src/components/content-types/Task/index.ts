@@ -1,16 +1,16 @@
-import { Task } from "./Task";
-import { PushpinUrl } from "../../pushpin-code/ShareLink";
-import { DocHandle } from "automerge-repo";
-import * as ContentTypes from "../../pushpin-code/ContentTypes";
+import { Task } from "./Task"
+import { PushpinUrl } from "../../pushpin-code/ShareLink"
+import { DocHandle } from "automerge-repo"
+import * as ContentTypes from "../../pushpin-code/ContentTypes"
 
 export interface TaskDoc {
-  title: string;
-  authors: PushpinUrl[]; // TODO: automatically maintained by host app
-  description: string;
-  status: string;
-  archived: boolean;
-  tags: string[];
-  assignee: PushpinUrl | null;
+  title: string
+  authors: PushpinUrl[] // TODO: automatically maintained by host app
+  description: string
+  status: string
+  archived: boolean
+  tags: string[]
+  assignee: PushpinUrl | null
 }
 
 function create(unusedAttrs: any, handle: DocHandle<any>) {
@@ -22,10 +22,10 @@ function create(unusedAttrs: any, handle: DocHandle<any>) {
       archived: false,
       tags: [],
       assignee: null,
-      authors: []
-    };
-    Object.assign(doc, newDoc);
-  });
+      authors: [],
+    }
+    Object.assign(doc, newDoc)
+  })
 }
 
 ContentTypes.register({
@@ -38,4 +38,4 @@ ContentTypes.register({
     // board: Task,
   },
   create,
-});
+})

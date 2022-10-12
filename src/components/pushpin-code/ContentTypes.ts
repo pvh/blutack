@@ -1,18 +1,18 @@
-import Debug from "debug";
-import { ComponentType } from "react";
-import { createDocumentLink, PushpinUrl } from "./ShareLink";
-import { ContentData } from "./ContentData";
-import { DocumentId } from "automerge-repo";
-import { DocCollection, DocHandle } from "automerge-repo";
+import Debug from "debug"
+import { ComponentType } from "react"
+import { createDocumentLink, PushpinUrl } from "./ShareLink"
+import { ContentData } from "./ContentData"
+import { DocumentId } from "automerge-repo"
+import { DocCollection, DocHandle } from "automerge-repo"
 
-const log = Debug("pushpin:content-types");
+const log = Debug("pushpin:content-types")
 
 // type Component = ComponentType<ContentProps>
 // TODO: This should be ComponentType<ContentProps>, but it breaks with
 // Content's "pass-through" props when React casts them with Readonly<P>.
 // The fix is likely to put "pass-through" props inside a single 'options: any' prop
 // that allows for pass-through.
-type Component = ComponentType<any>;
+type Component = ComponentType<any>
 
 export type Context =
   | "root"
@@ -21,91 +21,91 @@ export type Context =
   | "board"
   | "thread"
   | "title-bar"
-  | "contact";
+  | "contact"
 
 type Contexts = {
-  [K in Context]?: Component;
-};
+  [K in Context]?: Component
+}
 
 interface ContentType {
-  type: string;
-  name: string;
-  icon: string;
-  unlisted?: boolean;
-  resizable?: boolean;
-  contexts: Contexts;
-  create?: (typeAttrs: any, handle: DocHandle<unknown>) => Promise<void> | void;
+  type: string
+  name: string
+  icon: string
+  unlisted?: boolean
+  resizable?: boolean
+  contexts: Contexts
+  create?: (typeAttrs: any, handle: DocHandle<unknown>) => Promise<void> | void
   createFrom?: (
     contentData: ContentData,
     handle: DocHandle<any>
-  ) => Promise<void> | void;
-  supportsMimeType?: (type: string) => boolean;
+  ) => Promise<void> | void
+  supportsMimeType?: (type: string) => boolean
 }
 
-const registry: { [type: string]: ContentType } = {};
+const registry: { [type: string]: ContentType } = {}
 const defaultRegistry: {
-  [K in Context]?: Component;
-} = {};
+  [K in Context]?: Component
+} = {}
 
 // This is a hack to have a reference to the repo without relying on window.repo.
-let repo: DocCollection;
+let repo: DocCollection
 export function __getRepo() {
-  if (!repo) throw new Error("Repo has not been set. Must call __setRepo().");
-  return repo;
+  if (!repo) throw new Error("Repo has not been set. Must call __setRepo().")
+  return repo
 }
 export function setRepo(repoIn: DocCollection) {
-  repo = repoIn;
+  repo = repoIn
 }
 
 export function register(contentType: ContentType) {
-  const { type } = contentType;
+  const { type } = contentType
   const entry: ContentType = {
     unlisted: false,
     resizable: true,
     ...contentType,
-  };
+  }
 
-  log("register", entry);
+  log("register", entry)
 
   console.log("registering", entry)
 
   if (registry[type]) {
     // Allow re-registration to support HMR
-    log(`Replacing '${type}' content type.`);
+    log(`Replacing '${type}' content type.`)
   }
 
-  registry[type] = entry;
+  registry[type] = entry
 }
 
 export function registerDefault(contentType: {
-  component: Component;
-  context: Context;
+  component: Component
+  context: Context
 }) {
-  const { component, context } = contentType;
-  defaultRegistry[context] = component;
+  const { component, context } = contentType
+  defaultRegistry[context] = component
 }
 
 export interface LookupQuery {
-  type: string;
-  context: Context;
+  type: string
+  context: Context
 }
 
 export interface LookupResult {
-  type: string;
-  name: string;
-  icon: string;
-  unlisted: boolean;
-  resizable: boolean;
-  component: Component;
+  type: string
+  name: string
+  icon: string
+  unlisted: boolean
+  resizable: boolean
+  component: Component
 }
 
 export function lookup({ type, context }: LookupQuery): LookupResult | null {
-  const entry = registry[type];
+  const entry = registry[type]
   const component =
-    (entry && entry.contexts[context]) || defaultRegistry[context];
+    (entry && entry.contexts[context]) || defaultRegistry[context]
 
   if (!component) {
-    return null;
+    return null
   }
 
   const {
@@ -113,31 +113,31 @@ export function lookup({ type, context }: LookupQuery): LookupResult | null {
     icon = "question",
     unlisted = false,
     resizable = true,
-  } = entry || {};
+  } = entry || {}
 
-  return { type, name, icon, component, unlisted, resizable };
+  return { type, name, icon, component, unlisted, resizable }
 }
 
 export function mimeTypeToContentType(mimeType: string | null): ContentType {
   if (!mimeType) {
-    return registry.file;
+    return registry.file
   } // don't guess.
 
-  const types = Object.values(registry);
+  const types = Object.values(registry)
   const supportingType = types.find(
     (type) => type.supportsMimeType && type.supportsMimeType(mimeType)
-  );
+  )
   if (!supportingType) {
-    return registry.file;
+    return registry.file
   }
 
-  return supportingType;
+  return supportingType
 }
 
 export type CreateCallback = (
   url: PushpinUrl,
   handle: DocHandle<unknown>
-) => void;
+) => void
 
 export function createFrom(
   contentData: ContentData,
@@ -145,26 +145,26 @@ export function createFrom(
 ): void {
   // importFromText
   // TODO: the different content types should include mime type tests.
-  let contentType: string;
+  let contentType: string
   if (contentData.mimeType === "text/html") {
-    contentType = "url";
+    contentType = "url"
   } else if (contentData.mimeType.includes("text/")) {
-    contentType = "text";
+    contentType = "text"
   } else {
-    contentType = "file";
+    contentType = "file"
   }
-  const entry = registry[contentType];
-  if (!entry) return;
-  if (!entry.createFrom) throw new Error("Cannot be created from file");
-  const handle = __getRepo().create() as DocHandle<unknown>;
+  const entry = registry[contentType]
+  if (!entry) return
+  if (!entry.createFrom) throw new Error("Cannot be created from file")
+  const handle = __getRepo().create() as DocHandle<unknown>
   Promise.resolve(entry.createFrom(contentData, handle))
     .then(() => {
       callback(
         createDocumentLink(contentType, handle.documentId as DocumentId),
         handle // TODO: unclear if this is a good idea but YOLOing a bit for demo
-      );
+      )
     })
-    .catch(log);
+    .catch(log)
 }
 
 export function create(
@@ -172,30 +172,30 @@ export function create(
   attrs = {},
   callback: CreateCallback
 ): void {
-  const entry = registry[type];
+  const entry = registry[type]
   if (!entry) {
-    return;
+    return
   }
 
   // ugh
-  const handle = __getRepo().create() as DocHandle<unknown>;
+  const handle = __getRepo().create() as DocHandle<unknown>
 
   if (!entry.create) {
-    throw Error(`The ${type} content type cannot be created directly.`);
+    throw Error(`The ${type} content type cannot be created directly.`)
   }
   Promise.resolve(entry.create(attrs, handle))
     .then(() => {
       callback(
         createDocumentLink(type, handle.documentId as DocumentId),
         handle // unclear if this is a good idea but YOLOing a bit for demo
-      );
+      )
     })
-    .catch(log);
+    .catch(log)
 }
 
 export interface ListQuery {
-  context: Context;
-  withUnlisted?: boolean;
+  context: Context
+  withUnlisted?: boolean
 }
 
 export function list({
@@ -204,13 +204,13 @@ export function list({
 }: ListQuery): LookupResult[] {
   const allTypes = Object.keys(registry)
     .map((type) => lookup({ type, context }))
-    .filter((ct) => ct) as LookupResult[];
+    .filter((ct) => ct) as LookupResult[]
 
   if (withUnlisted) {
-    return allTypes;
+    return allTypes
   }
 
-  return allTypes.filter((ct) => ct && !ct.unlisted);
+  return allTypes.filter((ct) => ct && !ct.unlisted)
 }
 
 // Not yet included in / drive from the generic ContentTypes registry:

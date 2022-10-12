@@ -1,10 +1,10 @@
-import React from 'react'
-import './Heading.css'
-import Heading from './Heading'
-import SecondaryText from './SecondaryText'
-import TitleEditor from '../TitleEditor'
-import './TitleWithSubtitle.css'
-import { DocumentId } from 'automerge-repo'
+import React from "react"
+import "./Heading.css"
+import Heading from "./Heading"
+import SecondaryText from "./SecondaryText"
+import TitleEditor from "../TitleEditor"
+import "./TitleWithSubtitle.css"
+import { DocumentId } from "automerge-repo"
 
 export interface Props {
   title: string
@@ -30,11 +30,19 @@ export default function TitleWithSubtitle(props: Props) {
   return (
     <div className="TitleWithSubtitle">
       {editable ? (
-        <TitleEditor field={titleEditorField} placeholder={title} documentId={documentId} />
+        <TitleEditor
+          field={titleEditorField}
+          placeholder={title}
+          documentId={documentId}
+        />
       ) : (
         <Heading wrap={wrapTitle}>{title}</Heading>
       )}
-      {subtitle && <SecondaryText>{href ? <a href={href}>{subtitle}</a> : subtitle}</SecondaryText>}
+      {subtitle && (
+        <SecondaryText>
+          {href ? <a href={href}>{subtitle}</a> : subtitle}
+        </SecondaryText>
+      )}
     </div>
   )
 }

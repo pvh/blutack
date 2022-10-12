@@ -1,13 +1,13 @@
-import React from 'react'
+import React from "react"
 
-import { ContentProps } from '../../Content'
-import { BoardDoc, icon } from '.'
-import { useDocument } from 'automerge-repo-react-hooks'
-import './BoardInBoard.css'
-import Badge from '../../ui/Badge'
-import SecondaryText from '../../ui/SecondaryText'
-import Heading from '../../ui/Heading'
-import CenteredStack from '../../ui/CenteredStack'
+import { ContentProps } from "../../Content"
+import { BoardDoc, icon } from "."
+import { useDocument } from "automerge-repo-react-hooks"
+import "./BoardInBoard.css"
+import Badge from "../../ui/Badge"
+import SecondaryText from "../../ui/SecondaryText"
+import Heading from "../../ui/Heading"
+import CenteredStack from "../../ui/CenteredStack"
 
 BoardInBoard.minWidth = 5
 BoardInBoard.minHeight = 6
@@ -26,7 +26,7 @@ export default function BoardInBoard(props: ContentProps) {
   const { title, backgroundColor, cards } = doc
 
   const childCardCount = Object.keys(cards || {}).length
-  const subTitle = `${childCardCount} card${childCardCount === 1 ? '' : 's'}`
+  const subTitle = `${childCardCount} card${childCardCount === 1 ? "" : "s"}`
 
   return (
     <CenteredStack>

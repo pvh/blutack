@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect } from "react";
+import { useState, useLayoutEffect } from "react"
 
 /* Board Grid Utilities
  * (Please be careful before re-using these, they're somewhat idiosyncratic.)
@@ -17,16 +17,16 @@ import { useState, useLayoutEffect } from "react";
  *
  * */
 
-export const GRID_SIZE = 20;
+export const GRID_SIZE = 20
 
 export interface Position {
-  x: number;
-  y: number;
+  x: number
+  y: number
 }
 
 export interface Dimension {
-  width: number;
-  height: number;
+  width: number
+  height: number
 }
 
 /* given X/Y coordinates and an index, return the i-th offset.
@@ -39,24 +39,24 @@ export const gridOffset = ({ x, y }: Position, i: number) => {
   return {
     x: x + i * (GRID_SIZE * 2),
     y: y + i * (GRID_SIZE * 2),
-  };
-};
+  }
+}
 
 // many components have their default size expressed in grid cells
 // this is useful if we change grid sizes by a few pixels here or there
 // but will probably fall apart if we changed them by large amounts
 export const gridCellsToPixels = (i: number): number => {
-  return i * GRID_SIZE;
-};
+  return i * GRID_SIZE
+}
 
 // Snap given num to nearest multiple of our grid size.
 export const snapToGrid = (num: number) => {
-  const resto = num % GRID_SIZE;
+  const resto = num % GRID_SIZE
   if (resto <= GRID_SIZE / 2) {
-    return num - resto;
+    return num - resto
   }
-  return num + GRID_SIZE - resto;
-};
+  return num + GRID_SIZE - resto
+}
 
 // We have slightly different snap functions for coordinates (x,y) and
 // measures (height, width) because we want the latter to be a bit larger
@@ -68,7 +68,7 @@ export const snapToGrid = (num: number) => {
 export const snapPositionToGrid = ({ x, y }: Position): Position => ({
   x: snapToGrid(x),
   y: snapToGrid(y),
-});
+})
 
 export const snapDimensionToGrid = ({
   width,
@@ -77,38 +77,38 @@ export const snapDimensionToGrid = ({
   // we don't snap falsey-values like null or zero because we don't want them to become 1
   width: width ? snapToGrid(width) + 1 : width,
   height: height ? snapToGrid(height) + 1 : height,
-});
+})
 
 /**
  * measure the distance from a start point over time
  */
 export function useDistance(): {
-  measuring: boolean;
-  distance: Position;
-  startMeasure: (pos: Position) => void;
-  setCurrent: (pos: Position) => void;
-  endMeasure: () => void;
+  measuring: boolean
+  distance: Position
+  startMeasure: (pos: Position) => void
+  setCurrent: (pos: Position) => void
+  endMeasure: () => void
 } {
-  const [measuring, setMeasuring] = useState<boolean>(false);
-  const [start, setStart] = useState<Position>({ x: 0, y: 0 });
-  const [current, setCurrent] = useState<Position>({ x: 0, y: 0 });
+  const [measuring, setMeasuring] = useState<boolean>(false)
+  const [start, setStart] = useState<Position>({ x: 0, y: 0 })
+  const [current, setCurrent] = useState<Position>({ x: 0, y: 0 })
 
   const startMeasure = (position: Position) => {
-    setMeasuring(true);
-    setStart(position);
-    setCurrent(position);
-  };
+    setMeasuring(true)
+    setStart(position)
+    setCurrent(position)
+  }
 
   const endMeasure = () => {
-    setMeasuring(false);
-    setStart(current);
-  };
+    setMeasuring(false)
+    setStart(current)
+  }
 
-  const [distance, setDistance] = useState<Position>({ x: 0, y: 0 });
+  const [distance, setDistance] = useState<Position>({ x: 0, y: 0 })
 
   useLayoutEffect(() => {
-    setDistance({ x: current.x - start.x, y: current.y - start.y });
-  }, [start, current]);
+    setDistance({ x: current.x - start.x, y: current.y - start.y })
+  }, [start, current])
 
-  return { measuring, distance, startMeasure, setCurrent, endMeasure };
+  return { measuring, distance, startMeasure, setCurrent, endMeasure }
 }

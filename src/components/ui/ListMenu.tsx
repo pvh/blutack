@@ -1,5 +1,5 @@
-import React from 'react'
-import './ListMenu.css'
+import React from "react"
+import "./ListMenu.css"
 
 export interface Props {
   children: React.ReactNode

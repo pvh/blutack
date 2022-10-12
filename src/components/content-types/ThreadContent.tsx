@@ -1,17 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState } from "react"
 
-import * as ContentTypes from '../pushpin-code/ContentTypes'
-import Content, { ContentProps, EditableContentProps } from '../Content'
-import { createDocumentLink } from '../pushpin-code/ShareLink'
-import ListItem from '../ui/ListItem'
-import Badge from '../ui/Badge'
-import ContentDragHandle from '../ui/ContentDragHandle'
-import TitleWithSubtitle from '../ui/TitleWithSubtitle'
-import './ThreadContent.css'
-import { DocumentId } from 'automerge-repo'
-import { useDocument } from 'automerge-repo-react-hooks'
+import * as ContentTypes from "../pushpin-code/ContentTypes"
+import Content, { ContentProps, EditableContentProps } from "../Content"
+import { createDocumentLink } from "../pushpin-code/ShareLink"
+import ListItem from "../ui/ListItem"
+import Badge from "../ui/Badge"
+import ContentDragHandle from "../ui/ContentDragHandle"
+import TitleWithSubtitle from "../ui/TitleWithSubtitle"
+import "./ThreadContent.css"
+import { DocumentId } from "automerge-repo"
+import { useDocument } from "automerge-repo-react-hooks"
 
-import { DocHandle } from 'automerge-repo'
+import { DocHandle } from "automerge-repo"
 
 interface Message {
   authorId: DocumentId
@@ -24,13 +24,13 @@ interface Doc {
   messages: Message[]
 }
 
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-  localeMatcher: 'best fit',
-  weekday: 'short',
-  hour: 'numeric',
-  minute: '2-digit',
-  month: 'numeric',
-  day: 'numeric',
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  localeMatcher: "best fit",
+  weekday: "short",
+  hour: "numeric",
+  minute: "2-digit",
+  month: "numeric",
+  day: "numeric",
 })
 
 ThreadContent.minWidth = 9
@@ -41,7 +41,7 @@ ThreadContent.maxWidth = 24
 ThreadContent.maxHeight = 36
 
 export default function ThreadContent(props: ContentProps) {
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState("")
   const [doc, changeDoc] = useDocument<Doc>(props.documentId)
 
   if (!doc || !doc.messages) {
@@ -49,7 +49,7 @@ export default function ThreadContent(props: ContentProps) {
   }
 
   const { messages } = doc
-  const groupedMessages = groupBy(messages, 'authorId')
+  const groupedMessages = groupBy(messages, "authorId")
 
   function onInput(e: React.ChangeEvent<HTMLInputElement>) {
     setMessage(e.target.value)
@@ -58,7 +58,7 @@ export default function ThreadContent(props: ContentProps) {
   function onKeyDown(e: React.KeyboardEvent) {
     e.stopPropagation()
 
-    if (e.key === 'Enter' && !e.shiftKey && message) {
+    if (e.key === "Enter" && !e.shiftKey && message) {
       e.preventDefault()
 
       changeDoc((threadDoc: Doc) => {
@@ -69,7 +69,7 @@ export default function ThreadContent(props: ContentProps) {
         })
       })
 
-      setMessage('')
+      setMessage("")
     }
   }
 
@@ -101,8 +101,10 @@ export function ThreadInList(props: EditableContentProps) {
   const [doc] = useDocument<Doc>(documentId)
   if (!doc || !doc.messages) return null
 
-  const title = doc.title != null && doc.title !== '' ? doc.title : 'Untitled conversation'
-  const subtitle = (doc.messages[doc.messages.length - 1] || { content: '' }).content
+  const title =
+    doc.title != null && doc.title !== "" ? doc.title : "Untitled conversation"
+  const subtitle = (doc.messages[doc.messages.length - 1] || { content: "" })
+    .content
 
   return (
     <ListItem>
@@ -131,7 +133,9 @@ function renderMessage({ content, time }: Message, idx: number) {
   return (
     <div className="message" key={idx}>
       <div className="content">{content}</div>
-      {idx === 0 ? <div className="time">{dateFormatter.format(date)}</div> : null}
+      {idx === 0 ? (
+        <div className="time">{dateFormatter.format(date)}</div>
+      ) : null}
     </div>
   )
 }
@@ -139,10 +143,15 @@ function renderMessage({ content, time }: Message, idx: number) {
 function renderGroupedMessages(groupOfMessages: Message[], idx: number) {
   return (
     <div className="messageGroup" key={idx}>
-      <div style={{width: "40px"}}>
-        <Content context="thread" url={createDocumentLink('contact', groupOfMessages[0].authorId)} />
+      <div style={{ width: "40px" }}>
+        <Content
+          context="thread"
+          url={createDocumentLink("contact", groupOfMessages[0].authorId)}
+        />
       </div>
-      <div className="groupedMessages">{groupOfMessages.map(renderMessage)}</div>
+      <div className="groupedMessages">
+        {groupOfMessages.map(renderMessage)}
+      </div>
     </div>
   )
 }
@@ -152,7 +161,10 @@ function groupBy<T, K extends keyof T>(items: T[], key: K): T[][] {
   let currentGroup: T[]
 
   items.forEach((item) => {
-    if (!currentGroup || (currentGroup.length > 0 && currentGroup[0][key] !== item[key])) {
+    if (
+      !currentGroup ||
+      (currentGroup.length > 0 && currentGroup[0][key] !== item[key])
+    ) {
       currentGroup = []
       grouped.push(currentGroup)
     }
@@ -169,17 +181,17 @@ function create(unusedAttrs: any, handle: DocHandle<any>) {
   })
 }
 
-const icon = 'comments'
+const icon = "comments"
 
 ContentTypes.register({
-  type: 'thread',
-  name: 'Thread',
+  type: "thread",
+  name: "Thread",
   icon,
   contexts: {
     workspace: ThreadContent,
     board: ThreadContent,
     list: ThreadInList,
-    'title-bar': ThreadInList,
+    "title-bar": ThreadInList,
   },
   create,
 })

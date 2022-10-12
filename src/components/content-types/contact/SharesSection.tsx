@@ -1,13 +1,13 @@
-import React from 'react'
-import { DocumentId } from 'automerge-repo'
+import React from "react"
+import { DocumentId } from "automerge-repo"
 
-import { createDocumentLink } from '../../pushpin-code/ShareLink'
-import Content from '../../Content'
-import Heading from '../../ui/Heading'
-import SecondaryText from '../../ui/SecondaryText'
-import ListMenuSection from '../../ui/ListMenuSection'
-import ListMenuItem from '../../ui/ListMenuItem'
-import { ContactDocInvites } from '.'
+import { createDocumentLink } from "../../pushpin-code/ShareLink"
+import Content from "../../Content"
+import Heading from "../../ui/Heading"
+import SecondaryText from "../../ui/SecondaryText"
+import ListMenuSection from "../../ui/ListMenuSection"
+import ListMenuItem from "../../ui/ListMenuItem"
+import { ContactDocInvites } from "."
 
 interface Props {
   invites: ContactDocInvites
@@ -20,7 +20,10 @@ export default function SharesSection(props: Props) {
       {invites ? (
         Object.entries(invites).map(([contact, shares]) => (
           <ListMenuItem key={contact}>
-            <Content context="list" url={createDocumentLink('contact', contact as DocumentId)} />
+            <Content
+              context="list"
+              url={createDocumentLink("contact", contact as DocumentId)}
+            />
             <SecondaryText>{shares.length} items shared</SecondaryText>
           </ListMenuItem>
         ))

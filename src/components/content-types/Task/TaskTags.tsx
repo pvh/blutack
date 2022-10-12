@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react'
-import ReactTags from 'react-tag-autocomplete'
+import React, { useCallback } from "react"
+import ReactTags from "react-tag-autocomplete"
 
-import { TaskDoc } from '.'
+import { TaskDoc } from "."
 
 interface TaskTagsProps {
   doc: TaskDoc
@@ -32,5 +32,12 @@ export function TaskTags(props: TaskTagsProps) {
 
   const { tags } = doc
 
-  return <ReactTags tags={tags} allowNew onDelete={handleDelete} onAddition={handleAddition} />
+  return (
+    <ReactTags
+      tags={tags}
+      allowNew
+      onDelete={handleDelete}
+      onAddition={handleAddition}
+    />
+  )
 }

@@ -1,36 +1,34 @@
-import React, { useContext, useRef, Ref, ChangeEvent } from 'react'
+import React, { useContext, useRef, Ref, ChangeEvent } from "react"
 
-import {
-  parseDocumentLink,
-} from '../../pushpin-code/ShareLink'
+import { parseDocumentLink } from "../../pushpin-code/ShareLink"
 
-import DEFAULT_AVATAR_PATH from '../../../images/default-avatar.png'
-import { ContentProps } from '../../Content'
-import { ContactDoc } from '.'
+import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
+import { ContentProps } from "../../Content"
+import { ContactDoc } from "."
 
-import { DocumentId } from 'automerge-repo'
-import { useDocument } from 'automerge-repo-react-hooks'
-import Heading from '../../ui/Heading'
-import SecondaryText from '../../ui/SecondaryText'
+import { DocumentId } from "automerge-repo"
+import { useDocument } from "automerge-repo-react-hooks"
+import Heading from "../../ui/Heading"
+import SecondaryText from "../../ui/SecondaryText"
 
-import { CurrentDeviceContext } from '../workspace/Device'
-import { importFileList } from '../../pushpin-code/ImportData'
-import ConnectionStatusBadge from './ConnectionStatusBadge'
+import { CurrentDeviceContext } from "../workspace/Device"
+import { importFileList } from "../../pushpin-code/ImportData"
+import ConnectionStatusBadge from "./ConnectionStatusBadge"
 // import { useConnectionStatus } from '../../../PresenceHooks'
-import Badge from '../../ui/Badge'
-import CenteredStack from '../../ui/CenteredStack'
-import { without } from '../../pushpin-code/Misc'
-import ContactEditorDevice, { OnRemoveDevice } from './ContactEditorDevice'
-import ListMenuSection from '../../ui/ListMenuSection'
-import ListMenuItem from '../../ui/ListMenuItem'
-import TitleEditor from '../../TitleEditor'
-import ListItem from '../../ui/ListItem'
-import ListMenu from '../../ui/ListMenu'
-import { USER_COLORS } from './Constants'
-import SharesSection from './SharesSection'
-import './ContactEditor.css'
-import ColorPicker from '../../ui/ColorPicker'
-import { BinaryDataId, createBinaryDataUrl } from '../../../blobstore/Blob'
+import Badge from "../../ui/Badge"
+import CenteredStack from "../../ui/CenteredStack"
+import { without } from "../../pushpin-code/Misc"
+import ContactEditorDevice, { OnRemoveDevice } from "./ContactEditorDevice"
+import ListMenuSection from "../../ui/ListMenuSection"
+import ListMenuItem from "../../ui/ListMenuItem"
+import TitleEditor from "../../TitleEditor"
+import ListItem from "../../ui/ListItem"
+import ListMenu from "../../ui/ListMenu"
+import { USER_COLORS } from "./Constants"
+import SharesSection from "./SharesSection"
+import "./ContactEditor.css"
+import ColorPicker from "../../ui/ColorPicker"
+import { BinaryDataId, createBinaryDataUrl } from "../../../blobstore/Blob"
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.documentId)
@@ -90,7 +88,12 @@ export default function ContactEditor(props: ContentProps) {
           <Heading>Edit Profile...</Heading>
         </div>
         {renderNameEditor(props.documentId)}
-        {renderAvatarEditor(avatarBinaryId, onFilesChanged, hiddenFileInput, onImportClick)}
+        {renderAvatarEditor(
+          avatarBinaryId,
+          onFilesChanged,
+          hiddenFileInput,
+          onImportClick
+        )}
         {renderPresenceColorSelector(color, setColor)}
         {renderDevices(devices, status, selfUrl, removeDevice, currentDeviceId)}
         <SharesSection invites={invites} />
@@ -116,7 +119,13 @@ const renderAvatarEditor = (
   return (
     <ListMenuSection title="Avatar">
       <ListMenuItem>
-        <Badge img={ avatarBinaryId ? createBinaryDataUrl(avatarBinaryId) : DEFAULT_AVATAR_PATH} />
+        <Badge
+          img={
+            avatarBinaryId
+              ? createBinaryDataUrl(avatarBinaryId)
+              : DEFAULT_AVATAR_PATH
+          }
+        />
         <CenteredStack direction="row">
           <input
             type="file"
@@ -134,15 +143,23 @@ const renderAvatarEditor = (
   )
 }
 
-const renderPresenceColorSelector = (color: string, setColor: (color: { hex: string }) => void) => (
+const renderPresenceColorSelector = (
+  color: string,
+  setColor: (color: { hex: string }) => void
+) => (
   <ListMenuSection title="Presence Color">
     <ListMenuItem>
-      <ColorPicker color={color} colors={Object.values(USER_COLORS)} onChange={()=>{}} onChangeComplete={setColor} />
+      <ColorPicker
+        color={color}
+        colors={Object.values(USER_COLORS)}
+        onChange={() => {}}
+        onChangeComplete={setColor}
+      />
     </ListMenuItem>
     <ListMenuItem>
       <SecondaryText>
-        Your presence colour will be used by other authors to identify you when you are present
-        within a document.
+        Your presence colour will be used by other authors to identify you when
+        you are present within a document.
       </SecondaryText>
     </ListMenuItem>
   </ListMenuSection>
@@ -156,18 +173,21 @@ const renderDevices = (
   currentDeviceId: DocumentId | null
 ) => {
   if (!devices) {
-    return <SecondaryText>Something is wrong, you should always have a device!</SecondaryText>
+    return (
+      <SecondaryText>
+        Something is wrong, you should always have a device!
+      </SecondaryText>
+    )
   }
-  const renderedDevices = devices
-    .map((deviceId: DocumentId) => (
-      <ContactEditorDevice
-        key={deviceId}
-        selfId={selfId}
-        deviceId={deviceId}
-        onRemoveDevice={removeDevice}
-        isCurrentDevice={deviceId === currentDeviceId}
-      />
-    ))
+  const renderedDevices = devices.map((deviceId: DocumentId) => (
+    <ContactEditorDevice
+      key={deviceId}
+      selfId={selfId}
+      deviceId={deviceId}
+      onRemoveDevice={removeDevice}
+      isCurrentDevice={deviceId === currentDeviceId}
+    />
+  ))
 
   const title = (
     <>
@@ -179,12 +199,13 @@ const renderDevices = (
   return (
     <ListMenuSection title={title}>
       {renderedDevices}
-      {status !== 'connected' ? (
+      {status !== "connected" ? (
         <ListMenuItem key="storage-peer-hint">
           <ListItem>
             <Badge backgroundColor="#00000000" size="medium" icon="cloud" />
             <SecondaryText>
-              You aren't currently synchronizing to any other devices identified by this user ID.
+              You aren't currently synchronizing to any other devices identified
+              by this user ID.
             </SecondaryText>
           </ListItem>
         </ListMenuItem>

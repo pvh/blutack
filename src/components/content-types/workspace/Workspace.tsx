@@ -1,16 +1,21 @@
-import { useEffect, useContext, useRef, useState } from 'react'
-import Debug from 'debug'
-import { useDocument } from 'automerge-repo-react-hooks'
-import { DocumentId, DocHandle } from 'automerge-repo'
+import { useEffect, useContext, useRef, useState } from "react"
+import Debug from "debug"
+import { useDocument } from "automerge-repo-react-hooks"
+import { DocumentId, DocHandle } from "automerge-repo"
 
-import { parseDocumentLink, PushpinUrl, isPushpinUrl, createDocumentLink } from '../../pushpin-code/ShareLink'
-import Content, { ContentProps, ContentHandle } from '../../Content'
-import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import SelfContext from '../../pushpin-code/SelfHooks'
-import TitleBar from './TitleBar'
-import { ContactDoc } from '../contact'
+import {
+  parseDocumentLink,
+  PushpinUrl,
+  isPushpinUrl,
+  createDocumentLink,
+} from "../../pushpin-code/ShareLink"
+import Content, { ContentProps, ContentHandle } from "../../Content"
+import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import SelfContext from "../../pushpin-code/SelfHooks"
+import TitleBar from "./TitleBar"
+import { ContactDoc } from "../contact"
 
-import './Workspace.css'
+import "./Workspace.css"
 /* import {
   useAllHeartbeats,
   useHeartbeat,
@@ -18,16 +23,16 @@ import './Workspace.css'
   useDeviceOnlineStatus,
 } from '../../../PresenceHooks' */
 
-import { BoardDoc, CardId } from '../board'
+import { BoardDoc, CardId } from "../board"
 // import { useSystem } from '../../../System'
-import { CurrentDeviceContext } from './Device'
+import { CurrentDeviceContext } from "./Device"
 
-import WorkspaceInList from './WorkspaceInList'
-import { importPlainText } from '../../pushpin-code/ImportData'
-import { ContentListDoc } from '../ContentList'
+import WorkspaceInList from "./WorkspaceInList"
+import { importPlainText } from "../../pushpin-code/ImportData"
+import { ContentListDoc } from "../ContentList"
 // import * as DataUrl from '../../../../DataUrl'
 
-const log = Debug('pushpin:workspace')
+const log = Debug("pushpin:workspace")
 
 export interface WorkspaceDoc {
   selfId: DocumentId
@@ -49,7 +54,10 @@ interface ClipperPayload {
   capturedAt: string
 }
 
-export default function Workspace({ documentId, selfId }: WorkspaceContentProps) {
+export default function Workspace({
+  documentId,
+  selfId,
+}: WorkspaceContentProps) {
   // const crypto = useCrypto()
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDeviceUrl = useContext(CurrentDeviceContext)
@@ -57,43 +65,46 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
 
   const [once, setOnce] = useState<boolean>(false)
 
-  var baseUrl = window.location.href.split('?')[0];
-  navigator.registerProtocolHandler("web+pushpin", `${baseUrl}?document=%s`);
-  
+  var baseUrl = window.location.href.split("?")[0]
+  navigator.registerProtocolHandler("web+pushpin", `${baseUrl}?document=%s`)
+
   if (workspace?.currentDocUrl && !once) {
     setOnce(true)
-    const maybePushpinUrl = new URLSearchParams(window.location.search).get("document")
-    console.log('mpu', maybePushpinUrl)
+    const maybePushpinUrl = new URLSearchParams(window.location.search).get(
+      "document"
+    )
+    console.log("mpu", maybePushpinUrl)
     if (isPushpinUrl(maybePushpinUrl)) {
       // this is just to sanitize out any other bits of the URL
       const { scheme, type, documentId } = parseDocumentLink(maybePushpinUrl)
       const docLink = createDocumentLink(type, documentId)
       const currentDocUrl = workspace?.currentDocUrl
-      console.log('incoming ', docLink, 'current', currentDocUrl)
+      console.log("incoming ", docLink, "current", currentDocUrl)
       if (docLink !== currentDocUrl) {
         openDoc(docLink)
       }
     }
   }
 
-
   if ("navigation" in window) {
-    window.navigation.addEventListener('navigate', (navigateEvent: any) => {
+    window.navigation.addEventListener("navigate", (navigateEvent: any) => {
       // Exit early if this navigation shouldn't be intercepted.
       // The properties to look at are discussed later in the article.
       //if (shouldNotIntercept(navigateEvent)) return;
-    
-      const destination = new URL(navigateEvent.destination.url).searchParams.get("document")
+
+      const destination = new URL(
+        navigateEvent.destination.url
+      ).searchParams.get("document")
       if (isPushpinUrl(destination)) {
-        navigateEvent.intercept({handler: async () => {
-          openDoc(destination)
-        }});  
-      }
-      else { 
+        navigateEvent.intercept({
+          handler: async () => {
+            openDoc(destination)
+          },
+        })
+      } else {
         console.log("weird URL:", navigateEvent.destination.url)
       }
-    
-    });
+    })
   }
 
   /*
@@ -195,14 +206,16 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
     }
 
     const { type } = parseDocumentLink(docUrl)
-    if (type === 'workspace') {
+    if (type === "workspace") {
       // we're going to have to deal with this specially...
       // props.setWorkspaceUrl(docUrl)
       return
     }
 
     if (!workspace) {
-      log('Trying to navigate to a document before the workspace doc is loaded!')
+      log(
+        "Trying to navigate to a document before the workspace doc is loaded!"
+      )
       return
     }
 
@@ -210,7 +223,7 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
     window.scrollTo(0, 0)
 
     if (docUrl === workspace.currentDocUrl) {
-      log('Attempted to navigate to the same place we already are...')
+      log("Attempted to navigate to the same place we already are...")
       return
     }
 
@@ -228,7 +241,7 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
     })
   }
 
-/*  function importClip(payload: ClipperPayload) {
+  /*  function importClip(payload: ClipperPayload) {
     const creationCallback = (importedUrl) => {
       changeWorkspace((d) => {
         d.viewedDocUrls.unshift(importedUrl)
@@ -263,7 +276,7 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
     return false
   }
 
-  console.log('render')
+  console.log("render")
   if (!workspace) {
     return null
   }
@@ -280,51 +293,63 @@ export default function Workspace({ documentId, selfId }: WorkspaceContentProps)
       </div>
     )
   }
-  
+
   const content = renderContent(workspace.currentDocUrl)
 
   return (
     <SelfContext.Provider value={workspace.selfId}>
       <div className="Workspace">
-        <TitleBar documentId={documentId} openDoc={openDoc} onContent={onContent} />
+        <TitleBar
+          documentId={documentId}
+          openDoc={openDoc}
+          onContent={onContent}
+        />
         {content}
       </div>
     </SelfContext.Provider>
   )
 }
 export function create(_attrs: any, handle: DocHandle<any>) {
-  ContentTypes.create('contact', {}, (selfContentUrl) => {
+  ContentTypes.create("contact", {}, (selfContentUrl) => {
     const selfDocumentId = parseDocumentLink(selfContentUrl).documentId
     // this is, uh, a nasty hack.
     // we should refactor not to require the DocumentId on the contact
     // but i don't want to pull that in scope right now
 
-    ContentTypes.create('contentlist', { title: "Ink & Switch" }, (listUrl, listHandle) => {
-      ContentTypes.create('thread', { title: "#default" }, (threadUrl, threadHandle) => {
-        listHandle.change((doc) => {
-            (doc as ContentListDoc).content.push(threadUrl)
-        })
-        handle.change((workspace) => {
-          workspace.selfId = selfDocumentId
-          workspace.contactIds = []
-          workspace.currentDocUrl = listUrl
-          workspace.viewedDocUrls = [listUrl]
-          console.log("done", workspace)
-        })
-      })
-    })
+    ContentTypes.create(
+      "contentlist",
+      { title: "Ink & Switch" },
+      (listUrl, listHandle) => {
+        ContentTypes.create(
+          "thread",
+          { title: "#default" },
+          (threadUrl, threadHandle) => {
+            listHandle.change((doc) => {
+              ;(doc as ContentListDoc).content.push(threadUrl)
+            })
+            handle.change((workspace) => {
+              workspace.selfId = selfDocumentId
+              workspace.contactIds = []
+              workspace.currentDocUrl = listUrl
+              workspace.viewedDocUrls = [listUrl]
+              console.log("done", workspace)
+            })
+          }
+        )
+      }
+    )
   })
 }
 
 ContentTypes.register({
-  type: 'workspace',
-  name: 'Workspace',
-  icon: 'briefcase',
+  type: "workspace",
+  name: "Workspace",
+  icon: "briefcase",
   contexts: {
     root: Workspace,
     list: WorkspaceInList,
     board: WorkspaceInList,
-    'title-bar': WorkspaceInList,
+    "title-bar": WorkspaceInList,
   },
   resizable: false,
   unlisted: true,

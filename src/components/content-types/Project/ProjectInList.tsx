@@ -1,14 +1,14 @@
-import React from 'react'
+import React from "react"
 
-import Badge from '../../ui/Badge'
-import ListItem from '../../ui/ListItem'
-import ContentDragHandle from '../../ui/ContentDragHandle'
-import { ContentProps } from '../../Content'
-import { useDocument } from 'automerge-repo-react-hooks'
+import Badge from "../../ui/Badge"
+import ListItem from "../../ui/ListItem"
+import ContentDragHandle from "../../ui/ContentDragHandle"
+import { ContentProps } from "../../Content"
+import { useDocument } from "automerge-repo-react-hooks"
 
-import { ProjectDoc } from '.'
-import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
-import { PushpinUrl } from '../../pushpin-code/ShareLink'
+import { ProjectDoc } from "."
+import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
+import { PushpinUrl } from "../../pushpin-code/ShareLink"
 
 // todo: try changing the way that "render in a list" works to use our
 // schema mapping tool. A project just needs to define a schema mapping
@@ -25,7 +25,12 @@ export function ProjectInList(props: ContentProps) {
         <Badge icon="list" />
       </ContentDragHandle>
       {/* {doc.name} */}
-      <TitleWithSubtitle title={doc.name} subtitle="" editable={false} documentId={documentId}/>
+      <TitleWithSubtitle
+        title={doc.name}
+        subtitle=""
+        editable={false}
+        documentId={documentId}
+      />
     </ListItem>
   )
 }

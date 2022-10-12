@@ -1,20 +1,21 @@
-import React, { useRef, useState, memo } from 'react'
-import classNames from 'classnames'
-import { ContextMenu, MenuItem as ContextMenuItem } from 'react-contextmenu'
-declare module 'react-contextmenu' {
+import React, { useRef, useState, memo } from "react"
+import classNames from "classnames"
+import { ContextMenu, MenuItem as ContextMenuItem } from "react-contextmenu"
+declare module "react-contextmenu" {
   interface ContextMenuProps {
     children?: React.ReactNode
-  }interface MenuItemProps {
+  }
+  interface MenuItemProps {
     children?: React.ReactNode
   }
 }
 
-import './ContextMenu.css'
-import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import { importFileList } from '../../pushpin-code/ImportData'
-import { BoardAction } from './Board'
-import { gridOffset, Position } from './BoardGrid'
-import ColorPicker from '../../ui/ColorPicker'
+import "./ContextMenu.css"
+import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import { importFileList } from "../../pushpin-code/ImportData"
+import { BoardAction } from "./Board"
+import { gridOffset, Position } from "./BoardGrid"
+import ColorPicker from "../../ui/ColorPicker"
 
 interface Props {
   contentTypes: ContentTypes.LookupResult[]
@@ -25,7 +26,10 @@ interface Props {
 }
 
 function BoardContextMenu(props: Props) {
-  const [contextMenuPosition, setContextMenuPosition] = useState<Position>({ x: 0, y: 0 })
+  const [contextMenuPosition, setContextMenuPosition] = useState<Position>({
+    x: 0,
+    y: 0,
+  })
 
   const addContent = (e: any, contentType: ContentTypes.LookupResult) => {
     e.stopPropagation()
@@ -37,15 +41,15 @@ function BoardContextMenu(props: Props) {
     const position = contextMenuPosition
 
     switch (contentType.type) {
-      case 'board':
+      case "board":
         ContentTypes.create(
-          'board',
+          "board",
           {
             title: `Sub-board of ${props.boardTitle}`,
           },
           (url) => {
             props.dispatch({
-              type: 'AddCardForContent',
+              type: "AddCardForContent",
               card: { x: position.x, y: position.y, url },
             })
           }
@@ -54,7 +58,7 @@ function BoardContextMenu(props: Props) {
       default:
         ContentTypes.create(contentType.type, {}, (url) => {
           props.dispatch({
-            type: 'AddCardForContent',
+            type: "AddCardForContent",
             card: { x: position.x, y: position.y, url },
           })
         })
@@ -62,9 +66,12 @@ function BoardContextMenu(props: Props) {
   }
 
   const createMenuItems = props.contentTypes.map((contentType) => (
-    <ContextMenuItem key={contentType.type} onClick={(e) => addContent(e, contentType)}>
+    <ContextMenuItem
+      key={contentType.type}
+      onClick={(e) => addContent(e, contentType)}
+    >
       <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-        <i className={classNames('fa', `fa-${contentType.icon}`)} />
+        <i className={classNames("fa", `fa-${contentType.icon}`)} />
       </div>
       <span className="ContextMenu__label">{contentType.name}</span>
     </ContextMenuItem>
@@ -80,7 +87,7 @@ function BoardContextMenu(props: Props) {
     importFileList(e.target.files, (url, i) => {
       const position = gridOffset(contextMenuPosition, i)
       props.dispatch({
-        type: 'AddCardForContent',
+        type: "AddCardForContent",
         card: { x: position.x, y: position.y, url },
       })
     })
@@ -95,10 +102,15 @@ function BoardContextMenu(props: Props) {
 
   const colors = props.backgroundColors
 
-  const onChangeComplete = (color: any) => props.dispatch({ type: 'ChangeBackgroundColor', color })
+  const onChangeComplete = (color: any) =>
+    props.dispatch({ type: "ChangeBackgroundColor", color })
 
   return (
-    <ContextMenu id="BoardMenu" onShow={onShowContextMenu} className="ContextMenu">
+    <ContextMenu
+      id="BoardMenu"
+      onShow={onShowContextMenu}
+      className="ContextMenu"
+    >
       <div className="ContextMenu__section">{createMenuItems}</div>
 
       <div className="ContextMenu__section">
@@ -109,11 +121,11 @@ function BoardContextMenu(props: Props) {
           multiple
           onChange={onFilesChanged}
           ref={hiddenFileInput}
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
         />
         <ContextMenuItem key="import" onClick={onImportClick}>
           <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-            <i className={classNames('fa', `fa-download`)} />
+            <i className={classNames("fa", `fa-download`)} />
           </div>
           <span className="ContextMenu__label">Import files...</span>
         </ContextMenuItem>

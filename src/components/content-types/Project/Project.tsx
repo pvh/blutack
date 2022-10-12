@@ -1,15 +1,15 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState } from "react"
 
-import styled from 'styled-components'
-import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import Content, { ContentProps } from '../../Content'
-import { useDocument } from 'automerge-repo-react-hooks'
-import './Project.css'
+import styled from "styled-components"
+import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import Content, { ContentProps } from "../../Content"
+import { useDocument } from "automerge-repo-react-hooks"
+import "./Project.css"
 
 // We specify versions in the import path, but give non-versioned names in code.
 // To change versions in the future, we only need to change this one spot.
-import {ProjectDoc} from '.'
-import { createDocumentLink } from '../../../ShareLink'
+import { ProjectDoc } from "."
+import { createDocumentLink } from "../../../ShareLink"
 
 const ProjectTitle = styled.input`
   font-weight: bold;
@@ -40,7 +40,7 @@ const ShowDebugLink = styled.a`
   color: #aaa;
 `
 
-export default function Project({documentId}: ContentProps) {
+export default function Project({ documentId }: ContentProps) {
   const [doc, changeDoc] = useDocument<ProjectDoc>(documentId)
   const setName = useCallback(
     (name: string) => {
@@ -70,7 +70,7 @@ export default function Project({documentId}: ContentProps) {
   )
 
   const addTask = useCallback(() => {
-    ContentTypes.create('task', {}, (url) => {
+    ContentTypes.create("task", {}, (url) => {
       changeDoc((doc) => {
         doc.tasks.push(url)
       })

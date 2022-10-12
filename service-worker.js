@@ -1,11 +1,10 @@
-const STORE = {};
+const STORE = {}
 
-self.addEventListener('fetch', function(event) {
+self.addEventListener("fetch", function (event) {
   const url = new URL(event.request.url)
-  
+
   // TODO: this is not good
   const match = url.pathname.match(/^\/blutack\/src\/binary\/(.*)$/)
-
 
   if (match) {
     const [, data] = match
@@ -19,7 +18,7 @@ self.addEventListener('fetch', function(event) {
       event.respondWith(
         new Response("Not found", {
           status: 404,
-          headers: {'Content-Type': "text/plain"}
+          headers: { "Content-Type": "text/plain" },
         })
       )
 
@@ -28,41 +27,43 @@ self.addEventListener('fetch', function(event) {
 
     event.respondWith(
       new Response(entry.binary, {
-        headers: {'Content-Type': entry.mimeType}
+        headers: { "Content-Type": entry.mimeType },
       })
     )
   }
-});
+})
 
 // from: https://gist.github.com/72lions/4528834
-function concatArrayBuffers (bufs) {
-  var offset = 0;
-  var bytes = 0;
-  var bufs2=bufs.map(function(buf,total){
-      bytes += buf.byteLength;
-      return buf;
-  });
-  var buffer = new ArrayBuffer(bytes);
-  var store = new Uint8Array(buffer);
-  bufs2.forEach(function(buf){
-      store.set(new Uint8Array(buf.buffer||buf,buf.byteOffset),offset);
-      offset += buf.byteLength;
-  });
-  return buffer   
+function concatArrayBuffers(bufs) {
+  var offset = 0
+  var bytes = 0
+  var bufs2 = bufs.map(function (buf, total) {
+    bytes += buf.byteLength
+    return buf
+  })
+  var buffer = new ArrayBuffer(bytes)
+  var store = new Uint8Array(buffer)
+  bufs2.forEach(function (buf) {
+    store.set(new Uint8Array(buf.buffer || buf, buf.byteOffset), offset)
+    offset += buf.byteLength
+  })
+  return buffer
 }
 
 async function handleSetMessage(message) {
   console.log("Handling set message", message)
   const { binaryDataId, mimeType, binary } = message.data
 
-  const reader = binary.getReader();
+  const reader = binary.getReader()
   const buffers = []
-  while( true ) {
-    const { done, value } = await reader.read();
-    if( done ) { break; }
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) {
+      break
+    }
     buffers.push(value)
   }
-  
+
   STORE[binaryDataId] = { mimeType, binary: concatArrayBuffers(buffers) }
   console.log("Finished set and stored", STORE[binaryDataId])
 }
@@ -76,15 +77,20 @@ function handleGetMessage(message) {
   }
 
   const { mimeType, binary } = STORE[binaryDataId]
-  
-  var out = new ArrayBuffer(binary.byteLength);
-  new Uint8Array(out).set(new Uint8Array(binary));
+
+  var out = new ArrayBuffer(binary.byteLength)
+  new Uint8Array(out).set(new Uint8Array(binary))
 
   console.log("cloned and made", out)
-  
-  replyPort.postMessage({
-    binaryDataId, mimeType, binary: out
-  }, [out])
+
+  replyPort.postMessage(
+    {
+      binaryDataId,
+      mimeType,
+      binary: out,
+    },
+    [out]
+  )
 }
 
 self.addEventListener("message", (event) => {
@@ -104,4 +110,4 @@ self.addEventListener("message", (event) => {
 
 self.addEventListener("install", () => {
   self.skipWaiting()
-});
+})

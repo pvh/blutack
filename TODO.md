@@ -1,5 +1,4 @@
-TODO:
------
+## TODO:
 
 - figure out links / protocols / navigation
 - restore binary support via serviceworker
@@ -8,8 +7,9 @@ TODO:
 - review various paste / drag & drop stuff
 - some kind of authentication plan
 
-----
-----
+---
+
+---
 
 - re-build PDF / HTML import (URLContent/PDFContent) ... maybe?
 - invitation / sharing / encryption redesign
@@ -18,19 +18,17 @@ TODO:
 - motif sync
 - self-hosting progammableness(???)
 
-next
----
+## next
+
 creation of workspace with recursive doc creation
 access to repo outside of hooks
 
+## Disabled stuff
 
-
-Disabled stuff
----
 PresenceHooks
-  useHeartbeat, useConnectionStatus, useDeviceOnlineStatus
+useHeartbeat, useConnectionStatus, useDeviceOnlineStatus
 D&D stuff
-  importFileList, importPlainText, importFromText, DataUrl
+importFileList, importPlainText, importFromText, DataUrl
 base64 encoding in WebStreamLogic.ts
 encryption stuff! -> secretKey on workspace is a good entry
 importClip && the webclipper!
@@ -40,18 +38,18 @@ OmniboxWorkspaceListMenu -> InvitationsView { getDoc }
 review all the File types
 
 HyperFiles
- -> replace the existing hyperfile stuff with a service worker implementation
- -> find the places we reference hyperfiles (now FileIds) and call a function to make them useful URLs
- -> find the various import & ingestion places and fix those too
+-> replace the existing hyperfile stuff with a service worker implementation
+-> find the places we reference hyperfiles (now FileIds) and call a function to make them useful URLs
+-> find the various import & ingestion places and fix those too
 "Module "path" has been externalized for browser compatibility. Cannot access "path.extname" in client code."
 
-To Replace
----
+## To Replace
+
 useSystem -> gonna need a new approach
 hyperfiles -> use a serviceworker
 
-To improve
-----
+## To improve
+
 create() functions would benefit from better typing for DocHandle
 weird stuff around getRepo/setRepo
 workspace initialization <- calling create manually

@@ -1,11 +1,11 @@
-import React from 'react'
-import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import { ContentProps } from '../../Content'
-import Badge from '../../ui/Badge'
-import ContentDragHandle from '../../ui/ContentDragHandle'
-import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
-import ListItem from '../../ui/ListItem'
-import { useDocument } from 'automerge-repo-react-hooks'
+import React from "react"
+import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import { ContentProps } from "../../Content"
+import Badge from "../../ui/Badge"
+import ContentDragHandle from "../../ui/ContentDragHandle"
+import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
+import ListItem from "../../ui/ListItem"
+import { useDocument } from "automerge-repo-react-hooks"
 
 interface Doc {
   title?: string
@@ -20,9 +20,10 @@ export default function DefaultInList(props: ContentProps) {
   }
 
   const { type } = props
-  const contentType = ContentTypes.lookup({ type, context: 'list' })
+  const contentType = ContentTypes.lookup({ type, context: "list" })
 
-  const { icon = 'question', name = `Unidentified type: ${type}` } = contentType || {}
+  const { icon = "question", name = `Unidentified type: ${type}` } =
+    contentType || {}
 
   return (
     <ListItem>
@@ -36,5 +37,5 @@ export default function DefaultInList(props: ContentProps) {
 
 ContentTypes.registerDefault({
   component: ListItem,
-  context: 'list',
+  context: "list",
 })

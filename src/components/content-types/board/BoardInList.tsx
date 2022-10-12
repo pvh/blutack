@@ -1,12 +1,11 @@
-import React from 'react'
-import { BoardDoc, icon } from '.'
-import { ContentProps, EditableContentProps } from '../../Content'
-import { useDocument } from 'automerge-repo-react-hooks'
-import Badge, { Props as BadgeProps } from '../../ui/Badge'
-import ListItem from '../../ui/ListItem'
-import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
-import ContentDragHandle from '../../ui/ContentDragHandle'
-
+import React from "react"
+import { BoardDoc, icon } from "."
+import { ContentProps, EditableContentProps } from "../../Content"
+import { useDocument } from "automerge-repo-react-hooks"
+import Badge, { Props as BadgeProps } from "../../ui/Badge"
+import ListItem from "../../ui/ListItem"
+import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
+import ContentDragHandle from "../../ui/ContentDragHandle"
 
 export default function BoardInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
@@ -19,12 +18,12 @@ export default function BoardInList(props: EditableContentProps) {
   const { title, backgroundColor, cards } = doc
 
   const cardLength = Object.keys(cards).length
-  const subtitle = `${cardLength} item${cardLength !== 1 ? 's' : ''}`
+  const subtitle = `${cardLength} item${cardLength !== 1 ? "s" : ""}`
 
   const badgeProps: BadgeProps = {
     icon,
     backgroundColor,
-    size: "medium" 
+    size: "medium",
   }
 
   return (

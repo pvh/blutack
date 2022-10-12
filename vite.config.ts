@@ -1,8 +1,8 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import wasm from "vite-plugin-wasm";
-import topLevelAwait from "vite-plugin-top-level-await";
-import shimReactPdf from "vite-plugin-shim-react-pdf";
+import { defineConfig } from "vite"
+import react from "@vitejs/plugin-react"
+import wasm from "vite-plugin-wasm"
+import topLevelAwait from "vite-plugin-top-level-await"
+import shimReactPdf from "vite-plugin-shim-react-pdf"
 
 export default defineConfig({
   base: "/blutack/",
@@ -15,16 +15,16 @@ export default defineConfig({
     // allocations, initializing this twice causes horrible breakage
     exclude: ["@automerge/automerge-wasm"],
   },
-  
+
   resolve: {
     alias: {
-      path: "path-browserify"
-    }
+      path: "path-browserify",
+    },
   },
-  
+
   server: {
     fs: {
       strict: false,
     },
   },
-});
+})

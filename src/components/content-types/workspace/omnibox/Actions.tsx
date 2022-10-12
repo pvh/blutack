@@ -1,5 +1,5 @@
-import React from 'react'
-import Action from './Action'
+import React from "react"
+import Action from "./Action"
 
 export interface ActionItem {
   name: string

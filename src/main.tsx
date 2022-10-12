@@ -1,22 +1,21 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import Root from './components/Root'
-import './app.css'
-import './ibm-plex.css'
-import './vendor/line-awesome/css/line-awesome.min.css'
+import React from "react"
+import ReactDOM from "react-dom/client"
+import Root from "./components/Root"
+import "./app.css"
+import "./ibm-plex.css"
+import "./vendor/line-awesome/css/line-awesome.min.css"
 
 import localforage from "localforage"
 
 import { DocumentId, Repo } from "automerge-repo"
 import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
 import { BroadcastChannelNetworkAdapter } from "automerge-repo-network-broadcastchannel"
-import {  RepoContext } from 'automerge-repo-react-hooks'
-import * as ContentTypes from './components/pushpin-code/ContentTypes'
-import { create as createWorkspace } from './components/content-types/workspace/Workspace'
-import { BrowserWebSocketClientAdapter } from 'automerge-repo-network-websocket'
+import { RepoContext } from "automerge-repo-react-hooks"
+import * as ContentTypes from "./components/pushpin-code/ContentTypes"
+import { create as createWorkspace } from "./components/content-types/workspace/Workspace"
+import { BrowserWebSocketClientAdapter } from "automerge-repo-network-websocket"
 
-import { registerServiceWorker } from './blobstore/Blob'
-
+import { registerServiceWorker } from "./blobstore/Blob"
 
 registerServiceWorker()
 /* disabled to make debugging simpler.
@@ -32,23 +31,27 @@ new SharedWorker(
 // $ yarn
 // $ mkdir .amrg
 // $ yarn start
-let host = new URLSearchParams(window.location.search).get('host') || "automerge-repo-sync-server.fly.dev";
+let host =
+  new URLSearchParams(window.location.search).get("host") ||
+  "automerge-repo-sync-server.fly.dev"
 const url = `wss://${host}`
 const repo = await Repo({
-    storage: new LocalForageStorageAdapter(),
-    network: [
-      new BroadcastChannelNetworkAdapter(),
-      new BrowserWebSocketClientAdapter(url),
-    ],
-    sharePolicy: (peerId) => peerId.includes("storage-server"),
+  storage: new LocalForageStorageAdapter(),
+  network: [
+    new BroadcastChannelNetworkAdapter(),
+    new BrowserWebSocketClientAdapter(url),
+  ],
+  sharePolicy: (peerId) => peerId.includes("storage-server"),
 })
 
 ContentTypes.setRepo(repo)
 
 const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
-  let docId = new URLSearchParams(window.location.search).get(key);
+  let docId = new URLSearchParams(window.location.search).get(key)
 
-  if (!docId) { docId = await localforage.getItem(key) }
+  if (!docId) {
+    docId = await localforage.getItem(key)
+  }
   if (!docId) {
     const workspaceHandle = repo.create()
     docId = workspaceHandle.documentId
@@ -64,10 +67,10 @@ const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
 const workspaceDocId = await findOrMakeDoc("workspaceDocId")
 const deviceDocId = await findOrMakeDoc("deviceDocId")
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <RepoContext.Provider value={repo}>
-      <Root workspaceDocId={workspaceDocId} deviceDocId={deviceDocId}/>
+      <Root workspaceDocId={workspaceDocId} deviceDocId={deviceDocId} />
     </RepoContext.Provider>
   </React.StrictMode>
 )

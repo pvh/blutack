@@ -1,12 +1,12 @@
-import React from 'react'
+import React from "react"
 
-import { ContentProps } from '../../Content'
+import { ContentProps } from "../../Content"
 
-import { useSelfId } from '../../pushpin-code/SelfHooks'
+import { useSelfId } from "../../pushpin-code/SelfHooks"
 
-import ContactViewer from './ContactViewer'
-import ContactEditor from './ContactEditor'
-import './ContactWorkspace.css'
+import ContactViewer from "./ContactViewer"
+import ContactEditor from "./ContactEditor"
+import "./ContactWorkspace.css"
 
 export default function ContactWorkspace(props: ContentProps) {
   const { documentId: contactId } = props

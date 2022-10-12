@@ -1,20 +1,20 @@
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef, useMemo } from "react"
 
-import * as Automerge from '@automerge/automerge'
-import Quill, { TextChangeHandler, QuillOptionsStatic } from 'quill'
-import Delta from 'quill-delta'
-import * as ContentTypes from '../pushpin-code/ContentTypes'
-import { ContentProps, EditableContentProps } from '../Content'
-import { useDocument } from 'automerge-repo-react-hooks'
-import { useStaticCallback } from '../pushpin-code/Hooks'
-import './TextContent.css'
-import Badge from '../ui/Badge'
-import * as ContentData from '../pushpin-code/ContentData'
-import * as WebStreamLogic from '../pushpin-code/WebStreamLogic'
-import ListItem from '../ui/ListItem'
-import ContentDragHandle from '../ui/ContentDragHandle'
-import TitleWithSubtitle from '../ui/TitleWithSubtitle'
-import { DocHandle } from 'automerge-repo'
+import * as Automerge from "@automerge/automerge"
+import Quill, { TextChangeHandler, QuillOptionsStatic } from "quill"
+import Delta from "quill-delta"
+import * as ContentTypes from "../pushpin-code/ContentTypes"
+import { ContentProps, EditableContentProps } from "../Content"
+import { useDocument } from "automerge-repo-react-hooks"
+import { useStaticCallback } from "../pushpin-code/Hooks"
+import "./TextContent.css"
+import Badge from "../ui/Badge"
+import * as ContentData from "../pushpin-code/ContentData"
+import * as WebStreamLogic from "../pushpin-code/WebStreamLogic"
+import ListItem from "../ui/ListItem"
+import ContentDragHandle from "../ui/ContentDragHandle"
+import TitleWithSubtitle from "../ui/TitleWithSubtitle"
+import { DocHandle } from "automerge-repo"
 
 interface TextDoc {
   title: string
@@ -78,7 +78,7 @@ function useQuill({
   const ref = useRef<HTMLDivElement>(null)
   const quill = useRef<Quill | null>(null)
   // @ts-ignore-next-line
-  const textString = useMemo(() => text && text.join(''), [text])
+  const textString = useMemo(() => text && text.join(""), [text])
   const makeChange = useStaticCallback(change)
 
   useEffect(() => {
@@ -92,21 +92,21 @@ function useQuill({
     if (selected) q.focus()
 
     const onChange: TextChangeHandler = (changeDelta, _oldContents, source) => {
-      if (source !== 'user') return
+      if (source !== "user") return
 
       makeChange((content) => applyDeltaToText(content, changeDelta as any))
     }
 
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key !== 'Backspace') return
+      if (e.key !== "Backspace") return
 
       const str = q.getText()
-      if (str !== '' && str !== '\n') {
+      if (str !== "" && str !== "\n") {
         e.stopPropagation()
       }
     }
 
-    q.on('text-change', onChange)
+    q.on("text-change", onChange)
 
     /**
      * We bind this as a native event because of React's event delegation.
@@ -114,12 +114,12 @@ function useQuill({
      * seen the event at all. This causes a race condition where the doc looks like it was already
      * empty when Backspace is pressed, even though that very keypress made it empty.
      */
-    container.addEventListener('keydown', onKeyDown, { capture: true })
+    container.addEventListener("keydown", onKeyDown, { capture: true })
 
     return () => {
       quill.current = null
-      container.removeEventListener('keydown', onKeyDown, { capture: true })
-      q.off('text-change', onChange)
+      container.removeEventListener("keydown", onKeyDown, { capture: true })
+      q.off("text-change", onChange)
       // Quill gets garbage collected automatically
     }
   }, [ref.current]) // eslint-disable-line
@@ -148,8 +148,8 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
       i += op.retain
     }
 
-    if (typeof op.insert === 'string') {
-      const chars = op.insert.split('')
+    if (typeof op.insert === "string") {
+      const chars = op.insert.split("")
       text.insertAt!(i, ...chars)
       i += chars.length
     } else if (op.delete) {
@@ -158,26 +158,28 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
   })
 }
 
-async function createFrom(contentData: ContentData.ContentData, handle: DocHandle<TextDoc>) {
+async function createFrom(
+  contentData: ContentData.ContentData,
+  handle: DocHandle<TextDoc>
+) {
   const text = await WebStreamLogic.toString(contentData.data)
   handle.change((doc) => {
     doc.text = new Automerge.Text()
     if (text) {
-      doc.text.insertAt!(0, ...text.split(''))
+      doc.text.insertAt!(0, ...text.split(""))
 
-      if (!text || !text.endsWith('\n')) {
-        doc.text.insertAt!(text ? text.length : 0, '\n') // Quill prefers an ending newline
+      if (!text || !text.endsWith("\n")) {
+        doc.text.insertAt!(text ? text.length : 0, "\n") // Quill prefers an ending newline
       }
     }
   })
 }
 
-
 function create({ text }: any, handle: DocHandle<any>) {
   handle.change((doc) => {
     doc.text = new Automerge.Text(text)
-    if (!text || !text.endsWith('\n')) {
-      doc.text.insertAt!(text ? text.length : 0, '\n') // Quill prefers an ending newline
+    if (!text || !text.endsWith("\n")) {
+      doc.text.insertAt!(text ? text.length : 0, "\n") // Quill prefers an ending newline
     }
   })
 }
@@ -188,13 +190,13 @@ function TextInList(props: EditableContentProps) {
   if (!doc || !doc.text) return null
 
   const lines = doc.text
-  //  @ts-ignore-next-line
-    .join('')
-    .split('\n')
+    //  @ts-ignore-next-line
+    .join("")
+    .split("\n")
     .filter((l: string) => l.length > 0)
 
-  const title = doc.title || lines.shift() || '[empty text note]'
-  const subtitle = lines.slice(0, 2).join('\n')
+  const title = doc.title || lines.shift() || "[empty text note]"
+  const subtitle = lines.slice(0, 2).join("\n")
 
   return (
     <ListItem>
@@ -210,17 +212,17 @@ function TextInList(props: EditableContentProps) {
   )
 }
 
-const supportsMimeType = (mimeType: string) => !!mimeType.match('text/')
+const supportsMimeType = (mimeType: string) => !!mimeType.match("text/")
 
 ContentTypes.register({
-  type: 'text',
-  name: 'Text',
-  icon: 'sticky-note',
+  type: "text",
+  name: "Text",
+  icon: "sticky-note",
   contexts: {
     board: TextContent,
     workspace: TextContent,
     list: TextInList,
-    'title-bar': TextInList,
+    "title-bar": TextInList,
   },
   create,
   createFrom,

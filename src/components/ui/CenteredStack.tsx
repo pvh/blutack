@@ -1,9 +1,9 @@
-import React from 'react'
-import './CenteredStack.css'
-import classNames from 'classnames'
+import React from "react"
+import "./CenteredStack.css"
+import classNames from "classnames"
 
-type Row = 'row'
-type Column = 'column'
+type Row = "row"
+type Column = "column"
 type Direction = Row | Column
 
 export interface Props {
@@ -14,7 +14,7 @@ export interface Props {
 }
 
 export default function CenteredStack({
-  direction = 'column',
+  direction = "column",
   centerText = true,
   style,
   children,
@@ -22,9 +22,9 @@ export default function CenteredStack({
   return (
     <span
       className={classNames([
-        'CenteredStack',
+        "CenteredStack",
         `CenteredStack--${direction}`,
-        centerText && 'CenteredStack--centerText',
+        centerText && "CenteredStack--centerText",
       ])}
       style={style}
     >

@@ -1,9 +1,9 @@
-import React from 'react'
-import { parseDocumentLink, PushpinUrl } from '../../pushpin-code/ShareLink'
-import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import Badge from '../../ui/Badge'
-import { useDocument } from 'automerge-repo-react-hooks'
-import ContentDragHandle from '../../ui/ContentDragHandle'
+import React from "react"
+import { parseDocumentLink, PushpinUrl } from "../../pushpin-code/ShareLink"
+import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import Badge from "../../ui/Badge"
+import { useDocument } from "automerge-repo-react-hooks"
+import ContentDragHandle from "../../ui/ContentDragHandle"
 
 interface Props {
   url: PushpinUrl
@@ -21,7 +21,7 @@ export default (props: Props) => {
 
   const contentType = ContentTypes.lookup({ type, context })
 
-  const icon = contentType ? contentType.icon : 'exclamation-triangle'
+  const icon = contentType ? contentType.icon : "exclamation-triangle"
 
   return (
     <ContentDragHandle url={url}>

@@ -1,18 +1,18 @@
-import React, { useEffect } from 'react'
-import Debug from 'debug'
+import React, { useEffect } from "react"
+import Debug from "debug"
 
-import { PushpinUrl, parseDocumentLink } from '../../pushpin-code/ShareLink'
-import { WorkspaceDoc as WorkspaceDoc } from './Workspace'
-import Author from './Author'
+import { PushpinUrl, parseDocumentLink } from "../../pushpin-code/ShareLink"
+import { WorkspaceDoc as WorkspaceDoc } from "./Workspace"
+import Author from "./Author"
 
-import './Authors.css'
-import { DocumentId } from 'automerge-repo'
-import { useDocument } from 'automerge-repo-react-hooks'
+import "./Authors.css"
+import { DocumentId } from "automerge-repo"
+import { useDocument } from "automerge-repo-react-hooks"
 
-import { useSelfId } from '../../pushpin-code/SelfHooks'
+import { useSelfId } from "../../pushpin-code/SelfHooks"
 // import { usePresence } from '../../../PresenceHooks'
 
-const log = Debug('pushpin:authors')
+const log = Debug("pushpin:authors")
 
 interface Props {
   workspaceDocId: DocumentId
@@ -35,7 +35,11 @@ export default function Authors({ workspaceDocId, currentDocUrl }: Props) {
     .filter((authorId) => authorId !== selfId)
     .filter((id, i, a) => a.indexOf(id) === i)
     .map((id) => (
-      <Author key={id} contactId={id} isPresent={presence.some((p) => p.contact === id)} />
+      <Author
+        key={id}
+        contactId={id}
+        isPresent={presence.some((p) => p.contact === id)}
+      />
     ))
 
   return <div className="Authors">{authors}</div>
@@ -55,13 +59,15 @@ export function useAuthors(
       return
     }
 
-    log('updating workspace contacts')
+    log("updating workspace contacts")
 
     const { authorIds = [] } = doc
 
     // Add any never-before seen authors to our contacts.
     changeWorkspace(({ contactIds }) => {
-      const newContactIds = authorIds.filter((a) => selfId !== a && !contactIds.includes(a))
+      const newContactIds = authorIds.filter(
+        (a) => selfId !== a && !contactIds.includes(a)
+      )
 
       if (newContactIds.length) {
         contactIds.push(...newContactIds)
@@ -70,11 +76,11 @@ export function useAuthors(
   }, [selfId, doc && doc.authorIds])
 
   useEffect(() => {
-    if (!workspace || !doc || type === 'contact') {
+    if (!workspace || !doc || type === "contact") {
       return
     }
 
-    log('adding self to authors')
+    log("adding self to authors")
 
     // Add ourselves to the authors if we haven't yet.
     changeDoc((doc) => {

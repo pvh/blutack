@@ -1,34 +1,36 @@
-import { createDocumentLink, PushpinUrl } from '../../pushpin-code/ShareLink'
+import { createDocumentLink, PushpinUrl } from "../../pushpin-code/ShareLink"
 
-import DEFAULT_AVATAR_PATH from '../../../images/default-avatar.png'
-import Content, { ContentProps } from '../../Content'
-import { ContactDoc } from '.'
-import { FileDoc } from '../files'
+import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
+import Content, { ContentProps } from "../../Content"
+import { ContactDoc } from "."
+import { FileDoc } from "../files"
 
-import { DocumentId } from 'automerge-repo'
-import { useDocument } from 'automerge-repo-react-hooks'
+import { DocumentId } from "automerge-repo"
+import { useDocument } from "automerge-repo-react-hooks"
 
-import Heading from '../../ui/Heading'
-import SecondaryText from '../../ui/SecondaryText'
+import Heading from "../../ui/Heading"
+import SecondaryText from "../../ui/SecondaryText"
 
-import ConnectionStatusBadge from './ConnectionStatusBadge'
-import Badge from '../../ui/Badge'
-import CenteredStack from '../../ui/CenteredStack'
-import ListMenuSection from '../../ui/ListMenuSection'
-import ListMenuItem from '../../ui/ListMenuItem'
-import SharesSection from './SharesSection'
+import ConnectionStatusBadge from "./ConnectionStatusBadge"
+import Badge from "../../ui/Badge"
+import CenteredStack from "../../ui/CenteredStack"
+import ListMenuSection from "../../ui/ListMenuSection"
+import ListMenuItem from "../../ui/ListMenuItem"
+import SharesSection from "./SharesSection"
 
 // @ts-ignore-next-line
-import { Swatch } from 'react-color/lib/components/common/Swatch'
+import { Swatch } from "react-color/lib/components/common/Swatch"
 
-import './ContactEditor.css'
-import ListMenu from '../../ui/ListMenu'
+import "./ContactEditor.css"
+import ListMenu from "../../ui/ListMenu"
 
 export default function ContactViewer(props: ContentProps) {
   const { documentId: contactId } = props
   const [doc] = useDocument<ContactDoc>(contactId)
   const [avatarImageDoc] = useDocument<FileDoc>(doc && doc.avatarDocId)
-  const avatarImageUrl = avatarImageDoc ? avatarImageDoc.fileId : DEFAULT_AVATAR_PATH
+  const avatarImageUrl = avatarImageDoc
+    ? avatarImageDoc.fileId
+    : DEFAULT_AVATAR_PATH
 
   if (!doc) {
     return null
@@ -58,12 +60,11 @@ export default function ContactViewer(props: ContentProps) {
                 focusStyle={{ border: `0 0 4px ${doc.color}` }}
               />
             </div>
-
           </ListMenuItem>
           <ListMenuItem>
             <SecondaryText>
-              {doc.name}&apos;s presence colour can be used to identify them when they are present
-              within a document.
+              {doc.name}&apos;s presence colour can be used to identify them
+              when they are present within a document.
             </SecondaryText>
           </ListMenuItem>
         </ListMenuSection>
@@ -74,12 +75,19 @@ export default function ContactViewer(props: ContentProps) {
   )
 }
 
-const renderDevices = (devices: DocumentId[] | undefined, contactId: DocumentId) => {
+const renderDevices = (
+  devices: DocumentId[] | undefined,
+  contactId: DocumentId
+) => {
   if (!devices) {
-    return <SecondaryText>Something is wrong, you should always have a device!</SecondaryText>
+    return (
+      <SecondaryText>
+        Something is wrong, you should always have a device!
+      </SecondaryText>
+    )
   }
   const renderedDevices = devices
-    .map((deviceUrl: DocumentId) => createDocumentLink('device', deviceUrl))
+    .map((deviceUrl: DocumentId) => createDocumentLink("device", deviceUrl))
     .map((deviceId: PushpinUrl) => (
       <ListMenuItem key={deviceId}>
         <Content context="list" url={deviceId} editable />

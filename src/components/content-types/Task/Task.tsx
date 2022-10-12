@@ -1,12 +1,15 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
-import React, { useCallback, useState } from 'react'
-import styled from 'styled-components'
-import Select, { SelectItemRenderer, SelectRenderer } from 'react-dropdown-select'
-import { TaskDoc } from '.'
-import Content, { ContentProps } from '../../Content'
-import { TaskTags } from './TaskTags'
-import { useDocument } from 'automerge-repo-react-hooks'
-import { PushpinUrl } from '../../pushpin-code/ShareLink'
+import React, { useCallback, useState } from "react"
+import styled from "styled-components"
+import Select, {
+  SelectItemRenderer,
+  SelectRenderer,
+} from "react-dropdown-select"
+import { TaskDoc } from "."
+import Content, { ContentProps } from "../../Content"
+import { TaskTags } from "./TaskTags"
+import { useDocument } from "automerge-repo-react-hooks"
+import { PushpinUrl } from "../../pushpin-code/ShareLink"
 
 const TaskBox = styled.div`
   background-color: #fff;
@@ -23,7 +26,7 @@ const StatusDropdown = styled.select`
   font-size: 14px;
   font-family: inherit;
   height: 30px;
-  color: ${(props: any /* TODO */) => (props.value === 'done' ? '#aaa' : '')};
+  color: ${(props: any /* TODO */) => (props.value === "done" ? "#aaa" : "")};
 `
 
 const TaskTitle = styled.input`
@@ -36,7 +39,7 @@ const TaskTitle = styled.input`
   font-weight: 500;
   width: 50%;
   ${(status: string) =>
-    status === 'done' &&
+    status === "done" &&
     `
       text-decoration: line-through;
       color: #aaa;
@@ -53,7 +56,7 @@ const TaskDescription = styled.textarea`
   width: 350px;
   vertical-align: top;
   ${(status: string) =>
-    status === 'done' &&
+    status === "done" &&
     `
       text-decoration: line-through;
       color: #aaa;
@@ -141,7 +144,7 @@ export function Task(props: ContentProps) {
     value: string | null
   }
 
-  const unassignedOption = { label: 'unassigned', value: null }
+  const unassignedOption = { label: "unassigned", value: null }
   const assigneeOptions = [
     unassignedOption,
     ...doc.authors.map((member) => ({ value: member, label: member })),
@@ -167,7 +170,10 @@ export function Task(props: ContentProps) {
     )
   }
 
-  const customItemRenderer = ({ item, methods }: SelectItemRenderer<AssigneeOption>) => {
+  const customItemRenderer = ({
+    item,
+    methods,
+  }: SelectItemRenderer<AssigneeOption>) => {
     return (
       <Assignee
         assignee={item.value}
@@ -185,7 +191,10 @@ export function Task(props: ContentProps) {
   return (
     <TaskBox>
       <MainRow>
-        <StatusDropdown value={doc.status} onChange={(e: any /* TODO */) => updateStatus(e.target.value)}>
+        <StatusDropdown
+          value={doc.status}
+          onChange={(e: any /* TODO */) => updateStatus(e.target.value)}
+        >
           <option value="todo">📌 todo</option>
           <option value="inProgress">👷‍♂️ doing</option>
           <option value="done">done</option>

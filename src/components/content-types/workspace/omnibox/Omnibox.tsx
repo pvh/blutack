@@ -1,16 +1,16 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react'
-import Debug from 'debug'
-import classNames from 'classnames'
+import React, { useRef, useState, useCallback, useEffect } from "react"
+import Debug from "debug"
+import classNames from "classnames"
 
-import { PushpinUrl } from '../../../pushpin-code/ShareLink'
-import { useEvent } from '../../../pushpin-code/Hooks'
-import { DocumentId } from 'automerge-repo'
-import { useRepo } from 'automerge-repo-react-hooks'
-import OmniboxWorkspaceListMenu from './OmniboxWorkspaceListMenu'
+import { PushpinUrl } from "../../../pushpin-code/ShareLink"
+import { useEvent } from "../../../pushpin-code/Hooks"
+import { DocumentId } from "automerge-repo"
+import { useRepo } from "automerge-repo-react-hooks"
+import OmniboxWorkspaceListMenu from "./OmniboxWorkspaceListMenu"
 
-import './Omnibox.css'
+import "./Omnibox.css"
 
-const log = Debug('pushpin:omnibox')
+const log = Debug("pushpin:omnibox")
 
 export interface Props {
   active: boolean
@@ -22,14 +22,14 @@ export interface Props {
 export default function Omnibox(props: Props) {
   const { active, documentId, omniboxFinished, onContent } = props
   const omniboxInput = useRef<HTMLInputElement>(null)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState("")
 
-  const onInputChange = useCallback((e: any /* FIXME */ ) => {
+  const onInputChange = useCallback((e: any /* FIXME */) => {
     setSearch(e.target.value)
   }, [])
 
   const omniboxRef = useRef<HTMLDivElement>(null)
-  useEvent(window, 'click', (event) => {
+  useEvent(window, "click", (event) => {
     if (!omniboxRef.current) {
       return
     }
@@ -44,8 +44,8 @@ export default function Omnibox(props: Props) {
 
   useEffect(() => {
     if (active && omniboxInput.current) {
-      setSearch('')
-      omniboxInput.current.value = ''
+      setSearch("")
+      omniboxInput.current.value = ""
       omniboxInput.current.select()
     }
   }, [active])
@@ -57,11 +57,14 @@ export default function Omnibox(props: Props) {
 
   const repo = useRepo()
 
-  log('render')
+  log("render")
 
   return (
     <div
-      className={classNames(`Omnibox`, active ? 'Omnibox--active' : 'Omnibox--inactive')}
+      className={classNames(
+        `Omnibox`,
+        active ? "Omnibox--active" : "Omnibox--inactive"
+      )}
       ref={omniboxRef}
       onPaste={stopPropagation}
     >

@@ -116,7 +116,7 @@ blockquote:before,
 blockquote:after,
 q:before,
 q:after {
-  content: '';
+  content: "";
   content: none;
 }
 table {
@@ -154,7 +154,7 @@ a {
   visibility: hidden;
 }
 
-*[draggable='true'] {
+*[draggable="true"] {
   cursor: grab;
 }
 
@@ -171,7 +171,7 @@ body,
 }
 
 body {
-  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
   font-size: 14px;
   line-height: var(--cellSize);
   -webkit-font-smoothing: antialiased;
@@ -180,7 +180,7 @@ body {
 }
 
 input {
-  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
   font-size: 14px;
   line-height: inherit;
   color: var(--colorBlueBlack);

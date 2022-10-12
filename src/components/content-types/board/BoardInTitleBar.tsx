@@ -1,13 +1,13 @@
-import React from 'react'
-import { BoardDoc, BoardDocCard, CardId, icon } from '.'
-import Content, { ContentProps } from '../../Content'
-import { useDocument } from 'automerge-repo-react-hooks'
-import { useSelection } from './BoardSelection'
-import Badge from '../../ui/Badge'
-import CardBadge from './CardBadge'
-import ListItem from '../../ui/ListItem'
-import TitleWithSubtitle from '../../ui/TitleWithSubtitle'
-import ContentDragHandle from '../../ui/ContentDragHandle'
+import React from "react"
+import { BoardDoc, BoardDocCard, CardId, icon } from "."
+import Content, { ContentProps } from "../../Content"
+import { useDocument } from "automerge-repo-react-hooks"
+import { useSelection } from "./BoardSelection"
+import Badge from "../../ui/Badge"
+import CardBadge from "./CardBadge"
+import ListItem from "../../ui/ListItem"
+import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
+import ContentDragHandle from "../../ui/ContentDragHandle"
 
 interface Props extends ContentProps {
   editable: boolean
@@ -32,14 +32,15 @@ export default function BoardInTitleBar(props: Props) {
 const selectedCards = <K extends string, V>(
   selection: string[],
   cards: { [id: string]: V }
-): [K, V][] => (Object.entries(cards) as [K, V][]).filter(([id]) => selection.includes(id))
+): [K, V][] =>
+  (Object.entries(cards) as [K, V][]).filter(([id]) => selection.includes(id))
 
 const Board = (
   { url, documentId, editable }: Props,
   { title, backgroundColor, cards }: BoardDoc
 ) => {
   const items = Object.entries(cards)
-  const subtitle = `${items.length} item${items.length !== 1 ? 's' : ''}`
+  const subtitle = `${items.length} item${items.length !== 1 ? "s" : ""}`
   return (
     <ListItem>
       <ContentDragHandle url={url}>
@@ -70,7 +71,11 @@ export const BoardBadge = (props: Props) => {
   )
 }
 
-const BoardSelection = (props: Props, doc: BoardDoc, selectedCards: KeyedCard[]) =>
+const BoardSelection = (
+  props: Props,
+  doc: BoardDoc,
+  selectedCards: KeyedCard[]
+) =>
   selectedCards.length === 1
     ? ActiveBoardItem(props, doc, selectedCards[0])
     : SelectedBoardItems(props, doc, selectedCards)

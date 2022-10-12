@@ -1,11 +1,11 @@
-import React, { useRef, useState } from 'react'
-import { FileDoc } from '.'
+import React, { useRef, useState } from "react"
+import { FileDoc } from "."
 
-import { ContentProps } from '../../Content'
-import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import { useDocument } from 'automerge-repo-react-hooks'
-import './AudioContent.css'
-import { createBinaryDataUrl } from '../../../blobstore/Blob'
+import { ContentProps } from "../../Content"
+import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import { useDocument } from "automerge-repo-react-hooks"
+import "./AudioContent.css"
+import { createBinaryDataUrl } from "../../../blobstore/Blob"
 // import { usePresence } from '../../../PresenceHooks'
 
 interface AudioState {
@@ -17,7 +17,10 @@ export default function AudioContent({ documentId }: ContentProps) {
   const audioElement = useRef<HTMLAudioElement>(null)
   const progressElement = useRef<HTMLDivElement>(null)
   const progressBarElement = useRef<HTMLDivElement>(null)
-  const [audioState, setAudioState] = useState<AudioState>({ paused: true, time: 0 })
+  const [audioState, setAudioState] = useState<AudioState>({
+    paused: true,
+    time: 0,
+  })
 
   const remotePresences = [] /* usePresence<AudioState>(
     hypermergeUrl,
@@ -51,7 +54,9 @@ export default function AudioContent({ documentId }: ContentProps) {
   }
   function updateTime(time: number) {
     if (!audioElement.current || !progressBarElement.current) return
-    progressBarElement.current.style.width = `${(time / audioElement.current.duration) * 100}%`
+    progressBarElement.current.style.width = `${
+      (time / audioElement.current.duration) * 100
+    }%`
     setAudioState({ ...audioState, time })
   }
   function handlePlayPause() {
@@ -86,9 +91,13 @@ export default function AudioContent({ documentId }: ContentProps) {
       <div className="audioControls">
         <i
           onClick={handlePlayPause}
-          className={`playPause fa fa-${audioState.paused ? 'play' : 'pause'}`}
+          className={`playPause fa fa-${audioState.paused ? "play" : "pause"}`}
         />
-        <div className="progressContainer" ref={progressElement} onClick={handleScrubClick}>
+        <div
+          className="progressContainer"
+          ref={progressElement}
+          onClick={handleScrubClick}
+        >
           <div className="progressBar" ref={progressBarElement} />
         </div>
       </div>
@@ -96,12 +105,12 @@ export default function AudioContent({ documentId }: ContentProps) {
   )
 }
 
-const supportsMimeType = (mimeType: string) => !!mimeType.match('audio/')
+const supportsMimeType = (mimeType: string) => !!mimeType.match("audio/")
 
 ContentTypes.register({
-  type: 'audio',
-  name: 'Audio',
-  icon: 'file-audio-o',
+  type: "audio",
+  name: "Audio",
+  icon: "file-audio-o",
   unlisted: true,
   contexts: {
     workspace: AudioContent,

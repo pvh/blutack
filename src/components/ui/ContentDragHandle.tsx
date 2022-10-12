@@ -1,11 +1,11 @@
-import React, { ReactNode, useRef } from 'react'
-import './Heading.css'
-import mime from 'mime-types'
-import * as UriList from '../pushpin-code/UriList'
-import './ContentDragHandle.css'
-import { PushpinUrl } from '../pushpin-code/ShareLink'
-import { DocumentId } from 'automerge-repo'
-import { BinaryDataId, useBinaryDataHeader } from '../../blobstore/Blob'
+import React, { ReactNode, useRef } from "react"
+import "./Heading.css"
+import mime from "mime-types"
+import * as UriList from "../pushpin-code/UriList"
+import "./ContentDragHandle.css"
+import { PushpinUrl } from "../pushpin-code/ShareLink"
+import { DocumentId } from "automerge-repo"
+import { BinaryDataId, useBinaryDataHeader } from "../../blobstore/Blob"
 
 interface SimpleProps {
   url: PushpinUrl
@@ -22,7 +22,7 @@ export type Props = SimpleProps | FileProps
 export default function ContentDragHandle(props: Props) {
   const { url, children } = props
   const ref = useRef<HTMLSpanElement>(null)
-  const binaryDataId = 'binaryDataId' in props ? props.binaryDataId : undefined
+  const binaryDataId = "binaryDataId" in props ? props.binaryDataId : undefined
   const header = useBinaryDataHeader(binaryDataId)
 
   const onDragStart = (event: React.DragEvent<HTMLSpanElement>) => {
@@ -33,19 +33,24 @@ export default function ContentDragHandle(props: Props) {
     event.dataTransfer.setData(UriList.MIME_TYPE, url)
 
     // and we'll add a DownloadURL if we need to
-    if ('binaryDataId' in props && header) {
+    if ("binaryDataId" in props && header) {
       const { binaryDataId, filename, extension } = props
       const { mimeType } = header
 
-      const outputExtension = extension || mime.extension(mimeType) || ''
+      const outputExtension = extension || mime.extension(mimeType) || ""
 
       const downloadUrl = `text:${filename}.${outputExtension}:${binaryDataId}`
-      event.dataTransfer.setData('DownloadURL', downloadUrl)
+      event.dataTransfer.setData("DownloadURL", downloadUrl)
     }
   }
 
   return (
-    <span draggable ref={ref} onDragStart={onDragStart} className="ContentDragHandle">
+    <span
+      draggable
+      ref={ref}
+      onDragStart={onDragStart}
+      className="ContentDragHandle"
+    >
       {children}
     </span>
   )

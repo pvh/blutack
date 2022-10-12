@@ -1,12 +1,16 @@
-import React, { useCallback } from 'react'
-import { Doc } from '@automerge/automerge'
-import { PushpinUrl, parseDocumentLink, createDocumentLink } from '../../pushpin-code/ShareLink'
-import { DocumentId } from 'automerge-repo'
-import { useDocument, Change } from 'automerge-repo-react-hooks'
-import Content from '../../Content'
-import ActionListItem from '../workspace/omnibox/ActionListItem'
-import { DeviceDoc } from '../workspace/Device'
-import './ContactEditor.css'
+import React, { useCallback } from "react"
+import { Doc } from "@automerge/automerge"
+import {
+  PushpinUrl,
+  parseDocumentLink,
+  createDocumentLink,
+} from "../../pushpin-code/ShareLink"
+import { DocumentId } from "automerge-repo"
+import { useDocument, Change } from "automerge-repo-react-hooks"
+import Content from "../../Content"
+import ActionListItem from "../workspace/omnibox/ActionListItem"
+import { DeviceDoc } from "../workspace/Device"
+import "./ContactEditor.css"
 
 export interface Props {
   selfId: DocumentId
@@ -33,19 +37,20 @@ export default function ContactEditorDevice(props: Props) {
   // XXX: Would be better to not recreate this every render.
   const deviceActions = [
     {
-      name: 'remove',
+      name: "remove",
       destructive: true,
       callback: () => () => removeDevice(),
-      faIcon: 'fa-trash',
-      label: 'Remove',
-      shortcut: '⌘+⌫',
-      keysForActionPressed: (e: KeyboardEvent) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
+      faIcon: "fa-trash",
+      label: "Remove",
+      shortcut: "⌘+⌫",
+      keysForActionPressed: (e: KeyboardEvent) =>
+        (e.metaKey || e.ctrlKey) && e.key === "Backspace",
     },
   ]
 
   return (
     <ActionListItem
-      contentUrl={createDocumentLink('device', deviceId)}
+      contentUrl={createDocumentLink("device", deviceId)}
       actions={isCurrentDevice ? [] : deviceActions}
       selected={false}
     >

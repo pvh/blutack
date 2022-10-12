@@ -1,6 +1,6 @@
-import React, { EventHandler } from 'react'
-import classnames from 'classnames'
-import './ListMenuItem.css'
+import React, { EventHandler } from "react"
+import classnames from "classnames"
+import "./ListMenuItem.css"
 
 export interface Props {
   children: React.ReactNode
@@ -17,10 +17,10 @@ export default function ListMenuItem(props: Props) {
   const [content, actions] = React.Children.toArray(children)
 
   const className = classnames([
-    'ListMenuItem',
+    "ListMenuItem",
     {
-      'ListMenuItem--withDefaultAction': !!onClick,
-      'ListMenuItem--selected': selected,
+      "ListMenuItem--withDefaultAction": !!onClick,
+      "ListMenuItem--selected": selected,
     },
   ])
 

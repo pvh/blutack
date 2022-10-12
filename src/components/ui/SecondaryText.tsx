@@ -1,5 +1,5 @@
-import React from 'react'
-import './SecondaryText.css'
+import React from "react"
+import "./SecondaryText.css"
 
 export interface Props {
   style?: React.CSSProperties
