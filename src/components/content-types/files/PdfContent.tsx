@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import React, { useState, useCallback, useEffect, useRef, PointerEventHandler, useMemo } from 'react'
+import { getStroke, StrokePoint } from 'perfect-freehand'
 
 import { Document, Page, pdfjs } from 'react-pdf'
 
@@ -23,8 +24,56 @@ interface PdfDoc extends FileDoc {
 const PAGE_WIDTH = 1600
 const PAGE_HEIGHT = 2070
 
+type Point = number[]
+
+function getSvgPathFromStroke(stroke: Point[]) {
+  if (!stroke.length) return ""
+
+  const d = stroke.reduce(
+    (acc, [x0, y0], i, arr) => {
+      const [x1, y1] = arr[(i + 1) % arr.length]
+      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
+      return acc
+    },
+    ["M", ...stroke[0], "Q"]
+  )
+
+  d.push("Z")
+  return d.join(" ")
+}
+
+
 export default function PdfContent(props: ContentProps) {
-  const ctxRef = useRef<CanvasRenderingContext2D | undefined>()
+  const [points, setPoints] = React.useState<Point[]>([])
+
+  const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback((e: any) => {
+    const bounds = e.target.getBoundingClientRect();
+    const x = ((e.clientX - bounds.left) / bounds.width) * PAGE_WIDTH
+    const y = ((e.clientY - bounds.top) / bounds.height) * PAGE_HEIGHT
+
+    e.target.setPointerCapture(e.pointerId)
+
+    setPoints([[x, y, e.pressure]])
+  }, [points])
+
+  const handlePointerMove: PointerEventHandler<SVGSVGElement> = useCallback((e: any) => {
+    if (e.buttons !== 1) return
+
+    const bounds = e.target.getBoundingClientRect();
+    const x = ((e.clientX - bounds.left) / bounds.width) * PAGE_WIDTH
+    const y = ((e.clientY - bounds.top) / bounds.height) * PAGE_HEIGHT
+
+    setPoints([...points, [x, y, e.pressure]])
+  }, [points])
+
+  const stroke = getStroke(points, {
+    size: 30,
+    thinning: 0.5,
+    smoothing: 0.5,
+    streamline: 0.5,
+  })
+
+  const pathData = getSvgPathFromStroke(stroke)
 
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
   const buffer = useBinaryDataContents(pdf && pdf.binaryDataId)
@@ -49,122 +98,104 @@ export default function PdfContent(props: ContentProps) {
   }
 
   const onDocumentLoadSuccess = useCallback(
-     (result: any) => {
-       const { numPages } = result
+    (result: any) => {
+      const { numPages } = result
 
-       setNumPages(numPages)
+      setNumPages(numPages)
 
-       result.getMetadata().then((metadata: any) => {
-         const { info = {} } = metadata
-         const { Title } = info
+      result.getMetadata().then((metadata: any) => {
+        const { info = {} } = metadata
+        const { Title } = info
 
-         if (Title && pdf && !pdf.title) {
-           changePdf((doc) => {
-             doc.title = Title
-           })
-         }
-       })
+        if (Title && pdf && !pdf.title) {
+          changePdf((doc) => {
+            doc.title = Title
+          })
+        }
+      })
 
-       if (pdf && !pdf.content) {
-         getPDFText(result).then((content) => {
-           changePdf((doc) => {
-             doc.content = content
-           })
-         })
-       }
-     },
-     [changePdf, pdf]
-   )
+      if (pdf && !pdf.content) {
+        getPDFText(result).then((content) => {
+          changePdf((doc) => {
+            doc.content = content
+          })
+        })
+      }
+    },
+    [changePdf, pdf]
+  )
 
-   if (!pdf) {
-     return null
-   }
+  const param = useMemo(() => ({
+    data: buffer
+  }), [buffer])
+
+  if (!pdf) {
+    return null
+  }
 
   const { context } = props
 
   const forwardDisabled = pageNum >= numPages
   const backDisabled = pageNum <= 1
 
-
-  const renderCanvas = (ctx: CanvasRenderingContext2D) => {
-    ctx.clearRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT)
-    ctx.fillRect(500, 500, 500, 500)
-
-  }
-
-  if (ctxRef.current) {
-    renderCanvas(ctxRef.current)
-  }
-
-
   return (
-      <div style={{position: "relative"}}>
-        <div className="PdfContent-header">
-          <button
-            disabled={backDisabled}
-            type="button"
-            onClick={goBack}
-            className="PdfContent-navButton"
-          >
-            <i className="fa fa-angle-left" />
-          </button>
-          <input
-            className="PdfContent-headerInput"
-            value={pageInputValue}
-            type="number"
-            min={1}
-            max={numPages}
-            onChange={onPageInput}
-            onKeyDown={onPageInput}
-          />
-          <div className="PdfContent-headerNumPages">/ {numPages}</div>
-          <button
-            disabled={forwardDisabled}
-            type="button"
-            onClick={goForward}
-            className="PdfContent-navButton"
-          >
-            <i className="fa fa-angle-right" />
-          </button>
-
-          <button>marker</button>
-
-        </div>
-
-
-
-        {buffer ? (
-          <Document file={{ data: buffer }} onLoadSuccess={onDocumentLoadSuccess}>
-
-            <Page
-              loading=""
-              pageNumber={pageNum}
-              className="PdfContent-page"
-              width={1600}
-              renderTextLayer={false}
-            />
-          </Document>
-        ) : null}
-
-        <canvas
-          ref={(canvas) => {
-            if (canvas) {
-              const ctx = canvas.getContext("2d") as CanvasRenderingContext2D
-
-              renderCanvas(ctx)
-              ctxRef.current = ctx
-            } else {
-              ctxRef.current = undefined
-            }
-          }}
-          width="1600" height="2070"
-          style={{
-            width: "100%",
-            position: "absolute",
-            top: "0"
-          }}
+    <div style={{ position: "relative" }}>
+      <div className="PdfContent-header">
+        <button
+          disabled={backDisabled}
+          type="button"
+          onClick={goBack}
+          className="PdfContent-navButton"
+        >
+          <i className="fa fa-angle-left" />
+        </button>
+        <input
+          className="PdfContent-headerInput"
+          value={pageInputValue}
+          type="number"
+          min={1}
+          max={numPages}
+          onChange={onPageInput}
+          onKeyDown={onPageInput}
         />
+        <div className="PdfContent-headerNumPages">/ {numPages}</div>
+        <button
+          disabled={forwardDisabled}
+          type="button"
+          onClick={goForward}
+          className="PdfContent-navButton"
+        >
+          <i className="fa fa-angle-right" />
+        </button>
       </div>
+
+      {buffer ? (
+        <Document file={param} onLoadSuccess={onDocumentLoadSuccess}>
+          <Page
+            loading=""
+            pageNumber={pageNum}
+            className="PdfContent-page"
+            width={1600}
+            renderTextLayer={false}
+          />
+        </Document>
+      ) : null}
+
+      <svg
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        viewBox="0 0 1600 2070"
+        width={PAGE_WIDTH} height={PAGE_HEIGHT}
+        style={{
+          position: "absolute",
+          top: 0,
+          width: "100%",
+          height: "auto"
+        }}
+      >
+        {points && <path d={pathData} opacity={0.5} fill="#fdd835"/>}
+      </svg>
+    </div>
   )
 }
 
