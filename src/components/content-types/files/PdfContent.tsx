@@ -15,17 +15,47 @@ import Content, { ContentProps } from '../../Content'
 import './PdfContent.css'
 import { useBinaryDataContents, useBinaryDataHeader } from '../../../blobstore/Blob'
 import { useConfirmableInput } from '../../pushpin-code/Hooks'
-import { streamToBuffer } from '../../pushpin-code/ContentData'
-import { ContentListDoc } from "../ContentList";
-import { PushpinUrl } from "../../pushpin-code/ShareLink";
+import { createDocumentLink, parseDocumentLink, PushpinUrl } from "../../pushpin-code/ShareLink";
+import ContentList, { ContentListDoc, ContentListInList } from "../ContentList";
+import { DocHandle } from "automerge-repo";
+
+export interface PdfAnnotationDoc {
+  stroke: number[][]
+  pdfDocUrl: PushpinUrl
+  page: number
+}
+
+ContentTypes.register({
+  type: 'pdfannotation',
+  name: 'PDF Annotation',
+  icon: 'highlighter-line',
+  contexts: {
+  },
+  create: createAnnotation,
+})
+
+function createAnnotation(attrs: any, handle: DocHandle<any>) {
+  handle.change((doc: PdfAnnotationDoc) => {
+    doc.stroke = attrs.stroke
+    doc.pdfDocUrl = attrs.pdfDocUrl
+    doc.page = attrs.page
+  })
+}
 
 export interface PdfDoc extends FileDoc {
   content: string
-  annotationList: PushpinUrl
+  annotationListUrl: PushpinUrl
 }
 
 const PAGE_WIDTH = 1600
 const PAGE_HEIGHT = 2070
+
+const STROKE_PARAMS = {
+  size: 30,
+  thinning: 0.5,
+  smoothing: 0.5,
+  streamline: 0.5,
+}
 
 type Point = number[]
 
@@ -68,16 +98,34 @@ export default function PdfContent(props: ContentProps) {
     setPoints([...points, [x, y, e.pressure]])
   }, [points])
 
-  const stroke = getStroke(points, {
-    size: 30,
-    thinning: 0.5,
-    smoothing: 0.5,
-    streamline: 0.5,
-  })
+
+  const handlePointerUp: PointerEventHandler<SVGSVGElement> = useCallback(() => {
+    if (points.length !== 0) {
+      ContentTypes.create("pdfannotation", {
+        stroke: getStroke(points, STROKE_PARAMS),
+        pdfDocUrl: createDocumentLink("pdf", props.documentId),
+        page: 0
+      }, (pdfAnnotationUrl) => {
+
+        changeAnnotationList((annotationsList) => {
+          annotationsList.content.push(pdfAnnotationUrl)
+        })
+
+        setPoints([])
+      })
+
+      getStroke(points, STROKE_PARAMS)
+    }
+  }, [points])
+
+
+  const stroke = getStroke(points, STROKE_PARAMS)
 
   const pathData = getSvgPathFromStroke(stroke)
 
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
+  const [annotationList, changeAnnotationList] = useDocument<ContentListDoc>(pdf ? parseDocumentLink(pdf.annotationListUrl).documentId : undefined)
+
   const buffer = useBinaryDataContents(pdf && pdf.binaryDataId)
   const [pageNum, setPageNum] = useState(1)
   const [numPages, setNumPages] = useState(0)
@@ -137,10 +185,10 @@ export default function PdfContent(props: ContentProps) {
 
   // todo: annotationList initation shouldn't happen in view
 
-  if (!pdf.annotationList) {
+  if (!pdf.annotationListUrl) {
     ContentTypes.create("contentlist",  { title: "annotations" }, (annotationListUrl) => {
       changePdf(pdf => {
-        pdf.annotationList = annotationListUrl
+        pdf.annotationListUrl = annotationListUrl
       })
     })
   }
@@ -153,8 +201,8 @@ export default function PdfContent(props: ContentProps) {
 
   return (
     <div style={{ position: "relative" }}>
-      {pdf.annotationList && (
-        <Content context="list" url={pdf.annotationList} />
+      {pdf.annotationListUrl && (
+        <Content context="list" url={pdf.annotationListUrl} />
       )}
 
       <div className="PdfContent-header">
@@ -201,6 +249,7 @@ export default function PdfContent(props: ContentProps) {
       <svg
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
         viewBox="0 0 1600 2070"
         width={PAGE_WIDTH} height={PAGE_HEIGHT}
         style={{
