@@ -28,7 +28,7 @@ import Heading from "../../../ui/Heading"
 import {
   DocCollection,
   DocHandle,
-  DocHandleEventArg,
+  DocHandleChangeEvent,
   DocumentId,
 } from "automerge-repo"
 import { Doc } from "@automerge/automerge"
@@ -154,10 +154,7 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<
     }
     this.handle = this.props.repo.find(documentId)
     this.onChange({
-      doc: await this.handle.value(),
       handle: this.handle,
-      documentId: this.handle.documentId,
-      changes: [],
     })
     this.handle.addListener("change", (e) => this.onChange(e))
   }
@@ -167,12 +164,12 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<
     this.setState({ invitations }, () => this.forceUpdate())
   }
 
-  onChange = ({ doc }: DocHandleEventArg<WorkspaceDoc>) => {
-    log("onChange", doc)
+  onChange = ({ handle }: DocHandleChangeEvent<WorkspaceDoc>) => {
+    log("onChange", handle)
     if (!this) {
       throw new Error("c'mon man")
     }
-    this.setState({ doc }, () => {
+    this.setState({ doc: handle.doc }, () => {
       this.state.doc &&
         this.state.doc.viewedDocUrls.forEach((url) => {
           // create a handle for this document
@@ -183,9 +180,11 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<
             const handle = this.props.repo.find(documentId)
             handle.addListener(
               "change",
-              ({ doc }: DocHandleEventArg<unknown>) => {
+              ({ handle }: DocHandleChangeEvent<unknown>) => {
                 this.setState((state) => {
-                  return { viewedDocs: { ...state.viewedDocs, [url]: doc } }
+                  return {
+                    viewedDocs: { ...state.viewedDocs, [url]: handle.doc },
+                  }
                 })
               }
             )
@@ -202,9 +201,11 @@ export default class OmniboxWorkspaceListMenu extends React.PureComponent<
             const handle = this.props.repo.find<ContactDoc>(contactId)
             handle.addListener(
               "change",
-              ({ doc }: DocHandleEventArg<ContactDoc>) => {
+              ({ handle }: DocHandleChangeEvent<ContactDoc>) => {
                 this.setState((state) => {
-                  return { contacts: { ...state.contacts, [contactId]: doc } }
+                  return {
+                    contacts: { ...state.contacts, [contactId]: handle.doc },
+                  }
                 })
               }
             )

@@ -29,7 +29,7 @@ export default function ContactViewer(props: ContentProps) {
   const [doc] = useDocument<ContactDoc>(contactId)
   const [avatarImageDoc] = useDocument<FileDoc>(doc && doc.avatarDocId)
   const avatarImageUrl = avatarImageDoc
-    ? avatarImageDoc.fileId
+    ? avatarImageDoc.binaryDataId
     : DEFAULT_AVATAR_PATH
 
   if (!doc) {

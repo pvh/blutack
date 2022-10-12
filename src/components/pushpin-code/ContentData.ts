@@ -35,16 +35,3 @@ export async function storeContentData({
   const url = await storeBinaryData(data, mimeType)
   return url
 }
-
-// for our bad protocol implementation and our bad pdf implementation
-export async function streamToBuffer(
-  stream: ReadableStream<Uint8Array>
-): Promise<Buffer> {
-  return new Promise((res, rej) => {
-    const buffers: Buffer[] = []
-    stream
-      .on("data", (data: Buffer) => buffers.push(data))
-      .on("error", (err: any) => rej(err))
-      .on("end", () => res(Buffer.concat(buffers)))
-  })
-}
