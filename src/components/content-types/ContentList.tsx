@@ -27,7 +27,6 @@ import Badge from '../ui/Badge'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants";
 import * as ImportData from "../pushpin-code/ImportData";
-import PdfContent from './files/PdfContent'
 
 export interface ContentListDoc {
   title: string
@@ -189,13 +188,12 @@ export default function ContentList({ documentId }: ContentProps) {
         </ListMenu>
       </CenteredStackRowItem>
       <CenteredStackRowItem size={{ mode: "auto" }}>
-        {/* {
+        {
           (currentContent) ?
             <Content context="workspace" url={currentContent} />
             :
             <div style={{ padding: "10px" }}>Select something from the side</div>
-        } */}
-        <PdfContent />
+        }
       </CenteredStackRowItem>
     </CenteredStack>
   )

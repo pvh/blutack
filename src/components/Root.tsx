@@ -28,6 +28,7 @@ import './content-types/files/ImageContent'
 import './content-types/files/PdfContent'
 // import './content-types/files/AudioContent'
 // import './content-types/files/VideoContent'
+
 interface RootArgs {
   workspaceDocId: DocumentId
   deviceDocId: DocumentId
