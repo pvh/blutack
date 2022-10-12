@@ -31,7 +31,7 @@ export default function PdfContent(props: ContentProps) {
 
     setPageNum(Math.min(numPages, Math.max(1, nextPageNum)))
   })
-  
+
   function goForward() {
     if (pageNum < numPages) {
       setPageNum(pageNum + 1)
@@ -137,7 +137,7 @@ ContentTypes.register({
   type: 'pdf',
   name: 'PDF',
   icon: 'file-pdf-o',
-  // unlisted: true,
+  unlisted: true,
   contexts: {
     workspace: PdfContent,
     board: PdfContent,

@@ -27,6 +27,7 @@ import Badge from '../ui/Badge'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants";
 import * as ImportData from "../pushpin-code/ImportData";
+import Heading from '../ui/Heading'
 
 export interface ContentListDoc {
   title: string
@@ -86,6 +87,8 @@ export default function ContentList({ documentId }: ContentProps) {
 
   }, [draggedOverIndex])
 
+  const hiddenFileInput = useRef<HTMLInputElement>(null)
+
 
   if (!doc || !doc.content) {
     return null
@@ -134,6 +137,19 @@ export default function ContentList({ documentId }: ContentProps) {
       keysForActionPressed: (e: KeyboardEvent) => (e.metaKey || e.ctrlKey) && e.key === 'Backspace',
     },
   ]
+
+  const onImportClick = () => {
+    if (hiddenFileInput.current) {
+      hiddenFileInput.current.click()
+    }
+  }
+  const onFilesChanged = (e: any) => {
+    ImportData.importFileList(e.target.files, (url, i) => {
+      changeDoc(doc => {
+        doc.content.push(url)
+      })
+    })
+  }
 
   return (
     <CenteredStack direction='row' centerText={false}>
@@ -184,7 +200,17 @@ export default function ContentList({ documentId }: ContentProps) {
                 </ListMenuItem>))
               }
             </ListMenuSection>)}
-
+          <ListMenuItem key="import" onClick={onImportClick}>
+            <input
+              type="file"
+              id="hiddender"
+              multiple
+              onChange={onFilesChanged}
+              ref={hiddenFileInput}
+              style={{ display: 'none' }}
+            />
+            <Heading>Import file...</Heading>
+          </ListMenuItem>
         </ListMenu>
       </CenteredStackRowItem>
       <CenteredStackRowItem size={{ mode: "auto" }}>
