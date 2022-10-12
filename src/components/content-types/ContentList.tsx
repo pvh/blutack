@@ -252,8 +252,12 @@ export function ContentListInList(props: EditableContentProps) {
   )
 }
 
-function create(unusedAttrs: any, handle: DocHandle<any>) {
+function create(attrs: any, handle: DocHandle<any>) {
   handle.change((doc: ContentListDoc) => {
+    if (attrs.title) {
+      doc.title = attrs.title
+    }
+
     doc.content = []
   })
 }

@@ -11,14 +11,17 @@ import { useDocument } from 'automerge-repo-react-hooks'
 import { FileDoc } from '.'
 
 import * as ContentTypes from '../../pushpin-code/ContentTypes'
-import { ContentProps } from '../../Content'
+import Content, { ContentProps } from '../../Content'
 import './PdfContent.css'
 import { useBinaryDataContents, useBinaryDataHeader } from '../../../blobstore/Blob'
 import { useConfirmableInput } from '../../pushpin-code/Hooks'
 import { streamToBuffer } from '../../pushpin-code/ContentData'
+import { ContentListDoc } from "../ContentList";
+import { PushpinUrl } from "../../pushpin-code/ShareLink";
 
-interface PdfDoc extends FileDoc {
+export interface PdfDoc extends FileDoc {
   content: string
+  annotationList: PushpinUrl
 }
 
 const PAGE_WIDTH = 1600
@@ -41,7 +44,6 @@ function getSvgPathFromStroke(stroke: Point[]) {
   d.push("Z")
   return d.join(" ")
 }
-
 
 export default function PdfContent(props: ContentProps) {
   const [points, setPoints] = React.useState<Point[]>([])
@@ -133,6 +135,17 @@ export default function PdfContent(props: ContentProps) {
     return null
   }
 
+  // todo: annotationList initation shouldn't happen in view
+
+  if (!pdf.annotationList) {
+    ContentTypes.create("contentlist",  { title: "annotations" }, (annotationListUrl) => {
+      changePdf(pdf => {
+        pdf.annotationList = annotationListUrl
+      })
+    })
+  }
+
+
   const { context } = props
 
   const forwardDisabled = pageNum >= numPages
@@ -140,6 +153,10 @@ export default function PdfContent(props: ContentProps) {
 
   return (
     <div style={{ position: "relative" }}>
+      {pdf.annotationList && (
+        <Content context="list" url={pdf.annotationList} />
+      )}
+
       <div className="PdfContent-header">
         <button
           disabled={backDisabled}
