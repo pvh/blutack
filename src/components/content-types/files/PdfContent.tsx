@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 
 import { Document, Page, pdfjs } from 'react-pdf'
 
@@ -20,7 +20,11 @@ interface PdfDoc extends FileDoc {
   content: string
 }
 
+const PAGE_WIDTH = 1600
+const PAGE_HEIGHT = 2070
+
 export default function PdfContent(props: ContentProps) {
+  const ctxRef = useRef<CanvasRenderingContext2D | undefined>()
 
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
   const buffer = useBinaryDataContents(pdf && pdf.binaryDataId)
@@ -77,57 +81,90 @@ export default function PdfContent(props: ContentProps) {
    }
 
   const { context } = props
-  
+
   const forwardDisabled = pageNum >= numPages
   const backDisabled = pageNum <= 1
 
-  const header =
-    context === 'workspace' ? (
-      <div className="PdfContent-header">
-        <button
-          disabled={backDisabled}
-          type="button"
-          onClick={goBack}
-          className="PdfContent-navButton"
-        >
-          <i className="fa fa-angle-left" />
-        </button>
-        <input
-          className="PdfContent-headerInput"
-          value={pageInputValue}
-          type="number"
-          min={1}
-          max={numPages}
-          onChange={onPageInput}
-          onKeyDown={onPageInput}
-        />
-        <div className="PdfContent-headerNumPages">/ {numPages}</div>
-        <button
-          disabled={forwardDisabled}
-          type="button"
-          onClick={goForward}
-          className="PdfContent-navButton"
-        >
-          <i className="fa fa-angle-right" />
-        </button>
-      </div>
-    ) : null
+
+  const renderCanvas = (ctx: CanvasRenderingContext2D) => {
+    ctx.clearRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT)
+    ctx.fillRect(500, 500, 500, 500)
+
+  }
+
+  if (ctxRef.current) {
+    renderCanvas(ctxRef.current)
+  }
+
 
   return (
-    <>
-      {header}
-      {buffer ? (
-        <Document file={{ data: buffer }} onLoadSuccess={onDocumentLoadSuccess}>
-          <Page
-            loading=""
-            pageNumber={pageNum}
-            className="PdfContent-page"
-            width={1600}
-            renderTextLayer={false}
+      <div style={{position: "relative"}}>
+        <div className="PdfContent-header">
+          <button
+            disabled={backDisabled}
+            type="button"
+            onClick={goBack}
+            className="PdfContent-navButton"
+          >
+            <i className="fa fa-angle-left" />
+          </button>
+          <input
+            className="PdfContent-headerInput"
+            value={pageInputValue}
+            type="number"
+            min={1}
+            max={numPages}
+            onChange={onPageInput}
+            onKeyDown={onPageInput}
           />
-        </Document>
-      ) : null}
-    </>
+          <div className="PdfContent-headerNumPages">/ {numPages}</div>
+          <button
+            disabled={forwardDisabled}
+            type="button"
+            onClick={goForward}
+            className="PdfContent-navButton"
+          >
+            <i className="fa fa-angle-right" />
+          </button>
+
+          <button>marker</button>
+
+        </div>
+
+
+
+        {buffer ? (
+          <Document file={{ data: buffer }} onLoadSuccess={onDocumentLoadSuccess}>
+
+            <Page
+              loading=""
+              pageNumber={pageNum}
+              className="PdfContent-page"
+              width={1600}
+              renderTextLayer={false}
+            />
+          </Document>
+        ) : null}
+
+        <canvas
+          ref={(canvas) => {
+            if (canvas) {
+              const ctx = canvas.getContext("2d") as CanvasRenderingContext2D
+
+              renderCanvas(ctx)
+              ctxRef.current = ctx
+            } else {
+              ctxRef.current = undefined
+            }
+          }}
+          width="1600" height="2070"
+          style={{
+            width: "100%",
+            position: "absolute",
+            top: "0"
+          }}
+        />
+      </div>
   )
 }
 
