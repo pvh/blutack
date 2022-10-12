@@ -17,7 +17,7 @@ import { useBinaryDataContents, useBinaryDataHeader } from '../../../blobstore/B
 import { useConfirmableInput } from '../../pushpin-code/Hooks'
 import { createDocumentLink, parseDocumentLink, PushpinUrl } from "../../pushpin-code/ShareLink";
 import ContentList, { ContentListDoc, ContentListInList } from "../ContentList";
-import { DocHandle } from "automerge-repo";
+import { DocHandle, DocumentId } from "automerge-repo";
 
 export interface PdfAnnotationDoc {
   stroke: number[][]
@@ -29,8 +29,7 @@ ContentTypes.register({
   type: 'pdfannotation',
   name: 'PDF Annotation',
   icon: 'highlighter-line',
-  contexts: {
-  },
+  contexts: {},
   create: createAnnotation,
 })
 
@@ -124,7 +123,10 @@ export default function PdfContent(props: ContentProps) {
   const pathData = getSvgPathFromStroke(stroke)
 
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
-  const [annotationList, changeAnnotationList] = useDocument<ContentListDoc>(pdf ? parseDocumentLink(pdf.annotationListUrl).documentId : undefined)
+  const [annotationList, changeAnnotationList] = useDocument<ContentListDoc>(
+    pdf && pdf.annotationListUrl
+      ? parseDocumentLink(pdf.annotationListUrl).documentId : undefined
+  )
 
   const buffer = useBinaryDataContents(pdf && pdf.binaryDataId)
   const [pageNum, setPageNum] = useState(1)
@@ -186,7 +188,7 @@ export default function PdfContent(props: ContentProps) {
   // todo: annotationList initation shouldn't happen in view
 
   if (!pdf.annotationListUrl) {
-    ContentTypes.create("contentlist",  { title: "annotations" }, (annotationListUrl) => {
+    ContentTypes.create("contentlist", { title: "annotations" }, (annotationListUrl) => {
       changePdf(pdf => {
         pdf.annotationListUrl = annotationListUrl
       })
@@ -259,11 +261,38 @@ export default function PdfContent(props: ContentProps) {
           height: "auto"
         }}
       >
-        {points && <path d={pathData} opacity={0.5} fill="#fdd835"/>}
+        { // TODO: we should be using Content here, but I need to pass the selectedPage to the view
+          annotationList?.content.map((annotationUrl) => (
+          <PdfAnnotationOverlayView
+            key={annotationUrl}
+            selectedPage={0}
+            documentId={parseDocumentLink(annotationUrl).documentId}
+          />
+        ))}
+
+        {points && <path d={pathData} opacity={0.5} fill="#fdd835" />}
       </svg>
     </div>
   )
 }
+
+function PdfAnnotationOverlayView ({ selectedPage, documentId } : {
+  selectedPage: number,
+  documentId : DocumentId
+}) {
+  const [pdfAnnotation, changePdfAnnotation] = useDocument<PdfAnnotationDoc>(documentId)
+
+  if (!pdfAnnotation || !pdfAnnotation.stroke) {
+    return null
+  }
+
+  const pathData = getSvgPathFromStroke(pdfAnnotation?.stroke)
+
+  return (
+    <path d={pathData} opacity={0.5} fill="#fdd835" />
+  )
+}
+
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match('application/pdf')
 
