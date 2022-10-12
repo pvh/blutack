@@ -15,6 +15,13 @@ export default defineConfig({
     // allocations, initializing this twice causes horrible breakage
     exclude: ["@automerge/automerge-wasm"],
   },
+  
+  resolve: {
+    alias: {
+      path: "path-browserify"
+    }
+  },
+  
   server: {
     fs: {
       strict: false,

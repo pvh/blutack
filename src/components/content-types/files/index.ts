@@ -5,6 +5,8 @@ import * as ContentData from "../../pushpin-code/ContentData";
 import { DocumentId, DocHandle } from "automerge-repo";
 import { BinaryDataId } from "../../../blobstore/Blob";
 
+import path from "path"
+
 export interface FileDoc {
   title: string; // names are editable and not an intrinsic part of the file
   extension: string;
@@ -29,7 +31,8 @@ async function createFrom(
   const { capturedAt } = contentData;
 
   handle.change((doc: FileDoc) => {
-    const parsed = { name: "TODO", ext: "" } // pathParse(name);
+    const parsed = path.parse(name);
+    console.log('parsed path', parsed, parsed.name, parsed.ext)
     doc.binaryDataId = binaryDataId;
     doc.title = parsed.name;
     doc.extension = parsed.ext.slice(1);

@@ -50,9 +50,11 @@ export default function FileContent({ documentId, context, editable, url }: Prop
   const { size, mimeType } = header
 
   const subtitle = `${size !== null ? humanFileSize(size) : 'unknown size'}`
+
   function renderUnidentifiedFile() {
     switch (context) {
       case 'list':
+      case 'title-bar':
         return (
           <ListItem>
             <ContentDragHandle
@@ -94,6 +96,7 @@ export default function FileContent({ documentId, context, editable, url }: Prop
       />
     )
   }
+
   return renderUnidentifiedFile()
 }
 
