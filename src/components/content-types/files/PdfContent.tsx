@@ -103,9 +103,8 @@ export default function PdfContent(props: ContentProps) {
       ContentTypes.create("pdfannotation", {
         stroke: getStroke(points, STROKE_PARAMS),
         pdfDocUrl: createDocumentLink("pdf", props.documentId),
-        page: 0
+        page: pageNum
       }, (pdfAnnotationUrl) => {
-
         changeAnnotationList((annotationsList) => {
           annotationsList.content.push(pdfAnnotationUrl)
         })
@@ -265,7 +264,7 @@ export default function PdfContent(props: ContentProps) {
           annotationList?.content.map((annotationUrl) => (
           <PdfAnnotationOverlayView
             key={annotationUrl}
-            selectedPage={0}
+            selectedPage={pageNum}
             documentId={parseDocumentLink(annotationUrl).documentId}
           />
         ))}
@@ -282,7 +281,7 @@ function PdfAnnotationOverlayView ({ selectedPage, documentId } : {
 }) {
   const [pdfAnnotation, changePdfAnnotation] = useDocument<PdfAnnotationDoc>(documentId)
 
-  if (!pdfAnnotation || !pdfAnnotation.stroke) {
+  if (!pdfAnnotation || !pdfAnnotation.stroke || pdfAnnotation.page !== selectedPage) {
     return null
   }
 
