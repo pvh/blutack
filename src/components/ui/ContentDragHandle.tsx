@@ -25,7 +25,6 @@ export default function ContentDragHandle(props: Props) {
   const binaryDataId = 'binaryDataId' in props ? props.binaryDataId : undefined
   const header = useBinaryDataHeader(binaryDataId)
 
-  // TODO: get this working later
   const onDragStart = (event: React.DragEvent<HTMLSpanElement>) => {
     if (ref.current) {
       event.dataTransfer.setDragImage(ref.current, 0, 0)
@@ -34,13 +33,13 @@ export default function ContentDragHandle(props: Props) {
     event.dataTransfer.setData(UriList.MIME_TYPE, url)
 
     // and we'll add a DownloadURL if we need to
-    if ('hyperfileUrl' in props && header) {
-      const { hyperfileUrl, filename, extension } = props
+    if ('binaryDataId' in props && header) {
+      const { binaryDataId, filename, extension } = props
       const { mimeType } = header
 
       const outputExtension = extension || mime.extension(mimeType) || ''
 
-      const downloadUrl = `text:${filename}.${outputExtension}:${hyperfileUrl}`
+      const downloadUrl = `text:${filename}.${outputExtension}:${binaryDataId}`
       event.dataTransfer.setData('DownloadURL', downloadUrl)
     }
   }
