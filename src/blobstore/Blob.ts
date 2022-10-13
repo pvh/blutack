@@ -11,6 +11,11 @@ export interface BinaryDataHeader {
   mimeType: string
 }
 
+export interface BinaryObjectDoc {
+  mimeType?: string
+  binary: ArrayBuffer
+}
+
 // web+binarydata://docId
 
 interface Parts {
@@ -63,6 +68,7 @@ export function useBinaryDataHeader(
   return header
 }
 
+/* TODO: could request this from the shared-worker? would that be more efficient? */
 export function useBinaryDataContents(
   binaryDataId?: BinaryDataId
 ): ArrayBuffer | undefined {
@@ -92,34 +98,7 @@ async function loadBinaryData(
   })
 }
 
-export function connectToServiceWorker() {
-  console.log("setting up")
-  ;(async () => {
-    console.log("starting registration")
-    console.log("reday")
-
-    navigator.serviceWorker.controller!.postMessage("hello")
-    console.log("now listen")
-
-    navigator.serviceWorker.addEventListener("message", (event) => {
-      console.log("MESSAGE", event)
-
-      const message = (event as any).data
-
-      switch (message.type) {
-        case "get":
-          setTimeout(() => handleGetMessage(message), 100)
-          break
-      }
-    })
-  })
-}
-
-export interface BinaryObjectDoc {
-  mimeType?: string
-  binary: ArrayBuffer
-}
-
+/* TODO: send this to the shared-worker */
 async function storeData(binary: ReadableStream<Buffer>, mimeType?: string) {
   const reader = binary.getReader()
   const buffers: Buffer[] = []
@@ -141,27 +120,6 @@ async function storeData(binary: ReadableStream<Buffer>, mimeType?: string) {
   return ("web+binarydata://" + handle.documentId) as unknown as BinaryDataId
 }
 
-async function handleGetMessage(message: any) {
-  console.log("Getting data", message)
-  const { binaryDataId, replyPort } = message.data
-
-  const [header, binary] = await loadBinaryData(binaryDataId)
-  const { mimeType } = header
-  var out = new ArrayBuffer(binary.byteLength)
-  new Uint8Array(out).set(new Uint8Array(binary))
-
-  console.log("cloned and made", out)
-
-  replyPort.postMessage(
-    {
-      binaryDataId,
-      mimeType,
-      binary: out,
-    },
-    [out]
-  )
-}
-
 // from: https://gist.github.com/72lions/4528834
 function concatArrayBuffers(bufs: Buffer[]): ArrayBuffer {
   var offset = 0
@@ -177,27 +135,4 @@ function concatArrayBuffers(bufs: Buffer[]): ArrayBuffer {
     offset += buf.byteLength
   })
   return buffer
-}
-
-export async function registerServiceWorker() {
-  if ("serviceWorker" in navigator) {
-    try {
-      const registration = await navigator.serviceWorker.register(
-        "/service-worker.js",
-        {
-          scope: "/",
-        }
-      )
-
-      if (registration.installing) {
-        console.log("sw: Service worker installing")
-      } else if (registration.waiting) {
-        console.log("sw: Service worker installed")
-      } else if (registration.active) {
-        console.log("sw: Service worker active")
-      }
-    } catch (error) {
-      console.error(`sw: Registration failed with ${error}`)
-    }
-  }
 }

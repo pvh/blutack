@@ -15,8 +15,20 @@ import * as ContentTypes from "./components/pushpin-code/ContentTypes"
 import { create as createWorkspace } from "./components/content-types/workspace/Workspace"
 import { BrowserWebSocketClientAdapter } from "automerge-repo-network-websocket"
 
-import { registerServiceWorker } from "./blobstore/Blob"
-
+async function registerServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.register(
+        "/service-worker.js",
+        {
+          scope: "/",
+        }
+      )
+    } catch (error) {
+      console.error(`sw: Registration failed with ${error}`)
+    }
+  }
+}
 registerServiceWorker()
 
 const sharedWorker = new SharedWorker(
