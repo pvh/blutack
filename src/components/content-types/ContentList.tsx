@@ -183,9 +183,9 @@ export default function ContentList({ documentId }: ContentProps) {
               onDragEnter={(evt) => onDragOver(evt, index)}
               onDragLeave={(evt) => onDragLeave(evt, index)}
               onDrop={(evt) => onDrop(evt)}
+              key={url}
             >
               <ActionListItem
-                key={url}
                 contentUrl={url}
                 defaultAction={actions[0]}
                 actions={actions}
