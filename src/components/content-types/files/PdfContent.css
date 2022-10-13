@@ -56,6 +56,8 @@
 
 .PdfContent-document {
   position: relative;
+  height: 100%;
+  overflow-y: scroll;
 }
 
 .PdfContent-headerInput {
