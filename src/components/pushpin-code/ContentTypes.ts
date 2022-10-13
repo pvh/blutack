@@ -116,7 +116,7 @@ export function lookup({ type, context }: LookupQuery): LookupResult | null {
   return { type, name, icon, component, unlisted, resizable }
 }
 
-export function mimeTypeToContentType(mimeType: string | null): ContentType {
+export function mimeTypeToContentType(mimeType?: string): ContentType {
   if (!mimeType) {
     return registry.file
   } // don't guess.

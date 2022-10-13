@@ -37,7 +37,7 @@ export default function ContentDragHandle(props: Props) {
       const { binaryDataId, filename, extension } = props
       const { mimeType } = header
 
-      const outputExtension = extension || mime.extension(mimeType) || ""
+      const outputExtension = extension || mime.extension(mimeType || "") || ""
 
       const downloadUrl = `text:${filename}.${outputExtension}:${binaryDataId}`
       event.dataTransfer.setData("DownloadURL", downloadUrl)
