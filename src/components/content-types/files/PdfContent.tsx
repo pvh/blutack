@@ -108,6 +108,7 @@ export default function PdfContent(props: ContentProps) {
       e.target.setPointerCapture(e.pointerId)
 
       setPoints([[x, y, e.pressure]])
+      e.preventDefault()
     },
     [points, isMarkerSelected]
   )
@@ -125,6 +126,7 @@ export default function PdfContent(props: ContentProps) {
       const y = ((e.clientY - bounds.top) / bounds.height) * PAGE_HEIGHT
 
       setPoints([...points, [x, y, e.pressure]])
+      e.preventDefault()
     },
     [points, isMarkerSelected]
   )
@@ -141,7 +143,7 @@ export default function PdfContent(props: ContentProps) {
   }, [])
 
   const handlePointerUp: PointerEventHandler<SVGSVGElement> =
-    useCallback(() => {
+    useCallback((e) => {
       if (!isMarkerSelected) {
         return
       }
@@ -156,6 +158,7 @@ export default function PdfContent(props: ContentProps) {
         })
 
         setPoints([])
+        e.preventDefault()
       }
     }, [points, isMarkerSelected])
 
