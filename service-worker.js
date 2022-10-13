@@ -68,6 +68,10 @@ async function loadBinaryData(binaryDataId) {
   return promise
 }
 
-self.addEventListener("install", () => {
-  self.skipWaiting()
+self.addEventListener("install", function (event) {
+  event.waitUntil(self.skipWaiting()) // Activate worker immediately
+})
+
+self.addEventListener("activate", function (event) {
+  event.waitUntil(self.clients.claim()) // Become available to all pages
 })
