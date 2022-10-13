@@ -33,6 +33,7 @@ import {
 import ContentList, { ContentListDoc, ContentListInList } from "../ContentList"
 import { DocHandle, DocumentId } from "automerge-repo"
 import { ContactDoc } from "../contact"
+import classNames from "classnames"
 
 export interface PdfAnnotation {
   stroke: number[][]
@@ -76,9 +77,14 @@ function getSvgPathFromStroke(stroke: Point[]) {
 export default function PdfContent(props: ContentProps) {
   const [points, setPoints] = React.useState<Point[]>([])
   const [author] = useDocument<ContactDoc>(props.selfId)
+  const [isMarkerSelected, setIsMarkerSelected] = React.useState<boolean>(false)
 
   const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback(
     (e: any) => {
+      if (!isMarkerSelected) {
+        return
+      }
+
       const bounds = e.target.getBoundingClientRect()
       const x = ((e.clientX - bounds.left) / bounds.width) * PAGE_WIDTH
       const y = ((e.clientY - bounds.top) / bounds.height) * PAGE_HEIGHT
@@ -87,11 +93,15 @@ export default function PdfContent(props: ContentProps) {
 
       setPoints([[x, y, e.pressure]])
     },
-    [points]
+    [points, isMarkerSelected]
   )
 
   const handlePointerMove: PointerEventHandler<SVGSVGElement> = useCallback(
     (e: any) => {
+      if (!isMarkerSelected) {
+        return
+      }
+
       if (e.buttons !== 1) return
 
       const bounds = e.target.getBoundingClientRect()
@@ -100,11 +110,19 @@ export default function PdfContent(props: ContentProps) {
 
       setPoints([...points, [x, y, e.pressure]])
     },
-    [points]
+    [points, isMarkerSelected]
   )
+
+  const toggleIsMarkerSelected = useCallback(() => {
+    setIsMarkerSelected((isMarkerSelected) => !isMarkerSelected)
+  }, [])
 
   const handlePointerUp: PointerEventHandler<SVGSVGElement> =
     useCallback(() => {
+      if (!isMarkerSelected) {
+        return
+      }
+
       if (points.length !== 0) {
         changePdf((pdf) => {
           pdf.annotations.push({
@@ -116,7 +134,7 @@ export default function PdfContent(props: ContentProps) {
 
         setPoints([])
       }
-    }, [points])
+    }, [points, isMarkerSelected])
 
   const stroke = getStroke(points, STROKE_PARAMS)
 
@@ -204,11 +222,12 @@ export default function PdfContent(props: ContentProps) {
     <div className="PdfContent">
       <div className="PdfContent-main">
         <div className="PdfContent-header">
+          <div className="PdfContent-header-left"></div>
           <button
             disabled={backDisabled}
             type="button"
             onClick={goBack}
-            className="PdfContent-navButton"
+            className="PdfContent-button"
           >
             <i className="fa fa-angle-left" />
           </button>
@@ -226,65 +245,80 @@ export default function PdfContent(props: ContentProps) {
             disabled={forwardDisabled}
             type="button"
             onClick={goForward}
-            className="PdfContent-navButton"
+            className="PdfContent-button"
           >
             <i className="fa fa-angle-right" />
           </button>
+
+          <div className="PdfContent-header-right">
+            <button
+              disabled={forwardDisabled}
+              type="button"
+              onClick={toggleIsMarkerSelected}
+              className={classNames("PdfContent-button ", {
+                "is-selected": isMarkerSelected,
+              })}
+            >
+              <i className="fa fa-pencil" />
+            </button>
+          </div>
         </div>
 
-        {buffer ? (
-          <Document file={param} onLoadSuccess={onDocumentLoadSuccess}>
-            <Page
-              loading=""
-              pageNumber={pageNum}
-              className="PdfContent-page"
-              width={1600}
-              renderTextLayer={false}
-            />
-          </Document>
-        ) : null}
+        <div className="PdfContent-document">
+          {buffer ? (
+            <Document file={param} onLoadSuccess={onDocumentLoadSuccess}>
+              <Page
+                loading=""
+                pageNumber={pageNum}
+                className="PdfContent-page"
+                width={1600}
+                renderTextLayer={false}
+              />
+            </Document>
+          ) : null}
 
-        <svg
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          viewBox="0 0 1600 2070"
-          width={PAGE_WIDTH}
-          height={PAGE_HEIGHT}
-          style={{
-            position: "absolute",
-            top: 0,
-            width: "100%",
-            height: "auto",
-          }}
-        >
-          {
-            // TODO: we should be using Content here, but I need to pass the selectedPage to the view
-            pdf.annotations &&
-              pdf.annotations.map((annotation, index) => {
-                if (annotation.page !== pageNum) {
-                  return
-                }
+          <svg
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            viewBox="0 0 1600 2070"
+            width={PAGE_WIDTH}
+            height={PAGE_HEIGHT}
+            style={{
+              position: "absolute",
+              top: 0,
+              width: "100%",
+              height: "auto",
+            }}
+          >
+            {
+              // TODO: we should be using Content here, but I need to pass the selectedPage to the view
+              pdf.annotations &&
+                pdf.annotations.map((annotation, index) => {
+                  if (annotation.page !== pageNum) {
+                    return
+                  }
 
-                return (
-                  <PdfAnnotationOverlayView
-                    key={index}
-                    annotation={annotation}
-                  />
-                )
-              })
-          }
+                  return (
+                    <PdfAnnotationOverlayView
+                      key={index}
+                      annotation={annotation}
+                    />
+                  )
+                })
+            }
 
-          {points && (
-            <path
-              d={pathData}
-              opacity={0.5}
-              fill={author?.color ?? "#fdd835"}
-            />
-          )}
-        </svg>
+            {points && (
+              <path
+                d={pathData}
+                opacity={0.5}
+                fill={author?.color ?? "#fdd835"}
+              />
+            )}
+          </svg>
+        </div>
       </div>
-      <div className="PdfContent-sidebar">{}</div>
+      <div className="PdfContent-sidebar"></div>
     </div>
   )
 }
