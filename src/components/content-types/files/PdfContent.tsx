@@ -142,8 +142,8 @@ export default function PdfContent(props: ContentProps) {
     setIsMarkerSelected((isMarkerSelected) => !isMarkerSelected)
   }, [])
 
-  const handlePointerUp: PointerEventHandler<SVGSVGElement> =
-    useCallback((e) => {
+  const handlePointerUp: PointerEventHandler<SVGSVGElement> = useCallback(
+    (e) => {
       if (!isMarkerSelected) {
         return
       }
@@ -160,7 +160,9 @@ export default function PdfContent(props: ContentProps) {
         setPoints([])
         e.preventDefault()
       }
-    }, [points, isMarkerSelected])
+    },
+    [points, isMarkerSelected]
+  )
 
   const stroke = getStroke(points, STROKE_PARAMS)
 
@@ -255,8 +257,6 @@ export default function PdfContent(props: ContentProps) {
 
   const forwardDisabled = pageNum >= numPages
   const backDisabled = pageNum <= 1
-
-  console.log("test:", isAnnotationGroupHidden)
 
   return (
     <div className="PdfContent">

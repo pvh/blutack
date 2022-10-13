@@ -37,14 +37,16 @@ const sharedWorker = new SharedWorker(
 )
 
 async function introduceWorkers(sharedWorker: SharedWorker) {
-  await navigator.serviceWorker.ready
+  const reg = await navigator.serviceWorker.ready
+  if (!reg.active) {
+    throw new Error(" where's the worker? ")
+  }
+
   /* introduce the SharedWorker and the ServiceWorker. */
   console.log("service worker is ready")
   const channel = new MessageChannel()
-  navigator.serviceWorker.controller!.postMessage(
-    { sharedWorkerPort: channel.port1 },
-    [channel.port1]
-  )
+
+  reg.active.postMessage({ sharedWorkerPort: channel.port1 }, [channel.port1])
   sharedWorker.port.start()
   sharedWorker.port.postMessage({ serviceWorkerPort: channel.port2 }, [
     channel.port2,

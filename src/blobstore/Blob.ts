@@ -8,7 +8,7 @@ export type BinaryDataId = string & { __binaryDataId: true }
 
 export interface BinaryDataHeader {
   size: number
-  mimeType: string
+  mimeType?: string
 }
 
 export interface BinaryObjectDoc {
@@ -42,8 +42,8 @@ export function parseBinaryDataId(binaryDataId: BinaryDataId) {
 }
 
 export function createBinaryDataUrl(binaryDataId: BinaryDataId): string {
-  const { id } = parts(binaryDataId)
-  return `/blutack/src/binary/${id}`
+  const baseUrl = "/blutack/"
+  return `${baseUrl}?binaryDataId=${encodeURIComponent(binaryDataId)}`
 }
 
 export async function storeBinaryData(
@@ -92,8 +92,7 @@ async function loadBinaryData(
     const doc = await handle.value()
     if (!doc.binary) throw new Error("Got a document with no binary...")
 
-    const { mimeType = "wtf/whereisit", binary } = doc
-    console.log("found", doc)
+    const { mimeType, binary } = doc
     resolve([{ mimeType, size: binary.byteLength }, binary])
   })
 }

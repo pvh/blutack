@@ -2,14 +2,11 @@ const CACHED_BINARY_OBJECTS = {}
 
 self.addEventListener("fetch", async function (event) {
   const url = new URL(event.request.url)
+  console.log("fetch", event)
 
-  // TODO: this is not good
-  const match = url.pathname.match(/^\/blutack\/src\/binary\/(.*)$/)
-
-  if (match) {
-    const [, data] = match
-    const binaryDataId = `web+binarydata://${data}`
-
+  const binaryDataId = url.searchParams.get("binaryDataId")
+  if (url.pathname === "/blutack/" && binaryDataId) {
+    console.log("found a binary data URL")
     event.respondWith(
       (async () => {
         let entry = CACHED_BINARY_OBJECTS[binaryDataId]
@@ -41,7 +38,7 @@ const openRequests = {}
 
 let binaryDataRequestPort
 self.addEventListener("message", (e) => {
-  console.log("serviceworker recieved a message", e)
+  console.log("ServiceWorker recieved a message", e)
   binaryDataRequestPort = e.data.sharedWorkerPort
   binaryDataRequestPort.onmessage = (e) => {
     console.log("binaryDataRequestPort inbound message: ", e)
@@ -69,9 +66,11 @@ async function loadBinaryData(binaryDataId) {
 }
 
 self.addEventListener("install", function (event) {
+  console.log("installed")
   event.waitUntil(self.skipWaiting()) // Activate worker immediately
 })
 
 self.addEventListener("activate", function (event) {
+  console.log("activated")
   event.waitUntil(self.clients.claim()) // Become available to all pages
 })

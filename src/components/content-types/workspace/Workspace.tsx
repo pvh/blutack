@@ -73,13 +73,11 @@ export default function Workspace({
     const maybePushpinUrl = new URLSearchParams(window.location.search).get(
       "document"
     )
-    console.log("mpu", maybePushpinUrl)
     if (isPushpinUrl(maybePushpinUrl)) {
       // this is just to sanitize out any other bits of the URL
       const { scheme, type, documentId } = parseDocumentLink(maybePushpinUrl)
       const docLink = createDocumentLink(type, documentId)
       const currentDocUrl = workspace?.currentDocUrl
-      console.log("incoming ", docLink, "current", currentDocUrl)
       if (docLink !== currentDocUrl) {
         openDoc(docLink)
       }
