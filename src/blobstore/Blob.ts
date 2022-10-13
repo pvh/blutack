@@ -1,6 +1,8 @@
+import { DocumentId } from "automerge-repo"
 import { useRepo } from "automerge-repo-react-hooks"
 import { useEffect, useState } from "react"
 import { v4 } from "uuid"
+import { __getRepo } from "../components/pushpin-code/ContentTypes"
 
 export type BinaryDataId = string & { __binaryDataId: true }
 
@@ -43,20 +45,9 @@ export async function storeBinaryData(
   binary: ReadableStream,
   mimeType?: string
 ): Promise<BinaryDataId> {
-  await navigator.serviceWorker.ready
-
-  const binaryDataId = `web+binarydata://${v4()}` as BinaryDataId
-
-  navigator.serviceWorker.controller!.postMessage(
-    {
-      type: "set",
-      data: { binaryDataId, mimeType, binary },
-      // this extra array sends the binary via the TransferList
-      // see docs for Worker.postMessage
-    },
-    [binary as any]
-  )
-
+  console.log("storing binary data")
+  const binaryDataId = await storeData(binary, mimeType)
+  console.log("stored it")
   return binaryDataId
 }
 
@@ -74,37 +65,117 @@ export function useBinaryDataHeader(
 
 export function useBinaryDataContents(
   binaryDataId?: BinaryDataId
-): ReadableStream | undefined {
-  const [stream, setStream] = useState<ReadableStream | undefined>()
+): ArrayBuffer | undefined {
+  const [buffer, setBuffer] = useState<ArrayBuffer | undefined>()
   useEffect(() => {
     binaryDataId &&
-      loadBinaryData(binaryDataId).then(([, readable]) => setStream(readable))
+      loadBinaryData(binaryDataId).then(([, buffer]) => setBuffer(buffer))
   }, [binaryDataId])
-  return stream
+  return buffer
 }
 
 async function loadBinaryData(
   binaryDataId: BinaryDataId
-): Promise<[BinaryDataHeader, ReadableStream]> {
-  return new Promise((resolve, reject) => {
-    const { port1: myPort, port2: theirPort } = new MessageChannel()
-
-    myPort.addEventListener("message", (e) => {
-      console.log("heard back from the service worker", e)
-      const { mimeType, binary } = e.data
-      console.log(mimeType, binary)
-      resolve([{ size: binary.byteLength, mimeType }, binary])
-    })
-    myPort.start()
-
-    navigator.serviceWorker.controller!.postMessage(
-      {
-        type: "get",
-        data: { binaryDataId, replyPort: theirPort },
-      },
-      [theirPort]
+): Promise<[BinaryDataHeader, ArrayBuffer]> {
+  return new Promise(async (resolve, reject) => {
+    const { id: documentId } = parseBinaryDataId(binaryDataId)
+    const handle = __getRepo().find<BinaryObjectDoc>(
+      documentId as unknown as DocumentId
     )
+
+    const doc = await handle.value()
+    if (!doc.binary) throw new Error("Got a document with no binary...")
+
+    const { mimeType = "wtf/whereisit", binary } = doc
+    console.log("found", doc)
+    resolve([{ mimeType, size: binary.byteLength }, binary])
   })
+}
+
+console.log("setting up")
+;(async () => {
+  console.log("starting registration")
+  console.log("reday")
+
+  navigator.serviceWorker.controller!.postMessage("hello")
+
+  console.log("now listen")
+
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    console.log("MESSAGE", event)
+
+    const message = (event as any).data
+
+    switch (message.type) {
+      case "get":
+        setTimeout(() => handleGetMessage(message), 100)
+        break
+    }
+  })
+})()
+
+export interface BinaryObjectDoc {
+  mimeType?: string
+  binary: ArrayBuffer
+}
+
+async function storeData(binary: ReadableStream<Buffer>, mimeType?: string) {
+  const reader = binary.getReader()
+  const buffers: Buffer[] = []
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) {
+      break
+    }
+    buffers.push(value)
+  }
+
+  const handle = __getRepo().create<BinaryObjectDoc>()
+  handle.change((d) => {
+    d.binary = new Uint8Array(concatArrayBuffers(buffers))
+    d.mimeType = mimeType
+    console.log("done setting", mimeType, binary)
+  })
+
+  return ("web+binarydata://" + handle.documentId) as unknown as BinaryDataId
+}
+
+async function handleGetMessage(message: any) {
+  console.log("Getting data", message)
+  const { binaryDataId, replyPort } = message.data
+
+  const [header, binary] = await loadBinaryData(binaryDataId)
+  const { mimeType } = header
+  var out = new ArrayBuffer(binary.byteLength)
+  new Uint8Array(out).set(new Uint8Array(binary))
+
+  console.log("cloned and made", out)
+
+  replyPort.postMessage(
+    {
+      binaryDataId,
+      mimeType,
+      binary: out,
+    },
+    [out]
+  )
+}
+
+// from: https://gist.github.com/72lions/4528834
+function concatArrayBuffers(bufs: Buffer[]): ArrayBuffer {
+  var offset = 0
+  var bytes = 0
+  var bufs2 = bufs.map(function (buf, total) {
+    bytes += buf.byteLength
+    return buf
+  })
+  var buffer = new ArrayBuffer(bytes)
+  var store = new Uint8Array(buffer)
+  bufs2.forEach(function (buf) {
+    store.set(new Uint8Array(buf.buffer || buf, buf.byteOffset), offset)
+    offset += buf.byteLength
+  })
+  return buffer
 }
 
 export async function registerServiceWorker() {
