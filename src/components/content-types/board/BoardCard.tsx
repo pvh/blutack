@@ -94,7 +94,7 @@ function BoardCard(props: BoardCardProps) {
   const [doc] = useDocument<any>(documentId)
 
   const {
-    hyperfileUrl = null,
+    binaryDataId = null,
     title = "untitled",
     mimeType = "application/octet",
     extension = null,
@@ -124,10 +124,10 @@ function BoardCard(props: BoardCardProps) {
     event.dataTransfer.setData(UriList.MIME_TYPE, url)
 
     // and we'll add a DownloadURL
-    if (hyperfileUrl) {
+    if (binaryDataId) {
       const outputExtension = extension || mime.extension(mimeType) || ""
 
-      const downloadUrl = `text:${title}.${outputExtension}:${hyperfileUrl}`
+      const downloadUrl = `text:${title}.${outputExtension}:${binaryDataId}`
       event.dataTransfer.setData("DownloadURL", downloadUrl)
     }
   }
