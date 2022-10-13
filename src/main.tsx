@@ -18,30 +18,33 @@ import { BrowserWebSocketClientAdapter } from "automerge-repo-network-websocket"
 import { registerServiceWorker } from "./blobstore/Blob"
 
 registerServiceWorker()
-/* disabled to make debugging simpler.
-// find this at chrome://inspect#workers, then hit inspect
-new SharedWorker(
+
+const sharedWorker = new SharedWorker(
   new URL("./shared-worker.js", import.meta.url),
   { type: "module", name: "automerge-repo-shared-worker" }
 )
-*/
 
-// sync-server instructions:
-// $ cd automerge-repo/packages/automerge-repo-sync-server
-// $ yarn
-// $ mkdir .amrg
-// $ yarn start
-let host =
-  new URLSearchParams(window.location.search).get("host") ||
-  "automerge-repo-sync-server.fly.dev"
-const url = `wss://${host}`
+async function introduceWorkers(sharedWorker: SharedWorker) {
+  await navigator.serviceWorker.ready
+  /* introduce the SharedWorker and the ServiceWorker. */
+  console.log("service worker is ready")
+  const channel = new MessageChannel()
+  navigator.serviceWorker.controller!.postMessage(
+    { sharedWorkerPort: channel.port1 },
+    [channel.port1]
+  )
+  sharedWorker.port.start()
+  sharedWorker.port.postMessage({ serviceWorkerPort: channel.port2 }, [
+    channel.port2,
+  ])
+  console.log("posted to both workers")
+}
+introduceWorkers(sharedWorker)
+
 const repo = await Repo({
   storage: new LocalForageStorageAdapter(),
-  network: [
-    new BroadcastChannelNetworkAdapter(),
-    new BrowserWebSocketClientAdapter(url),
-  ],
-  sharePolicy: (peerId) => peerId.includes("storage-server"),
+  network: [new BroadcastChannelNetworkAdapter()],
+  sharePolicy: (peerId) => peerId.includes("shared-worker"),
 })
 
 ContentTypes.setRepo(repo)

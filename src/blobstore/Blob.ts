@@ -92,27 +92,28 @@ async function loadBinaryData(
   })
 }
 
-console.log("setting up")
-;(async () => {
-  console.log("starting registration")
-  console.log("reday")
+export function connectToServiceWorker() {
+  console.log("setting up")
+  ;(async () => {
+    console.log("starting registration")
+    console.log("reday")
 
-  navigator.serviceWorker.controller!.postMessage("hello")
+    navigator.serviceWorker.controller!.postMessage("hello")
+    console.log("now listen")
 
-  console.log("now listen")
+    navigator.serviceWorker.addEventListener("message", (event) => {
+      console.log("MESSAGE", event)
 
-  navigator.serviceWorker.addEventListener("message", (event) => {
-    console.log("MESSAGE", event)
+      const message = (event as any).data
 
-    const message = (event as any).data
-
-    switch (message.type) {
-      case "get":
-        setTimeout(() => handleGetMessage(message), 100)
-        break
-    }
+      switch (message.type) {
+        case "get":
+          setTimeout(() => handleGetMessage(message), 100)
+          break
+      }
+    })
   })
-})()
+}
 
 export interface BinaryObjectDoc {
   mimeType?: string
