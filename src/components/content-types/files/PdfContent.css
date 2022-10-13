@@ -7,11 +7,20 @@
 
 .PdfContent {
   display: flex;
+  height: 100%;
+}
+
+.PdfContent-annotationGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .PdfContent-sidebar {
   width: 200px;
   flex-shrink: 0;
+  padding: 8px;
   border-left: 1px solid #eeeeee;
 }
 

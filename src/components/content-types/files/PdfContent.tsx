@@ -34,6 +34,8 @@ import ContentList, { ContentListDoc, ContentListInList } from "../ContentList"
 import { DocHandle, DocumentId } from "automerge-repo"
 import { ContactDoc } from "../contact"
 import classNames from "classnames"
+import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
+import Heading from "../../ui/Heading"
 
 export interface PdfAnnotation {
   stroke: number[][]
@@ -78,6 +80,20 @@ export default function PdfContent(props: ContentProps) {
   const [points, setPoints] = React.useState<Point[]>([])
   const [author] = useDocument<ContactDoc>(props.selfId)
   const [isMarkerSelected, setIsMarkerSelected] = React.useState<boolean>(false)
+  const [isAnnotationGroupHidden, setIsAnnotationGroupHidden] = React.useState<{
+    [authorId: DocumentId]: boolean
+  }>({})
+
+  const toggleIsAnnotationGroupOfAuthorHidden = (authorId: DocumentId) => {
+    if (!isAnnotationGroupHidden[authorId]) {
+      setIsMarkerSelected(false)
+    }
+
+    setIsAnnotationGroupHidden((isAnnotationGroupHidden) => ({
+      ...isAnnotationGroupHidden,
+      [authorId]: !isAnnotationGroupHidden[authorId],
+    }))
+  }
 
   const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback(
     (e: any) => {
@@ -114,6 +130,13 @@ export default function PdfContent(props: ContentProps) {
   )
 
   const toggleIsMarkerSelected = useCallback(() => {
+    if (!isMarkerSelected) {
+      setIsAnnotationGroupHidden(() => ({
+        ...isAnnotationGroupHidden,
+        [props.selfId]: false,
+      }))
+    }
+
     setIsMarkerSelected((isMarkerSelected) => !isMarkerSelected)
   }, [])
 
@@ -215,8 +238,22 @@ export default function PdfContent(props: ContentProps) {
 
   const { context } = props
 
+  const annotations = pdf.annotations ?? []
+  const annotationByAuthor = annotations.reduce(
+    (group: { [id: DocumentId]: PdfAnnotation[] }, annotation) => {
+      if (!group[annotation.authorId]) {
+        group[annotation.authorId] = []
+      }
+      group[annotation.authorId].push(annotation)
+      return group
+    },
+    {}
+  )
+
   const forwardDisabled = pageNum >= numPages
   const backDisabled = pageNum <= 1
+
+  console.log("test:", isAnnotationGroupHidden)
 
   return (
     <div className="PdfContent">
@@ -295,7 +332,10 @@ export default function PdfContent(props: ContentProps) {
               // TODO: we should be using Content here, but I need to pass the selectedPage to the view
               pdf.annotations &&
                 pdf.annotations.map((annotation, index) => {
-                  if (annotation.page !== pageNum) {
+                  if (
+                    annotation.page !== pageNum ||
+                    isAnnotationGroupHidden[annotation.authorId]
+                  ) {
                     return
                   }
 
@@ -318,7 +358,42 @@ export default function PdfContent(props: ContentProps) {
           </svg>
         </div>
       </div>
-      <div className="PdfContent-sidebar"></div>
+      <div className="PdfContent-sidebar">
+        <Heading>Annotations by</Heading>
+
+        {Object.entries(annotationByAuthor).map(([authorId, annotations]) => (
+          <AnnotationGroup
+            authorId={authorId as DocumentId}
+            annotations={annotations}
+            key={authorId}
+            isHidden={isAnnotationGroupHidden[authorId as DocumentId]}
+            onToggleIsHidden={() =>
+              toggleIsAnnotationGroupOfAuthorHidden(authorId as DocumentId)
+            }
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function AnnotationGroup({
+  authorId,
+  annotations,
+  isHidden,
+  onToggleIsHidden,
+}: {
+  authorId: DocumentId
+  annotations: PdfAnnotation[]
+  isHidden: boolean
+  onToggleIsHidden: () => void
+}) {
+  const [author] = useDocument(authorId)
+
+  return (
+    <div className="PdfContent-annotationGroup">
+      <input type="checkbox" checked={!isHidden} onChange={onToggleIsHidden} />
+      <Content context="thread" url={createDocumentLink("contact", authorId)} />
     </div>
   )
 }
