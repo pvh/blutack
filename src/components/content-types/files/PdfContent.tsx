@@ -32,41 +32,26 @@ import {
 } from "../../pushpin-code/ShareLink"
 import ContentList, { ContentListDoc, ContentListInList } from "../ContentList"
 import { DocHandle, DocumentId } from "automerge-repo"
+import { ContactDoc } from "../contact"
 
-export interface PdfAnnotationDoc {
+export interface PdfAnnotation {
   stroke: number[][]
-  pdfDocUrl: PushpinUrl
   page: number
-}
-
-ContentTypes.register({
-  type: "pdfannotation",
-  name: "PDF Annotation",
-  icon: "highlighter-line",
-  contexts: {},
-  create: createAnnotation,
-})
-
-function createAnnotation(attrs: any, handle: DocHandle<any>) {
-  handle.change((doc: PdfAnnotationDoc) => {
-    doc.stroke = attrs.stroke
-    doc.pdfDocUrl = attrs.pdfDocUrl
-    doc.page = attrs.page
-  })
+  authorId: DocumentId
 }
 
 export interface PdfDoc extends FileDoc {
   content: string
-  annotationListUrl: PushpinUrl
+  annotations: PdfAnnotation[]
 }
 
 const PAGE_WIDTH = 1600
 const PAGE_HEIGHT = 2070
 
 const STROKE_PARAMS = {
-  size: 30,
-  thinning: 0.5,
-  smoothing: 0.5,
+  size: 10,
+  thinning: 0.1,
+  smoothing: 0.75,
   streamline: 0.5,
 }
 
@@ -90,6 +75,7 @@ function getSvgPathFromStroke(stroke: Point[]) {
 
 export default function PdfContent(props: ContentProps) {
   const [points, setPoints] = React.useState<Point[]>([])
+  const [author] = useDocument<ContactDoc>(props.selfId)
 
   const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback(
     (e: any) => {
@@ -120,23 +106,15 @@ export default function PdfContent(props: ContentProps) {
   const handlePointerUp: PointerEventHandler<SVGSVGElement> =
     useCallback(() => {
       if (points.length !== 0) {
-        ContentTypes.create(
-          "pdfannotation",
-          {
+        changePdf((pdf) => {
+          pdf.annotations.push({
             stroke: getStroke(points, STROKE_PARAMS),
-            pdfDocUrl: createDocumentLink("pdf", props.documentId),
             page: pageNum,
-          },
-          (pdfAnnotationUrl) => {
-            changeAnnotationList((annotationsList) => {
-              annotationsList.content.push(pdfAnnotationUrl)
-            })
+            authorId: props.selfId,
+          })
+        })
 
-            setPoints([])
-          }
-        )
-
-        getStroke(points, STROKE_PARAMS)
+        setPoints([])
       }
     }, [points])
 
@@ -145,11 +123,6 @@ export default function PdfContent(props: ContentProps) {
   const pathData = getSvgPathFromStroke(stroke)
 
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
-  const [annotationList, changeAnnotationList] = useDocument<ContentListDoc>(
-    pdf && pdf.annotationListUrl
-      ? parseDocumentLink(pdf.annotationListUrl).documentId
-      : undefined
-  )
 
   const buffer = useBinaryDataContents(pdf && pdf.binaryDataId)
   const [pageNum, setPageNum] = useState(1)
@@ -216,16 +189,10 @@ export default function PdfContent(props: ContentProps) {
 
   // todo: annotationList initation shouldn't happen in view
 
-  if (!pdf.annotationListUrl) {
-    ContentTypes.create(
-      "contentlist",
-      { title: "annotations" },
-      (annotationListUrl) => {
-        changePdf((pdf) => {
-          pdf.annotationListUrl = annotationListUrl
-        })
-      }
-    )
+  if (!pdf.annotations) {
+    changePdf((pdf) => {
+      pdf.annotations = []
+    })
   }
 
   const { context } = props
@@ -234,104 +201,104 @@ export default function PdfContent(props: ContentProps) {
   const backDisabled = pageNum <= 1
 
   return (
-    <div style={{ position: "relative" }}>
-      {pdf.annotationListUrl && (
-        <Content context="list" url={pdf.annotationListUrl} />
-      )}
-
-      <div className="PdfContent-header">
-        <button
-          disabled={backDisabled}
-          type="button"
-          onClick={goBack}
-          className="PdfContent-navButton"
-        >
-          <i className="fa fa-angle-left" />
-        </button>
-        <input
-          className="PdfContent-headerInput"
-          value={pageInputValue}
-          type="number"
-          min={1}
-          max={numPages}
-          onChange={onPageInput}
-          onKeyDown={onPageInput}
-        />
-        <div className="PdfContent-headerNumPages">/ {numPages}</div>
-        <button
-          disabled={forwardDisabled}
-          type="button"
-          onClick={goForward}
-          className="PdfContent-navButton"
-        >
-          <i className="fa fa-angle-right" />
-        </button>
-      </div>
-
-      {buffer ? (
-        <Document file={param} onLoadSuccess={onDocumentLoadSuccess}>
-          <Page
-            loading=""
-            pageNumber={pageNum}
-            className="PdfContent-page"
-            width={1600}
-            renderTextLayer={false}
+    <div className="PdfContent">
+      <div className="PdfContent-main">
+        <div className="PdfContent-header">
+          <button
+            disabled={backDisabled}
+            type="button"
+            onClick={goBack}
+            className="PdfContent-navButton"
+          >
+            <i className="fa fa-angle-left" />
+          </button>
+          <input
+            className="PdfContent-headerInput"
+            value={pageInputValue}
+            type="number"
+            min={1}
+            max={numPages}
+            onChange={onPageInput}
+            onKeyDown={onPageInput}
           />
-        </Document>
-      ) : null}
+          <div className="PdfContent-headerNumPages">/ {numPages}</div>
+          <button
+            disabled={forwardDisabled}
+            type="button"
+            onClick={goForward}
+            className="PdfContent-navButton"
+          >
+            <i className="fa fa-angle-right" />
+          </button>
+        </div>
 
-      <svg
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        viewBox="0 0 1600 2070"
-        width={PAGE_WIDTH}
-        height={PAGE_HEIGHT}
-        style={{
-          position: "absolute",
-          top: 0,
-          width: "100%",
-          height: "auto",
-        }}
-      >
-        {
-          // TODO: we should be using Content here, but I need to pass the selectedPage to the view
-          annotationList?.content.map((annotationUrl) => (
-            <PdfAnnotationOverlayView
-              key={annotationUrl}
-              selectedPage={pageNum}
-              documentId={parseDocumentLink(annotationUrl).documentId}
+        {buffer ? (
+          <Document file={param} onLoadSuccess={onDocumentLoadSuccess}>
+            <Page
+              loading=""
+              pageNumber={pageNum}
+              className="PdfContent-page"
+              width={1600}
+              renderTextLayer={false}
             />
-          ))
-        }
+          </Document>
+        ) : null}
 
-        {points && <path d={pathData} opacity={0.5} fill="#fdd835" />}
-      </svg>
+        <svg
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          viewBox="0 0 1600 2070"
+          width={PAGE_WIDTH}
+          height={PAGE_HEIGHT}
+          style={{
+            position: "absolute",
+            top: 0,
+            width: "100%",
+            height: "auto",
+          }}
+        >
+          {
+            // TODO: we should be using Content here, but I need to pass the selectedPage to the view
+            pdf.annotations &&
+              pdf.annotations.map((annotation, index) => {
+                if (annotation.page !== pageNum) {
+                  return
+                }
+
+                return (
+                  <PdfAnnotationOverlayView
+                    key={index}
+                    annotation={annotation}
+                  />
+                )
+              })
+          }
+
+          {points && (
+            <path
+              d={pathData}
+              opacity={0.5}
+              fill={author?.color ?? "#fdd835"}
+            />
+          )}
+        </svg>
+      </div>
+      <div className="PdfContent-sidebar">{}</div>
     </div>
   )
 }
 
 function PdfAnnotationOverlayView({
-  selectedPage,
-  documentId,
+  annotation,
 }: {
-  selectedPage: number
-  documentId: DocumentId
+  annotation: PdfAnnotation
 }) {
-  const [pdfAnnotation, changePdfAnnotation] =
-    useDocument<PdfAnnotationDoc>(documentId)
+  const [author] = useDocument<ContactDoc>(annotation.authorId)
 
-  if (
-    !pdfAnnotation ||
-    !pdfAnnotation.stroke ||
-    pdfAnnotation.page !== selectedPage
-  ) {
-    return null
-  }
+  const pathData = getSvgPathFromStroke(annotation.stroke)
 
-  const pathData = getSvgPathFromStroke(pdfAnnotation?.stroke)
-
-  return <path d={pathData} opacity={0.5} fill="#fdd835" />
+  return <path d={pathData} opacity={0.5} fill={author?.color ?? "#fdd835"} />
 }
 
 const supportsMimeType = (mimeType: string) =>
