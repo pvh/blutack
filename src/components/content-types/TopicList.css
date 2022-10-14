@@ -1,0 +1,67 @@
+.TopicList {
+  width: 100%;
+  padding: var(--halfCellSize);
+}
+
+.TopicList-title {
+  font-size: 1.5em;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.TopicList-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.TopicList-item {
+  display: flex;
+  gap: 8px;
+  background: white;
+  align-items: baseline;
+}
+
+.TopicList-count {
+  border: 1px solid #d2d2d2;
+  border-radius: 100%;
+  width:  24px;
+  height: 24px;
+  text-align: center;
+  line-height: 24px;
+  flex-shrink: 0;
+}
+
+.TopicList-spacer {
+  flex: 1;
+}
+
+.TopicList-button {
+  font-weight: bold;
+  border: 0;
+  color: gray;
+  background: transparent;
+  text-align: center;
+  line-height: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.TopicList-button:hover {
+  color: black;
+  background-color: #ddd;
+}
+
+.TopicList:hover > .TopicList-title > .TopicList-button,
+.TopicList-item:hover > .TopicList-button,
+.TopicList-button.is-selected {
+  visibility: visible;
+}
+
+.TopicList-button.is-selected {
+  color: #000000;
+}

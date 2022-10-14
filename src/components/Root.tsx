@@ -3,12 +3,6 @@ import { DocumentId } from "automerge-repo"
 import { CurrentDeviceContext } from "./content-types/workspace/Device"
 import { createDocumentLink } from "./pushpin-code/ShareLink"
 
-// We load these modules here so that the content registry will have them.
-import "./content-types/workspace/Workspace"
-
-// default context components
-import "./content-types/defaults/DefaultInList"
-
 // board in various contexts
 import "./content-types/board"
 import "./content-types/contact"
@@ -25,6 +19,8 @@ import "./content-types/files/ImageContent"
 import "./content-types/files/PdfContent"
 import "./content-types/files/AudioContent"
 import "./content-types/files/VideoContent"
+
+import "./content-types/TopicList"
 
 interface RootArgs {
   workspaceDocId: DocumentId

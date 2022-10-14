@@ -287,6 +287,7 @@ function BoardCard(props: BoardCardProps) {
     >
       <Content
         context="board"
+        boardId={props.boardId}
         url={url}
         uniquelySelected={props.uniquelySelected}
       />
