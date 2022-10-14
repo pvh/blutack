@@ -11,6 +11,7 @@ import { TextDoc } from "./TextContent";
 import './TopicList.css'
 import classNames from "classnames";
 import { sortBy } from "lodash";
+import * as UriList from "../pushpin-code/UriList";
 
 
 interface Votes {
@@ -51,6 +52,13 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
 
   if (!topicList || !topicList.votesByTitle) {
     return null
+  }
+
+  const handleDragStart = (evt: React.DragEvent<HTMLDivElement>, text: string) => {
+    console.log('dragStart')
+
+    stopPropagation(evt)
+    evt.dataTransfer.setData("text/plain", text)
   }
 
   const toggleVoteForTopic = ({ title }: Topic) => {
@@ -118,8 +126,17 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
             key={index}
             className="TopicList-item"
           >
-            <div className="TopicList-count">{Object.keys(topic.votes).length}</div>
-            {topic.title}
+            <div className="TopicList-count">
+              {Object.keys(topic.votes).length}
+            </div>
+            <div
+              draggable
+              onDragStart={(evt) => {
+                handleDragStart(evt, topic.title)
+              }}
+            >
+              {topic.title}
+            </div>
             <div className="TopicList-spacer"></div>
             <button
               className={classNames("TopicList-button", {
@@ -226,5 +243,3 @@ ContentTypes.register({
   },
   create,
 });
-
-console.log('foo', 123)
