@@ -57,7 +57,12 @@ introduceWorkers(sharedWorker)
 
 const repo = await Repo({
   storage: new LocalForageStorageAdapter(),
-  network: [new BroadcastChannelNetworkAdapter()],
+  network: [
+    new BroadcastChannelNetworkAdapter(),
+    new BrowserWebSocketClientAdapter(
+      "wss://automerge-repo-sync-server.fly.dev"
+    ),
+  ],
   sharePolicy: (peerId) => peerId.includes("shared-worker"),
 })
 
