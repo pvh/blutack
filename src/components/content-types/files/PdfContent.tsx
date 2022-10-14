@@ -79,6 +79,11 @@ function getSvgPathFromStroke(stroke: Point[]) {
   return d.join(" ")
 }
 
+function stopPropagation(e: React.SyntheticEvent) {
+  e.stopPropagation()
+  e.nativeEvent.stopImmediatePropagation()
+}
+
 export default function PdfContent(props: ContentProps) {
   const [points, setPoints] = React.useState<Point[]>([])
   const [author] = useDocument<ContactDoc>(props.selfId)
@@ -270,7 +275,11 @@ export default function PdfContent(props: ContentProps) {
 
         <ListMenu>
           {Object.entries(openPageNumByPerson).map(([viewerId, pageNum]) => (
-            <ListMenuItem>
+            <ListMenuItem
+              onClick={() => {
+                setPageNum(pageNum)
+              }}
+            >
               <Content
                 context="list"
                 url={createDocumentLink("contact", viewerId as DocumentId)}
@@ -285,7 +294,7 @@ export default function PdfContent(props: ContentProps) {
           "is-marker-selected": isMarkerSelected,
         })}
       >
-        <div className="PdfContent-header">
+        <div className="PdfContent-header" onDoubleClick={stopPropagation}>
           <div className="PdfContent-header-left"></div>
           <button
             disabled={backDisabled}
