@@ -2,7 +2,6 @@ const CACHED_BINARY_OBJECTS = {}
 
 self.addEventListener("fetch", async function (event) {
   const url = new URL(event.request.url)
-  console.log("fetch", event)
 
   const binaryDataId = url.searchParams.get("binaryDataId")
   if (url.pathname === "/blutack/" && binaryDataId) {
@@ -11,13 +10,15 @@ self.addEventListener("fetch", async function (event) {
       (async () => {
         let entry = CACHED_BINARY_OBJECTS[binaryDataId]
         if (!entry) {
-          console.log("requesting", binaryDataId)
+          console.log(`[${binaryDataId}]: requesting from shared-worker`)
           entry = await loadBinaryData(binaryDataId)
-          console.log("requested and got ", entry)
+          console.log(`[${binaryDataId}]: received from shared-worker`, entry)
           CACHED_BINARY_OBJECTS[binaryDataId] = entry
         }
         // TODO: handle case where it's not in either
         const [header, binary] = entry || [null, null]
+
+        console.log(`[${binaryDataId}]: answering`, entry)
 
         if (!header) {
           return new Response("Not found", {

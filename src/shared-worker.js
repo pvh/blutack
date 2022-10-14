@@ -15,8 +15,17 @@ self.onconnect = function (e) {
       const message = e.data
       const { binaryDataId } = message
       const { id } = parseBinaryDataId(binaryDataId)
+      console.log(`[${this.documentId}]: shared-worker request`)
+
       const handle = repo.find(id)
       handle.value().then((doc) => {
+        console.log(
+          `[${this.documentId}]: shared-worker value, ${JSON.stringify({
+            ...doc,
+            binary: null,
+          })}`
+        )
+
         const { mimeType, binary } = doc
         var outboundBinary = new ArrayBuffer(binary.byteLength)
         new Uint8Array(outboundBinary).set(new Uint8Array(binary))
