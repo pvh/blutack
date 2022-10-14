@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as ContentTypes from "../pushpin-code/ContentTypes";
 import { ContentProps, EditableContentProps } from "../Content";
 import { useDocument, useHandle, useRepo } from "automerge-repo-react-hooks";
@@ -8,8 +8,19 @@ import ContentList, { ContentListInList } from "./ContentList";
 import { BoardDoc, BoardDocCard } from "./board";
 import { parseDocumentLink, PushpinUrl } from "../pushpin-code/ShareLink";
 import { TextDoc } from "./TextContent";
+import './TopicList.css'
+import classNames from "classnames";
 
-interface TopicListDoc {}
+
+interface Votes { [id: DocumentId]: boolean }
+
+interface VotesByTitle {
+  [title: string]: Votes
+}
+
+interface TopicListDoc {
+  votesByTitle: VotesByTitle
+}
 
 interface Props extends ContentProps {
   boardId: DocumentId;
@@ -19,44 +30,96 @@ TopicList.minWidth = 6;
 TopicList.minHeight = 2;
 TopicList.defaultWidth = 15;
 
-export default function TopicList({boardId, documentId}: Props) {
+interface Topic {
+  title: string
+  votes: Votes
+}
+
+function stopPropagation (e: React.SyntheticEvent) {
+  e.stopPropagation()
+  e.nativeEvent.stopImmediatePropagation()
+}
+
+export default function TopicList({ boardId, documentId, selfId }: Props) {
+  const [topicList, changeTopicList] = useDocument<TopicListDoc>(documentId)
   const textDocs = useTextDocsInBoard(boardId)
-  const topics = textDocs.flatMap((textDoc) => (
-    getTopicsInText(textDoc.text.toString())
-  ))
+
+  const toggleVoteForTopic = ({title}: Topic) => {
+    changeTopicList((topicList) => {
+      if(!topicList.votesByTitle[title]) {
+        topicList.votesByTitle[title] = {}
+      }
+
+      if (topicList.votesByTitle[title][selfId]) {
+        delete topicList.votesByTitle[title][selfId]
+      } else {
+        topicList.votesByTitle[title][selfId] = true
+      }
+    })
+  }
+
+  const topics : Topic[] = (
+    textDocs
+      .flatMap((textDoc) => (
+        (!textDoc || !textDoc.text)
+          ? []
+          : getTopLevelBulletPointsInText(textDoc.text.toString())
+      ))
+      .map(title => {
+        return {
+          title,
+          votes: topicList?.votesByTitle[title] ?? {}
+        }
+      })
+  )
+
 
   return (
-    <div>
-      <h1>Topic list</h1>
+    <div onDoubleClick={stopPropagation} className="TopicList">
+      <h1 className="TopicList-title">Topic list</h1>
 
-      <ul>
+      <ul className="TopicList-list">
         {topics.map((topic, index) => (
-          <li key={index}>{topic}</li>
+          <li
+            key={index}
+            className="TopicList-item"
+          >
+            <div className="TopicList-count">{Object.values(topic.votes).length}</div>
+            {topic.title}
+            <div className="TopicList-spacer"></div>
+            <button
+              className={classNames("TopicList-button", {
+                'is-selected': topic.votes[selfId]
+              })}
+                    onClick={() => toggleVoteForTopic(topic)}>
+              + 1
+            </button>
+          </li>
         ))}
       </ul>
     </div>
   );
 }
 
-function getTopicsInText(text: string): string[] {
+function getTopLevelBulletPointsInText(text: string): string[] {
   return Array.from(text.matchAll(/^-(.*)/mg))
     .map(([, topic]) => topic.trim())
 }
 
-function useTextDocsInBoard (boardId: DocumentId): TextDoc[] {
+function useTextDocsInBoard(boardId: DocumentId): TextDoc[] {
   const boardHandle = useHandle<BoardDoc>(boardId)
-  const handlersRef = useRef< {[id: DocumentId]: DocHandle<TextDoc>}>({})
+  const handlersRef = useRef<{ [id: DocumentId]: DocHandle<TextDoc> }>({})
   const repo = useRepo()
-  const [textDocs, setTextDocs] = useState<{[id: DocumentId] : TextDoc }>([])
+  const [textDocs, setTextDocs] = useState<{ [id: DocumentId]: TextDoc }>([])
 
-  function setTextDoc (id: DocumentId, doc: TextDoc) {
+  function setTextDoc(id: DocumentId, doc: TextDoc) {
     setTextDocs((textDocs) => ({
       ...textDocs,
       [id]: doc
     }))
   }
 
-  function updateActiveCards (cards: BoardDocCard[]) {
+  function updateActiveCards(cards: BoardDocCard[]) {
     const handlers = handlersRef.current
 
     const prevHandlerIds = Object.keys(handlers)
@@ -115,7 +178,7 @@ function useTextDocsInBoard (boardId: DocumentId): TextDoc[] {
 
 function create(unusedAttrs: any, handle: DocHandle<any>) {
   handle.change((doc) => {
-    // todo: init
+    doc.votesByTitle = {}
   });
 }
 
