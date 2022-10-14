@@ -12,8 +12,10 @@ import './TopicList.css'
 import classNames from "classnames";
 import { sortBy } from "lodash";
 import * as UriList from "../pushpin-code/UriList";
+import Author from "./workspace/Author";
 
 
+/** UserId => did they upvote */
 interface Votes {
   [id: DocumentId]: boolean
 }
@@ -107,7 +109,7 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
   return (
     <div onDoubleClick={stopPropagation} className="TopicList">
       <h1 className="TopicList-title">
-        Topics
+        Upvoter
 
         <button
           className={classNames("TopicList-button", {
@@ -126,6 +128,13 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
             key={index}
             className="TopicList-item"
           >
+            <button
+              className={classNames("TopicList-button", {
+                'is-selected': topic.votes[selfId]
+              })}
+              onClick={() => toggleVoteForTopic(topic)}>
+              ▲
+            </button>
             <div className="TopicList-count">
               {Object.keys(topic.votes).length}
             </div>
@@ -138,13 +147,9 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
               {topic.title}
             </div>
             <div className="TopicList-spacer"></div>
-            <button
-              className={classNames("TopicList-button", {
-                'is-selected': topic.votes[selfId]
-              })}
-              onClick={() => toggleVoteForTopic(topic)}>
-              + 1
-            </button>
+            <div className="Authors">
+              {Object.keys(topic.votes).map((id) => <Author key={id} contactId={id as DocumentId} isPresent={false} />)}
+            </div>
           </li>
         ))}
       </ul>
@@ -236,7 +241,7 @@ function create(unusedAttrs: any, handle: DocHandle<any>) {
 
 ContentTypes.register({
   type: "topiclist",
-  name: "Topic List",
+  name: "Upvoter",
   icon: "list",
   contexts: {
     board: TopicList,

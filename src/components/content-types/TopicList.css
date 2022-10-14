@@ -46,8 +46,14 @@
   text-align: center;
   line-height: 24px;
   height: 24px;
-  visibility: hidden;
   flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.TopicList-button:hover {
+  color: black;
+  background-color: #ddd;
 }
 
 .TopicList:hover > .TopicList-title > .TopicList-button,
