@@ -778,10 +778,10 @@ arg@^4.1.0:
   resolved "https://registry.yarnpkg.com/arg/-/arg-4.1.3.tgz#269fc7ad5b8e42cb63c896d5666017261c144089"
   integrity sha512-58S9QDqG0Xx27YwPSt9fJxivjYl432YCwfDMfZ+71RAqUrZef7LrKQZ3LHLOwCS4FLNBplP533Zx895SeOCHvA==
 
-automerge-repo-network-broadcastchannel@^0.0.11:
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/automerge-repo-network-broadcastchannel/-/automerge-repo-network-broadcastchannel-0.0.11.tgz#424f2251e7430b1a510904cfb7e90c684359975b"
-  integrity sha512-cON1/W0ROkoyYRL8M3dXX+Z2kH16i4X4l0Sv1HxD2Fc1xGzwiAkZGT4C1ASElyDElEyTc8zQFx/jlun2gQBYEg==
+automerge-repo-network-messagechannel@^0.0.12:
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/automerge-repo-network-messagechannel/-/automerge-repo-network-messagechannel-0.0.12.tgz#cecb56a2ecdffe8cad5556f38f8d9390fd727c76"
+  integrity sha512-tWWfJCIDydZfDefPa8hE+iOwdmoD9Kz2+XmNo3ImkhgN/fTfC0ZGCUu9dWUmygs4pskkgr7mxcjqbx4m7kfRcQ==
   dependencies:
     automerge-repo "*"
 

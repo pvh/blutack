@@ -8,8 +8,7 @@ import "./vendor/line-awesome/css/line-awesome.min.css"
 import localforage from "localforage"
 
 import { DocumentId, Repo } from "automerge-repo"
-import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
-import { BroadcastChannelNetworkAdapter } from "automerge-repo-network-broadcastchannel"
+import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechannel"
 import { RepoContext } from "automerge-repo-react-hooks"
 import * as ContentTypes from "./components/pushpin-code/ContentTypes"
 import { create as createWorkspace } from "./components/content-types/workspace/Workspace"
@@ -47,7 +46,6 @@ async function introduceWorkers(sharedWorker: SharedWorker) {
   const channel = new MessageChannel()
 
   reg.active.postMessage({ sharedWorkerPort: channel.port1 }, [channel.port1])
-  sharedWorker.port.start()
   sharedWorker.port.postMessage({ serviceWorkerPort: channel.port2 }, [
     channel.port2,
   ])
@@ -55,18 +53,22 @@ async function introduceWorkers(sharedWorker: SharedWorker) {
 }
 introduceWorkers(sharedWorker)
 
-const repo = await Repo({
-  storage: new LocalForageStorageAdapter(),
-  network: [
-    new BroadcastChannelNetworkAdapter(),
-    new BrowserWebSocketClientAdapter(
-      "wss://automerge-repo-sync-server.fly.dev"
-    ),
-  ],
-  sharePolicy: (peerId) => peerId.includes("shared-worker"),
-})
+async function setupSharedWorkerAndRepo() {
+  const repoNetworkChannel = new MessageChannel()
+  sharedWorker.port.postMessage({ repoNetworkPort: repoNetworkChannel.port2 }, [
+    repoNetworkChannel.port2,
+  ])
 
-ContentTypes.setRepo(repo)
+  const repo = await Repo({
+    network: [new MessageChannelNetworkAdapter(repoNetworkChannel.port1)],
+    sharePolicy: (peerId) => peerId.includes("shared-worker"),
+  })
+
+  ContentTypes.setRepo(repo)
+  return repo
+}
+
+const repo = await setupSharedWorkerAndRepo()
 
 const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
   let docId = new URLSearchParams(window.location.search).get(key)
