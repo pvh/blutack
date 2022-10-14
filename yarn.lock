@@ -10,17 +10,17 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@automerge/automerge-wasm@0.1.9":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@automerge/automerge-wasm/-/automerge-wasm-0.1.9.tgz#f372b6d4826ecc25bd9baa725b03be80d7b162ec"
-  integrity sha512-lqb+dZAgWyVwIXfQbLhSdt0zecr0jsxKztuTyu0PcMm3i0NeWXvPuxLcJvZ72K2/V7mKnNYs2cqYZFXYqC3yKg==
+"@automerge/automerge-wasm@0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@automerge/automerge-wasm/-/automerge-wasm-0.1.10.tgz#acebbd593c383d44871eb102bfd96c62bb4fe1e0"
+  integrity sha512-VNcgRhiaG6QNIkU2tawysusWSpoMwUV2Olef6tmjfwSjMFvzts5SO2g9HjaOYhpPoaEvNUyYULFuTz0OxJ4hcw==
 
 "@automerge/automerge@*":
-  version "2.0.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/@automerge/automerge/-/automerge-2.0.0-alpha.4.tgz#e1737ae89c15e7d7f0cf5fd6e9d6abcee47883ce"
-  integrity sha512-YCKcJOmDpo7qPPriDAwKCu8bvLyrEP20jBhrETJJAt51jY9L6K2sLVB50P4z5vhVASggHfHPSwikh/35HH8QQA==
+  version "2.0.0-alpha.5"
+  resolved "https://registry.yarnpkg.com/@automerge/automerge/-/automerge-2.0.0-alpha.5.tgz#87fc276fef5e2ef63fe433d8873517220f270d37"
+  integrity sha512-dlAXKUcI0bPLwq3UX0k9kZB2WHBYvnOO1c8as4LVLVXqfLuY8owE5EVvnrWa/GH54bVLItJHhxwSvpmQ7tw5uQ==
   dependencies:
-    "@automerge/automerge-wasm" "0.1.9"
+    "@automerge/automerge-wasm" "0.1.10"
     uuid "^8.3"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.18.6":
@@ -617,6 +617,11 @@
   dependencies:
     "@types/react" "*"
     hoist-non-react-statics "^3.3.0"
+
+"@types/lodash@^4.14.186":
+  version "4.14.186"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.186.tgz#862e5514dd7bd66ada6c70ee5fce844b06c8ee97"
+  integrity sha512-eHcVlLXP0c2FlMPm56ITode2AgLMSa6aJ05JTTbYbI+7EMkCEE5qk2E41d5g2lCVTqRe0GnnRFurmlCsDODrPw==
 
 "@types/mime-types@^2.1.1":
   version "2.1.1"
@@ -1341,7 +1346,7 @@ lodash.isequal@^4.5.0:
   resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
   integrity sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==
 
-lodash@^4.0.1, lodash@^4.17.11, lodash@^4.17.15:
+lodash@^4.0.1, lodash@^4.17.11, lodash@^4.17.15, lodash@^4.17.21:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==

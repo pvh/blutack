@@ -1,11 +1,14 @@
 .TopicList {
   width: 100%;
-  padding: var(--halfCellSize);x
+  padding: var(--halfCellSize);
 }
 
 .TopicList-title {
   font-size: 1.5em;
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .TopicList-list {
@@ -47,6 +50,7 @@
   flex-shrink: 0;
 }
 
+.TopicList:hover > .TopicList-title > .TopicList-button,
 .TopicList-item:hover > .TopicList-button,
 .TopicList-button.is-selected {
   visibility: visible;

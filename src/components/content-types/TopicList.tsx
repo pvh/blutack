@@ -10,16 +10,25 @@ import { parseDocumentLink, PushpinUrl } from "../pushpin-code/ShareLink";
 import { TextDoc } from "./TextContent";
 import './TopicList.css'
 import classNames from "classnames";
+import { sortBy } from "lodash";
 
 
-interface Votes { [id: DocumentId]: boolean }
+interface Votes {
+  [id: DocumentId]: boolean
+}
 
 interface VotesByTitle {
   [title: string]: Votes
 }
 
+interface Topic {
+  title: string
+  votes: Votes
+}
+
 interface TopicListDoc {
   votesByTitle: VotesByTitle
+  isSorted: boolean
 }
 
 interface Props extends ContentProps {
@@ -30,12 +39,8 @@ TopicList.minWidth = 6;
 TopicList.minHeight = 2;
 TopicList.defaultWidth = 15;
 
-interface Topic {
-  title: string
-  votes: Votes
-}
 
-function stopPropagation (e: React.SyntheticEvent) {
+function stopPropagation(e: React.SyntheticEvent) {
   e.stopPropagation()
   e.nativeEvent.stopImmediatePropagation()
 }
@@ -44,9 +49,13 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
   const [topicList, changeTopicList] = useDocument<TopicListDoc>(documentId)
   const textDocs = useTextDocsInBoard(boardId)
 
-  const toggleVoteForTopic = ({title}: Topic) => {
+  if (!topicList || !topicList.votesByTitle) {
+    return null
+  }
+
+  const toggleVoteForTopic = ({ title }: Topic) => {
     changeTopicList((topicList) => {
-      if(!topicList.votesByTitle[title]) {
+      if (!topicList.votesByTitle[title]) {
         topicList.votesByTitle[title] = {}
       }
 
@@ -58,7 +67,13 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
     })
   }
 
-  const topics : Topic[] = (
+  const toggleIsSorted = () => {
+    changeTopicList((topicList) => {
+      topicList.isSorted = !topicList.isSorted
+    })
+  }
+
+  const topics: Topic[] = (
     textDocs
       .flatMap((textDoc) => (
         (!textDoc || !textDoc.text)
@@ -73,25 +88,36 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
       })
   )
 
-
   return (
     <div onDoubleClick={stopPropagation} className="TopicList">
-      <h1 className="TopicList-title">Topic list</h1>
+      <h1 className="TopicList-title">
+        Topics
+
+        <button
+          className={classNames("TopicList-button", {
+            'is-selected': topicList.isSorted
+          })}
+          onClick={() => toggleIsSorted()}>
+          sorted
+        </button>
+      </h1>
 
       <ul className="TopicList-list">
-        {topics.map((topic, index) => (
+        {(topicList.isSorted
+          ? sortBy(topics, ({ votes }) => -Object.keys(votes).length)
+          : topics).map((topic, index) => (
           <li
             key={index}
             className="TopicList-item"
           >
-            <div className="TopicList-count">{Object.values(topic.votes).length}</div>
+            <div className="TopicList-count">{Object.keys(topic.votes).length}</div>
             {topic.title}
             <div className="TopicList-spacer"></div>
             <button
               className={classNames("TopicList-button", {
                 'is-selected': topic.votes[selfId]
               })}
-                    onClick={() => toggleVoteForTopic(topic)}>
+              onClick={() => toggleVoteForTopic(topic)}>
               + 1
             </button>
           </li>
@@ -110,7 +136,7 @@ function useTextDocsInBoard(boardId: DocumentId): TextDoc[] {
   const boardHandle = useHandle<BoardDoc>(boardId)
   const handlersRef = useRef<{ [id: DocumentId]: DocHandle<TextDoc> }>({})
   const repo = useRepo()
-  const [textDocs, setTextDocs] = useState<{ [id: DocumentId]: TextDoc }>([])
+  const [textDocs, setTextDocs] = useState<{ [id: DocumentId]: TextDoc }>({})
 
   function setTextDoc(id: DocumentId, doc: TextDoc) {
     setTextDocs((textDocs) => ({
@@ -179,6 +205,7 @@ function useTextDocsInBoard(boardId: DocumentId): TextDoc[] {
 function create(unusedAttrs: any, handle: DocHandle<any>) {
   handle.change((doc) => {
     doc.votesByTitle = {}
+    doc.isSorted = false
   });
 }
 
