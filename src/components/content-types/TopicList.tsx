@@ -75,11 +75,19 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
 
   const topics: Topic[] = (
     textDocs
-      .flatMap((textDoc) => (
-        (!textDoc || !textDoc.text)
-          ? []
-          : getTopLevelBulletPointsInText(textDoc.text.toString())
-      ))
+      .flatMap((textDoc) => {
+        if (!textDoc || !textDoc.text) {
+          return []
+        }
+
+        const text = textDoc.text.toString()
+
+        if (!text.startsWith("# Topics")) {
+          return []
+        }
+
+        return getTopLevelBulletPointsInText(text)
+      })
       .map(title => {
         return {
           title,
