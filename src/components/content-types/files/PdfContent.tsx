@@ -274,18 +274,20 @@ export default function PdfContent(props: ContentProps) {
         <div className="PdfContent-sidebarTitle">Viewers</div>
 
         <ListMenu>
-          {Object.entries(openPageNumByPerson).map(([viewerId, pageNum]) => (
-            <ListMenuItem
-              onClick={() => {
-                setPageNum(pageNum)
-              }}
-            >
-              <Content
-                context="list"
-                url={createDocumentLink("contact", viewerId as DocumentId)}
-              />
-            </ListMenuItem>
-          ))}
+          {Object.entries(openPageNumByPerson)
+            .filter(([viewerId]) => viewerId !== props.selfId)
+            .map(([viewerId, pageNum]) => (
+              <ListMenuItem
+                onClick={() => {
+                  setPageNum(pageNum)
+                }}
+              >
+                <Content
+                  context="list"
+                  url={createDocumentLink("contact", viewerId as DocumentId)}
+                />
+              </ListMenuItem>
+            ))}
         </ListMenu>
       </div>
 
