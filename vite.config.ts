@@ -2,11 +2,10 @@ import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import wasm from "vite-plugin-wasm"
 import topLevelAwait from "vite-plugin-top-level-await"
-import shimReactPdf from "vite-plugin-shim-react-pdf"
 
 export default defineConfig({
   base: "/blutack/",
-  plugins: [topLevelAwait(), react(), wasm(), shimReactPdf()],
+  plugins: [topLevelAwait(), react(), wasm()],
 
   optimizeDeps: {
     // This is necessary because otherwise `vite dev` includes two separate
