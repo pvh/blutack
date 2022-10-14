@@ -276,7 +276,7 @@ function BoardCard(props: BoardCardProps) {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
-      <Content context="board" url={url} uniquelySelected={props.uniquelySelected} />
+      <Content context="board" boardId={props.boardId} url={url} uniquelySelected={props.uniquelySelected} />
       {contentType && contentType.resizable !== false && (
         <span
           onPointerDown={resizePointerDown}
