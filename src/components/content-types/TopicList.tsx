@@ -1,19 +1,18 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import * as ContentTypes from "../pushpin-code/ContentTypes";
-import { ContentProps, EditableContentProps } from "../Content";
-import { useDocument, useHandle, useRepo } from "automerge-repo-react-hooks";
-import "./TextContent.css";
-import { DocCollection, DocHandle, DocumentId } from "automerge-repo";
-import ContentList, { ContentListInList } from "./ContentList";
-import { BoardDoc, BoardDocCard } from "./board";
-import { parseDocumentLink, PushpinUrl } from "../pushpin-code/ShareLink";
-import { TextDoc } from "./TextContent";
-import './TopicList.css'
-import classNames from "classnames";
-import { sortBy } from "lodash";
-import * as UriList from "../pushpin-code/UriList";
-import Author from "./workspace/Author";
-
+import React, { useCallback, useEffect, useRef, useState } from "react"
+import * as ContentTypes from "../pushpin-code/ContentTypes"
+import { ContentProps, EditableContentProps } from "../Content"
+import { useDocument, useHandle, useRepo } from "automerge-repo-react-hooks"
+import "./TextContent.css"
+import { DocCollection, DocHandle, DocumentId } from "automerge-repo"
+import ContentList, { ContentListInList } from "./ContentList"
+import { BoardDoc, BoardDocCard } from "./board"
+import { parseDocumentLink, PushpinUrl } from "../pushpin-code/ShareLink"
+import { TextDoc } from "./TextContent"
+import "./TopicList.css"
+import classNames from "classnames"
+import { sortBy } from "lodash"
+import * as UriList from "../pushpin-code/UriList"
+import Author from "./workspace/Author"
 
 /** UserId => did they upvote */
 interface Votes {
@@ -35,13 +34,12 @@ interface TopicListDoc {
 }
 
 interface Props extends ContentProps {
-  boardId: DocumentId;
+  boardId: DocumentId
 }
 
-TopicList.minWidth = 6;
-TopicList.minHeight = 2;
-TopicList.defaultWidth = 15;
-
+TopicList.minWidth = 6
+TopicList.minHeight = 2
+TopicList.defaultWidth = 15
 
 function stopPropagation(e: React.SyntheticEvent) {
   e.stopPropagation()
@@ -56,8 +54,11 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
     return null
   }
 
-  const handleDragStart = (evt: React.DragEvent<HTMLDivElement>, text: string) => {
-    console.log('dragStart')
+  const handleDragStart = (
+    evt: React.DragEvent<HTMLDivElement>,
+    text: string
+  ) => {
+    console.log("dragStart")
 
     stopPropagation(evt)
     evt.dataTransfer.setData("text/plain", text)
@@ -83,39 +84,37 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
     })
   }
 
-  const topics: Topic[] = (
-    textDocs
-      .flatMap((textDoc) => {
-        if (!textDoc || !textDoc.text) {
-          return []
-        }
+  const topics: Topic[] = textDocs
+    .flatMap((textDoc) => {
+      if (!textDoc || !textDoc.text) {
+        return []
+      }
 
-        const text = textDoc.text.toString()
+      const text = textDoc.text.toString()
 
-        if (!text.startsWith("# Topics")) {
-          return []
-        }
+      if (!text.startsWith("# Topics")) {
+        return []
+      }
 
-        return getTopLevelBulletPointsInText(text)
-      })
-      .map(title => {
-        return {
-          title,
-          votes: topicList?.votesByTitle[title] ?? {}
-        }
-      })
-  )
+      return getTopLevelBulletPointsInText(text)
+    })
+    .map((title) => {
+      return {
+        title,
+        votes: topicList?.votesByTitle[title] ?? {},
+      }
+    })
 
   return (
     <div onDoubleClick={stopPropagation} className="TopicList">
       <h1 className="TopicList-title">
         Upvoter
-
         <button
           className={classNames("TopicList-button", {
-            'is-selected': topicList.isSorted
+            "is-selected": topicList.isSorted,
           })}
-          onClick={() => toggleIsSorted()}>
+          onClick={() => toggleIsSorted()}
+        >
           sorted
         </button>
       </h1>
@@ -123,16 +122,15 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
       <ul className="TopicList-list">
         {(topicList.isSorted
           ? sortBy(topics, ({ votes }) => -Object.keys(votes).length)
-          : topics).map((topic, index) => (
-          <li
-            key={index}
-            className="TopicList-item"
-          >
+          : topics
+        ).map((topic, index) => (
+          <li key={index} className="TopicList-item">
             <button
               className={classNames("TopicList-button", {
-                'is-selected': topic.votes[selfId]
+                "is-selected": topic.votes[selfId],
               })}
-              onClick={() => toggleVoteForTopic(topic)}>
+              onClick={() => toggleVoteForTopic(topic)}
+            >
               ▲
             </button>
             <div className="TopicList-count">
@@ -148,18 +146,23 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
             </div>
             <div className="TopicList-spacer"></div>
             <div className="Authors">
-              {Object.keys(topic.votes).map((id) => <Author key={id} contactId={id as DocumentId} isPresent={false} />)}
+              {Object.keys(topic.votes).map((id) => (
+                <Author
+                  key={id}
+                  contactId={id as DocumentId}
+                  isPresent={false}
+                />
+              ))}
             </div>
           </li>
         ))}
       </ul>
     </div>
-  );
+  )
 }
 
 function getTopLevelBulletPointsInText(text: string): string[] {
-  return Array.from(text.matchAll(/^-(.*)/mg))
-    .map(([, topic]) => topic.trim())
+  return Array.from(text.matchAll(/^-(.*)/gm)).map(([, topic]) => topic.trim())
 }
 
 function useTextDocsInBoard(boardId: DocumentId): TextDoc[] {
@@ -171,7 +174,7 @@ function useTextDocsInBoard(boardId: DocumentId): TextDoc[] {
   function setTextDoc(id: DocumentId, doc: TextDoc) {
     setTextDocs((textDocs) => ({
       ...textDocs,
-      [id]: doc
+      [id]: doc,
     }))
   }
 
@@ -180,28 +183,26 @@ function useTextDocsInBoard(boardId: DocumentId): TextDoc[] {
 
     const prevHandlerIds = Object.keys(handlers)
 
-    const textCardIds = (
-      Object.values(cards)
-        .map(card => parseDocumentLink(card.url))
-        .filter(({ type }) => type === "text")
-        .map(card => card.documentId)
-    )
+    const textCardIds = Object.values(cards)
+      .map((card) => parseDocumentLink(card.url))
+      .filter(({ type }) => type === "text")
+      .map((card) => card.documentId)
 
-    textCardIds.forEach(id => {
+    textCardIds.forEach((id) => {
       if (handlers[id]) {
         return
       }
 
-      const handler = handlers[id] = repo.find<TextDoc>(id)
+      const handler = (handlers[id] = repo.find<TextDoc>(id))
       handler.value().then((doc) => {
         setTextDoc(id as DocumentId, doc)
       })
       handler.on("change", (evt) => {
-        setTextDoc(id as DocumentId, evt.doc)
+        setTextDoc(id as DocumentId, evt.handle.doc)
       })
     })
 
-    prevHandlerIds.forEach(id => {
+    prevHandlerIds.forEach((id) => {
       if (handlers[id as DocumentId]) {
         return
       }
@@ -211,22 +212,25 @@ function useTextDocsInBoard(boardId: DocumentId): TextDoc[] {
       delete handlers[id as DocumentId]
 
       setTextDocs((textDocs) => {
-        const copy = { ...textDocs };
-        delete copy[id as DocumentId];
+        const copy = { ...textDocs }
+        delete copy[id as DocumentId]
         return copy
       })
     })
-
   }
 
   useEffect(() => {
-    boardHandle.value().then(doc => {
+    boardHandle.value().then((doc) => {
       updateActiveCards(Object.values(doc.cards))
     })
 
-    boardHandle.on('change', (evt) => {
-      updateActiveCards(Object.values(evt.doc.cards))
-    }, [boardHandle])
+    boardHandle.on(
+      "change",
+      (evt) => {
+        updateActiveCards(Object.values(evt.handle.doc.cards))
+      },
+      [boardHandle]
+    )
   })
 
   return Object.values(textDocs)
@@ -236,7 +240,7 @@ function create(unusedAttrs: any, handle: DocHandle<any>) {
   handle.change((doc) => {
     doc.votesByTitle = {}
     doc.isSorted = false
-  });
+  })
 }
 
 ContentTypes.register({
@@ -247,4 +251,4 @@ ContentTypes.register({
     board: TopicList,
   },
   create,
-});
+})
