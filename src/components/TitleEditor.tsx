@@ -57,7 +57,7 @@ export default function TitleEditor(props: Props) {
         onDragStart={onDragStart}
         type="text"
         className="TitleEditor"
-        value={doc[field]}
+        defaultValue={doc[field]}
         placeholder={placeholder}
         onKeyDown={onKeyDown}
         onChange={onChange}
