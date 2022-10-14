@@ -396,7 +396,7 @@ function AnnotationGroup({
   return (
     <div className="PdfContent-annotationGroup">
       <input type="checkbox" checked={!isHidden} onChange={onToggleIsHidden} />
-      <Content context="thread" url={createDocumentLink("contact", authorId)} />
+      <Content context="list" url={createDocumentLink("contact", authorId)} />
     </div>
   )
 }
