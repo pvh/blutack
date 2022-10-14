@@ -16,7 +16,7 @@ import ContentDragHandle from '../ui/ContentDragHandle'
 import TitleWithSubtitle from '../ui/TitleWithSubtitle'
 import { DocHandle } from 'automerge-repo'
 
-interface TextDoc {
+export interface TextDoc {
   title: string
   text: Automerge.Text
 }

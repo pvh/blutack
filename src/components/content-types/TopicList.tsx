@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as ContentTypes from "../pushpin-code/ContentTypes";
 import { ContentProps, EditableContentProps } from "../Content";
-import { useDocument } from "automerge-repo-react-hooks";
+import { useDocument, useRepo } from "automerge-repo-react-hooks";
 import "./TextContent.css";
-import { DocHandle, DocumentId } from "automerge-repo";
+import { DocCollection, DocHandle, DocumentId } from "automerge-repo";
 import ContentList, { ContentListInList } from "./ContentList";
 import { BoardDoc } from "./board";
+import { parseDocumentLink, PushpinUrl } from "../pushpin-code/ShareLink";
+import { TextDoc } from "./TextContent";
 
 interface TopicListDoc {}
 
@@ -19,17 +21,43 @@ TopicList.defaultWidth = 15;
 
 export default function TopicList({boardId, documentId}: Props) {
   const [doc, changeDoc] = useDocument<TopicListDoc>(documentId);
-  const [board] = useDocument<BoardDoc>(boardId)
 
-  const cards = board?.cards ? Object.keys(board.cards).length : 0
+
+  const textDocs = useTextDocsInBoard(boardId)
+
 
   return (
     <div>
       <h1>Topic list</h1>
 
-      {cards}
+      <pre>{textDocs.length}</pre>
     </div>
   );
+}
+
+function useTextDocsInBoard (boardId: DocumentId): TextDoc[] {
+  const [board] = useDocument<BoardDoc>(boardId)
+  const repo = useRepo()
+
+  const [textDocs, setTextDocs] = useState<TextDoc[]>([])
+
+  useEffect(() => {
+    if (!board || !board.cards) {
+      return
+    }
+
+    Promise.all(Object.values(board.cards)
+      .map(card => parseDocumentLink(card.url))
+      .filter(({ type }) => type === "text")
+      .map(({ documentId}) => {
+        const handle = repo.find<TextDoc>(documentId)
+        return handle.value()
+      }))
+      .then(setTextDocs)
+
+  }, [board])
+
+  return textDocs
 }
 
 function create(unusedAttrs: any, handle: DocHandle<any>) {
@@ -47,3 +75,5 @@ ContentTypes.register({
   },
   create,
 });
+
+console.log('foo', 123)
