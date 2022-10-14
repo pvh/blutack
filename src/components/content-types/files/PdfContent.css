@@ -26,6 +26,11 @@
 
 .PdfContent-main {
   flex: 1;
+  background: #dadada;
+}
+
+.PdfContent-main.is-marker-selected {
+  cursor: crosshair !important;
 }
 
 .PdfContent--loading {

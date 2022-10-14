@@ -260,7 +260,11 @@ export default function PdfContent(props: ContentProps) {
 
   return (
     <div className="PdfContent">
-      <div className="PdfContent-main">
+      <div
+        className={classNames("PdfContent-main", {
+          "is-marker-selected": isMarkerSelected,
+        })}
+      >
         <div className="PdfContent-header">
           <div className="PdfContent-header-left"></div>
           <button
