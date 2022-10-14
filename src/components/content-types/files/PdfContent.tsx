@@ -36,6 +36,8 @@ import { ContactDoc } from "../contact"
 import classNames from "classnames"
 import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import Heading from "../../ui/Heading"
+import ListMenu from "../../ui/ListMenu"
+import ListMenuItem from "../../ui/ListMenuItem"
 
 export interface PdfAnnotation {
   stroke: number[][]
@@ -46,6 +48,7 @@ export interface PdfAnnotation {
 export interface PdfDoc extends FileDoc {
   content: string
   annotations: PdfAnnotation[]
+  openPageNumByPerson: { [id: DocumentId]: number } // todo: handle case where person has pdf open multiple times
 }
 
 const PAGE_WIDTH = 1600
@@ -80,20 +83,6 @@ export default function PdfContent(props: ContentProps) {
   const [points, setPoints] = React.useState<Point[]>([])
   const [author] = useDocument<ContactDoc>(props.selfId)
   const [isMarkerSelected, setIsMarkerSelected] = React.useState<boolean>(false)
-  const [isAnnotationGroupHidden, setIsAnnotationGroupHidden] = React.useState<{
-    [authorId: DocumentId]: boolean
-  }>({})
-
-  const toggleIsAnnotationGroupOfAuthorHidden = (authorId: DocumentId) => {
-    if (!isAnnotationGroupHidden[authorId]) {
-      setIsMarkerSelected(false)
-    }
-
-    setIsAnnotationGroupHidden((isAnnotationGroupHidden) => ({
-      ...isAnnotationGroupHidden,
-      [authorId]: !isAnnotationGroupHidden[authorId],
-    }))
-  }
 
   const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback(
     (e: any) => {
@@ -132,13 +121,6 @@ export default function PdfContent(props: ContentProps) {
   )
 
   const toggleIsMarkerSelected = useCallback(() => {
-    if (!isMarkerSelected) {
-      setIsAnnotationGroupHidden(() => ({
-        ...isAnnotationGroupHidden,
-        [props.selfId]: false,
-      }))
-    }
-
     setIsMarkerSelected((isMarkerSelected) => !isMarkerSelected)
   }, [])
 
@@ -169,9 +151,8 @@ export default function PdfContent(props: ContentProps) {
   const pathData = getSvgPathFromStroke(stroke)
 
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
-
   const buffer = useBinaryDataContents(pdf && pdf.binaryDataId)
-  const [pageNum, setPageNum] = useState(1)
+  const [pageNum, _setPageNum] = useState(1)
   const [numPages, setNumPages] = useState(0)
   const [pageInputValue, onPageInput] = useConfirmableInput(
     String(pageNum),
@@ -181,6 +162,38 @@ export default function PdfContent(props: ContentProps) {
       setPageNum(Math.min(numPages, Math.max(1, nextPageNum)))
     }
   )
+
+  const setPageNum = useCallback(
+    (number: number) => {
+      _setPageNum(number)
+
+      changePdf((pdf) => {
+        if (!pdf.openPageNumByPerson) {
+          pdf.openPageNumByPerson = {}
+        }
+
+        pdf.openPageNumByPerson[props.selfId] = pageNum
+      })
+    },
+    [_setPageNum]
+  )
+
+  // store openPdf number of user on mount and remove on unmount
+  useEffect(() => {
+    changePdf((pdf) => {
+      if (!pdf.openPageNumByPerson) {
+        pdf.openPageNumByPerson = {}
+      }
+
+      pdf.openPageNumByPerson[props.selfId] = pageNum
+    })
+
+    return () => {
+      changePdf((pdf) => {
+        delete pdf.openPageNumByPerson[props.selfId]
+      })
+    }
+  }, [])
 
   function goForward() {
     if (pageNum < numPages) {
@@ -244,22 +257,29 @@ export default function PdfContent(props: ContentProps) {
   const { context } = props
 
   const annotations = pdf.annotations ?? []
-  const annotationByAuthor = annotations.reduce(
-    (group: { [id: DocumentId]: PdfAnnotation[] }, annotation) => {
-      if (!group[annotation.authorId]) {
-        group[annotation.authorId] = []
-      }
-      group[annotation.authorId].push(annotation)
-      return group
-    },
-    {}
-  )
 
   const forwardDisabled = pageNum >= numPages
   const backDisabled = pageNum <= 1
 
+  const openPageNumByPerson = pdf.openPageNumByPerson ?? {}
+
   return (
     <div className="PdfContent">
+      <div className="PdfContent-sidebar is-left">
+        <div className="PdfContent-sidebarTitle">Viewers</div>
+
+        <ListMenu>
+          {Object.entries(openPageNumByPerson).map(([viewerId, pageNum]) => (
+            <ListMenuItem>
+              <Content
+                context="list"
+                url={createDocumentLink("contact", viewerId as DocumentId)}
+              />
+            </ListMenuItem>
+          ))}
+        </ListMenu>
+      </div>
+
       <div
         className={classNames("PdfContent-main", {
           "is-marker-selected": isMarkerSelected,
@@ -339,10 +359,7 @@ export default function PdfContent(props: ContentProps) {
               // TODO: we should be using Content here, but I need to pass the selectedPage to the view
               pdf.annotations &&
                 pdf.annotations.map((annotation, index) => {
-                  if (
-                    annotation.page !== pageNum ||
-                    isAnnotationGroupHidden[annotation.authorId]
-                  ) {
+                  if (annotation.page !== pageNum) {
                     return
                   }
 
@@ -365,42 +382,6 @@ export default function PdfContent(props: ContentProps) {
           </svg>
         </div>
       </div>
-      <div className="PdfContent-sidebar">
-        <Heading>Annotations by</Heading>
-
-        {Object.entries(annotationByAuthor).map(([authorId, annotations]) => (
-          <AnnotationGroup
-            authorId={authorId as DocumentId}
-            annotations={annotations}
-            key={authorId}
-            isHidden={isAnnotationGroupHidden[authorId as DocumentId]}
-            onToggleIsHidden={() =>
-              toggleIsAnnotationGroupOfAuthorHidden(authorId as DocumentId)
-            }
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function AnnotationGroup({
-  authorId,
-  annotations,
-  isHidden,
-  onToggleIsHidden,
-}: {
-  authorId: DocumentId
-  annotations: PdfAnnotation[]
-  isHidden: boolean
-  onToggleIsHidden: () => void
-}) {
-  const [author] = useDocument(authorId)
-
-  return (
-    <div className="PdfContent-annotationGroup">
-      <input type="checkbox" checked={!isHidden} onChange={onToggleIsHidden} />
-      <Content context="list" url={createDocumentLink("contact", authorId)} />
     </div>
   )
 }

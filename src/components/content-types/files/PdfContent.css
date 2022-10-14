@@ -21,7 +21,19 @@
   width: 200px;
   flex-shrink: 0;
   padding: 8px;
+}
+
+.PdfContent-sidebarTitle {
+  color: gray;
+  margin-bottom: 8px;
+}
+
+.PdfContent-sidebar.is-right {
   border-left: 1px solid #eeeeee;
+}
+
+.PdfContent-sidebar.is-left {
+  border-right: 1px solid #eeeeee;
 }
 
 .PdfContent-main {

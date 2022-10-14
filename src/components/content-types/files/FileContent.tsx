@@ -14,6 +14,7 @@ import CenteredStack from "../../ui/CenteredStack"
 import SecondaryText from "../../ui/SecondaryText"
 import Heading from "../../ui/Heading"
 import { useBinaryDataHeader } from "../../../blobstore/Blob"
+import { PdfDoc } from "./PdfContent"
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
