@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as ContentTypes from "../pushpin-code/ContentTypes";
 import { ContentProps, EditableContentProps } from "../Content";
-import { useDocument, useRepo } from "automerge-repo-react-hooks";
+import { useDocument, useHandle, useRepo } from "automerge-repo-react-hooks";
 import "./TextContent.css";
 import { DocCollection, DocHandle, DocumentId } from "automerge-repo";
 import ContentList, { ContentListInList } from "./ContentList";
-import { BoardDoc } from "./board";
+import { BoardDoc, BoardDocCard } from "./board";
 import { parseDocumentLink, PushpinUrl } from "../pushpin-code/ShareLink";
 import { TextDoc } from "./TextContent";
 
@@ -20,8 +20,6 @@ TopicList.minHeight = 2;
 TopicList.defaultWidth = 15;
 
 export default function TopicList({boardId, documentId}: Props) {
-  const [doc, changeDoc] = useDocument<TopicListDoc>(documentId);
-
   const textDocs = useTextDocsInBoard(boardId)
   const topics = textDocs.flatMap((textDoc) => (
     getTopicsInText(textDoc.text.toString())
@@ -36,8 +34,6 @@ export default function TopicList({boardId, documentId}: Props) {
           <li key={index}>{topic}</li>
         ))}
       </ul>
-
-      <pre>{textDocs.length}</pre>
     </div>
   );
 }
@@ -48,28 +44,73 @@ function getTopicsInText(text: string): string[] {
 }
 
 function useTextDocsInBoard (boardId: DocumentId): TextDoc[] {
-  const [board] = useDocument<BoardDoc>(boardId)
+  const boardHandle = useHandle<BoardDoc>(boardId)
+  const handlersRef = useRef< {[id: DocumentId]: DocHandle<TextDoc>}>({})
   const repo = useRepo()
+  const [textDocs, setTextDocs] = useState<{[id: DocumentId] : TextDoc }>([])
 
-  const [textDocs, setTextDocs] = useState<TextDoc[]>([])
+  function setTextDoc (id: DocumentId, doc: TextDoc) {
+    setTextDocs((textDocs) => ({
+      ...textDocs,
+      [id]: doc
+    }))
+  }
+
+  function updateActiveCards (cards: BoardDocCard[]) {
+    const handlers = handlersRef.current
+
+    const prevHandlerIds = Object.keys(handlers)
+
+    const textCardIds = (
+      Object.values(cards)
+        .map(card => parseDocumentLink(card.url))
+        .filter(({ type }) => type === "text")
+        .map(card => card.documentId)
+    )
+
+    textCardIds.forEach(id => {
+      if (handlers[id]) {
+        return
+      }
+
+      const handler = handlers[id] = repo.find<TextDoc>(id)
+      handler.value().then((doc) => {
+        setTextDoc(id as DocumentId, doc)
+      })
+      handler.on("change", (evt) => {
+        setTextDoc(id as DocumentId, evt.doc)
+      })
+    })
+
+    prevHandlerIds.forEach(id => {
+      if (handlers[id as DocumentId]) {
+        return
+      }
+
+      const handler = handlers[id as DocumentId]
+      handler.off("change")
+      delete handlers[id as DocumentId]
+
+      setTextDocs((textDocs) => {
+        const copy = { ...textDocs };
+        delete copy[id as DocumentId];
+        return copy
+      })
+    })
+
+  }
 
   useEffect(() => {
-    if (!board || !board.cards) {
-      return
-    }
+    boardHandle.value().then(doc => {
+      updateActiveCards(Object.values(doc.cards))
+    })
 
-    Promise.all(Object.values(board.cards)
-      .map(card => parseDocumentLink(card.url))
-      .filter(({ type }) => type === "text")
-      .map(({ documentId}) => {
-        const handle = repo.find<TextDoc>(documentId)
-        return handle.value()
-      }))
-      .then(setTextDocs)
+    boardHandle.on('change', (evt) => {
+      updateActiveCards(Object.values(evt.doc.cards))
+    }, [boardHandle])
+  })
 
-  }, [board])
-
-  return textDocs
+  return Object.values(textDocs)
 }
 
 function create(unusedAttrs: any, handle: DocHandle<any>) {
