@@ -22,17 +22,29 @@ TopicList.defaultWidth = 15;
 export default function TopicList({boardId, documentId}: Props) {
   const [doc, changeDoc] = useDocument<TopicListDoc>(documentId);
 
-
   const textDocs = useTextDocsInBoard(boardId)
-
+  const topics = textDocs.flatMap((textDoc) => (
+    getTopicsInText(textDoc.text.toString())
+  ))
 
   return (
     <div>
       <h1>Topic list</h1>
 
+      <ul>
+        {topics.map((topic, index) => (
+          <li key={index}>{topic}</li>
+        ))}
+      </ul>
+
       <pre>{textDocs.length}</pre>
     </div>
   );
+}
+
+function getTopicsInText(text: string): string[] {
+  return Array.from(text.matchAll(/^-(.*)/mg))
+    .map(([, topic]) => topic.trim())
 }
 
 function useTextDocsInBoard (boardId: DocumentId): TextDoc[] {
