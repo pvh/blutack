@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
 import Root from "./components/Root"
-import "./app.css"
+import "./App.css"
 import "./ibm-plex.css"
 import "./vendor/line-awesome/css/line-awesome.min.css"
 
