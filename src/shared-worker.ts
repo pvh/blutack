@@ -42,6 +42,7 @@ const repo = new Repo({
 self.addEventListener("connect", (e: MessageEvent) => {
   console.log("client connected to shared-worker")
   var mainPort = e.ports[0]
+  mainPort.postMessage("READY")
   mainPort.onmessage = function (e: MessageEvent<SharedWorkerMessage>) {
     console.log("got a message", e)
     const data = e.data
