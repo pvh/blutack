@@ -31,7 +31,7 @@ async function registerServiceWorker() {
 registerServiceWorker()
 
 const sharedWorker = new SharedWorker(
-  new URL("./shared-worker.js", import.meta.url),
+  new URL("./shared-worker.ts", import.meta.url),
   { type: "module", name: "automerge-repo-shared-worker" }
 )
 
@@ -53,13 +53,13 @@ async function introduceWorkers(sharedWorker: SharedWorker) {
 }
 introduceWorkers(sharedWorker)
 
-async function setupSharedWorkerAndRepo() {
+function setupSharedWorkerAndRepo() {
   const repoNetworkChannel = new MessageChannel()
   sharedWorker.port.postMessage({ repoNetworkPort: repoNetworkChannel.port2 }, [
     repoNetworkChannel.port2,
   ])
 
-  const repo = await Repo({
+  const repo = new Repo({
     network: [new MessageChannelNetworkAdapter(repoNetworkChannel.port1)],
     sharePolicy: (peerId) => peerId.includes("shared-worker"),
   })
@@ -68,7 +68,7 @@ async function setupSharedWorkerAndRepo() {
   return repo
 }
 
-const repo = await setupSharedWorkerAndRepo()
+const repo = setupSharedWorkerAndRepo()
 
 const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
   let docId = new URLSearchParams(window.location.search).get(key)

@@ -40,6 +40,12 @@ export interface ContentListDoc {
   content: PushpinUrl[]
 }
 
+ContentList.minWidth = 24
+ContentList.minHeight = 8
+ContentList.defaultWidth = 24
+ContentList.maxWidth = 80
+ContentList.maxHeight = 36
+
 export default function ContentList({ documentId }: ContentProps) {
   const [doc, changeDoc] = useDocument<ContentListDoc>(documentId)
   const [currentContent, selectContent] = useState<PushpinUrl | undefined>()
