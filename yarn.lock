@@ -826,10 +826,10 @@ automerge-repo@*:
     ts-node "^10.9.1"
     uuid "^8.3.2"
 
-automerge-repo@0.0.21:
-  version "0.0.21"
-  resolved "https://registry.yarnpkg.com/automerge-repo/-/automerge-repo-0.0.21.tgz#70de7c206e2dcf91dead37498e6414ddc477b569"
-  integrity sha512-HE44Ozy45xY4G7x8ZsgseNoaunCfdVEa5RjaLk5N/Q+LsSqQQG1Ft3O+j6W80czyeHriZ8KZoKRLin13QxvSyA==
+automerge-repo@0.0.22:
+  version "0.0.22"
+  resolved "https://registry.yarnpkg.com/automerge-repo/-/automerge-repo-0.0.22.tgz#216f9d2096a0d86353b5719f636e9b789ef92ac9"
+  integrity sha512-QzS7xMRE4D35jq3Y47vO0GlJLZKLL7sJGz/q4HuyXIep+c+VRkvQf6RXJJKjTlC9Gji9UqRFtPV6VDX5Br1o/w==
   dependencies:
     cbor-x "^1.3.0"
     eventemitter3 "^4.0.7"
