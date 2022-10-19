@@ -30,7 +30,8 @@ export type SharedWorkerMessage = ServiceWorkerConnection | FrontendConnection
 // $ yarn
 // $ mkdir .amrg
 // $ yarn start
-// change the URL below to "ws://localhost:3030"
+// uncomment this and comment out the one below:
+// const url = "ws://localhost:3030"
 const url = "wss://automerge-repo-sync-server.fly.dev"
 const repo = new Repo({
   storage: new LocalForageStorageAdapter(),
