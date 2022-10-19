@@ -12,7 +12,7 @@ import { Document, Page, pdfjs } from "react-pdf"
 
 // TODO: see if we can find a better way to load this file;
 // some ideas: https://github.com/wojtekmaj/react-pdf/issues/97
-pdfjs.GlobalWorkerOptions.workerSrc = `/src/assets/pdf.worker.js`
+pdfjs.GlobalWorkerOptions.workerSrc = `./pdf.worker.js`
 
 import { useDocument } from "automerge-repo-react-hooks"
 import { FileDoc } from "."
