@@ -12,15 +12,14 @@ import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechan
 import { RepoContext } from "automerge-repo-react-hooks"
 import * as ContentTypes from "./components/pushpin-code/ContentTypes"
 import { create as createWorkspace } from "./components/content-types/workspace/Workspace"
-import { BrowserWebSocketClientAdapter } from "automerge-repo-network-websocket"
 
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
     try {
       const registration = await navigator.serviceWorker.register(
-        new URL("./service-worker.js", import.meta.url),
+        "/blutack/service-worker.js", // TODO: path fix
         {
-          scope: "/",
+          scope: "/blutack/",
         }
       )
     } catch (error) {
