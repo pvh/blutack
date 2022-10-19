@@ -790,10 +790,10 @@ automerge-repo-network-messagechannel@^0.0.13:
   dependencies:
     automerge-repo "*"
 
-automerge-repo-network-websocket@^0.0.13:
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/automerge-repo-network-websocket/-/automerge-repo-network-websocket-0.0.13.tgz#55a9389cc7745dd1f4c1d038ee14722dd4bc4fa1"
-  integrity sha512-tmbR99GN9v5TkJRUngvu1aZGcf6aE1AHFB7dMgVnUCI09TevgEWCpLPwtNv1pfue3RkTnXHT8ywkW2Q26tb2+Q==
+automerge-repo-network-websocket@0.0.14:
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/automerge-repo-network-websocket/-/automerge-repo-network-websocket-0.0.14.tgz#b9e0bc771bf74897376947da9759c17ff8bff3e5"
+  integrity sha512-B/isNboBTroK5JVIfsMPvWGN6hPFL8uiZiEgByunkQOlnNlK345vdcjX6CMaucmT7A2nSDGvqKIvEpGNSsZWBw==
   dependencies:
     automerge-repo "*"
     cbor-x "^1.3.0"
