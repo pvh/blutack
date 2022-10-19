@@ -33,12 +33,15 @@ registerServiceWorker()
 let sharedWorker = await createSharedWorker()
 
 // FIXME - had an issue with shared worker missing the connect message on the first startup
-// if it was also loading wasm - unsure what the issue is but repeating the sharedworker 
+// if it was also loading wasm - unsure what the issue is but repeating the sharedworker
 // in the only workaround we have at the moment
-function createSharedWorker() {
+function createSharedWorker(): Promise<SharedWorker> {
   return new Promise((resolve) => {
     let interval = setInterval(() => {
-      let worker = new SharedWorker(new URL("./shared-worker.ts", import.meta.url), { type: "module", name: "automerge-repo-shared-worker" })
+      let worker = new SharedWorker(
+        new URL("./shared-worker.ts", import.meta.url),
+        { type: "module", name: "automerge-repo-shared-worker" }
+      )
       worker.port.onmessage = (e) => {
         if (e.data === "READY") {
           clearInterval(interval)
