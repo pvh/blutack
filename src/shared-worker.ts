@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 declare const self: SharedWorkerGlobalScope
 
-import { DocumentId, Repo } from "automerge-repo"
+import { DocumentId, PeerId, Repo } from "automerge-repo"
 import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechannel"
 import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
 import { BrowserWebSocketClientAdapter } from "automerge-repo-network-websocket"
@@ -35,7 +35,7 @@ const url = "wss://automerge-repo-sync-server.fly.dev"
 const repo = new Repo({
   storage: new LocalForageStorageAdapter(),
   network: [new BrowserWebSocketClientAdapter(url)],
-  peerId: "shared-worker-" + Math.round(Math.random() * 10000),
+  peerId: ("shared-worker-" + Math.round(Math.random() * 10000)) as PeerId,
   sharePolicy: (peerId) => peerId.includes("storage-server"),
 })
 
