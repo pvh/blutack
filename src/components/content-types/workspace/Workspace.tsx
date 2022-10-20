@@ -114,6 +114,7 @@ export default function Workspace({ documentId }: WorkspaceContentProps) {
       return
     }
 
+    console.log("SELF devices:", self.devices)
     if (
       currentDeviceId &&
       (!self.devices || !self.devices.includes(currentDeviceId))

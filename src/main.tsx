@@ -12,6 +12,7 @@ import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechan
 import { RepoContext } from "automerge-repo-react-hooks"
 import * as ContentTypes from "./components/pushpin-code/ContentTypes"
 import { create as createWorkspace } from "./components/content-types/workspace/Workspace"
+import { create as createDevice } from "./components/content-types/workspace/Device"
 
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
@@ -86,6 +87,7 @@ function setupSharedWorkerAndRepo() {
 
 const repo = setupSharedWorkerAndRepo()
 
+// TODO: Yikes on bikes, ought to redesign this
 const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
   let docId = new URLSearchParams(window.location.search).get(key)
 
@@ -93,10 +95,13 @@ const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
     docId = await localforage.getItem(key)
   }
   if (!docId) {
-    const workspaceHandle = repo.create()
-    docId = workspaceHandle.documentId
+    const handle = repo.create()
+    docId = handle.documentId
     if (key == "workspaceDocId") {
-      createWorkspace({}, workspaceHandle)
+      createWorkspace({}, handle)
+    }
+    if (key == "deviceDocId") {
+      createDevice({}, handle)
     }
     await localforage.setItem(key, docId)
   }

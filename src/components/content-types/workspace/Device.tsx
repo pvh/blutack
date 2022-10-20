@@ -75,12 +75,16 @@ function Device(props: Props) {
   }
 }
 
-function create(deviceAttrs: any, handle: DocHandle<any>) {
+export function create(deviceAttrs: any, handle: DocHandle<any>) {
+  handle.change((doc: DeviceDoc) => {
+    doc.name = "computer"
+    doc.icon = "desktop"
+  })
   ;(navigator as any).getBattery().then((b: any) => {
     const isLaptop = b.chargingTime !== 0
     const icon = isLaptop ? "laptop" : "desktop"
     handle.change((doc: DeviceDoc) => {
-      doc.name = "computer" // Os.hostname()
+      doc.name = icon
       doc.icon = icon
     })
   })

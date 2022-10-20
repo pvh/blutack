@@ -49,7 +49,11 @@ export default function ContactEditorDevice(props: Props) {
       actions={isCurrentDevice ? [] : deviceActions}
       selected={false}
     >
-      <Content context="list" url={deviceId} editable />
+      <Content
+        context="list"
+        url={createDocumentLink("device", deviceId)}
+        editable
+      />
     </ActionListItem>
   )
 }
