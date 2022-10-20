@@ -57,11 +57,3 @@
 .BoardCard:hover .BoardCard-resizeHandle {
   visibility: visible;
 }
-
-/* XXX: hack to match legacy behavior */
-.BoardCard .Image {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  pointer-events: none;
-}

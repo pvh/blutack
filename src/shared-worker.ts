@@ -25,6 +25,11 @@ export interface ServerWorkerRequest {
 
 export type SharedWorkerMessage = ServiceWorkerConnection | FrontendConnection
 
+// TODO: this is just a debugging thing, take out the next few lines if you notice them here
+import * as Automerge from "@automerge/automerge"
+// @ts-ignore-next-line
+self.Automerge = Automerge
+
 // BYO sync-server instructions:
 // $ cd automerge-repo/packages/automerge-repo-sync-server
 // $ yarn

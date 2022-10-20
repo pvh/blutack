@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* our unfluff images don't have meaningful alt-text aside from the title */
-import React from "react"
 import { FileDoc } from "."
+
+import "./ImageContent.css"
 
 import { ContentProps } from "../../Content"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
