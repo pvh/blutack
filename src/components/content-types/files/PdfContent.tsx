@@ -20,10 +20,7 @@ import { FileDoc } from "."
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import Content, { ContentProps } from "../../Content"
 import "./PdfContent.css"
-import {
-  useBinaryDataContents,
-  useBinaryDataHeader,
-} from "../../../blobstore/Blob"
+import { createBinaryDataUrl } from "../../../blobstore/Blob"
 import { useConfirmableInput } from "../../pushpin-code/Hooks"
 import {
   createDocumentLink,
@@ -156,7 +153,6 @@ export default function PdfContent(props: ContentProps) {
   const pathData = getSvgPathFromStroke(stroke)
 
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
-  const buffer = useBinaryDataContents(pdf && pdf.binaryDataId)
   const [pageNum, _setPageNum] = useState(1)
   const [numPages, setNumPages] = useState(0)
   const [pageInputValue, onPageInput] = useConfirmableInput(
@@ -238,13 +234,6 @@ export default function PdfContent(props: ContentProps) {
       }
     },
     [changePdf, pdf]
-  )
-
-  const param = useMemo(
-    () => ({
-      data: buffer,
-    }),
-    [buffer]
   )
 
   if (!pdf) {
@@ -340,17 +329,18 @@ export default function PdfContent(props: ContentProps) {
         </div>
 
         <div className="PdfContent-document">
-          {buffer ? (
-            <Document file={param} onLoadSuccess={onDocumentLoadSuccess}>
-              <Page
-                loading=""
-                pageNumber={pageNum}
-                className="PdfContent-page"
-                width={1600}
-                renderTextLayer={false}
-              />
-            </Document>
-          ) : null}
+          <Document
+            file={createBinaryDataUrl(pdf.binaryDataId)}
+            onLoadSuccess={onDocumentLoadSuccess}
+          >
+            <Page
+              loading=""
+              pageNumber={pageNum}
+              className="PdfContent-page"
+              width={1600}
+              renderTextLayer={false}
+            />
+          </Document>
 
           <svg
             onPointerDown={handlePointerDown}
