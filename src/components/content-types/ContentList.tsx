@@ -85,10 +85,12 @@ export default function ContentList({ documentId }: ContentProps) {
         e.dataTransfer.getData(MIMETYPE_CONTENT_LIST_INDEX),
         10
       )
-      const insertIndex =
+      const insertIndex = Math.max(
+        0,
         !isNaN(deleteIndex) && deleteIndex < draggedOverIndex
           ? draggedOverIndex - 1
           : draggedOverIndex
+      )
 
       setDraggedOverIndex(undefined)
 
