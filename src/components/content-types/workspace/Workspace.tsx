@@ -24,13 +24,11 @@ import "./Workspace.css"
 } from '../../../PresenceHooks' */
 
 import { BoardDoc, CardId } from "../board"
-// import { useSystem } from '../../../System'
 import { CurrentDeviceContext } from "./Device"
 
 import WorkspaceInList from "./WorkspaceInList"
 import { importPlainText } from "../../pushpin-code/ImportData"
 import { ContentListDoc } from "../ContentList"
-// import * as DataUrl from '../../../../DataUrl'
 
 const log = Debug("pushpin:workspace")
 
@@ -40,7 +38,6 @@ export interface WorkspaceDoc {
   currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
-  // secretKey?: Crypto.SignedMessage<Crypto.EncodedSecretEncryptionKey>
 }
 
 interface WorkspaceContentProps extends ContentProps {
@@ -48,20 +45,16 @@ interface WorkspaceContentProps extends ContentProps {
   createWorkspace: () => void
 }
 
-interface ClipperPayload {
-  src: string
-  dataUrl: string
-  capturedAt: string
-}
-
-export default function Workspace({
-  documentId,
-  selfId,
-}: WorkspaceContentProps) {
-  // const crypto = useCrypto()
+export default function Workspace({ documentId }: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
-  const currentDeviceUrl = useContext(CurrentDeviceContext)
-  const [self, changeSelf] = useDocument<ContactDoc>(selfId || undefined)
+  const currentDeviceId = useContext(CurrentDeviceContext)
+
+  // we can't get the selfId as a prop for this document because it *stores* the selfId
+  // and passes it down through the rest of the system via a selfId prop on Content
+  // this isn't ideal: it means only the workspace can sit at the root of the application
+  // and it's hard to detect structurally because all the hooks need to support missing values
+  const selfId: DocumentId | undefined = workspace && workspace.selfId
+  const [self, changeSelf] = useDocument<ContactDoc>(selfId)
 
   const [once, setOnce] = useState<boolean>(false)
 
@@ -106,15 +99,6 @@ export default function Workspace({
   }
 
   /*
-  const selfId: DocumentId | undefined = workspace && workspace.selfId
-   const currentDocUrl =
-    workspace && workspace.currentDocUrl && parseDocumentLink(workspace.currentDocUrl).documentId
-
-  const [self, changeSelf] = useDocument<ContactDoc>(selfId)
-  const currentDeviceId = currentDeviceUrl
-    ? parseDocumentLink(currentDeviceUrl).documentId
-    : null
-
   useAllHeartbeats(selfId)
   useHeartbeat(selfId)
   useHeartbeat(currentDeviceId)
@@ -124,51 +108,24 @@ export default function Workspace({
   useContactOnlineStatus(selfId)
   */
 
-  /* const sendToSystem = useSystem(
-    (msg) => {
-      switch (msg.type) {
-        case 'IncomingUrl':
-          openDoc(msg.url)
-          break
-        case 'IncomingClip':
-          importClip(msg.payload)
-          break
-        case 'NewDocument':
-          if (!selfId) break
-          ContentTypes.create('board', { selfId }, (boardUrl: PushpinUrl) => {
-            openDoc(boardUrl)
-          })
-          break
-        case 'NewWorkspace':
-          props.createWorkspace()
-          break
-      }
-    },
-    [selfId]
-  ) 
-
-  useEffect(() => {
-    // For background debugging:
-    if (currentDocUrl) sendToSystem({ type: 'Navigated', url: currentDocUrl })
-  }, [currentDocUrl, sendToSystem])
-  */
-
   // Add devices if not already on doc.
   useEffect(() => {
-    if (!currentDeviceUrl || !self || !changeSelf) {
+    if (!currentDeviceId || !self || !changeSelf) {
       return
     }
 
-    const { documentId } = parseDocumentLink(currentDeviceUrl)
-    if (documentId && (!self.devices || !self.devices.includes(documentId))) {
+    if (
+      currentDeviceId &&
+      (!self.devices || !self.devices.includes(currentDeviceId))
+    ) {
       changeSelf((doc: ContactDoc) => {
         if (!doc.devices) {
           doc.devices = []
         }
-        doc.devices.push(documentId)
+        doc.devices.push(currentDeviceId)
       })
     }
-  }, [changeSelf, currentDeviceUrl, self])
+  }, [changeSelf, currentDeviceId, self])
 
   // Add encryption keys if not already on doc.
   /*

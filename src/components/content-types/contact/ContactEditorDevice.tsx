@@ -1,15 +1,11 @@
-import React, { useCallback } from "react"
-import { Doc } from "@automerge/automerge"
-import {
-  PushpinUrl,
-  parseDocumentLink,
-  createDocumentLink,
-} from "../../pushpin-code/ShareLink"
+import { useCallback } from "react"
+import { createDocumentLink } from "../../pushpin-code/ShareLink"
 import { DocumentId } from "automerge-repo"
 import { useDocument, Change } from "automerge-repo-react-hooks"
 import Content from "../../Content"
 import ActionListItem from "../workspace/omnibox/ActionListItem"
 import { DeviceDoc } from "../workspace/Device"
+
 import "./ContactEditor.css"
 
 export interface Props {
@@ -23,8 +19,7 @@ export type OnRemoveDevice = (documentId: DocumentId) => void
 
 export default function ContactEditorDevice(props: Props) {
   const { selfId, deviceId, onRemoveDevice, isCurrentDevice } = props
-  const { documentId: deviceDocId } = parseDocumentLink(deviceId)
-  const [deviceDoc, changeDevice] = useDocument<DeviceDoc>(deviceDocId)
+  const [deviceDoc, changeDevice] = useDocument<DeviceDoc>(deviceId)
 
   const removeDevice = useCallback(() => {
     onRemoveDevice(deviceId)
