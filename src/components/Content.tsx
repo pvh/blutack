@@ -2,6 +2,7 @@ import React, {
   useState,
   useCallback,
   useEffect,
+  useContext,
   forwardRef,
   Ref,
   memo,
@@ -13,6 +14,7 @@ import { parseDocumentLink, PushpinUrl } from "./pushpin-code/ShareLink"
 import Crashable from "./Crashable"
 import { DocumentId } from "automerge-repo"
 import { useSelfId } from "./pushpin-code/SelfHooks"
+import { Path, PathContext } from "./Path"
 // import { useHeartbeat } from '../PresenceHooks'
 
 // this is the interface imported by Content types
@@ -23,6 +25,7 @@ export interface ContentProps {
   documentId: DocumentId
   selfId: DocumentId
   contentRef?: Ref<ContentHandle>
+  path: Path
 }
 
 // I don't think this is a good longterm solution but it'll do for now.
@@ -33,6 +36,7 @@ export interface EditableContentProps extends ContentProps {
 // These are the props the generic Content wrapper receives
 interface Props {
   url: PushpinUrl
+  path?: Path
   context: ContentTypes.Context
   [arbitraryProp: string]: any
 }
@@ -52,6 +56,8 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
   const onCatch = useCallback(() => setCrashed(true), [])
 
   const { type, documentId } = parseDocumentLink(url)
+
+  const contextPath = useContext(PathContext)
 
   // useHeartbeat(['workspace'].includes(context) ? documentId : null)
 
@@ -73,7 +79,7 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
     return renderError(type)
   }
 
-  return (
+  const contentView = (
     <Crashable onCatch={onCatch}>
       <contentType.component
         {...props}
@@ -82,8 +88,17 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
         type={type}
         documentId={documentId}
         selfId={selfId}
+        path={props.path || contextPath}
       />
     </Crashable>
+  )
+
+  return props.path ? (
+    <PathContext.Provider value={props.path}>
+      {contentView}
+    </PathContext.Provider>
+  ) : (
+    contentView
   )
 }
 

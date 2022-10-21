@@ -21,6 +21,8 @@ import "./content-types/files/AudioContent"
 import "./content-types/files/VideoContent"
 
 import "./content-types/TopicList"
+import { useMemo, useState } from "react"
+import { Path, PathContext } from "./Path"
 
 interface RootArgs {
   workspaceDocId: DocumentId
@@ -28,12 +30,20 @@ interface RootArgs {
 }
 
 export default function Root({ workspaceDocId, deviceDocId }: RootArgs) {
+  const [url, setUrl] = useState("")
+
+  const rootPath = useMemo(() => new Path(setUrl, "", url), [url])
+
+  console.log("URL!! root:", url)
+
   return (
     <CurrentDeviceContext.Provider value={deviceDocId}>
-      <Content
-        context="root"
-        url={createDocumentLink("workspace", workspaceDocId)}
-      />
+      <PathContext.Provider value={rootPath}>
+        <Content
+          context="root"
+          url={createDocumentLink("workspace", workspaceDocId)}
+        />
+      </PathContext.Provider>
     </CurrentDeviceContext.Provider>
   )
 }

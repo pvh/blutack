@@ -45,9 +45,23 @@ interface WorkspaceContentProps extends ContentProps {
   createWorkspace: () => void
 }
 
-export default function Workspace({ documentId }: WorkspaceContentProps) {
+export default function Workspace({ documentId, path }: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDeviceId = useContext(CurrentDeviceContext)
+
+  const [currentDocUrl, currentDocPath] = path.getPart()
+  useEffect(() => {
+    if (currentDocUrl && workspace?.currentDocUrl !== currentDocUrl) {
+      /* changeWorkspace((ws) => {
+        ws.currentDocUrl = urlState
+      })  */
+      return
+    }
+
+    if (workspace?.currentDocUrl) {
+      path.setPart(workspace.currentDocUrl)
+    }
+  }, [workspace?.currentDocUrl, currentDocUrl])
 
   // we can't get the selfId as a prop for this document because it *stores* the selfId
   // and passes it down through the rest of the system via a selfId prop on Content
@@ -245,7 +259,12 @@ export default function Workspace({ documentId }: WorkspaceContentProps) {
     const { type } = parseDocumentLink(currentDocUrl)
     return (
       <div className={`Workspace__container Workspace__container--${type}`}>
-        <Content ref={contentRef} context="workspace" url={currentDocUrl} />
+        <Content
+          ref={contentRef}
+          context="workspace"
+          url={currentDocUrl}
+          path={currentDocPath}
+        />
       </div>
     )
   }
@@ -265,6 +284,7 @@ export default function Workspace({ documentId }: WorkspaceContentProps) {
     </SelfContext.Provider>
   )
 }
+
 export function create(_attrs: any, handle: DocHandle<any>) {
   ContentTypes.create("contact", {}, (selfContentUrl) => {
     const selfDocumentId = parseDocumentLink(selfContentUrl).documentId

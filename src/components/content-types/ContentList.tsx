@@ -1,12 +1,4 @@
-import React, {
-  useContext,
-  useRef,
-  Ref,
-  ChangeEvent,
-  useState,
-  useMemo,
-  useCallback,
-} from "react"
+import React, { useRef, useState, useMemo, useCallback } from "react"
 
 import { PushpinUrl } from "../pushpin-code/ShareLink"
 
@@ -46,15 +38,20 @@ ContentList.defaultWidth = 24
 ContentList.maxWidth = 80
 ContentList.maxHeight = 36
 
-export default function ContentList({ documentId }: ContentProps) {
+export default function ContentList({ documentId, path }: ContentProps) {
   const [doc, changeDoc] = useDocument<ContentListDoc>(documentId)
-  const [currentContent, selectContent] = useState<PushpinUrl | undefined>()
   const [addingNewItem, setAddingNewItem] = useState(false)
   const contentTypes = useMemo(
     () => ContentTypes.list({ context: "board" }),
     []
   )
   const [draggedOverIndex, setDraggedOverIndex] = useState<number | undefined>()
+
+  const [currentContentUrl, currentContentPath] = path.getPart()
+
+  const selectContentUrl = (url: PushpinUrl) => {
+    path.setPart(url)
+  }
 
   const onDragOver = useCallback((e: React.DragEvent, index: number) => {
     const element = e.target as Element
@@ -115,8 +112,8 @@ export default function ContentList({ documentId }: ContentProps) {
     return null
   }
 
-  if (!currentContent && doc.content.length > 0) {
-    selectContent(doc.content[0])
+  if (!currentContentUrl && doc.content.length > 0) {
+    selectContentUrl(doc.content[0])
   }
 
   const { content } = doc
@@ -147,7 +144,7 @@ export default function ContentList({ documentId }: ContentProps) {
       shortcut: "⏎",
       keysForActionPressed: (e: KeyboardEvent) =>
         !e.shiftKey && e.key === "Enter",
-      callback: (url: PushpinUrl) => () => selectContent(url),
+      callback: (url: PushpinUrl) => () => selectContentUrl(url),
     },
     {
       name: "remove",
@@ -197,7 +194,7 @@ export default function ContentList({ documentId }: ContentProps) {
                 contentUrl={url}
                 defaultAction={actions[0]}
                 actions={actions}
-                selected={url === currentContent}
+                selected={url === currentContentUrl}
               >
                 <Content context="list" url={url} editable={true} />
               </ActionListItem>
@@ -243,8 +240,12 @@ export default function ContentList({ documentId }: ContentProps) {
         </ListMenu>
       </CenteredStackRowItem>
       <CenteredStackRowItem size={{ mode: "auto" }}>
-        {currentContent ? (
-          <Content context="workspace" url={currentContent} />
+        {currentContentUrl ? (
+          <Content
+            context="workspace"
+            url={currentContentUrl}
+            path={currentContentPath}
+          />
         ) : (
           <div style={{ padding: "10px" }}>Select something from the side</div>
         )}
