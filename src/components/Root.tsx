@@ -22,7 +22,7 @@ import "./content-types/files/VideoContent"
 
 import "./content-types/TopicList"
 import { useMemo, useState } from "react"
-import { Path, PathContext } from "./Path"
+import { Path, PathContext, useRootPath } from "./Path"
 
 interface RootArgs {
   workspaceDocId: DocumentId
@@ -30,11 +30,7 @@ interface RootArgs {
 }
 
 export default function Root({ workspaceDocId, deviceDocId }: RootArgs) {
-  const [url, setUrl] = useState("")
-
-  const rootPath = useMemo(() => new Path(setUrl, "", url), [url])
-
-  console.log("URL!! root:", url)
+  const rootPath = useRootPath()
 
   return (
     <CurrentDeviceContext.Provider value={deviceDocId}>

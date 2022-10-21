@@ -1,8 +1,9 @@
-import React from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { createDocumentLink, isPushpinUrl } from "./pushpin-code/ShareLink"
 
 export class Path {
   constructor(
-    private readonly setGlobalPath: (path: string) => void,
+    private readonly onChangePath: (path: string) => void,
     readonly parentPath: string,
     readonly currentPath: string
   ) {}
@@ -16,7 +17,7 @@ export class Path {
     return [
       decodeURIComponent(part),
       new Path(
-        this.setGlobalPath,
+        this.onChangePath,
         this.parentPath.concat(part),
         this.currentPath.slice(index + 1)
       ),
@@ -28,7 +29,7 @@ export class Path {
     const path =
       this.parentPath === "" ? encodedPart : `${this.parentPath}/${encodedPart}`
 
-    this.setGlobalPath(path)
+    this.onChangePath(path)
   }
 
   getFullUrl(): string {
@@ -37,3 +38,31 @@ export class Path {
 }
 
 export const PathContext = React.createContext<Path | undefined>(undefined)
+
+export function useRootPath() {
+  const [path, setPath] = useState(getCurrentPath())
+
+  const onChangePath = useCallback((path: string) => {
+    setPath(path)
+    // todo: remove reference to "/blutack/"
+    history.pushState(null, "", `/blutack/${path}`)
+  }, [])
+
+  useEffect(() => {
+    const onPopState = (event: PopStateEvent) => {
+      setPath(getCurrentPath())
+    }
+    addEventListener("popstate", onPopState)
+
+    return () => {
+      removeEventListener("popstate", onPopState)
+    }
+  }, [])
+
+  return useMemo(() => new Path(onChangePath, "", path), [path])
+}
+
+function getCurrentPath() {
+  // todo: remove reference to "/blutack/"
+  return location.pathname.slice("/blutack/".length)
+}

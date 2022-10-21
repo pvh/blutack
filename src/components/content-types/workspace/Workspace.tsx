@@ -52,9 +52,9 @@ export default function Workspace({ documentId, path }: WorkspaceContentProps) {
   const [currentDocUrl, currentDocPath] = path.getPart()
   useEffect(() => {
     if (currentDocUrl && workspace?.currentDocUrl !== currentDocUrl) {
-      /* changeWorkspace((ws) => {
-        ws.currentDocUrl = urlState
-      })  */
+      /*changeWorkspace((ws) => {
+        ws.currentDocUrl = currentDocUrl as PushpinUrl
+      })*/
       return
     }
 
@@ -75,6 +75,7 @@ export default function Workspace({ documentId, path }: WorkspaceContentProps) {
   var baseUrl = window.location.href.split("?")[0]
   navigator.registerProtocolHandler("web+pushpin", `${baseUrl}?document=%s`)
 
+  /*
   if (workspace?.currentDocUrl && !once) {
     setOnce(true)
     const maybePushpinUrl = new URLSearchParams(window.location.search).get(
@@ -89,7 +90,7 @@ export default function Workspace({ documentId, path }: WorkspaceContentProps) {
         openDoc(docLink)
       }
     }
-  }
+  }*/
 
   if ("navigation" in window) {
     window.navigation.addEventListener("navigate", (navigateEvent: any) => {

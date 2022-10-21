@@ -112,9 +112,9 @@ export default function ContentList({ documentId, path }: ContentProps) {
     return null
   }
 
-  if (!currentContentUrl && doc.content.length > 0) {
+  /* if (!currentContentUrl && doc.content.length > 0) {
     selectContentUrl(doc.content[0])
-  }
+  } */
 
   const { content } = doc
 
