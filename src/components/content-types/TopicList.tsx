@@ -10,7 +10,6 @@ import { parseDocumentLink, PushpinUrl } from "../pushpin-code/ShareLink"
 import { TextDoc } from "./TextContent"
 import "./TopicList.css"
 import classNames from "classnames"
-import { sortBy } from "lodash"
 import * as UriList from "../pushpin-code/UriList"
 import Author from "./workspace/Author"
 
@@ -121,7 +120,7 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
 
       <ul className="TopicList-list">
         {(topicList.isSorted
-          ? sortBy(topics, ({ votes }) => -Object.keys(votes).length)
+          ? topics.sort(({ votes }) => -Object.keys(votes).length)
           : topics
         ).map((topic, index) => (
           <li key={index} className="TopicList-item">
