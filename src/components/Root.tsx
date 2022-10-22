@@ -20,6 +20,7 @@ import "./content-types/files/PdfContent"
 import "./content-types/files/AudioContent"
 import "./content-types/files/VideoContent"
 
+import "./content-types/Scene"
 import "./content-types/TopicList"
 
 interface RootArgs {
