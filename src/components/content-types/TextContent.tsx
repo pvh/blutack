@@ -97,12 +97,29 @@ function useQuill({
       makeChange((content) => applyDeltaToText(content, changeDelta as any))
     }
 
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key !== "Backspace") return
+    const onAutocomplete = () => {
+      // TODO: replace with a real GPT-3 thing
+      setTimeout(() => {
+        change(text => text.insertAt(text.length - 1, ..."hello".split("")))
+      }, 1000)
+    }
 
-      const str = q.getText()
-      if (str !== "" && str !== "\n") {
-        e.stopPropagation()
+    function onKeyDown(e: KeyboardEvent) {
+      switch(e.key) {
+        case "Backspace": {
+          const str = q.getText()
+          if (str !== "" && str !== "\n") {
+            e.stopPropagation()
+          }
+          break
+        }
+        case "Enter": {
+          if(e.metaKey) {
+            onAutocomplete()
+          }
+          break
+        }
+        default: {}
       }
     }
 
