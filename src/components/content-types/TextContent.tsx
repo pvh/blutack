@@ -100,12 +100,12 @@ function useQuill({
     const onAutocomplete = () => {
       // TODO: replace with a real GPT-3 thing
       setTimeout(() => {
-        change(text => text.insertAt(text.length - 1, ..."hello".split("")))
+        change((text) => text.insertAt(text.length - 1, ..."hello".split("")))
       }, 1000)
     }
 
     function onKeyDown(e: KeyboardEvent) {
-      switch(e.key) {
+      switch (e.key) {
         case "Backspace": {
           const str = q.getText()
           if (str !== "" && str !== "\n") {
@@ -114,12 +114,13 @@ function useQuill({
           break
         }
         case "Enter": {
-          if(e.metaKey) {
+          if (e.metaKey) {
             onAutocomplete()
           }
           break
         }
-        default: {}
+        default: {
+        }
       }
     }
 
