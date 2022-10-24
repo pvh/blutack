@@ -9,6 +9,7 @@ import "./content-types/contact"
 
 // other single-context components
 import "./content-types/TextContent"
+import "./content-types/LanguageModel"
 import "./content-types/ThreadContent"
 
 import "./content-types/ContentList"
