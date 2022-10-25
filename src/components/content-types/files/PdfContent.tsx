@@ -35,6 +35,10 @@ import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import Heading from "../../ui/Heading"
 import ListMenu from "../../ui/ListMenu"
 import ListMenuItem from "../../ui/ListMenuItem"
+import * as buffer from "buffer"
+import ListMenuSection from "../../ui/ListMenuSection"
+import { contentType } from "mime-types"
+import { LookupResult } from "../../pushpin-code/ContentTypes"
 
 export interface PdfAnnotation {
   stroke: number[][]
@@ -69,7 +73,7 @@ type Rectangle = {
 type Region = {
   rectangle: Rectangle
   page: number
-  url?: PushpinUrl
+  annotationUrls: PushpinUrl[]
   authorId: DocumentId
 }
 
@@ -174,6 +178,7 @@ export default function PdfContent(props: ContentProps) {
           pdf.regions.push({
             rectangle,
             page: pageNum,
+            annotationUrls: [],
             authorId: props.selfId,
           })
         })
@@ -253,6 +258,14 @@ export default function PdfContent(props: ContentProps) {
     }
   }
 
+  const addContentAtIndex = (index: number, type: string) => {
+    ContentTypes.create(type, {}, (contentUrl) => {
+      changePdf((pdf) => {
+        pdf.regions[index].annotationUrls.push(contentUrl)
+      })
+    })
+  }
+
   const onDocumentLoadSuccess = useCallback(
     (result: any) => {
       const { numPages } = result
@@ -307,6 +320,12 @@ export default function PdfContent(props: ContentProps) {
   const backDisabled = pageNum <= 1
 
   const openPageNumByPerson = pdf.openPageNumByPerson ?? {}
+
+  const regionsOnPage = pdf.regions
+    ? pdf.regions
+        .map((region, index) => [region, index] as [Region, number])
+        .filter(([region]) => region.page === pageNum)
+    : []
 
   return (
     <div className="PdfContent">
@@ -417,34 +436,28 @@ export default function PdfContent(props: ContentProps) {
               height: "auto",
             }}
           >
-            {
-              // TODO: we should be using Content here, but I need to pass the selectedPage to the view
-              pdf.annotations &&
-                pdf.annotations.map((annotation, index) => {
-                  if (annotation.page !== pageNum) {
-                    return
-                  }
+            {pdf.annotations &&
+              pdf.annotations.map((annotation, index) => {
+                if (annotation.page !== pageNum) {
+                  return
+                }
 
-                  return (
-                    <PdfAnnotationOverlayView
-                      key={index}
-                      annotation={annotation}
-                    />
-                  )
-                })
-            }
-
-            {
-              // TODO: we should be using Content here, but I need to pass the selectedPage to the view
-              pdf.regions &&
-                pdf.regions.map((region, index) => {
-                  if (region.page !== pageNum) {
-                    return
-                  }
-
-                  return <PdfRegionOvelaryView region={region} />
-                })
-            }
+                return (
+                  <PdfAnnotationOverlayView
+                    key={index}
+                    annotation={annotation}
+                  />
+                )
+              })}
+            {regionsOnPage.map(([region, index], number) => {
+              return (
+                <PdfRegionOvelaryView
+                  region={region}
+                  number={number + 1}
+                  key={index}
+                />
+              )
+            })}
 
             {rectangle && (
               <rect
@@ -468,26 +481,129 @@ export default function PdfContent(props: ContentProps) {
           </svg>
         </div>
       </div>
+
+      <div className="PdfContent-sidebar is-right">
+        <div className="PdfContent-sidebarTitle">Annotations</div>
+
+        {regionsOnPage.map(([region, number], index) => {
+          return (
+            <PdfRegionListItemView
+              onAddContent={(type) => addContentAtIndex(index, type)}
+              region={region}
+              number={number + 1}
+              key={index}
+            />
+          )
+        })}
+      </div>
     </div>
   )
 }
 
-function PdfRegionOvelaryView({ region }: { region: Region }) {
+function PdfRegionListItemView({
+  region,
+  number,
+  onAddContent,
+}: {
+  region: Region
+  number: number
+  onAddContent: (contentType: string) => void
+}) {
+  const [author] = useDocument<ContactDoc>(region.authorId)
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const contentTypes = useMemo(
+    () => ContentTypes.list({ context: "board" }),
+    []
+  )
+
+  return (
+    <div>
+      <div
+        className="PdfContent-regionMarker"
+        style={{ background: author?.color ?? "#fdd835" }}
+      >
+        {number}
+      </div>
+
+      {region.annotationUrls.map((contentUrl, index) => (
+        <Content context="board" url={contentUrl} index={index} />
+      ))}
+
+      <ListMenuItem onClick={() => setIsMenuOpen(!isMenuOpen)}>
+        Create new item +
+      </ListMenuItem>
+
+      {isMenuOpen && (
+        <ListMenuSection>
+          {contentTypes.map((contentType) => (
+            <ListMenuItem
+              onClick={() => {
+                onAddContent(contentType.type)
+                setIsMenuOpen(false)
+              }}
+              key={contentType.type}
+            >
+              <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
+                <i className={classNames("fa", `fa-${contentType.icon}`)} />
+              </div>
+              <span className="ContextMenu__label">{contentType.name}</span>
+            </ListMenuItem>
+          ))}
+        </ListMenuSection>
+      )}
+    </div>
+  )
+}
+
+function PdfRegionOvelaryView({
+  region,
+  number,
+}: {
+  region: Region
+  number: number
+}) {
   const [author] = useDocument<ContactDoc>(region.authorId)
 
   const { rectangle } = region
 
+  const width = rectangle.to[0] - rectangle.from[0]
+  const height = rectangle.to[1] - rectangle.from[1]
+
   return (
-    <rect
-      className="PdfContent-region"
-      x={rectangle.from[0]}
-      y={rectangle.from[1]}
-      width={rectangle.to[0] - rectangle.from[0]}
-      height={rectangle.to[1] - rectangle.from[1]}
-      stroke={author?.color ?? "#fdd835"}
-      strokeWidth={5}
-      fill="transparent"
-    />
+    <g transform={`translate(${rectangle.from[0]}, ${rectangle.from[1]})`}>
+      <rect
+        className="PdfContent-region"
+        width={width}
+        height={height}
+        stroke={author?.color ?? "#fdd835"}
+        strokeWidth={5}
+        fill="transparent"
+      />
+      <g transform={`translate(${width}, ${height})`}>
+        <circle
+          fill={author?.color ?? "#fdd835"}
+          x={-20}
+          y={-20}
+          r={20}
+        ></circle>
+        <text
+          fill="white"
+          x={0}
+          y={1}
+          alignmentBaseline="middle"
+          textAnchor="middle"
+          style={{
+            fontWeight: "bold",
+            fontSize: "24px",
+            fontFamily: "sans-serif",
+          }}
+        >
+          {number}
+        </text>
+      </g>
+    </g>
   )
 }
 

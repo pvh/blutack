@@ -133,3 +133,13 @@
 .PdfContent-region:hover {
   opacity: 1;
 }
+
+.PdfContent-regionMarker {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  line-height: 24px;
+}
