@@ -1,0 +1,11 @@
+.FeedbackParser--doc {
+  width: 100%;
+  height: 50%;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #eee;
+}
+
+.FeedbackParser--tool-heading {
+  padding: 10px;
+}
