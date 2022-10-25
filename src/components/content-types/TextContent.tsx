@@ -19,6 +19,7 @@ import { DocHandle } from "automerge-repo"
 export interface TextDoc {
   title: string
   text: Automerge.Text
+  requestAutocomplete: boolean
 }
 
 interface Props extends ContentProps {
@@ -48,6 +49,9 @@ export default function TextContent(props: Props) {
         },
       },
     },
+    requestAutocomplete: () => {
+      changeDoc((doc: TextDoc) => (doc.requestAutocomplete = true))
+    },
   })
 
   return (
@@ -65,6 +69,7 @@ export default function TextContent(props: Props) {
 interface QuillOpts {
   text: Automerge.Text | null
   change: (cb: (text: Automerge.Text) => void) => void
+  requestAutocomplete: () => void
   selected?: boolean
   config?: QuillOptionsStatic
 }
@@ -74,6 +79,7 @@ function useQuill({
   change,
   selected,
   config,
+  requestAutocomplete,
 }: QuillOpts): [React.Ref<HTMLDivElement>, Quill | null] {
   const ref = useRef<HTMLDivElement>(null)
   const quill = useRef<Quill | null>(null)
@@ -97,13 +103,6 @@ function useQuill({
       makeChange((content) => applyDeltaToText(content, changeDelta as any))
     }
 
-    const onAutocomplete = () => {
-      // TODO: replace with a real GPT-3 thing
-      setTimeout(() => {
-        change((text) => text.insertAt(text.length - 1, ..."hello".split("")))
-      }, 1000)
-    }
-
     function onKeyDown(e: KeyboardEvent) {
       switch (e.key) {
         case "Backspace": {
@@ -115,7 +114,7 @@ function useQuill({
         }
         case "Enter": {
           if (e.metaKey) {
-            onAutocomplete()
+            requestAutocomplete()
           }
           break
         }
@@ -195,6 +194,7 @@ async function createFrom(
 
 function create({ text }: any, handle: DocHandle<any>) {
   handle.change((doc) => {
+    doc.requestAutocomplete = false
     doc.text = new Automerge.Text(text)
     if (!text || !text.endsWith("\n")) {
       doc.text.insertAt!(text ? text.length : 0, "\n") // Quill prefers an ending newline
