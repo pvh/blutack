@@ -45,6 +45,7 @@ export interface PdfAnnotation {
 export interface PdfDoc extends FileDoc {
   content: string
   annotations: PdfAnnotation[]
+  regions: Region[]
   openPageNumByPerson: { [id: DocumentId]: number } // todo: handle case where person has pdf open multiple times
 }
 
@@ -59,6 +60,18 @@ const STROKE_PARAMS = {
 }
 
 type Point = number[]
+
+type Rectangle = {
+  from: Point
+  to: Point
+}
+
+type Region = {
+  rectangle: Rectangle
+  page: number
+  url?: PushpinUrl
+  authorId: DocumentId
+}
 
 function getSvgPathFromStroke(stroke: Point[]) {
   if (!stroke.length) return ""
@@ -83,56 +96,67 @@ function stopPropagation(e: React.SyntheticEvent) {
 
 export default function PdfContent(props: ContentProps) {
   const [points, setPoints] = React.useState<Point[]>([])
+  const [rectangle, setRectangle] = React.useState<Rectangle>()
   const [author] = useDocument<ContactDoc>(props.selfId)
-  const [isMarkerSelected, setIsMarkerSelected] = React.useState<boolean>(false)
+  const [selectedTool, setSelectedTool] = React.useState<
+    undefined | "marker" | "region"
+  >()
+
+  const isMarkerSelected = selectedTool === "marker"
+  const isRegionToolSelected = selectedTool === "region"
 
   const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback(
     (e: any) => {
-      if (!isMarkerSelected) {
-        return
-      }
-
       const bounds = e.target.getBoundingClientRect()
       const x = ((e.clientX - bounds.left) / bounds.width) * PAGE_WIDTH
       const y = ((e.clientY - bounds.top) / bounds.height) * PAGE_HEIGHT
 
       e.target.setPointerCapture(e.pointerId)
-
-      setPoints([[x, y, e.pressure]])
       e.preventDefault()
+
+      if (isMarkerSelected) {
+        setPoints([[x, y, e.pressure]])
+        return
+      }
+
+      if (isRegionToolSelected) {
+        setRectangle({
+          from: [x, y],
+          to: [x, y],
+        })
+        return
+      }
     },
-    [points, isMarkerSelected]
+    [isMarkerSelected, isRegionToolSelected, rectangle, points]
   )
 
   const handlePointerMove: PointerEventHandler<SVGSVGElement> = useCallback(
     (e: any) => {
-      if (!isMarkerSelected) {
-        return
-      }
-
       if (e.buttons !== 1) return
 
       const bounds = e.target.getBoundingClientRect()
       const x = ((e.clientX - bounds.left) / bounds.width) * PAGE_WIDTH
       const y = ((e.clientY - bounds.top) / bounds.height) * PAGE_HEIGHT
-
-      setPoints([...points, [x, y, e.pressure]])
       e.preventDefault()
-    },
-    [points, isMarkerSelected]
-  )
 
-  const toggleIsMarkerSelected = useCallback(() => {
-    setIsMarkerSelected((isMarkerSelected) => !isMarkerSelected)
-  }, [])
-
-  const handlePointerUp: PointerEventHandler<SVGSVGElement> = useCallback(
-    (e) => {
-      if (!isMarkerSelected) {
+      if (isMarkerSelected) {
+        setPoints([...points, [x, y, e.pressure]])
         return
       }
 
-      if (points.length !== 0) {
+      if (isRegionToolSelected && rectangle) {
+        setRectangle({ ...rectangle, to: [x, y] })
+        return
+      }
+    },
+    [isMarkerSelected, isRegionToolSelected, rectangle, points]
+  )
+
+  const handlePointerUp: PointerEventHandler<SVGSVGElement> = useCallback(
+    (e) => {
+      e.preventDefault()
+
+      if (isMarkerSelected && points.length !== 0) {
         changePdf((pdf) => {
           pdf.annotations.push({
             stroke: getStroke(points, STROKE_PARAMS),
@@ -142,11 +166,32 @@ export default function PdfContent(props: ContentProps) {
         })
 
         setPoints([])
-        e.preventDefault()
+        return
+      }
+
+      if (isRegionToolSelected && rectangle) {
+        changePdf((pdf) => {
+          pdf.regions.push({
+            rectangle,
+            page: pageNum,
+            authorId: props.selfId,
+          })
+        })
+
+        setSelectedTool(undefined)
+        setRectangle(undefined)
       }
     },
-    [points, isMarkerSelected]
+    [isMarkerSelected, isRegionToolSelected, rectangle, points]
   )
+
+  const toggleIsMarkerSelected = useCallback(() => {
+    setSelectedTool(isMarkerSelected ? undefined : "marker")
+  }, [isMarkerSelected])
+
+  const toggleIsRegionToolSelected = useCallback(() => {
+    setSelectedTool(isRegionToolSelected ? undefined : "region")
+  }, [isRegionToolSelected])
 
   const stroke = getStroke(points, STROKE_PARAMS)
 
@@ -248,6 +293,12 @@ export default function PdfContent(props: ContentProps) {
     })
   }
 
+  if (!pdf.regions) {
+    changePdf((pdf) => {
+      pdf.regions = []
+    })
+  }
+
   const { context } = props
 
   const annotations = pdf.annotations ?? []
@@ -282,7 +333,7 @@ export default function PdfContent(props: ContentProps) {
 
       <div
         className={classNames("PdfContent-main", {
-          "is-marker-selected": isMarkerSelected,
+          "is-tool-selected": selectedTool !== undefined,
         })}
       >
         <div className="PdfContent-header" onDoubleClick={stopPropagation}>
@@ -315,6 +366,16 @@ export default function PdfContent(props: ContentProps) {
           </button>
 
           <div className="PdfContent-header-right">
+            <button
+              disabled={forwardDisabled}
+              type="button"
+              onClick={toggleIsRegionToolSelected}
+              className={classNames("PdfContent-button ", {
+                "is-selected": isRegionToolSelected,
+              })}
+            >
+              <i className="fa fa-plus-square" />
+            </button>
             <button
               disabled={forwardDisabled}
               type="button"
@@ -373,6 +434,30 @@ export default function PdfContent(props: ContentProps) {
                 })
             }
 
+            {
+              // TODO: we should be using Content here, but I need to pass the selectedPage to the view
+              pdf.regions &&
+                pdf.regions.map((region, index) => {
+                  if (region.page !== pageNum) {
+                    return
+                  }
+
+                  return <PdfRegionOvelaryView region={region} />
+                })
+            }
+
+            {rectangle && (
+              <rect
+                x={rectangle.from[0]}
+                y={rectangle.from[1]}
+                width={rectangle.to[0] - rectangle.from[0]}
+                height={rectangle.to[1] - rectangle.from[1]}
+                stroke={author?.color ?? "#fdd835"}
+                strokeWidth={3}
+                fill="transparent"
+              />
+            )}
+
             {points && (
               <path
                 d={pathData}
@@ -384,6 +469,25 @@ export default function PdfContent(props: ContentProps) {
         </div>
       </div>
     </div>
+  )
+}
+
+function PdfRegionOvelaryView({ region }: { region: Region }) {
+  const [author] = useDocument<ContactDoc>(region.authorId)
+
+  const { rectangle } = region
+
+  return (
+    <rect
+      className="PdfContent-region"
+      x={rectangle.from[0]}
+      y={rectangle.from[1]}
+      width={rectangle.to[0] - rectangle.from[0]}
+      height={rectangle.to[1] - rectangle.from[1]}
+      stroke={author?.color ?? "#fdd835"}
+      strokeWidth={5}
+      fill="transparent"
+    />
   )
 }
 

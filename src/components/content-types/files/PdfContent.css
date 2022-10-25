@@ -41,7 +41,7 @@
   background: #dadada;
 }
 
-.PdfContent-main.is-marker-selected {
+.PdfContent-main.is-tool-selected {
   cursor: crosshair !important;
 }
 
@@ -123,4 +123,13 @@
 .PdfContent-navButton:not([disabled]):hover {
   color: var(--colorGrey);
   border: 1px solid;
+}
+
+
+.PdfContent-region {
+  opacity: 0.5;
+}
+
+.PdfContent-region:hover {
+  opacity: 1;
 }
