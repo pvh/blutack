@@ -54,7 +54,7 @@
 .time {
   flex: none;
   position: absolute;
-  right: 0px;
+  right: 12px;
   font-size: 12px;
   color: var(--colorSecondaryGrey);
   margin-top: -22px;

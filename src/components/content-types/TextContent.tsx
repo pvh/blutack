@@ -4,7 +4,7 @@ import * as Automerge from "@automerge/automerge"
 import Quill, { TextChangeHandler, QuillOptionsStatic } from "quill"
 import Delta from "quill-delta"
 import * as ContentTypes from "../pushpin-code/ContentTypes"
-import { ContentProps, EditableContentProps } from "../Content"
+import Content, { ContentProps, EditableContentProps } from "../Content"
 import { useDocument } from "automerge-repo-react-hooks"
 import { useStaticCallback } from "../pushpin-code/Hooks"
 import "./TextContent.css"
@@ -15,6 +15,7 @@ import ListItem from "../ui/ListItem"
 import ContentDragHandle from "../ui/ContentDragHandle"
 import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { DocHandle } from "automerge-repo"
+import { createDocumentLink } from "../pushpin-code/ShareLink"
 
 export interface TextDoc {
   title: string

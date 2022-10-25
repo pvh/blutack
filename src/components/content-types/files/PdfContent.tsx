@@ -451,7 +451,7 @@ export default function PdfContent(props: ContentProps) {
               })}
             {regionsOnPage.map(([region, index], number) => {
               return (
-                <PdfRegionOvelaryView
+                <PdfRegionOverlayView
                   region={region}
                   number={number + 1}
                   key={index}
@@ -483,9 +483,7 @@ export default function PdfContent(props: ContentProps) {
       </div>
 
       <div className="PdfContent-sidebar is-right">
-        <div className="PdfContent-sidebarTitle">Annotations</div>
-
-        {regionsOnPage.map(([region, number], index) => {
+        {regionsOnPage.map(([region, index], number) => {
           return (
             <PdfRegionListItemView
               onAddContent={(type) => addContentAtIndex(index, type)}
@@ -519,7 +517,7 @@ function PdfRegionListItemView({
   )
 
   return (
-    <div>
+    <div className="PdfContent-regionGroup">
       <div
         className="PdfContent-regionMarker"
         style={{ background: author?.color ?? "#fdd835" }}
@@ -528,11 +526,13 @@ function PdfRegionListItemView({
       </div>
 
       {region.annotationUrls.map((contentUrl, index) => (
-        <Content context="board" url={contentUrl} index={index} />
+        <div className="PdfContent-annotationContent">
+          <Content context="board" url={contentUrl} index={index} />
+        </div>
       ))}
 
       <ListMenuItem onClick={() => setIsMenuOpen(!isMenuOpen)}>
-        Create new item +
+        + Add new item
       </ListMenuItem>
 
       {isMenuOpen && (
@@ -557,7 +557,7 @@ function PdfRegionListItemView({
   )
 }
 
-function PdfRegionOvelaryView({
+function PdfRegionOverlayView({
   region,
   number,
 }: {

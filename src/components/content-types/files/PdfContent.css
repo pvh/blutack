@@ -20,15 +20,16 @@
 .PdfContent-sidebar {
   width: 200px;
   flex-shrink: 0;
-  padding: 8px;
 }
 
 .PdfContent-sidebarTitle {
   color: gray;
   margin-bottom: 8px;
+  padding: 8px;
 }
 
 .PdfContent-sidebar.is-right {
+  width: 300px;
   border-left: 1px solid #eeeeee;
 }
 
@@ -142,4 +143,19 @@
   font-weight: bold;
   text-align: center;
   line-height: 24px;
+}
+
+.PdfContent-annotationContent {
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.PdfContent-regionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid #eaeaea;
+  padding: 8px;
 }
