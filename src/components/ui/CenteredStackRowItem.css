@@ -1,4 +1,5 @@
 .CenteredStackRowItem {
+  overflow-x: hidden;
   height: 100%;
 }
 
