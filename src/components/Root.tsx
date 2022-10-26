@@ -21,6 +21,7 @@ import "./content-types/files/AudioContent"
 import "./content-types/files/VideoContent"
 
 import "./content-types/TopicList"
+import "./content-types/TodoList"
 
 interface RootArgs {
   workspaceDocId: DocumentId
