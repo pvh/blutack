@@ -1,6 +1,6 @@
 import { Doc } from "@automerge/automerge"
-import { DocumentId, DocCollection } from "automerge-repo"
-import { useDocument } from "automerge-repo-react-hooks"
+import { DocumentId, DocCollection, DocHandle } from "automerge-repo"
+import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import {
   useEffect,
   useState,
@@ -13,6 +13,58 @@ import {
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
 type Cleanup = void | (() => void)
+
+export interface DocMap<T> {
+  [id: DocumentId]: T
+}
+
+export function useDocuments<T>(docIds: DocumentId[]): DocMap<T> {
+  const handlersRef = useRef<DocMap<DocHandle<T>>>({})
+  const repo = useRepo()
+  const [documents, setDocuments] = useState<DocMap<T>>({})
+
+  function setSingleDocument(id: DocumentId, doc: T) {
+    setDocuments((textDocs) => ({
+      ...textDocs,
+      [id]: doc,
+    }))
+  }
+
+  const handlers = handlersRef.current
+  const prevHandlerIds = Object.keys(handlers)
+
+  docIds.forEach((id) => {
+    if (handlers[id]) {
+      return
+    }
+
+    const handler = (handlers[id] = repo.find<T>(id))
+    handler.value().then((doc) => {
+      setSingleDocument(id as DocumentId, doc)
+    })
+    handler.on("change", (evt) => {
+      setSingleDocument(id as DocumentId, evt.handle.doc)
+    })
+  })
+
+  prevHandlerIds.forEach((id) => {
+    if (handlers[id as DocumentId]) {
+      return
+    }
+
+    const handler = handlers[id as DocumentId]
+    handler.off("change")
+    delete handlers[id as DocumentId]
+
+    setDocuments((textDocs) => {
+      const copy = { ...textDocs }
+      delete copy[id as DocumentId]
+      return copy
+    })
+  })
+
+  return documents
+}
 
 export function useDocumentReducer<D, A>(
   documentId: DocumentId | undefined,
