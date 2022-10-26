@@ -3,6 +3,8 @@
   flex-direction: column;
   gap: 16px;
   padding: 8px;
+  height: 100%;
+  overflow: auto;
 }
 
 .TodoList-todo {

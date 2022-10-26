@@ -510,13 +510,13 @@ export function PdfAsSourceLink(props: PdfSourceLinkProps) {
   const [pdf] = useDocument<PdfDoc>(props.documentId)
 
   if (!pdf || !pdf.title) {
-    return
+    return null
   }
 
   const subtitle = `on page ${props.region.page}`
 
   return (
-    <div className="PdfContent-sourceLink">
+    <ListItem>
       <ContentDragHandle
         url={createDocumentLink("pdf", props.documentId)}
         filename={pdf.title}
@@ -531,7 +531,7 @@ export function PdfAsSourceLink(props: PdfSourceLinkProps) {
         documentId={props.documentId}
         editable={false}
       />
-    </div>
+    </ListItem>
   )
 }
 
