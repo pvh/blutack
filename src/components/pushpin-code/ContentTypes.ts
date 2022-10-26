@@ -22,6 +22,8 @@ export type Context =
   | "thread"
   | "title-bar"
   | "contact"
+  | "source"
+  | "source-link"
 
 type Contexts = {
   [K in Context]?: Component

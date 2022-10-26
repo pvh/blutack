@@ -39,6 +39,9 @@ import * as buffer from "buffer"
 import ListMenuSection from "../../ui/ListMenuSection"
 import { contentType } from "mime-types"
 import { LookupResult } from "../../pushpin-code/ContentTypes"
+import ListItem from "../../ui/ListItem";
+import ContentDragHandle from "../../ui/ContentDragHandle";
+import Badge from "../../ui/Badge";
 
 export interface PdfAnnotation {
   stroke: number[][]
@@ -498,6 +501,30 @@ export default function PdfContent(props: ContentProps) {
   )
 }
 
+interface PdfSourceLinkProps extends ContentProps {
+  region: Region
+}
+
+export function PdfAsSourceLink(props: ContentProps) {
+
+  return (<div>
+    <ContentDragHandle
+      url={createDocumentLink("pdf", props.documentId)}
+      filename={title}
+      extension={extension}
+      binaryDataId={binaryDataId}
+    >
+      <Badge shape="square" icon="file-o" />
+    </ContentDragHandle>
+    <TitleWithSubtitle
+      title={title}
+      subtitle={subtitle}
+      documentId={documentId}
+      editable={editable}
+    />
+  </div>)
+}
+
 function PdfRegionListItemView({
   region,
   number,
@@ -630,6 +657,7 @@ ContentTypes.register({
   contexts: {
     workspace: PdfContent,
     board: PdfContent,
+    "source-link": PdfAsSourceLink,
   },
   supportsMimeType,
 })

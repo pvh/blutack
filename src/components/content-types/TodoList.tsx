@@ -13,10 +13,19 @@ import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import * as ImportData from "../pushpin-code/ImportData"
 import { PdfDoc } from "./files/PdfContent"
 import "./TodoList.css"
+import ActionListItem from "./workspace/omnibox/ActionListItem"
+import Actions from "./workspace/omnibox/Actions"
+import Action from "./workspace/omnibox/Action"
+
+interface Source {
+  url: PushpinUrl
+  params: any
+}
 
 interface Todo {
   isDone: boolean
   contentUrl: PushpinUrl
+  source: Source
 }
 
 interface TodoListDoc {
@@ -58,6 +67,12 @@ export default function TodoList({ boardId, documentId, selfId }: Props) {
                   todoList.todos.push({
                     isDone: false,
                     contentUrl: annotationUrl,
+                    source: {
+                      url,
+                      params: {
+                        region: region,
+                      },
+                    },
                   })
                 })
               })
@@ -68,10 +83,19 @@ export default function TodoList({ boardId, documentId, selfId }: Props) {
     })
   }, [])
 
-  const changeIsDoneAt = useCallback(
+  const changeTodoIsDoneAt = useCallback(
     (index: number) => {
       changeTodoList((todoList) => {
         todoList.todos[index].isDone = !todoList.todos[index].isDone
+      })
+    },
+    [changeTodoList]
+  )
+
+  const deleteTodoAt = useCallback(
+    (deletedIndex: number) => {
+      changeTodoList((todoList) => {
+        todoList.todos.splice(deletedIndex, 1)
       })
     },
     [changeTodoList]
@@ -95,11 +119,22 @@ export default function TodoList({ boardId, documentId, selfId }: Props) {
           <input
             type="checkbox"
             checked={todo.isDone}
-            onChange={() => changeIsDoneAt(index)}
+            onChange={() => changeTodoIsDoneAt(index)}
           />
 
           <div className="TodoList-todoContent">
             <Content url={todo.contentUrl} context="board" key={index} />
+          </div>
+
+          <div className="TodoList-spacer"></div>
+
+          <div className="TodoList-actions">
+            <Action
+              callback={(e) => deleteTodoAt(index)}
+              faIcon={"fa-trash"}
+              label={"Remove"}
+              destructive={true}
+            />
           </div>
         </div>
       ))}
