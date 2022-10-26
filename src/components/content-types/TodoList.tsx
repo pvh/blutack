@@ -17,8 +17,6 @@ import "./TodoList.css"
 interface Todo {
   isDone: boolean
   contentUrl: PushpinUrl
-
-  // todo: add source to todos
 }
 
 interface TodoListDoc {
@@ -70,11 +68,14 @@ export default function TodoList({ boardId, documentId, selfId }: Props) {
     })
   }, [])
 
-  const changeIsDoneAt = useCallback((index: number) => {
-    changeTodoList((todoList) => {
-      todoList.todos[index].isDone = !todoList.todos[index].isDone
-    })
-  }, [])
+  const changeIsDoneAt = useCallback(
+    (index: number) => {
+      changeTodoList((todoList) => {
+        todoList.todos[index].isDone = !todoList.todos[index].isDone
+      })
+    },
+    [changeTodoList]
+  )
 
   if (!todoList || !todoList.todos) {
     return null
@@ -91,7 +92,11 @@ export default function TodoList({ boardId, documentId, selfId }: Props) {
       <h1 className="TodoList-title">Todos</h1>
       {todoList.todos.map((todo, index) => (
         <div className="TodoList-todo">
-          <input type="checkbox" onChange={() => changeIsDoneAt(index)} />
+          <input
+            type="checkbox"
+            checked={todo.isDone}
+            onChange={() => changeIsDoneAt(index)}
+          />
 
           <div className="TodoList-todoContent">
             <Content url={todo.contentUrl} context="board" key={index} />
