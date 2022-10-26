@@ -24,7 +24,6 @@
   overflow: hidden;
 }
 
-
 .TodoList-spacer {
   flex: 1;
 }
@@ -35,4 +34,10 @@
 
 .TodoList-todo:hover > .TodoList-actions {
   visibility: visible;
+}
+
+.TodoList-todoMain {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
 }

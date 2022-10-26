@@ -5,6 +5,7 @@ import React, {
   useRef,
   PointerEventHandler,
   useMemo,
+  useContext,
 } from "react"
 import { getStroke, StrokePoint } from "perfect-freehand"
 
@@ -39,9 +40,9 @@ import * as buffer from "buffer"
 import ListMenuSection from "../../ui/ListMenuSection"
 import { contentType } from "mime-types"
 import { LookupResult } from "../../pushpin-code/ContentTypes"
-import ListItem from "../../ui/ListItem";
-import ContentDragHandle from "../../ui/ContentDragHandle";
-import Badge from "../../ui/Badge";
+import ListItem from "../../ui/ListItem"
+import ContentDragHandle from "../../ui/ContentDragHandle"
+import Badge from "../../ui/Badge"
 
 export interface PdfAnnotation {
   stroke: number[][]
@@ -505,24 +506,33 @@ interface PdfSourceLinkProps extends ContentProps {
   region: Region
 }
 
-export function PdfAsSourceLink(props: ContentProps) {
+export function PdfAsSourceLink(props: PdfSourceLinkProps) {
+  const [pdf] = useDocument<PdfDoc>(props.documentId)
 
-  return (<div>
-    <ContentDragHandle
-      url={createDocumentLink("pdf", props.documentId)}
-      filename={title}
-      extension={extension}
-      binaryDataId={binaryDataId}
-    >
-      <Badge shape="square" icon="file-o" />
-    </ContentDragHandle>
-    <TitleWithSubtitle
-      title={title}
-      subtitle={subtitle}
-      documentId={documentId}
-      editable={editable}
-    />
-  </div>)
+  if (!pdf || !pdf.title) {
+    return
+  }
+
+  const subtitle = `on page ${props.region.page}`
+
+  return (
+    <div className="PdfContent-sourceLink">
+      <ContentDragHandle
+        url={createDocumentLink("pdf", props.documentId)}
+        filename={pdf.title}
+        extension="pdf"
+        binaryDataId={pdf.binaryDataId}
+      >
+        <Badge shape="square" icon="file-o" />
+      </ContentDragHandle>
+      <TitleWithSubtitle
+        title={pdf.title}
+        subtitle={subtitle}
+        documentId={props.documentId}
+        editable={false}
+      />
+    </div>
+  )
 }
 
 function PdfRegionListItemView({

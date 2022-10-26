@@ -4,7 +4,11 @@ import Content, { ContentProps, EditableContentProps } from "../Content"
 import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import "./TextContent.css"
 import { DocHandle, DocumentId } from "automerge-repo"
-import { parseDocumentLink, PushpinUrl } from "../pushpin-code/ShareLink"
+import {
+  createDocumentLink,
+  parseDocumentLink,
+  PushpinUrl,
+} from "../pushpin-code/ShareLink"
 import "./TopicList.css"
 import ListItem from "../ui/ListItem"
 import ContentDragHandle from "../ui/ContentDragHandle"
@@ -60,6 +64,9 @@ export default function TodoList({ boardId, documentId, selfId }: Props) {
         case "file": {
           const pdfDoc = await repo.find<PdfDoc>(documentId).value()
 
+          // todo: it's not nice to explicitly create a pdf link here
+          const pdfUrl = createDocumentLink("pdf", documentId)
+
           if (pdfDoc.regions) {
             changeTodoList((todoList) => {
               pdfDoc.regions.forEach((region) => {
@@ -68,9 +75,11 @@ export default function TodoList({ boardId, documentId, selfId }: Props) {
                     isDone: false,
                     contentUrl: annotationUrl,
                     source: {
-                      url,
+                      url: pdfUrl,
                       params: {
-                        region: region,
+                        region: {
+                          page: region.page,
+                        },
                       },
                     },
                   })
@@ -122,8 +131,16 @@ export default function TodoList({ boardId, documentId, selfId }: Props) {
             onChange={() => changeTodoIsDoneAt(index)}
           />
 
-          <div className="TodoList-todoContent">
-            <Content url={todo.contentUrl} context="board" key={index} />
+          <div className="TodoList-todoMain">
+            <Content
+              context="source-link"
+              url={todo.source.url}
+              {...todo.source.params}
+            />
+
+            <div className="TodoList-todoContent">
+              <Content url={todo.contentUrl} context="board" key={index} />
+            </div>
           </div>
 
           <div className="TodoList-spacer"></div>
