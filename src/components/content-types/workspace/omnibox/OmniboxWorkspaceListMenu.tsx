@@ -1,7 +1,4 @@
-/* eslint-disable react/sort-comp */
-// this component has a bunch of weird pseudo-members that make eslint sad
-
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Debug from "debug"
 
 import {
@@ -19,21 +16,16 @@ import InvitationListItem from "./InvitationListItem"
 import ListMenuSection from "../../../ui/ListMenuSection"
 import ListMenuItem from "../../../ui/ListMenuItem"
 import ListMenu from "../../../ui/ListMenu"
-import OmniboxWorkspaceListMenuSection from "./OmniboxWorkspaceListMenuSection"
 import { WorkspaceDoc as WorkspaceDoc } from "../Workspace"
 
 import "./OmniboxWorkspaceListMenu.css"
 import ActionListItem from "./ActionListItem"
 import Heading from "../../../ui/Heading"
-import {
-  DocCollection,
-  DocHandle,
-  DocHandleChangeEvent,
-  DocumentId,
-} from "automerge-repo"
+import { DocCollection, DocumentId } from "automerge-repo"
 import { Doc } from "@automerge/automerge"
 import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import { useDocumentIds, useDocuments } from "../../../pushpin-code/Hooks"
+import Content from "../../../Content"
 
 const log = Debug("pushpin:omnibox")
 
@@ -41,7 +33,6 @@ export interface Props {
   active: boolean
   search: string
   documentId: DocumentId
-  repo: DocCollection // this is not a great interface, but beats window.repo
   omniboxFinished: Function
   onContent: (url: PushpinUrl) => boolean
 }
@@ -108,11 +99,6 @@ export default function OmniboxWorkspaceListMenu(props: Props) {
   const contacts = useDocumentIds(workspace?.contactIds)
 
   const handleCommandKeys = (e: KeyboardEvent) => {
-    // XXX hmmmmm, this could be cleaner
-    if (!props.active) {
-      return
-    }
-
     if (e.key === "ArrowDown") {
       e.preventDefault()
       moveDown()
@@ -127,7 +113,7 @@ export default function OmniboxWorkspaceListMenu(props: Props) {
 
     const selected = items[selectedIndex]
     if (!selected) {
-      return
+      return null
     }
 
     // see if any of the actions for the currently selected item are triggered by the keypress
@@ -143,9 +129,15 @@ export default function OmniboxWorkspaceListMenu(props: Props) {
   }
 
   useEffect(() => {
-    document.addEventListener("keydown", handleCommandKeys)
-    return () => {}
-  })
+    if (props.active) {
+      document.addEventListener("keydown", handleCommandKeys)
+    } else {
+      document.removeEventListener("keydown", handleCommandKeys)
+    }
+    return () => {
+      document.removeEventListener("keydown", handleCommandKeys)
+    }
+  }, [props.active])
 
   if (!workspace) {
     return
@@ -500,17 +492,34 @@ export default function OmniboxWorkspaceListMenu(props: Props) {
     return null
   }
 
+  // fold in the section items and filter out empty sections
+  const sections = sectionDefinitions
+    .map((sD) => ({
+      ...sD,
+      items: sectionItems(sD.name),
+    }))
+    .filter((s) => s.items.length > 0)
+
   return (
     <ListMenu>
       {renderInvitationsSection()}
-      {sectionDefinitions.map(({ name, label, actions }) => (
-        <OmniboxWorkspaceListMenuSection
-          key={name}
-          name={name}
-          label={label}
-          actions={actions}
-          items={sectionItems(name)}
-        />
+      {sections.map(({ name, label, items, actions }) => (
+        <ListMenuSection key={name} title={label}>
+          {items.map(
+            ({ url, selected }) =>
+              url && (
+                <ActionListItem
+                  key={url}
+                  contentUrl={url}
+                  defaultAction={actions[0]}
+                  actions={actions}
+                  selected={selected}
+                >
+                  <Content context="list" url={url} />
+                </ActionListItem>
+              )
+          )}
+        </ListMenuSection>
       ))}
       {renderNothingFound()}
     </ListMenu>

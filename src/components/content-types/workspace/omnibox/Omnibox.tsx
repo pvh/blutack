@@ -80,7 +80,6 @@ export default function Omnibox(props: Props) {
       </div>
       <div className="Omnibox-Workspace">
         <OmniboxWorkspaceListMenu
-          repo={repo}
           active={active}
           search={search}
           onContent={onContent}
