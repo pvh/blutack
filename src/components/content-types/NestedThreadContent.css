@@ -3,14 +3,19 @@
   margin: 0;
   margin-left: -1px;
   margin-top: -1px;
-  flex-direction: column;
+  /* flex-direction: column; */
   background: white;
 }
 
+.messageContentWrapper {
+  display: flex;
+}
+
 .messageContent {
-  border: thin solid rgb(221, 221, 221);
-  margin: 0;
+  margin: 1px;
   padding: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .repliesWrapper:hover {
@@ -57,4 +62,20 @@
   width: 20px;
   height: 20px;
   margin-bottom: 2px;
+}
+
+.collapseButton {
+  margin: 0;
+  border: 0;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-bottom: 1em;
+  display: block;
+  background: none;
+  cursor: pointer;
+  color: var(--colorPaleGrey);
+}
+
+.collapseButton:hover {
+  color: var(--colorSecondaryGrey);
 }

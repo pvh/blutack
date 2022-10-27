@@ -11,7 +11,7 @@ import ListItem from "../ui/ListItem"
 import ContentDragHandle from "../ui/ContentDragHandle"
 import Badge from "../ui/Badge"
 import TitleWithSubtitle from "../ui/TitleWithSubtitle"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useSelfId } from "../pushpin-code/SelfHooks"
 import * as ImportData from "../pushpin-code/ImportData"
 
@@ -36,6 +36,7 @@ function NestedThreadContentItem({
   const hiddenFileInput = useRef<HTMLInputElement>(null)
   const parsed = parseDocumentLink(itemUrl)
   const isThread = parsed.type === "nested-thread"
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   function insertItemSibling(
     currentItemUrl: PushpinUrl,
@@ -74,60 +75,74 @@ function NestedThreadContentItem({
   }
 
   return (
-    <div
-      className="messageWrapper"
-      style={{ marginLeft: isThread ? "1em" : "" }}
-    >
-      <div className="messageContent">
-        <Content context="workspace" url={itemUrl} editable={true} />
-
-        {!isThread && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "end",
-              marginRight: "0.5em",
-            }}
-          >
-            <div className="buttonsWrapper">
-              <button
-                onClick={() => {
-                  ContentTypes.create("text", {}, (contentUrl) => {
-                    insertItemSibling(itemUrl, contentUrl)
-                  })
-                }}
-              >
-                + Text
-              </button>
-
-              <button
-                onClick={() => {
-                  hiddenFileInput.current?.click()
-                }}
-              >
-                + File
-              </button>
-
-              <button
-                onClick={() => {
-                  ContentTypes.create("nested-thread", {}, (threadUrl) => {
-                    insertItemSibling(itemUrl, threadUrl)
-                  })
-                }}
-              >
-                ↳ Thread
-              </button>
-            </div>
-
-            <div className="messageUser">
-              <Content
-                context="thread"
-                url={createDocumentLink("contact", selfId)}
-              />
-            </div>
+    <div className="messageWrapper">
+      <div className="messageContentWrapper">
+        {isThread && (
+          <div>
+            <button
+              className="collapseButton"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+            >
+              {isCollapsed ? "▶" : "▼"}
+            </button>
           </div>
         )}
+
+        <div
+          className="messageContent"
+          style={{ border: isThread ? "" : "thin solid rgb(221, 221, 221)" }}
+        >
+          {!isCollapsed && (
+            <Content context="workspace" url={itemUrl} editable={true} />
+          )}
+
+          {!isThread && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "end",
+                marginRight: "0.5em",
+              }}
+            >
+              <div className="buttonsWrapper">
+                <button
+                  onClick={() => {
+                    ContentTypes.create("text", {}, (contentUrl) => {
+                      insertItemSibling(itemUrl, contentUrl)
+                    })
+                  }}
+                >
+                  + Text
+                </button>
+
+                <button
+                  onClick={() => {
+                    hiddenFileInput.current?.click()
+                  }}
+                >
+                  + File
+                </button>
+
+                <button
+                  onClick={() => {
+                    ContentTypes.create("nested-thread", {}, (threadUrl) => {
+                      insertItemSibling(itemUrl, threadUrl)
+                    })
+                  }}
+                >
+                  ↳ Thread
+                </button>
+              </div>
+              <div className="messageUser">
+                <Content
+                  context="thread"
+                  url={createDocumentLink("contact", selfId)}
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <input
