@@ -9,29 +9,31 @@ import {
   createContext,
   useContext,
 } from "react"
+import { parseDocumentLink, PushpinUrl } from "./ShareLink"
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
 type Cleanup = void | (() => void)
 
 export interface DocMap<T> {
+  [id: PushpinUrl]: T
+}
+
+export interface DocIdMap<T> {
   [id: DocumentId]: T
 }
 
-export function useDocuments<T>(docIds: DocumentId[]): DocMap<T> {
-  const handlersRef = useRef<DocMap<DocHandle<T>>>({})
+export function useDocumentIds<T>(docIds?: DocumentId[]): DocIdMap<T> {
+  const handlersRef = useRef<DocIdMap<DocHandle<T>>>({})
   const repo = useRepo()
-  const [documents, setDocuments] = useState<DocMap<T>>({})
+  const [documents, setDocuments] = useState<DocIdMap<T>>({})
 
-  function setSingleDocument(id: DocumentId, doc: T) {
-    setDocuments((textDocs) => ({
-      ...textDocs,
-      [id]: doc,
-    }))
+  if (!docIds) {
+    return documents
   }
 
   const handlers = handlersRef.current
-  const prevHandlerIds = Object.keys(handlers)
+  const prevHandlerIds = Object.keys(handlers) as DocumentId[]
 
   docIds.forEach((id) => {
     if (handlers[id]) {
@@ -40,25 +42,87 @@ export function useDocuments<T>(docIds: DocumentId[]): DocMap<T> {
 
     const handler = (handlers[id] = repo.find<T>(id))
     handler.value().then((doc) => {
-      setSingleDocument(id as DocumentId, doc)
+      setDocuments((docs) => ({
+        ...docs,
+        [id]: doc,
+      }))
     })
+
+    // TODO: evt.handle.doc isn't awesome
     handler.on("change", (evt) => {
-      setSingleDocument(id as DocumentId, evt.handle.doc)
+      setDocuments((docs) => ({
+        ...docs,
+        [id]: evt.handle.doc,
+      }))
     })
   })
 
   prevHandlerIds.forEach((id) => {
-    if (handlers[id as DocumentId]) {
+    if (handlers[id]) {
       return
     }
 
-    const handler = handlers[id as DocumentId]
+    const handler = handlers[id]
     handler.off("change")
-    delete handlers[id as DocumentId]
+    delete handlers[id]
 
     setDocuments((textDocs) => {
       const copy = { ...textDocs }
-      delete copy[id as DocumentId]
+      delete copy[id]
+      return copy
+    })
+  })
+
+  return documents
+}
+
+export function useDocuments<T>(urls?: PushpinUrl[]): DocMap<T> {
+  const handlersRef = useRef<DocMap<DocHandle<T>>>({})
+  const repo = useRepo()
+  const [documents, setDocuments] = useState<DocMap<T>>({})
+
+  if (!urls) {
+    return documents
+  }
+
+  const handlers = handlersRef.current
+  const prevHandlerIds = Object.keys(handlers) as PushpinUrl[]
+
+  urls.forEach((url) => {
+    if (handlers[url]) {
+      return
+    }
+
+    const id = parseDocumentLink(url).documentId
+    const handler = (handlers[url] = repo.find<T>(id))
+    handler.value().then((doc) => {
+      setDocuments((docs) => ({
+        ...docs,
+        [url]: doc,
+      }))
+    })
+
+    // TODO: evt.handle.doc isn't awesome
+    handler.on("change", (evt) => {
+      setDocuments((docs) => ({
+        ...docs,
+        [url]: evt.handle.doc,
+      }))
+    })
+  })
+
+  prevHandlerIds.forEach((url) => {
+    if (handlers[url]) {
+      return
+    }
+
+    const handler = handlers[url]
+    handler.off("change")
+    delete handlers[url]
+
+    setDocuments((textDocs) => {
+      const copy = { ...textDocs }
+      delete copy[url]
       return copy
     })
   })
