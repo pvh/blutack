@@ -169,3 +169,34 @@
   height: 40px;
   font-size: 1.3em;
 }
+
+
+/* context-menu */
+
+.PdfContent-contextMenu {
+  position: relative;
+}
+
+.PdfContent-contextMenuContent {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+  width: 200px;
+  z-index: 10;
+}
+
+.PdfContent-contextMenuOption {
+  padding: 8px;
+}
+
+
+.PdfContent-contextMenuOption:hover {
+  background: rgb(239, 239, 239);
+}
+
+.PdfContent-buttonGroup {
+  display: flex;
+  gap: 8px;
+}

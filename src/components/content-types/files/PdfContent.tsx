@@ -43,6 +43,7 @@ import { LookupResult } from "../../pushpin-code/ContentTypes"
 import ListItem from "../../ui/ListItem"
 import ContentDragHandle from "../../ui/ContentDragHandle"
 import Badge from "../../ui/Badge"
+import ColorPicker from "../../ui/ColorPicker"
 
 export interface PdfAnnotation {
   stroke: number[][]
@@ -102,6 +103,42 @@ function getSvgPathFromStroke(stroke: Point[]) {
   return d.join(" ")
 }
 
+function ContextMenu({ children }: React.PropsWithChildren) {
+  const ref = useRef(null)
+  const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    const onClick = () => {
+      setIsOpen(false)
+    }
+
+    document.addEventListener("click", onClick)
+
+    return () => {
+      document.removeEventListener("click", onClick)
+    }
+  })
+
+  return (
+    <div className="PdfContent-contextMenu" ref={ref}>
+      <button
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation()
+          setIsOpen(!isOpen)
+        }}
+        className="PdfContent-button"
+      >
+        <i className="fa fa-ellipsis-h" />
+      </button>
+
+      {isOpen && (
+        <div className="PdfContent-contextMenuContent">{children}</div>
+      )}
+    </div>
+  )
+}
+
 export default function PdfSplitView(props: ContentProps) {
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
 
@@ -110,6 +147,18 @@ export default function PdfSplitView(props: ContentProps) {
       pdf.panels.splice(index, 1)
     })
   }, [])
+
+  const openRegionsPanel = useCallback(() => {
+    changePdf((pdf) => {
+      pdf.panels.push({ type: "regions" })
+    })
+  }, [changePdf])
+
+  const openViewersPanel = useCallback(() => {
+    changePdf((pdf) => {
+      pdf.panels.unshift({ type: "viewers" })
+    })
+  }, [changePdf])
 
   if (!pdf || !pdf.binaryDataId) {
     return null
@@ -121,6 +170,9 @@ export default function PdfSplitView(props: ContentProps) {
       pdf.panels = [{ type: "viewers" }, { type: "pdf" }, { type: "regions" }]
     })
   }
+
+  const hasRegionsPanel = pdf.panels.some((panel) => panel.type === "regions")
+  const hasViewersPanel = pdf.panels.some((panel) => panel.type === "viewers")
 
   const panels = pdf.panels ?? []
 
@@ -156,7 +208,30 @@ export default function PdfSplitView(props: ContentProps) {
                 <div className="PdfContent-panelHeader">
                   {pdf?.title}
 
-                  {closeButton}
+                  <div className="PdfContent-buttonGroup">
+                    {(!hasRegionsPanel || !hasViewersPanel) && (
+                      <ContextMenu>
+                        {!hasRegionsPanel && (
+                          <div
+                            className="PdfContent-contextMenuOption"
+                            onClick={openRegionsPanel}
+                          >
+                            show annotations
+                          </div>
+                        )}
+                        {!hasViewersPanel && (
+                          <div
+                            className="PdfContent-contextMenuOption"
+                            onClick={openViewersPanel}
+                          >
+                            show viewer
+                          </div>
+                        )}
+                      </ContextMenu>
+                    )}
+
+                    <div>{closeButton}</div>
+                  </div>
                 </div>
                 <PdfContent {...props} key={index} />
               </div>
@@ -228,7 +303,9 @@ export function PdfRegionsList(props: ContentProps) {
     return null
   }
 
-  const pageNum = pdf?.openPageNumByPerson[props.selfId] || 1
+  const pageNum =
+    (pdf?.openPageNumByPerson && pdf?.openPageNumByPerson[props.selfId]) ?? 1
+
   const regionsOnPage = getRegionsOnPage(pdf, pageNum)
 
   const addContentAtIndex = (index: number, type: string) => {
@@ -266,7 +343,8 @@ export function PdfContent(props: ContentProps) {
   const [numPages, setNumPages] = useState(0)
   const isMarkerSelected = selectedTool === "marker"
   const isRegionToolSelected = selectedTool === "region"
-  const pageNum = pdf?.openPageNumByPerson[props.selfId] || 1
+  const pageNum =
+    (pdf?.openPageNumByPerson && pdf?.openPageNumByPerson[props.selfId]) ?? 1
 
   const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback(
     (e: any) => {
