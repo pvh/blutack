@@ -167,8 +167,9 @@ export default function PdfSplitView(props: ContentProps) {
   // TODO: initialization should not happen in view
   if (!pdf.panels) {
     changePdf((pdf) => {
-      pdf.panels = [{ type: "viewers" }, { type: "pdf" }, { type: "regions" }]
+      pdf.panels = [{ type: "pdf" }]
     })
+    return null
   }
 
   const hasRegionsPanel = pdf.panels.some((panel) => panel.type === "regions")
