@@ -50,8 +50,13 @@ export interface PdfAnnotation {
   authorId: DocumentId
 }
 
+interface Panel {
+  type: "pdf" | "regions" | "viewers" // todo: panel shouldn't have custom type attribute, should use content urls instead
+}
+
 export interface PdfDoc extends FileDoc {
   content: string
+  panels: Panel[]
   annotations: PdfAnnotation[]
   regions: Region[]
   openPageNumByPerson: { [id: DocumentId]: number } // todo: handle case where person has pdf open multiple times
@@ -97,21 +102,133 @@ function getSvgPathFromStroke(stroke: Point[]) {
   return d.join(" ")
 }
 
+export default function PdfSplitView(props: ContentProps) {
+  const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
+
+  if (!pdf || !pdf.binaryDataId) {
+    return null
+  }
+
+  // TODO: initialization should not happen in view
+  if (!pdf.panels) {
+    changePdf((pdf) => {
+      pdf.panels = [{ type: "viewers" }, { type: "pdf" }, { type: "regions" }]
+    })
+  }
+
+  const panels = pdf.panels ?? []
+
+  return (
+    <div className="PdfContent-splitView">
+      {panels.map((panel, index) => {
+        switch (panel.type) {
+          case "regions":
+            return <PdfRegionsList {...props} key={index} />
+
+          case "pdf":
+            return <PdfContent {...props} key={index} />
+
+          case "viewers":
+            return <PdfViewerList {...props} key={index} />
+        }
+      })}
+    </div>
+  )
+}
+
 function stopPropagation(e: React.SyntheticEvent) {
   e.stopPropagation()
   e.nativeEvent.stopImmediatePropagation()
 }
 
-export default function PdfContent(props: ContentProps) {
+export function PdfViewerList(props: ContentProps) {
+  const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
+
+  if (!pdf || !pdf.binaryDataId) {
+    return null
+  }
+
+  const openPageNumByPerson = pdf.openPageNumByPerson ?? {}
+
+  return (
+    <div className="PdfContent-panel">
+      <div className="PdfContent-title">Viewers</div>
+
+      <ListMenu>
+        {Object.entries(openPageNumByPerson)
+          .filter(([viewerId]) => viewerId !== props.selfId)
+          .map(([viewerId, pageNum]) => (
+            <ListMenuItem
+              onClick={() => {
+                // todo:
+                // setPageNum(pageNum)
+              }}
+            >
+              <Content
+                context="list"
+                url={createDocumentLink("contact", viewerId as DocumentId)}
+              />
+            </ListMenuItem>
+          ))}
+      </ListMenu>
+    </div>
+  )
+}
+
+function getRegionsOnPage(pdf: PdfDoc, pageNum: number) {
+  return pdf.regions
+    ? pdf.regions
+        .map((region, index) => [region, index] as [Region, number])
+        .filter(([region]) => region.page === pageNum)
+    : []
+}
+
+export function PdfRegionsList(props: ContentProps) {
+  const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
+
+  if (!pdf || !pdf.binaryDataId) {
+    return null
+  }
+
+  const pageNum = pdf?.openPageNumByPerson[props.selfId] || 1
+  const regionsOnPage = getRegionsOnPage(pdf, pageNum)
+
+  const addContentAtIndex = (index: number, type: string) => {
+    ContentTypes.create(type, {}, (contentUrl) => {
+      changePdf((pdf) => {
+        pdf.regions[index].annotationUrls.push(contentUrl)
+      })
+    })
+  }
+
+  return (
+    <div className="PdfContent-panel">
+      {regionsOnPage.map(([region, index], number) => {
+        return (
+          <PdfRegionListItemView
+            onAddContent={(type) => addContentAtIndex(index, type)}
+            region={region}
+            number={number + 1}
+            key={index}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+export function PdfContent(props: ContentProps) {
   const [points, setPoints] = React.useState<Point[]>([])
   const [rectangle, setRectangle] = React.useState<Rectangle>()
   const [author] = useDocument<ContactDoc>(props.selfId)
   const [selectedTool, setSelectedTool] = React.useState<
     undefined | "marker" | "region"
   >()
-
+  const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
+  const [numPages, setNumPages] = useState(0)
   const isMarkerSelected = selectedTool === "marker"
   const isRegionToolSelected = selectedTool === "region"
+  const pageNum = pdf?.openPageNumByPerson[props.selfId] || 1
 
   const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback(
     (e: any) => {
@@ -202,13 +319,6 @@ export default function PdfContent(props: ContentProps) {
     setSelectedTool(isRegionToolSelected ? undefined : "region")
   }, [isRegionToolSelected])
 
-  const stroke = getStroke(points, STROKE_PARAMS)
-
-  const pathData = getSvgPathFromStroke(stroke)
-
-  const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
-  const [pageNum, _setPageNum] = useState(1)
-  const [numPages, setNumPages] = useState(0)
   const [pageInputValue, onPageInput] = useConfirmableInput(
     String(pageNum),
     (str) => {
@@ -218,20 +328,15 @@ export default function PdfContent(props: ContentProps) {
     }
   )
 
-  const setPageNum = useCallback(
-    (number: number) => {
-      _setPageNum(number)
+  const setPageNum = useCallback((number: number) => {
+    changePdf((pdf) => {
+      if (!pdf.openPageNumByPerson) {
+        pdf.openPageNumByPerson = {}
+      }
 
-      changePdf((pdf) => {
-        if (!pdf.openPageNumByPerson) {
-          pdf.openPageNumByPerson = {}
-        }
-
-        pdf.openPageNumByPerson[props.selfId] = pageNum
-      })
-    },
-    [_setPageNum]
-  )
+      pdf.openPageNumByPerson[props.selfId] = pageNum
+    })
+  }, [])
 
   // store openPdf number of user on mount and remove on unmount
   useEffect(() => {
@@ -240,7 +345,7 @@ export default function PdfContent(props: ContentProps) {
         pdf.openPageNumByPerson = {}
       }
 
-      pdf.openPageNumByPerson[props.selfId] = pageNum
+      pdf.openPageNumByPerson[props.selfId] = 1
     })
 
     return () => {
@@ -260,14 +365,6 @@ export default function PdfContent(props: ContentProps) {
     if (pageNum > 1) {
       setPageNum(pageNum - 1)
     }
-  }
-
-  const addContentAtIndex = (index: number, type: string) => {
-    ContentTypes.create(type, {}, (contentUrl) => {
-      changePdf((pdf) => {
-        pdf.regions[index].annotationUrls.push(contentUrl)
-      })
-    })
   }
 
   const onDocumentLoadSuccess = useCallback(
@@ -316,14 +413,15 @@ export default function PdfContent(props: ContentProps) {
     })
   }
 
+  const stroke = getStroke(points, STROKE_PARAMS)
+  const pathData = getSvgPathFromStroke(stroke)
+
   const { context } = props
 
   const annotations = pdf.annotations ?? []
 
   const forwardDisabled = pageNum >= numPages
   const backDisabled = pageNum <= 1
-
-  const openPageNumByPerson = pdf.openPageNumByPerson ?? {}
 
   const regionsOnPage = pdf.regions
     ? pdf.regions
@@ -332,28 +430,7 @@ export default function PdfContent(props: ContentProps) {
     : []
 
   return (
-    <div className="PdfContent">
-      <div className="PdfContent-sidebar is-left">
-        <div className="PdfContent-sidebarTitle">Viewers</div>
-
-        <ListMenu>
-          {Object.entries(openPageNumByPerson)
-            .filter(([viewerId]) => viewerId !== props.selfId)
-            .map(([viewerId, pageNum]) => (
-              <ListMenuItem
-                onClick={() => {
-                  setPageNum(pageNum)
-                }}
-              >
-                <Content
-                  context="list"
-                  url={createDocumentLink("contact", viewerId as DocumentId)}
-                />
-              </ListMenuItem>
-            ))}
-        </ListMenu>
-      </div>
-
+    <div className="PdfContent-panel">
       <div
         className={classNames("PdfContent-main", {
           "is-tool-selected": selectedTool !== undefined,
@@ -453,6 +530,7 @@ export default function PdfContent(props: ContentProps) {
                   />
                 )
               })}
+
             {regionsOnPage.map(([region, index], number) => {
               return (
                 <PdfRegionOverlayView
@@ -484,19 +562,6 @@ export default function PdfContent(props: ContentProps) {
             )}
           </svg>
         </div>
-      </div>
-
-      <div className="PdfContent-sidebar is-right">
-        {regionsOnPage.map(([region, index], number) => {
-          return (
-            <PdfRegionListItemView
-              onAddContent={(type) => addContentAtIndex(index, type)}
-              region={region}
-              number={number + 1}
-              key={index}
-            />
-          )
-        })}
       </div>
     </div>
   )
@@ -665,8 +730,8 @@ ContentTypes.register({
   icon: "file-pdf-o",
   unlisted: true,
   contexts: {
-    workspace: PdfContent,
-    board: PdfContent,
+    workspace: PdfSplitView,
+    board: PdfSplitView,
     "source-link": PdfAsSourceLink,
   },
   supportsMimeType,

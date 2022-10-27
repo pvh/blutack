@@ -17,24 +17,10 @@
   margin-top: 8px;
 }
 
-.PdfContent-sidebar {
-  width: 200px;
-  flex-shrink: 0;
-}
-
-.PdfContent-sidebarTitle {
+.PdfContent-title {
   color: gray;
   margin-bottom: 8px;
   padding: 8px;
-}
-
-.PdfContent-sidebar.is-right {
-  width: 300px;
-  border-left: 1px solid #eeeeee;
-}
-
-.PdfContent-sidebar.is-left {
-  border-right: 1px solid #eeeeee;
 }
 
 .PdfContent-main {
@@ -159,3 +145,23 @@
   border-top: 1px solid #eaeaea;
   padding: 8px;
 }
+
+
+/* split-view */
+
+.PdfContent-splitView {
+  display: flex;
+  gap: 1px;
+  height: 100%;
+  overflow: auto;
+}
+
+.PdfContent-panel {
+  border-right: 1px solid #eeeeee;
+  min-width: 200px;
+}
+
+.PdfContent-panel:last-child {
+  border-right: 0;
+}
+
