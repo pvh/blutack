@@ -10,6 +10,7 @@ import "./content-types/contact"
 // other single-context components
 import "./content-types/TextContent"
 import "./content-types/ThreadContent"
+import "./content-types/NestedThreadContent"
 
 import "./content-types/ContentList"
 

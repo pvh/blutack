@@ -1,0 +1,50 @@
+.messageWrapper {
+  padding: 0;
+  margin: 0;
+  margin-left: -1px;
+  margin-top: -1px;
+  flex-direction: column;
+  background: white;
+}
+
+.messageContent {
+  border: thin solid rgb(221, 221, 221);
+  margin: 0;
+  padding: 0;
+}
+
+.repliesWrapper:hover {
+  background: red;
+}
+
+.repliesWrapper {
+  padding: 0;
+  padding-left: 1em;
+}
+
+.buttonsWrapper {
+  display: block;
+}
+
+.buttonsWrapper > button {
+  margin: 0;
+  margin-left: 0.5em;
+  border: 0;
+  padding: 0.5em;
+  background: none;
+  cursor: pointer;
+  color: var(--colorSecondaryGrey);
+}
+
+.buttonsWrapper > button:hover {
+  color: var(--colorBlueBlack);
+}
+
+.messageUser {
+  float: right;
+}
+
+.messageUser > .Contact-user {
+  flex-direction: row;
+  gap: 0.5em;
+}

@@ -20,6 +20,7 @@ export type Context =
   | "list"
   | "board"
   | "thread"
+  | "nested-thread"
   | "title-bar"
   | "contact"
 

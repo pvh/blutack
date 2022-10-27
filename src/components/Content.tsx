@@ -47,16 +47,16 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
 ) => {
   const { context, url } = props
 
-  const [isCrashed, setCrashed] = useState(false)
+  const [crashError, setCrashError] = useState<Error | null>(null)
   const selfId = useSelfId()
-  const onCatch = useCallback(() => setCrashed(true), [])
+  const onCatch = useCallback((error: Error) => setCrashError(error), [])
 
   const { type, documentId } = parseDocumentLink(url)
 
   // useHeartbeat(['workspace'].includes(context) ? documentId : null)
 
   useEffect(() => {
-    setCrashed(false)
+    setCrashError(null)
   }, [url])
 
   if (!url) {
@@ -69,8 +69,8 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
     return renderMissingType(type, context)
   }
 
-  if (isCrashed) {
-    return renderError(type)
+  if (crashError) {
+    return renderError(type, crashError)
   }
 
   return (
@@ -87,11 +87,14 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
   )
 }
 
-function renderError(type: string) {
+function renderError(type: string, error: Error) {
   return (
-    <div>
-      <i className="fa fa-exclamation-triangle" />A &quot;{type}&quot; threw an
-      error during render.
+    <div style={{ color: "red", padding: "1em", fontFamily: "monospace" }}>
+      A <strong>{type}</strong> threw an error during render:
+      <pre style={{ marginTop: "1em" }}>
+        {error.message}
+        {error.stack}
+      </pre>
     </div>
   )
 }

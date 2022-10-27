@@ -1,5 +1,6 @@
 .CenteredStackRowItem {
   height: 100%;
+  overflow: scroll;
 }
 
 .CenteredStackRowItem--fixed {
