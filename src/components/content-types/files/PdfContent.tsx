@@ -105,6 +105,12 @@ function getSvgPathFromStroke(stroke: Point[]) {
 export default function PdfSplitView(props: ContentProps) {
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
 
+  const closePanelAtIndex = useCallback((index: number) => {
+    changePdf((pdf) => {
+      pdf.panels.splice(index, 1)
+    })
+  }, [])
+
   if (!pdf || !pdf.binaryDataId) {
     return null
   }
@@ -121,15 +127,51 @@ export default function PdfSplitView(props: ContentProps) {
   return (
     <div className="PdfContent-splitView">
       {panels.map((panel, index) => {
+        const closeButton =
+          panels.length !== 1 ? (
+            <button
+              type="button"
+              onClick={() => closePanelAtIndex(index)}
+              className="PdfContent-button"
+            >
+              <i className="fa fa-times" />
+            </button>
+          ) : null
+
         switch (panel.type) {
           case "regions":
-            return <PdfRegionsList {...props} key={index} />
+            return (
+              <div className="PdfContent-panel">
+                <div className="PdfContent-panelHeader">
+                  Annotations
+                  {closeButton}
+                </div>
+                <PdfRegionsList {...props} key={index} />
+              </div>
+            )
 
           case "pdf":
-            return <PdfContent {...props} key={index} />
+            return (
+              <div className="PdfContent-panel">
+                <div className="PdfContent-panelHeader">
+                  {pdf?.title}
+
+                  {closeButton}
+                </div>
+                <PdfContent {...props} key={index} />
+              </div>
+            )
 
           case "viewers":
-            return <PdfViewerList {...props} key={index} />
+            return (
+              <div className="PdfContent-panel">
+                <div className="PdfContent-panelHeader">
+                  Viewers
+                  {closeButton}
+                </div>
+                <PdfViewerList {...props} key={index} />
+              </div>
+            )
         }
       })}
     </div>
@@ -151,27 +193,23 @@ export function PdfViewerList(props: ContentProps) {
   const openPageNumByPerson = pdf.openPageNumByPerson ?? {}
 
   return (
-    <div className="PdfContent-panel">
-      <div className="PdfContent-title">Viewers</div>
-
-      <ListMenu>
-        {Object.entries(openPageNumByPerson)
-          .filter(([viewerId]) => viewerId !== props.selfId)
-          .map(([viewerId, pageNum]) => (
-            <ListMenuItem
-              onClick={() => {
-                // todo:
-                // setPageNum(pageNum)
-              }}
-            >
-              <Content
-                context="list"
-                url={createDocumentLink("contact", viewerId as DocumentId)}
-              />
-            </ListMenuItem>
-          ))}
-      </ListMenu>
-    </div>
+    <ListMenu>
+      {Object.entries(openPageNumByPerson)
+        .filter(([viewerId]) => viewerId !== props.selfId)
+        .map(([viewerId, pageNum]) => (
+          <ListMenuItem
+            onClick={() => {
+              // todo:
+              // setPageNum(pageNum)
+            }}
+          >
+            <Content
+              context="list"
+              url={createDocumentLink("contact", viewerId as DocumentId)}
+            />
+          </ListMenuItem>
+        ))}
+    </ListMenu>
   )
 }
 
@@ -430,138 +468,133 @@ export function PdfContent(props: ContentProps) {
     : []
 
   return (
-    <div className="PdfContent-panel">
-      <div
-        className={classNames("PdfContent-main", {
-          "is-tool-selected": selectedTool !== undefined,
-        })}
-      >
-        <div className="PdfContent-header" onDoubleClick={stopPropagation}>
-          <div className="PdfContent-header-left"></div>
-          <button
-            disabled={backDisabled}
-            type="button"
-            onClick={goBack}
-            className="PdfContent-button"
-          >
-            <i className="fa fa-angle-left" />
-          </button>
-          <input
-            className="PdfContent-headerInput"
-            value={pageInputValue}
-            type="number"
-            min={1}
-            max={numPages}
-            onChange={onPageInput}
-            onKeyDown={onPageInput}
-          />
-          <div className="PdfContent-headerNumPages">/ {numPages}</div>
+    <div
+      className={classNames("PdfContent-main", {
+        "is-tool-selected": selectedTool !== undefined,
+      })}
+    >
+      <div className="PdfContent-header" onDoubleClick={stopPropagation}>
+        <div className="PdfContent-header-left"></div>
+        <button
+          disabled={backDisabled}
+          type="button"
+          onClick={goBack}
+          className="PdfContent-button"
+        >
+          <i className="fa fa-angle-left" />
+        </button>
+        <input
+          className="PdfContent-headerInput"
+          value={pageInputValue}
+          type="number"
+          min={1}
+          max={numPages}
+          onChange={onPageInput}
+          onKeyDown={onPageInput}
+        />
+        <div className="PdfContent-headerNumPages">/ {numPages}</div>
+        <button
+          disabled={forwardDisabled}
+          type="button"
+          onClick={goForward}
+          className="PdfContent-button"
+        >
+          <i className="fa fa-angle-right" />
+        </button>
+
+        <div className="PdfContent-header-right">
           <button
             disabled={forwardDisabled}
             type="button"
-            onClick={goForward}
-            className="PdfContent-button"
+            onClick={toggleIsRegionToolSelected}
+            className={classNames("PdfContent-button ", {
+              "is-selected": isRegionToolSelected,
+            })}
           >
-            <i className="fa fa-angle-right" />
+            <i className="fa fa-plus-square" />
           </button>
-
-          <div className="PdfContent-header-right">
-            <button
-              disabled={forwardDisabled}
-              type="button"
-              onClick={toggleIsRegionToolSelected}
-              className={classNames("PdfContent-button ", {
-                "is-selected": isRegionToolSelected,
-              })}
-            >
-              <i className="fa fa-plus-square" />
-            </button>
-            <button
-              disabled={forwardDisabled}
-              type="button"
-              onClick={toggleIsMarkerSelected}
-              className={classNames("PdfContent-button ", {
-                "is-selected": isMarkerSelected,
-              })}
-            >
-              <i className="fa fa-pencil" />
-            </button>
-          </div>
+          <button
+            disabled={forwardDisabled}
+            type="button"
+            onClick={toggleIsMarkerSelected}
+            className={classNames("PdfContent-button ", {
+              "is-selected": isMarkerSelected,
+            })}
+          >
+            <i className="fa fa-pencil" />
+          </button>
         </div>
+      </div>
 
-        <div className="PdfContent-document">
-          <Document
-            file={createBinaryDataUrl(pdf.binaryDataId)}
-            onLoadSuccess={onDocumentLoadSuccess}
-          >
-            <Page
-              loading=""
-              pageNumber={pageNum}
-              className="PdfContent-page"
-              width={1600}
-              renderTextLayer={false}
-            />
-          </Document>
+      <div className="PdfContent-document">
+        <Document
+          file={createBinaryDataUrl(pdf.binaryDataId)}
+          onLoadSuccess={onDocumentLoadSuccess}
+        >
+          <Page
+            loading=""
+            pageNumber={pageNum}
+            className="PdfContent-page"
+            width={1600}
+            renderTextLayer={false}
+          />
+        </Document>
 
-          <svg
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            viewBox="0 0 1600 2070"
-            width={PAGE_WIDTH}
-            height={PAGE_HEIGHT}
-            style={{
-              position: "absolute",
-              top: 0,
-              width: "100%",
-              height: "auto",
-            }}
-          >
-            {pdf.annotations &&
-              pdf.annotations.map((annotation, index) => {
-                if (annotation.page !== pageNum) {
-                  return
-                }
+        <svg
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          viewBox="0 0 1600 2070"
+          width={PAGE_WIDTH}
+          height={PAGE_HEIGHT}
+          style={{
+            position: "absolute",
+            top: 0,
+            width: "100%",
+            height: "auto",
+          }}
+        >
+          {pdf.annotations &&
+            pdf.annotations.map((annotation, index) => {
+              if (annotation.page !== pageNum) {
+                return
+              }
 
-                return (
-                  <PdfAnnotationOverlayView
-                    key={index}
-                    annotation={annotation}
-                  />
-                )
-              })}
-
-            {regionsOnPage.map(([region, index], number) => {
               return (
-                <PdfRegionOverlayView
-                  region={region}
-                  number={number + 1}
-                  key={index}
-                />
+                <PdfAnnotationOverlayView key={index} annotation={annotation} />
               )
             })}
 
-            {rectangle && (
-              <rect
-                x={rectangle.from[0]}
-                y={rectangle.from[1]}
-                width={rectangle.to[0] - rectangle.from[0]}
-                height={rectangle.to[1] - rectangle.from[1]}
-                stroke={author?.color ?? "#fdd835"}
-                strokeWidth={3}
-                fill="transparent"
+          {regionsOnPage.map(([region, index], number) => {
+            return (
+              <PdfRegionOverlayView
+                region={region}
+                number={number + 1}
+                key={index}
               />
-            )}
+            )
+          })}
 
-            {points && (
-              <path
-                d={pathData}
-                opacity={0.5}
-                fill={author?.color ?? "#fdd835"}
-              />
-            )}
-          </svg>
-        </div>
+          {rectangle && (
+            <rect
+              x={rectangle.from[0]}
+              y={rectangle.from[1]}
+              width={rectangle.to[0] - rectangle.from[0]}
+              height={rectangle.to[1] - rectangle.from[1]}
+              stroke={author?.color ?? "#fdd835"}
+              strokeWidth={3}
+              fill="transparent"
+            />
+          )}
+
+          {points && (
+            <path
+              d={pathData}
+              opacity={0.5}
+              fill={author?.color ?? "#fdd835"}
+            />
+          )}
+        </svg>
       </div>
     </div>
   )

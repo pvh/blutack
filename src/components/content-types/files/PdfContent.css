@@ -17,12 +17,6 @@
   margin-top: 8px;
 }
 
-.PdfContent-title {
-  color: gray;
-  margin-bottom: 8px;
-  padding: 8px;
-}
-
 .PdfContent-main {
   flex: 1;
   background: #dadada;
@@ -103,7 +97,8 @@
   cursor: default;
 }
 
-.PdfContent-button.is-selected {
+.PdfContent-button.is-selected,
+.PdfContent-button:hover {
   background: rgb(239, 239, 239);
 }
 
@@ -165,3 +160,12 @@
   border-right: 0;
 }
 
+.PdfContent-panelHeader {
+  border-bottom: 1px solid #eeeeee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 8px;
+  height: 40px;
+  font-size: 1.3em;
+}
