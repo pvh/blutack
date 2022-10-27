@@ -16,6 +16,8 @@ import { useSelfId } from "../pushpin-code/SelfHooks"
 import * as ImportData from "../pushpin-code/ImportData"
 
 import "./NestedThreadContent.css"
+import CenteredStack from "../ui/CenteredStack"
+import CenteredStackRowItem from "../ui/CenteredStackRowItem"
 
 const ICON = "ban"
 
@@ -28,9 +30,11 @@ type Doc = {
 function NestedThreadContentItem({
   itemUrl,
   changeDoc,
+  setSidebarDocUrl,
 }: {
   itemUrl: PushpinUrl
   changeDoc: Change<Doc>
+  setSidebarDocUrl: (url: PushpinUrl | null) => void
 }) {
   const selfId = useSelfId()
   const hiddenFileInput = useRef<HTMLInputElement>(null)
@@ -80,11 +84,21 @@ function NestedThreadContentItem({
         {isThread && (
           <div>
             <button
-              className="collapseButton"
+              className="secondaryButton"
               onClick={() => setIsCollapsed(!isCollapsed)}
             >
               {isCollapsed ? "▶" : "▼"}
             </button>
+            {!isCollapsed && (
+              <button
+                className="secondaryButton"
+                onClick={() => {
+                  setSidebarDocUrl(itemUrl)
+                }}
+              >
+                ➔
+              </button>
+            )}
           </div>
         )}
 
@@ -107,6 +121,7 @@ function NestedThreadContentItem({
             >
               <div className="buttonsWrapper">
                 <button
+                  className="primaryButton"
                   onClick={() => {
                     ContentTypes.create("text", {}, (contentUrl) => {
                       insertItemSibling(itemUrl, contentUrl)
@@ -117,6 +132,7 @@ function NestedThreadContentItem({
                 </button>
 
                 <button
+                  className="primaryButton"
                   onClick={() => {
                     hiddenFileInput.current?.click()
                   }}
@@ -125,6 +141,7 @@ function NestedThreadContentItem({
                 </button>
 
                 <button
+                  className="primaryButton"
                   onClick={() => {
                     ContentTypes.create("nested-thread", {}, (threadUrl) => {
                       insertItemSibling(itemUrl, threadUrl)
@@ -163,6 +180,7 @@ export default function NestedThreadContent(props: ContentProps) {
   const { documentId } = props
   const [doc, changeDoc] = useDocument<Doc>(documentId)
   const selfId = useSelfId()
+  const [sidebarDocUrl, setSidebarDocUrl] = useState<PushpinUrl | null>(null)
 
   // set author to self -- a hack, but I can't figure out how to get selfId when create() is called
   useEffect(() => {
@@ -174,13 +192,48 @@ export default function NestedThreadContent(props: ContentProps) {
   }, [doc])
 
   return (
-    <div>
-      {doc?.items.map((itemUrl) => {
-        return (
-          <NestedThreadContentItem itemUrl={itemUrl} changeDoc={changeDoc} />
-        )
-      })}
-    </div>
+    <CenteredStack direction="row" centerText={false}>
+      <CenteredStackRowItem
+        size={{ mode: "auto" }}
+        style={{ borderRight: "solid thin #ddd" }}
+      >
+        {doc?.items.map((itemUrl) => {
+          return (
+            <NestedThreadContentItem
+              itemUrl={itemUrl}
+              changeDoc={changeDoc}
+              setSidebarDocUrl={(newSidebarDocUrl) =>
+                setSidebarDocUrl(
+                  newSidebarDocUrl === sidebarDocUrl ? null : newSidebarDocUrl
+                )
+              }
+            />
+          )
+        })}
+      </CenteredStackRowItem>
+
+      {sidebarDocUrl && (
+        <CenteredStackRowItem size={{ mode: "auto" }}>
+          <Content context="workspace" url={sidebarDocUrl} editable={true} />
+
+          {/*
+          <button
+            style={{
+              fontSize: "1.2em",
+              padding: "0.5em",
+              position: "absolute",
+              top: "1em",
+              right: "1em",
+            }}
+            className="primaryButton"
+            onClick={() => setSidebarDocUrl(null)}
+          >
+            ×
+          </button>
+            */}
+        </CenteredStackRowItem>
+      )}
+    </CenteredStack>
   )
 }
 

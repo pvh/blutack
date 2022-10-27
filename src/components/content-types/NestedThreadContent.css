@@ -31,17 +31,22 @@
   display: block;
 }
 
-.buttonsWrapper > button {
-  margin: 0;
+.buttonsWrapper > .primaryButton {
   margin-left: 0.5em;
-  border: 0;
   padding: 0.5em;
+
+}
+
+.primaryButton {
+  margin: 0;
+  padding: 0;
+  border: 0;
   background: none;
   cursor: pointer;
   color: var(--colorSecondaryGrey);
 }
 
-.buttonsWrapper > button:hover {
+.primaryButton:hover {
   color: var(--colorBlueBlack);
 }
 
@@ -64,18 +69,16 @@
   margin-bottom: 2px;
 }
 
-.collapseButton {
+.secondaryButton {
   margin: 0;
   border: 0;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  padding-bottom: 1em;
+  padding: 0.5em;
   display: block;
   background: none;
   cursor: pointer;
   color: var(--colorPaleGrey);
 }
 
-.collapseButton:hover {
+.secondaryButton:hover {
   color: var(--colorSecondaryGrey);
 }
