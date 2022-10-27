@@ -444,15 +444,18 @@ export function PdfContent(props: ContentProps) {
     }
   )
 
-  const setPageNum = useCallback((number: number) => {
-    changePdf((pdf) => {
-      if (!pdf.openPageNumByPerson) {
-        pdf.openPageNumByPerson = {}
-      }
+  const setPageNum = useCallback(
+    (number: number) => {
+      changePdf((pdf) => {
+        if (!pdf.openPageNumByPerson) {
+          pdf.openPageNumByPerson = {}
+        }
 
-      pdf.openPageNumByPerson[props.selfId] = pageNum
-    })
-  }, [])
+        pdf.openPageNumByPerson[props.selfId] = number
+      })
+    },
+    [changePdf]
+  )
 
   // store openPdf number of user on mount and remove on unmount
   useEffect(() => {
