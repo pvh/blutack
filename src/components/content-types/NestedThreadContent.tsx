@@ -1,7 +1,7 @@
 import * as ContentTypes from "../pushpin-code/ContentTypes"
 import Content, { ContentProps, EditableContentProps } from "../Content"
 import { DocHandle, DocumentId } from "automerge-repo"
-import { useDocument, useRepo } from "automerge-repo-react-hooks"
+import { Change, useDocument } from "automerge-repo-react-hooks"
 import {
   createDocumentLink,
   parseDocumentLink,
@@ -25,12 +25,129 @@ type Doc = {
   items: PushpinUrl[]
 }
 
+function NestedThreadContentItem({
+  itemUrl,
+  changeDoc,
+}: {
+  itemUrl: PushpinUrl
+  changeDoc: Change<Doc>
+}) {
+  const selfId = useSelfId()
+  const hiddenFileInput = useRef<HTMLInputElement>(null)
+  const parsed = parseDocumentLink(itemUrl)
+  const isThread = parsed.type === "nested-thread"
+
+  function insertItemSibling(
+    currentItemUrl: PushpinUrl,
+    contentUrlToInsert: PushpinUrl
+  ) {
+    changeDoc((doc) => {
+      if (doc.items.length === 0) {
+        doc.items.push(contentUrlToInsert)
+        return
+      }
+
+      const matchingItemIndex = doc.items.findIndex(
+        (itemUrl) => itemUrl === currentItemUrl
+      )
+
+      if (matchingItemIndex === doc.items.length) {
+        doc.items.push(contentUrlToInsert)
+        return
+      }
+
+      // insert after any threads started from this item
+      let itemInSlot
+      let slotIndex = matchingItemIndex
+
+      do {
+        slotIndex = slotIndex + 1
+        itemInSlot =
+          doc.items[slotIndex] && parseDocumentLink(doc.items[slotIndex])
+      } while (
+        itemInSlot?.type === "nested-thread" &&
+        slotIndex < doc.items.length
+      )
+
+      doc.items.splice(slotIndex, 0, contentUrlToInsert)
+    })
+  }
+
+  return (
+    <div
+      className="messageWrapper"
+      style={{ marginLeft: isThread ? "1em" : "" }}
+    >
+      <div className="messageContent">
+        <Content context="workspace" url={itemUrl} editable={true} />
+
+        {!isThread && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "end",
+              marginRight: "0.5em",
+            }}
+          >
+            <div className="buttonsWrapper">
+              <button
+                onClick={() => {
+                  ContentTypes.create("text", {}, (contentUrl) => {
+                    insertItemSibling(itemUrl, contentUrl)
+                  })
+                }}
+              >
+                + Text
+              </button>
+
+              <button
+                onClick={() => {
+                  hiddenFileInput.current?.click()
+                }}
+              >
+                + File
+              </button>
+
+              <button
+                onClick={() => {
+                  ContentTypes.create("nested-thread", {}, (threadUrl) => {
+                    insertItemSibling(itemUrl, threadUrl)
+                  })
+                }}
+              >
+                ↳ Thread
+              </button>
+            </div>
+
+            <div className="messageUser">
+              <Content
+                context="thread"
+                url={createDocumentLink("contact", selfId)}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <input
+        type="file"
+        onChange={(e: any) => {
+          ImportData.importFileList(e.target.files, (url) => {
+            insertItemSibling(itemUrl, url)
+          })
+        }}
+        ref={hiddenFileInput}
+        style={{ display: "none" }}
+      />
+    </div>
+  )
+}
+
 export default function NestedThreadContent(props: ContentProps) {
   const { documentId } = props
   const [doc, changeDoc] = useDocument<Doc>(documentId)
   const selfId = useSelfId()
-  const hiddenFileInput = useRef<HTMLInputElement>(null)
-  const repo = useRepo()
 
   // set author to self -- a hack, but I can't figure out how to get selfId when create() is called
   useEffect(() => {
@@ -41,100 +158,13 @@ export default function NestedThreadContent(props: ContentProps) {
     }
   }, [doc])
 
-  console.log("PROPS", props, doc)
-
   return (
     <div>
       {doc?.items.map((itemUrl) => {
-        const parsed = parseDocumentLink(itemUrl)
-        const isThread = parsed.type === "nested-thread"
-
         return (
-          <div
-            className="messageWrapper"
-            style={{ marginLeft: isThread ? "1em" : "" }}
-          >
-            <div className="messageContent">
-              <Content context="workspace" url={itemUrl} editable={true} />
-
-              {!isThread && (
-                <div
-                  style={{
-                    display: "flex",
-                    float: "right",
-                    alignItems: "end",
-                    marginRight: "0.5em",
-                    marginBottom: "0.5em",
-                  }}
-                >
-                  <div className="messageUser">
-                    <Content
-                      context="thread"
-                      url={createDocumentLink("contact", selfId)}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          <NestedThreadContentItem itemUrl={itemUrl} changeDoc={changeDoc} />
         )
       })}
-      <div>
-        <button
-          onClick={() => {
-            ContentTypes.create("text", {}, (contentUrl) => {
-              changeDoc((doc) => {
-                doc.items.push(contentUrl)
-              })
-            })
-          }}
-        >
-          + Text
-        </button>
-
-        <button
-          onClick={() => {
-            hiddenFileInput.current?.click()
-          }}
-        >
-          + File
-        </button>
-
-        <button
-          onClick={() => {
-            ContentTypes.create("nested-thread", {}, (threadUrl) => {
-              changeDoc((doc) => {
-                doc.items.push(threadUrl)
-              })
-
-              // start with text inside the thread
-              const threadHandle = repo.find(
-                parseDocumentLink(threadUrl).documentId
-              )
-              threadHandle.change((threadDoc) => {
-                ContentTypes.create("text", {}, (textUrl) => {
-                  ;(threadDoc as Doc).items.push(textUrl)
-                })
-              })
-            })
-          }}
-        >
-          ↳ Thread
-        </button>
-
-        <input
-          type="file"
-          onChange={(e: any) => {
-            ImportData.importFileList(e.target.files, (url) => {
-              changeDoc((doc) => {
-                doc.items.push(url)
-              })
-            })
-          }}
-          ref={hiddenFileInput}
-          style={{ display: "none" }}
-        />
-      </div>
     </div>
   )
 }

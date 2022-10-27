@@ -44,7 +44,17 @@
   float: right;
 }
 
-.messageUser > .Contact-user {
+.messageUser .Contact-user {
   flex-direction: row;
   gap: 0.5em;
+}
+
+.messageUser .Contact-status {
+  display: none;
+}
+
+.messageUser .Avatar {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 2px;
 }
