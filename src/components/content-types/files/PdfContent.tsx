@@ -44,6 +44,7 @@ import ListItem from "../../ui/ListItem"
 import ContentDragHandle from "../../ui/ContentDragHandle"
 import Badge from "../../ui/Badge"
 import ColorPicker from "../../ui/ColorPicker"
+import { filter } from "lodash"
 
 export interface PdfAnnotation {
   stroke: number[][]
@@ -56,10 +57,12 @@ interface PdfPanel {
 }
 
 type PdfRegionsPanelFilter = "currentPage" | "all"
+type PdfRegionsPanelView = "default" | "withExcerpt"
 
 interface PdfRegionsPanel {
   type: "regions"
   filter: PdfRegionsPanelFilter
+  view: PdfRegionsPanelView
 }
 
 interface PdfViewersPanel {
@@ -199,6 +202,15 @@ export default function PdfSplitView(props: ContentProps) {
     []
   )
 
+  const changeRegionViewAtIndex = useCallback(
+    (index: number, view: PdfRegionsPanelView) => {
+      changePdf((pdf) => {
+        ;(pdf.panels[index] as PdfRegionsPanel).view = view
+      })
+    },
+    []
+  )
+
   const openPdfPanel = useCallback(() => {
     changePdf((pdf) => {
       if (hasRegionsPanel && !hasViewersPanel) {
@@ -217,7 +229,11 @@ export default function PdfSplitView(props: ContentProps) {
 
   const openRegionsPanel = useCallback(() => {
     changePdf((pdf) => {
-      pdf.panels.push({ type: "regions", filter: "currentPage" })
+      pdf.panels.push({
+        type: "regions",
+        filter: "currentPage",
+        view: "default",
+      })
     })
   }, [changePdf])
 
@@ -328,6 +344,29 @@ export default function PdfSplitView(props: ContentProps) {
                       <div className="PdfContent-circle" />
                       all pages
                     </div>
+
+                    <div className="PdfContent-contextMenuDivider"></div>
+
+                    <div
+                      className={classNames("PdfContent-contextMenuOption", {
+                        "is-selected": panel.view === "default",
+                      })}
+                      onClick={() => changeRegionViewAtIndex(index, "default")}
+                    >
+                      <div className="PdfContent-circle" />
+                      without excerpt
+                    </div>
+                    <div
+                      className={classNames("PdfContent-contextMenuOption", {
+                        "is-selected": panel.view === "withExcerpt",
+                      })}
+                      onClick={() =>
+                        changeRegionViewAtIndex(index, "withExcerpt")
+                      }
+                    >
+                      <div className="PdfContent-circle" />
+                      with excerpt
+                    </div>
                   </ContextMenu>
 
                   <div className="PdfContent-buttonGroup">
@@ -345,7 +384,12 @@ export default function PdfSplitView(props: ContentProps) {
                     {closeButton}
                   </div>
                 </div>
-                <PdfRegionsList {...props} key={index} filter={panel.filter} />
+                <PdfRegionsList
+                  {...props}
+                  key={index}
+                  filter={panel.filter}
+                  view={panel.view}
+                />
               </div>
             )
 
@@ -397,21 +441,19 @@ export function PdfViewerList(props: ContentProps) {
 
   return (
     <ListMenu>
-      {Object.entries(openPageNumByPerson)
-        .filter(([viewerId]) => viewerId !== props.selfId)
-        .map(([viewerId, pageNum]) => (
-          <ListMenuItem
-            onClick={() => {
-              // todo:
-              // setPageNum(pageNum)
-            }}
-          >
-            <Content
-              context="list"
-              url={createDocumentLink("contact", viewerId as DocumentId)}
-            />
-          </ListMenuItem>
-        ))}
+      {Object.entries(openPageNumByPerson).map(([viewerId, pageNum]) => (
+        <ListMenuItem
+          onClick={() => {
+            // todo:
+            // setPageNum(pageNum)
+          }}
+        >
+          <Content
+            context="list"
+            url={createDocumentLink("contact", viewerId as DocumentId)}
+          />
+        </ListMenuItem>
+      ))}
     </ListMenu>
   )
 }
@@ -431,6 +473,7 @@ function getAllRegionsWithIndex(pdf: PdfDoc): [Region, number][] {
 
 interface PdfRegionsListProps extends ContentProps {
   filter: PdfRegionsPanelFilter
+  view: PdfRegionsPanelView
 }
 
 export function PdfRegionsList(props: PdfRegionsListProps) {
@@ -461,10 +504,15 @@ export function PdfRegionsList(props: PdfRegionsListProps) {
       {regionsOnPage.map(([region, index]) => {
         return (
           <PdfRegionListItemView
+            pdfId={props.documentId}
             onAddContent={(type) => addContentAtIndex(index, type)}
             region={region}
             number={index + 1}
             key={index}
+            showExcerpt={props.view === "withExcerpt"}
+            showPageNumber={
+              props.view === "withExcerpt" || props.filter === "all"
+            }
           />
         )
       })}
@@ -817,6 +865,46 @@ export function PdfContent(props: ContentProps) {
   )
 }
 
+interface PdfExcerptProps {
+  documentId: DocumentId
+  region: Region
+}
+
+export function PdfExcerpt({ documentId, region }: PdfExcerptProps) {
+  const [pdf] = useDocument<PdfDoc>(documentId)
+
+  if (!pdf || !pdf.binaryDataId) {
+    return null
+  }
+
+  return (
+    <div className="PdfContent-excerpt">
+      <Document file={createBinaryDataUrl(pdf.binaryDataId)}>
+        <Page
+          loading=""
+          pageNumber={region.page}
+          className="PdfContent-page"
+          width={1600}
+          renderTextLayer={false}
+        />
+      </Document>
+      <svg
+        viewBox="0 0 1600 2070"
+        width={PAGE_WIDTH}
+        height={PAGE_HEIGHT}
+        style={{
+          position: "absolute",
+          top: 0,
+          width: "100%",
+          height: "auto",
+        }}
+      >
+        <PdfRegionOverlayView region={region} />
+      </svg>
+    </div>
+  )
+}
+
 interface PdfSourceLinkProps extends ContentProps {
   region: Region
 }
@@ -827,8 +915,6 @@ export function PdfAsSourceLink(props: PdfSourceLinkProps) {
   if (!pdf || !pdf.title) {
     return null
   }
-
-  const subtitle = `on page ${props.region.page}`
 
   return (
     <ListItem>
@@ -842,7 +928,6 @@ export function PdfAsSourceLink(props: PdfSourceLinkProps) {
       </ContentDragHandle>
       <TitleWithSubtitle
         title={pdf.title}
-        subtitle={subtitle}
         documentId={props.documentId}
         editable={false}
       />
@@ -851,13 +936,19 @@ export function PdfAsSourceLink(props: PdfSourceLinkProps) {
 }
 
 function PdfRegionListItemView({
+  pdfId,
   region,
   number,
   onAddContent,
+  showExcerpt,
+  showPageNumber,
 }: {
+  pdfId: DocumentId
   region: Region
   number: number
   onAddContent: (contentType: string) => void
+  showExcerpt: boolean
+  showPageNumber: boolean
 }) {
   const [author] = useDocument<ContactDoc>(region.authorId)
 
@@ -870,12 +961,18 @@ function PdfRegionListItemView({
 
   return (
     <div className="PdfContent-regionGroup">
-      <div
-        className="PdfContent-regionMarker"
-        style={{ background: author?.color ?? "#fdd835" }}
-      >
-        {number}
+      <div className="PdfContent-regionGroupHeader">
+        <div
+          className="PdfContent-regionMarker"
+          style={{ background: author?.color ?? "#fdd835" }}
+        >
+          {number}
+        </div>
+
+        {showPageNumber && `on page ${region.page}`}
       </div>
+
+      {showExcerpt && <PdfExcerpt documentId={pdfId} region={region} />}
 
       {region.annotationUrls.map((contentUrl, index) => (
         <div className="PdfContent-annotationContent">
@@ -914,7 +1011,7 @@ function PdfRegionOverlayView({
   number,
 }: {
   region: Region
-  number: number
+  number?: number
 }) {
   const [author] = useDocument<ContactDoc>(region.authorId)
 
@@ -933,28 +1030,30 @@ function PdfRegionOverlayView({
         strokeWidth={5}
         fill="transparent"
       />
-      <g transform={`translate(${width}, ${height})`}>
-        <circle
-          fill={author?.color ?? "#fdd835"}
-          x={-20}
-          y={-20}
-          r={20}
-        ></circle>
-        <text
-          fill="white"
-          x={0}
-          y={1}
-          alignmentBaseline="middle"
-          textAnchor="middle"
-          style={{
-            fontWeight: "bold",
-            fontSize: "24px",
-            fontFamily: "sans-serif",
-          }}
-        >
-          {number}
-        </text>
-      </g>
+      {number !== undefined && (
+        <g transform={`translate(${width}, ${height})`}>
+          <circle
+            fill={author?.color ?? "#fdd835"}
+            x={-20}
+            y={-20}
+            r={20}
+          ></circle>
+          <text
+            fill="white"
+            x={0}
+            y={1}
+            alignmentBaseline="middle"
+            textAnchor="middle"
+            style={{
+              fontWeight: "bold",
+              fontSize: "24px",
+              fontFamily: "sans-serif",
+            }}
+          >
+            {number}
+          </text>
+        </g>
+      )}
     </g>
   )
 }

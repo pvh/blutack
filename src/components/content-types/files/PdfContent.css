@@ -58,6 +58,12 @@
   overflow-y: scroll;
 }
 
+.PdfContent-excerpt {
+  position: relative;
+  overflow: hidden;
+  max-width: 500px;
+}
+
 .PdfContent-headerInput {
   width: 5ch;
   text-align: right;
@@ -141,6 +147,13 @@
   padding: 8px;
 }
 
+.PdfContent-regionGroupHeader {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  color: gray;
+}
+
 
 /* split-view */
 
@@ -179,6 +192,10 @@
 
 .PdfContent-contextMenu {
   position: relative;
+}
+
+.PdfContent-contextMenuDivider {
+  border-top: 1px solid gray;
 }
 
 .PdfContent-contextMenuContent {
