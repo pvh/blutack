@@ -156,6 +156,10 @@
   min-width: 200px;
 }
 
+.PdfContent-panel.stretch {
+  flex: 1;
+}
+
 .PdfContent-panel:last-child {
   border-right: 0;
 }
@@ -187,8 +191,23 @@
   z-index: 10;
 }
 
+.PdfContent-contextMenuContent.left {
+  left: -8px;
+}
+
 .PdfContent-contextMenuOption {
   padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.PdfContent-contextMenuOption {
+  font-size: 16px;
+}
+
+.PdfContent-contextMenuOption.is-selected > .PdfContent-circle {
+  background: #000000;
 }
 
 
@@ -199,4 +218,11 @@
 .PdfContent-buttonGroup {
   display: flex;
   gap: 8px;
+}
+
+
+.PdfContent-circle {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }

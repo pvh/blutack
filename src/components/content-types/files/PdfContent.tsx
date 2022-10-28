@@ -51,9 +51,22 @@ export interface PdfAnnotation {
   authorId: DocumentId
 }
 
-interface Panel {
-  type: "pdf" | "regions" | "viewers" // todo: panel shouldn't have custom type attribute, should use content urls instead
+interface PdfPanel {
+  type: "pdf"
 }
+
+type PdfRegionsPanelFilter = "currentPage" | "all"
+
+interface PdfRegionsPanel {
+  type: "regions"
+  filter: PdfRegionsPanelFilter
+}
+
+interface PdfViewersPanel {
+  type: "viewers"
+}
+
+type Panel = PdfPanel | PdfRegionsPanel | PdfViewersPanel
 
 export interface PdfDoc extends FileDoc {
   content: string
@@ -103,12 +116,30 @@ function getSvgPathFromStroke(stroke: Point[]) {
   return d.join(" ")
 }
 
-function ContextMenu({ children }: React.PropsWithChildren) {
-  const ref = useRef(null)
+interface ContextMenuProps extends React.PropsWithChildren {
+  trigger?: React.ReactElement
+  closeOnClick?: boolean
+  alignment?: "left" | "right"
+}
+
+function ContextMenu({
+  trigger,
+  children,
+  closeOnClick = true,
+  alignment = "right",
+}: ContextMenuProps) {
+  const ref = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    const onClick = () => {
+    const onClick = (event: any) => {
+      if (
+        !closeOnClick &&
+        (!ref.current || ref.current.contains(event.target))
+      ) {
+        return
+      }
+
       setIsOpen(false)
     }
 
@@ -121,19 +152,25 @@ function ContextMenu({ children }: React.PropsWithChildren) {
 
   return (
     <div className="PdfContent-contextMenu" ref={ref}>
-      <button
-        type="button"
-        onClick={(event) => {
-          event.stopPropagation()
-          setIsOpen(!isOpen)
-        }}
-        className="PdfContent-button"
-      >
-        <i className="fa fa-ellipsis-h" />
-      </button>
+      {
+        <div
+          onClick={(event) => {
+            event.stopPropagation()
+            setIsOpen(!isOpen)
+          }}
+        >
+          {trigger ?? (
+            <button className="PdfContent-button">
+              <i className="fa fa-ellipsis-h" />
+            </button>
+          )}
+        </div>
+      }
 
       {isOpen && (
-        <div className="PdfContent-contextMenuContent">{children}</div>
+        <div className={classNames("PdfContent-contextMenuContent", alignment)}>
+          {children}
+        </div>
       )}
     </div>
   )
@@ -142,15 +179,45 @@ function ContextMenu({ children }: React.PropsWithChildren) {
 export default function PdfSplitView(props: ContentProps) {
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
 
+  // This sections might seem overly complicated, why not just toggle the individual panel if you just have one of each
+  // I tried to imagine here how the Pdf viewer could be implemented if we had the ability to span other panes to
+  // the right or left of it. This could be used by different component and maybe people would also want to customize
+  // for themselves on which side each panel is
+
   const closePanelAtIndex = useCallback((index: number) => {
     changePdf((pdf) => {
       pdf.panels.splice(index, 1)
     })
   }, [])
 
+  const changeRegionFilterAtIndex = useCallback(
+    (index: number, filter: PdfRegionsPanelFilter) => {
+      changePdf((pdf) => {
+        ;(pdf.panels[index] as PdfRegionsPanel).filter = filter
+      })
+    },
+    []
+  )
+
+  const openPdfPanel = useCallback(() => {
+    changePdf((pdf) => {
+      if (hasRegionsPanel && !hasViewersPanel) {
+        pdf.panels.unshift({ type: "pdf" })
+      }
+
+      if (!hasRegionsPanel && hasViewersPanel) {
+        pdf.panels.push({ type: "pdf" })
+      }
+
+      if (hasRegionsPanel && hasViewersPanel) {
+        pdf.panels.splice(1, 0, { type: "pdf" })
+      }
+    })
+  }, [changePdf])
+
   const openRegionsPanel = useCallback(() => {
     changePdf((pdf) => {
-      pdf.panels.push({ type: "regions" })
+      pdf.panels.push({ type: "regions", filter: "currentPage" })
     })
   }, [changePdf])
 
@@ -174,6 +241,7 @@ export default function PdfSplitView(props: ContentProps) {
 
   const hasRegionsPanel = pdf.panels.some((panel) => panel.type === "regions")
   const hasViewersPanel = pdf.panels.some((panel) => panel.type === "viewers")
+  const hasPdfPanel = pdf.panels.some((panel) => panel.type === "pdf")
 
   const panels = pdf.panels ?? []
 
@@ -192,17 +260,6 @@ export default function PdfSplitView(props: ContentProps) {
           ) : null
 
         switch (panel.type) {
-          case "regions":
-            return (
-              <div className="PdfContent-panel">
-                <div className="PdfContent-panelHeader">
-                  Annotations
-                  {closeButton}
-                </div>
-                <PdfRegionsList {...props} key={index} />
-              </div>
-            )
-
           case "pdf":
             return (
               <div className="PdfContent-panel">
@@ -238,12 +295,82 @@ export default function PdfSplitView(props: ContentProps) {
               </div>
             )
 
+          case "regions":
+            return (
+              <div
+                className={classNames("PdfContent-panel", {
+                  stretch: !hasPdfPanel,
+                })}
+              >
+                <div className="PdfContent-panelHeader">
+                  <ContextMenu
+                    alignment="left"
+                    closeOnClick={false}
+                    trigger={<div>Annotations</div>}
+                  >
+                    <div
+                      className={classNames("PdfContent-contextMenuOption", {
+                        "is-selected": panel.filter === "currentPage",
+                      })}
+                      onClick={() =>
+                        changeRegionFilterAtIndex(index, "currentPage")
+                      }
+                    >
+                      <div className="PdfContent-circle" />
+                      current page
+                    </div>
+                    <div
+                      className={classNames("PdfContent-contextMenuOption", {
+                        "is-selected": panel.filter === "all",
+                      })}
+                      onClick={() => changeRegionFilterAtIndex(index, "all")}
+                    >
+                      <div className="PdfContent-circle" />
+                      all pages
+                    </div>
+                  </ContextMenu>
+
+                  <div className="PdfContent-buttonGroup">
+                    {!hasPdfPanel && (
+                      <ContextMenu>
+                        <div
+                          className="PdfContent-contextMenuOption"
+                          onClick={openPdfPanel}
+                        >
+                          show pdf
+                        </div>
+                      </ContextMenu>
+                    )}
+
+                    {closeButton}
+                  </div>
+                </div>
+                <PdfRegionsList {...props} key={index} filter={panel.filter} />
+              </div>
+            )
+
           case "viewers":
             return (
-              <div className="PdfContent-panel">
+              <div
+                className={classNames("PdfContent-panel", {
+                  stretch: !hasPdfPanel,
+                })}
+              >
                 <div className="PdfContent-panelHeader">
                   Viewers
-                  {closeButton}
+                  <div className="PdfContent-buttonGroup">
+                    {!hasPdfPanel && (
+                      <ContextMenu>
+                        <div
+                          className="PdfContent-contextMenuOption"
+                          onClick={openPdfPanel}
+                        >
+                          show pdf
+                        </div>
+                      </ContextMenu>
+                    )}
+                    {closeButton}
+                  </div>
                 </div>
                 <PdfViewerList {...props} key={index} />
               </div>
@@ -289,15 +416,24 @@ export function PdfViewerList(props: ContentProps) {
   )
 }
 
-function getRegionsOnPage(pdf: PdfDoc, pageNum: number) {
-  return pdf.regions
-    ? pdf.regions
-        .map((region, index) => [region, index] as [Region, number])
-        .filter(([region]) => region.page === pageNum)
-    : []
+function getRegionsOnPageWithIndex(
+  pdf: PdfDoc,
+  pageNum: number
+): [Region, number][] {
+  return getAllRegionsWithIndex(pdf).filter(
+    ([region]) => region.page === pageNum
+  )
 }
 
-export function PdfRegionsList(props: ContentProps) {
+function getAllRegionsWithIndex(pdf: PdfDoc): [Region, number][] {
+  return pdf.regions ? pdf.regions.map((region, index) => [region, index]) : []
+}
+
+interface PdfRegionsListProps extends ContentProps {
+  filter: PdfRegionsPanelFilter
+}
+
+export function PdfRegionsList(props: PdfRegionsListProps) {
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
 
   if (!pdf || !pdf.binaryDataId) {
@@ -307,7 +443,10 @@ export function PdfRegionsList(props: ContentProps) {
   const pageNum =
     (pdf?.openPageNumByPerson && pdf?.openPageNumByPerson[props.selfId]) ?? 1
 
-  const regionsOnPage = getRegionsOnPage(pdf, pageNum)
+  const regionsOnPage =
+    props.filter === "all"
+      ? getAllRegionsWithIndex(pdf)
+      : getRegionsOnPageWithIndex(pdf, pageNum)
 
   const addContentAtIndex = (index: number, type: string) => {
     ContentTypes.create(type, {}, (contentUrl) => {
@@ -319,12 +458,12 @@ export function PdfRegionsList(props: ContentProps) {
 
   return (
     <div className="PdfContent-panel">
-      {regionsOnPage.map(([region, index], number) => {
+      {regionsOnPage.map(([region, index]) => {
         return (
           <PdfRegionListItemView
             onAddContent={(type) => addContentAtIndex(index, type)}
             region={region}
-            number={number + 1}
+            number={index + 1}
             key={index}
           />
         )
@@ -543,11 +682,7 @@ export function PdfContent(props: ContentProps) {
   const forwardDisabled = pageNum >= numPages
   const backDisabled = pageNum <= 1
 
-  const regionsOnPage = pdf.regions
-    ? pdf.regions
-        .map((region, index) => [region, index] as [Region, number])
-        .filter(([region]) => region.page === pageNum)
-    : []
+  const regionsOnPage = getRegionsOnPageWithIndex(pdf, pageNum)
 
   return (
     <div
@@ -647,11 +782,11 @@ export function PdfContent(props: ContentProps) {
               )
             })}
 
-          {regionsOnPage.map(([region, index], number) => {
+          {regionsOnPage.map(([region, index]) => {
             return (
               <PdfRegionOverlayView
                 region={region}
-                number={number + 1}
+                number={index + 1}
                 key={index}
               />
             )
