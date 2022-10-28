@@ -8,7 +8,6 @@ import {
   PushpinUrl,
 } from "../../../pushpin-code/ShareLink"
 
-// import InvitationsView from '../../../../InvitationsView'
 import { ContactDoc } from "../../contact"
 import Badge from "../../../ui/Badge"
 import "./Omnibox.css"
@@ -26,6 +25,8 @@ import { Doc } from "@automerge/automerge"
 import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import { useDocumentIds, useDocuments } from "../../../pushpin-code/Hooks"
 import Content from "../../../Content"
+import { useSelfId } from "../../../pushpin-code/SelfHooks"
+import useInvitations, { Invitation } from "./InvitationsHook"
 
 const log = Debug("pushpin:omnibox")
 
@@ -95,7 +96,8 @@ export default function OmniboxWorkspaceListMenu(
   const repo = useRepo()
 
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const [invitations, setInvitations] = useState([])
+
+  const invitations = useInvitations(props.documentId)
 
   const viewedDocs = useDocuments<TitledDoc>(workspace?.viewedDocUrls)
   const contacts = useDocumentIds(workspace?.contactIds)
@@ -103,12 +105,12 @@ export default function OmniboxWorkspaceListMenu(
   const handleCommandKeys = (e: KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault()
-      moveDown()
+      moveDown(selectedIndex)
     }
 
     if (e.key === "ArrowUp") {
       e.preventDefault()
-      moveUp()
+      moveUp(selectedIndex)
     }
 
     const { items } = menuSections()
@@ -139,29 +141,26 @@ export default function OmniboxWorkspaceListMenu(
     return () => {
       document.removeEventListener("keydown", handleCommandKeys)
     }
-  }, [props.active])
+  }, [props.active, selectedIndex])
 
   if (!workspace) {
     return null
   }
 
-  const {
-    viewedDocUrls = [],
-    contactIds = [],
-    archivedDocUrls = [],
-  } = workspace
+  const { archivedDocUrls = [] } = workspace
 
   const endSession = () => {
+    setSelectedIndex(0)
     props.omniboxFinished()
   }
 
-  const moveUp = () => {
+  const moveUp = (selectedIndex: number) => {
     if (selectedIndex > 0) {
       setSelectedIndex(selectedIndex - 1)
     }
   }
 
-  const moveDown = () => {
+  const moveDown = (selectedIndex: number) => {
     const { items } = menuSections()
     if (selectedIndex < items.length - 1) {
       setSelectedIndex(selectedIndex + 1)
@@ -177,8 +176,8 @@ export default function OmniboxWorkspaceListMenu(
     const sectionIndices: { [section: string]: SectionRange } = {}
     const { search } = props
 
-    let searchRegEx: RegExp | null
     // if we have an invalid regex, shortcircuit out of here
+    let searchRegEx: RegExp
     try {
       searchRegEx = new RegExp(search, "i")
     } catch (e) {
@@ -186,6 +185,25 @@ export default function OmniboxWorkspaceListMenu(
       sectionIndices.nothingFound = { start: 0, end: 1 }
       return { items, sectionIndices }
     }
+
+    // invitations are sort of a pseudo-section right now with lots of weird behaviour
+    const invitationItems = (invitations || [])
+      .filter((i) => !workspace.viewedDocUrls.some((url) => url === i.docUrl))
+      .filter((invitation) =>
+        ((invitation.doc as TitledDoc).title || "Loading...").match(searchRegEx)
+      )
+      .map((invitation) => ({
+        type: "invitation",
+        object: invitation,
+        url: invitation.docUrl,
+        actions: [view],
+      }))
+
+    sectionIndices.invitations = {
+      start: items.length,
+      end: invitationItems.length,
+    }
+    items = items.concat(invitationItems)
 
     // add each section definition's items to the output
     sectionDefinitions.forEach((sectionDefinition) => {
@@ -224,7 +242,6 @@ export default function OmniboxWorkspaceListMenu(
     const sectionRange = sectionIndices[name]
 
     if (sectionRange) {
-      console.log("ITEMS:", items.slice(sectionRange.start, sectionRange.end))
       return items.slice(sectionRange.start, sectionRange.end)
     }
 
@@ -457,14 +474,14 @@ export default function OmniboxWorkspaceListMenu(
     const actions = [view, place, archive]
 
     const invitations = sectionItems("invitations").map((item) => {
-      const invitation = item.object
+      const invitation = item.object as Invitation
 
-      const url = invitation.documentUrl
+      const url = invitation.docUrl
       const { documentId } = parseDocumentLink(url)
 
       return (
         <ActionListItem
-          key={`${invitation.sender.hypermergeUrl}-${invitation.documentUrl}`}
+          key={`${invitation.senderId}-${invitation.docUrl}`}
           contentUrl={url}
           defaultAction={actions[0]}
           actions={actions}
