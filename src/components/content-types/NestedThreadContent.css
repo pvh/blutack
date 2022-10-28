@@ -34,7 +34,6 @@
 .buttonsWrapper > .primaryButton {
   margin-left: 0.5em;
   padding: 0.5em;
-
 }
 
 .primaryButton {
@@ -81,4 +80,14 @@
 
 .secondaryButton:hover {
   color: var(--colorSecondaryGrey);
+}
+
+.threadButtonsWrapper {
+  display: flex;
+}
+
+.threadButtonsWrapper > .secondaryButton {
+  width: 30px;
+  height: 30px;
+  text-align: center;
 }

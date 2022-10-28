@@ -29,12 +29,14 @@ type Doc = {
 
 function NestedThreadContentItem({
   itemUrl,
+  sidebarDocUrl,
   changeDoc,
   setSidebarDocUrl,
 }: {
   itemUrl: PushpinUrl
+  sidebarDocUrl?: PushpinUrl
   changeDoc: Change<Doc>
-  setSidebarDocUrl: (url: PushpinUrl | null) => void
+  setSidebarDocUrl: (url: PushpinUrl | undefined) => void
 }) {
   const selfId = useSelfId()
   const hiddenFileInput = useRef<HTMLInputElement>(null)
@@ -82,23 +84,38 @@ function NestedThreadContentItem({
     <div className="messageWrapper">
       <div className="messageContentWrapper">
         {isThread && (
-          <div>
+          <div
+            className="threadButtonsWrapper"
+            style={{
+              flexDirection: isCollapsed ? "row" : "column",
+            }}
+          >
             <button
               className="secondaryButton"
               onClick={() => setIsCollapsed(!isCollapsed)}
             >
               {isCollapsed ? "▶" : "▼"}
             </button>
-            {!isCollapsed && (
-              <button
-                className="secondaryButton"
-                onClick={() => {
-                  setSidebarDocUrl(itemUrl)
-                }}
-              >
-                ➔
-              </button>
-            )}
+            <button
+              className="secondaryButton"
+              onClick={() => {
+                setSidebarDocUrl(itemUrl)
+              }}
+            >
+              {sidebarDocUrl === itemUrl ? (
+                <span
+                  style={{
+                    fontSize: "1.2em",
+                    fontWeight: "bold",
+                    color: "var(--colorBlueBlack)",
+                  }}
+                >
+                  ×
+                </span>
+              ) : (
+                "➔"
+              )}
+            </button>
           </div>
         )}
 
@@ -180,7 +197,9 @@ export default function NestedThreadContent(props: ContentProps) {
   const { documentId } = props
   const [doc, changeDoc] = useDocument<Doc>(documentId)
   const selfId = useSelfId()
-  const [sidebarDocUrl, setSidebarDocUrl] = useState<PushpinUrl | null>(null)
+  const [sidebarDocUrl, setSidebarDocUrl] = useState<PushpinUrl | undefined>(
+    undefined
+  )
 
   // set author to self -- a hack, but I can't figure out how to get selfId when create() is called
   useEffect(() => {
@@ -202,9 +221,12 @@ export default function NestedThreadContent(props: ContentProps) {
             <NestedThreadContentItem
               itemUrl={itemUrl}
               changeDoc={changeDoc}
+              sidebarDocUrl={sidebarDocUrl}
               setSidebarDocUrl={(newSidebarDocUrl) =>
                 setSidebarDocUrl(
-                  newSidebarDocUrl === sidebarDocUrl ? null : newSidebarDocUrl
+                  newSidebarDocUrl === sidebarDocUrl
+                    ? undefined
+                    : newSidebarDocUrl
                 )
               }
             />
@@ -215,22 +237,6 @@ export default function NestedThreadContent(props: ContentProps) {
       {sidebarDocUrl && (
         <CenteredStackRowItem size={{ mode: "auto" }}>
           <Content context="workspace" url={sidebarDocUrl} editable={true} />
-
-          {/*
-          <button
-            style={{
-              fontSize: "1.2em",
-              padding: "0.5em",
-              position: "absolute",
-              top: "1em",
-              right: "1em",
-            }}
-            className="primaryButton"
-            onClick={() => setSidebarDocUrl(null)}
-          >
-            ×
-          </button>
-            */}
         </CenteredStackRowItem>
       )}
     </CenteredStack>
@@ -261,7 +267,7 @@ export function NestedThreadInList(props: EditableContentProps) {
   )
 }
 
-function create(unusedAttrs: any, handle: DocHandle<any>) {
+function create(_: any, handle: DocHandle<any>) {
   ContentTypes.create("text", {}, (topLevelText) => {
     handle.change((doc: Doc) => {
       doc.title = ""
