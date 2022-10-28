@@ -85,7 +85,7 @@ interface TitledDoc {
   title: string
 }
 
-export default function OmniboxWorkspaceListMenu(props: Props) {
+export default function OmniboxWorkspaceListMenu(props: Props): Element | null {
   const omniboxInput = useRef<HTMLInputElement>()
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(
     props.documentId
@@ -140,7 +140,7 @@ export default function OmniboxWorkspaceListMenu(props: Props) {
   }, [props.active])
 
   if (!workspace) {
-    return
+    return null
   }
 
   const {
