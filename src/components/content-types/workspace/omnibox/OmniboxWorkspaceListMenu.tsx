@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { ReactElement, useEffect, useRef, useState } from "react"
 import Debug from "debug"
 
 import {
@@ -85,7 +85,9 @@ interface TitledDoc {
   title: string
 }
 
-export default function OmniboxWorkspaceListMenu(props: Props): Element | null {
+export default function OmniboxWorkspaceListMenu(
+  props: Props
+): ReactElement | null {
   const omniboxInput = useRef<HTMLInputElement>()
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(
     props.documentId
