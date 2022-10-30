@@ -6,9 +6,9 @@ type Row = "row"
 type Column = "column"
 type Direction = Row | Column
 
-type Start = 'start'
-type Center = 'center'
-type End = 'end'
+type Start = "start"
+type Center = "center"
+type End = "end"
 type Alignment = Start | Center | End
 export interface Props {
   direction?: Direction
@@ -19,12 +19,7 @@ export interface Props {
 }
 
 export default function CenteredStack({
-<<<<<<< HEAD
   direction = "column",
-=======
-  direction = 'column',
-  align = 'center',
->>>>>>> 3da0889 (wip)
   centerText = true,
   style,
   children,
@@ -34,12 +29,7 @@ export default function CenteredStack({
       className={classNames([
         "CenteredStack",
         `CenteredStack--${direction}`,
-<<<<<<< HEAD
         centerText && "CenteredStack--centerText",
-=======
-        `CenteredStack--${align}`,
-        centerText && 'CenteredStack--centerText',
->>>>>>> 3da0889 (wip)
       ])}
       style={style}
     >

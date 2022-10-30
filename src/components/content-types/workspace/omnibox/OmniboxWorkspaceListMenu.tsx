@@ -23,7 +23,7 @@ import Heading from "../../../ui/Heading"
 import {
   DocCollection,
   DocHandle,
-  DocHandleChangeEventArg,
+  DocHandleChangeEvent,
   DocumentId,
 } from "automerge-repo"
 import { Doc } from "@automerge/automerge"
