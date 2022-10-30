@@ -30,25 +30,7 @@ async function registerServiceWorker() {
 }
 registerServiceWorker()
 
-<<<<<<< HEAD
 let sharedWorker = await createSharedWorker()
-=======
-// sync-server instructions:
-// $ cd automerge-repo/packages/automerge-repo-sync-server
-// $ yarn
-// $ mkdir .amrg
-// $ yarn start
-let host = new URLSearchParams(window.location.search).get('host') || "localhost:3030";
-const url = `ws://${host}`
-const repo = await Repo({
-    storage: new LocalForageStorageAdapter(),
-    network: [
-      new BroadcastChannelNetworkAdapter(),
-      new BrowserWebSocketClientAdapter(url),
-    ],
-    sharePolicy: (peerId) => peerId.includes("storage-server"),
-})
->>>>>>> f9a8fe8 (wip)
 
 // FIXME - had an issue with shared worker missing the connect message on the first startup
 // if it was also loading wasm - unsure what the issue is but repeating the sharedworker
