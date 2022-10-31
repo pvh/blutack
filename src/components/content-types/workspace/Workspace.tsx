@@ -59,7 +59,6 @@ export default function Workspace({ documentId }: WorkspaceContentProps) {
   const [once, setOnce] = useState<boolean>(false)
 
   var baseUrl = window.location.href.split("?")[0]
-  navigator.registerProtocolHandler("web+pushpin", `${baseUrl}?document=%s`)
 
   if (workspace?.currentDocUrl && !once) {
     setOnce(true)

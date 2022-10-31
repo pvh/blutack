@@ -63,11 +63,14 @@ export function parseDocumentLink(link: string): Parts {
 }
 
 export function parts(str: string) {
-  const url = new URL(str, document.URL)
+  const matches = str.match(
+    /(.+):\/\/(?:www\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)*(\/[\/\d\w\.-]*)*(?:[\?])*(.+)*/
+  )
+  if (!matches) return { scheme: "", type: "", documentId: "" }
+  const [, protocol, , , path] = matches
 
-  const scheme = url.protocol.slice(0, -1)
-  const [, , type, documentId] = url.pathname.split("/")
+  const scheme = protocol
+  const [type, documentId] = path.split("/")
 
-  const params = new URLSearchParams(url.search)
   return { scheme, type, documentId }
 }
