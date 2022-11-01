@@ -773,17 +773,17 @@ arg@^4.1.0:
   resolved "https://registry.yarnpkg.com/arg/-/arg-4.1.3.tgz#269fc7ad5b8e42cb63c896d5666017261c144089"
   integrity sha512-58S9QDqG0Xx27YwPSt9fJxivjYl432YCwfDMfZ+71RAqUrZef7LrKQZ3LHLOwCS4FLNBplP533Zx895SeOCHvA==
 
-automerge-repo-network-messagechannel@0.0.14:
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/automerge-repo-network-messagechannel/-/automerge-repo-network-messagechannel-0.0.14.tgz#d35f9425ca8e7a9e36c3b357b8965b42428536a3"
-  integrity sha512-uZmVAyZTDL3uI2Zi/KeH0+p4txPd/EjqsiUrlEEwnrMAXEqJpYkjUJpJAIG/vN0wXFwkJFQ9Mu8+XocOcV6KWg==
+automerge-repo-network-messagechannel@0.0.30:
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/automerge-repo-network-messagechannel/-/automerge-repo-network-messagechannel-0.0.30.tgz#95a840d6595bff5dfd2460441f75fce1080890d7"
+  integrity sha512-o2r9+aNmec83GJP7YLfAIsL+/aiwHcicH1i9tCi8NO2Vnb6F23coz39eNppaIfXGa8uH+EtAGMLpuVhWAU9h5w==
   dependencies:
     automerge-repo "*"
 
-automerge-repo-network-websocket@0.0.14:
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/automerge-repo-network-websocket/-/automerge-repo-network-websocket-0.0.14.tgz#b9e0bc771bf74897376947da9759c17ff8bff3e5"
-  integrity sha512-B/isNboBTroK5JVIfsMPvWGN6hPFL8uiZiEgByunkQOlnNlK345vdcjX6CMaucmT7A2nSDGvqKIvEpGNSsZWBw==
+automerge-repo-network-websocket@0.0.30:
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/automerge-repo-network-websocket/-/automerge-repo-network-websocket-0.0.30.tgz#99d3a486d727383ee6a82cdc1772b3b015cd993f"
+  integrity sha512-WzDPniX3QuZMiyyh7PUepcacV2zzlEhO2hgw8RzUnLx3cyuyT4y1vPhb+hKewayk1l9YU+zTaZlf+alYxii1yw==
   dependencies:
     automerge-repo "*"
     cbor-x "^1.3.0"
@@ -805,12 +805,13 @@ automerge-repo-storage-localforage@^0.0.11:
     automerge-repo "*"
     localforage "^1.10.0"
 
-automerge-repo@*, automerge-repo@0.0.29:
-  version "0.0.29"
-  resolved "https://registry.yarnpkg.com/automerge-repo/-/automerge-repo-0.0.29.tgz#6147fa65ce273fce0e337dd0f410548b7d255956"
-  integrity sha512-MPHaQCOT6XcJ2yRY+uUg2wgma3N2mj/w7T0sSwpoRYBSqq0YG3o2aSe3THrY2UL3rKgNSnu3+Zzj21egF5zdfA==
+automerge-repo@*, automerge-repo@0.0.30:
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/automerge-repo/-/automerge-repo-0.0.30.tgz#272371fec28a5e86abaec1180142f8964b95363e"
+  integrity sha512-trEiJrGFzQ0K4VrmHWdg0eqCBYvGM3DDhrHo2ruSahMam/leLlmpVaGRWox/LbvjSLKV0PD9hXTYgzGxjzYsmQ==
   dependencies:
     cbor-x "^1.3.0"
+    debug "^4.3.4"
     eventemitter3 "^4.0.7"
     tiny-typed-emitter "^2.1.0"
     ts-node "^10.9.1"
