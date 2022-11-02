@@ -80,13 +80,11 @@ export function create(deviceAttrs: any, handle: DocHandle<any>) {
     doc.name = "computer"
     doc.icon = "desktop"
   })
-  ;(navigator as any).getBattery().then((b: any) => {
-    const isLaptop = b.chargingTime !== 0
-    const icon = isLaptop ? "laptop" : "desktop"
-    handle.change((doc: DeviceDoc) => {
-      doc.name = icon
-      doc.icon = icon
-    })
+  const isLaptop = true
+  const icon = isLaptop ? "laptop" : "desktop"
+  handle.change((doc: DeviceDoc) => {
+    doc.name = icon
+    doc.icon = icon
   })
 }
 
