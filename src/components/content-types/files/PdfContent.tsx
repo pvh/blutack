@@ -563,7 +563,7 @@ function PdfRegionListItemView({
       </div>
 
       {region.annotationUrls.map((contentUrl, index) => (
-        <div className="PdfContent-annotationContent">
+        <div className="PdfContent-annotationContent" key={index}>
           <Content context="board" url={contentUrl} index={index} />
         </div>
       ))}
