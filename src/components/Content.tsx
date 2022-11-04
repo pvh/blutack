@@ -13,7 +13,7 @@ import { parseDocumentLink, PushpinUrl } from "./pushpin-code/ShareLink"
 import Crashable from "./Crashable"
 import { DocumentId } from "automerge-repo"
 import { useSelfId } from "./pushpin-code/SelfHooks"
-// import { useHeartbeat } from '../PresenceHooks'
+import { useHeartbeat } from "./pushpin-code/PresenceHooks"
 
 // this is the interface imported by Content types
 export interface ContentProps {
@@ -53,7 +53,7 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
 
   const { type, documentId } = parseDocumentLink(url)
 
-  // useHeartbeat(['workspace'].includes(context) ? documentId : null)
+  useHeartbeat(["workspace"].includes(context) ? documentId : undefined)
 
   useEffect(() => {
     setCrashed(false)

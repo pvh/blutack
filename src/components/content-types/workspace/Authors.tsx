@@ -10,7 +10,7 @@ import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
 import { useSelfId } from "../../pushpin-code/SelfHooks"
-// import { usePresence } from '../../../PresenceHooks'
+import { usePresence } from "../../pushpin-code/PresenceHooks"
 
 const log = Debug("pushpin:authors")
 
@@ -27,7 +27,7 @@ interface DocWithAuthors {
 export default function Authors({ workspaceDocId, currentDocUrl }: Props) {
   const authorIds = useAuthors(currentDocUrl, workspaceDocId)
   const currentDocId = parseDocumentLink(currentDocUrl).documentId
-  const presence: any[] = [] // usePresence(currentDocId)
+  const presence: any[] = usePresence(currentDocId)
 
   // Remove self from the authors list.
   const selfId = useSelfId()

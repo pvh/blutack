@@ -6,7 +6,7 @@ import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import "./AudioContent.css"
 import { createBinaryDataUrl } from "../../../blobstore/Blob"
-// import { usePresence } from '../../../PresenceHooks'
+import { usePresence } from "../../pushpin-code/PresenceHooks"
 
 interface AudioState {
   paused: boolean
@@ -22,12 +22,12 @@ export default function AudioContent({ documentId }: ContentProps) {
     time: 0,
   })
 
-  const remotePresences = [] /* usePresence<AudioState>(
-    hypermergeUrl,
+  const remotePresences = usePresence<AudioState>(
+    documentId,
     // !audioState.paused || audioState.time > 0 ?
     { ...audioState }
     // : undefined
-  ) */
+  )
 
   const presences = [] /* remotePresences.filter(
     (presence) => presence && presence.data && presence.data.time

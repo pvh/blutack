@@ -170,7 +170,7 @@ const renderDevices = (
   status: string,
   selfId: DocumentId,
   removeDevice: OnRemoveDevice,
-  currentDeviceId: DocumentId | null
+  currentDeviceId: DocumentId | undefined
 ) => {
   if (!devices) {
     return (

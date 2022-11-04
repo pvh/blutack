@@ -49,13 +49,12 @@ interface WorkspaceContentProps extends ContentProps {
   createWorkspace: () => void
 }
 
-export default function Workspace({
-  documentId,
-  selfId,
-}: WorkspaceContentProps) {
+export default function Workspace({ documentId }: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDeviceId = useContext(CurrentDeviceContext)
-  const [self, changeSelf] = useDocument<ContactDoc>(selfId || undefined)
+  const [self, changeSelf] = useDocument<ContactDoc>(workspace?.selfId)
+
+  const selfId = workspace?.selfId
 
   const [once, setOnce] = useState<boolean>(false)
 
@@ -103,13 +102,13 @@ export default function Workspace({
     workspace.currentDocUrl &&
     parseDocumentLink(workspace.currentDocUrl).documentId
 
-  // useAllHeartbeats(selfId)
-  // useHeartbeat(selfId)
-  // useHeartbeat(currentDeviceId)
-  // useHeartbeat(currentDocUrl)
+  useAllHeartbeats(selfId)
+  useHeartbeat(selfId)
+  useHeartbeat(currentDeviceId)
+  useHeartbeat(currentDocUrl)
 
-  // useDeviceOnlineStatus(currentDeviceId)
-  // useContactOnlineStatus(selfId)
+  useDeviceOnlineStatus(currentDeviceId)
+  useContactOnlineStatus(selfId)
 
   // TODO: this is so grody
   // Add devices if not already on doc.
@@ -118,8 +117,12 @@ export default function Workspace({
       return
     }
 
-    if (documentId && (!self.devices || !self.devices.includes(documentId))) {
+    if (
+      currentDeviceId &&
+      (!self.devices || !self.devices.includes(currentDeviceId))
+    ) {
       changeSelf((doc: ContactDoc) => {
+        doc.devices = []
         if (!doc.devices) {
           doc.devices = []
         }
@@ -202,7 +205,6 @@ export default function Workspace({
     return false
   }
 
-  console.log("render")
   if (!workspace) {
     return null
   }
