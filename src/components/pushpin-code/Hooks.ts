@@ -1,5 +1,5 @@
 import { Doc } from "@automerge/automerge"
-import { DocumentId, DocCollection, DocHandle } from "automerge-repo"
+import { DocumentId, DocCollection, DocHandle, ChannelId } from "automerge-repo"
 import { useDocument, useHandle, useRepo } from "automerge-repo-react-hooks"
 import {
   useEffect,
@@ -153,9 +153,7 @@ export function useMessaging<M>(
   documentId: DocumentId | undefined,
   onMsg: (msg: M) => void
 ): (msg: M) => void {
-  const [sendObj, setSend] = useState<{ send: (msg: M) => void }>({
-    send() {},
-  })
+  const docAsChannel = documentId as unknown as ChannelId
 
   // Without this ref, we'd close over the `onMsg` passed during the very first render.
   // Instead, we close over the ref object and can be sure we're always reading
@@ -163,17 +161,25 @@ export function useMessaging<M>(
   const onMsgRef = useRef(onMsg)
   onMsgRef.current = onMsg
 
-  const handle = useHandle(documentId)
-  if (handle) {
-    handle.on("message", (msg: M) => onMsgRef.current(msg))
-    // setSend({ send: handle.broadcast });
+  const repo = useRepo()
 
-    return () => {
-      onMsgRef.current = () => {}
-      setSend({ send() {} })
-    }
-  }
-  return sendObj.send
+  useEffect(() => {
+    repo.ephemeralData.on("data", ({ peerId, channelId, data }) => {
+      if (channelId == docAsChannel) {
+        console.log("ON DATA", peerId, channelId, data)
+        onMsg(data as M)
+      }
+    })
+  }, [documentId])
+
+  const sendObj = useCallback(
+    (msg: M) => {
+      repo.ephemeralData.broadcast(docAsChannel, msg)
+    },
+    [docAsChannel]
+  )
+
+  return sendObj
 }
 
 /*

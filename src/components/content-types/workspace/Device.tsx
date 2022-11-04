@@ -9,7 +9,7 @@ import { useDocument } from "automerge-repo-react-hooks"
 
 import Badge from "../../ui/Badge"
 import "./Device.css"
-// import { useDeviceOnlineStatus } from '../../../PresenceHooks'
+import { useDeviceOnlineStatus } from "../../pushpin-code/PresenceHooks"
 import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import { DocHandle } from "automerge-repo"
 
@@ -24,7 +24,7 @@ interface Props extends ContentProps {
 
 function Device(props: Props) {
   const [doc] = useDocument<DeviceDoc>(props.documentId)
-  const isOnline = false // useDeviceOnlineStatus(props.documentId)
+  const isOnline = useDeviceOnlineStatus(props.documentId)
   if (!doc) return null
   const { icon = "desktop", name } = doc
 
@@ -103,4 +103,6 @@ ContentTypes.register({
   create,
 })
 
-export const CurrentDeviceContext = React.createContext<DocumentId | null>(null)
+export const CurrentDeviceContext = React.createContext<DocumentId | undefined>(
+  undefined
+)
