@@ -20,7 +20,7 @@ const myPresence: {
   [documentId: DocumentId]: { [key: string]: unknown }
 } = {}
 
-const HEARTBEAT_INTERVAL = 5000 // ms
+const HEARTBEAT_INTERVAL = 1000 // ms
 
 export interface RemotePresence<P> {
   contact: DocumentId
