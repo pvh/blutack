@@ -26,8 +26,9 @@ export const addCardForContent = (b: BoardDoc, card: BoardDocCard) => {
     context: "board",
   }) as any
 
-  if (!card.width) card.width = gridCellsToPixels(component.defaultWidth)
-  if (!card.height) card.height = gridCellsToPixels(component.defaultHeight)
+  if (!card.width) card.width = gridCellsToPixels(component.defaultWidth || 12)
+  if (!card.height)
+    card.height = gridCellsToPixels(component.defaultHeight || 8)
 
   const position = { x: card.x, y: card.y }
   const dimension = { width: card.width, height: card.height }
