@@ -21,6 +21,7 @@ const log = Debug("pushpin:settings")
 
 ContactInVarious.minWidth = 4
 ContactInVarious.minHeight = 5
+ContactInVarious.defaultWidth = 4
 
 export interface ContactProps extends ContentProps {
   isPresent?: boolean
