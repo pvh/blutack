@@ -7,6 +7,7 @@
 
 .PdfContent {
   display: flex;
+  flex-direction: column;
   height: 100%;
 }
 
@@ -20,6 +21,7 @@
 .PdfContent-sidebar {
   width: 200px;
   flex-shrink: 0;
+  background: #ffffff;
 }
 
 .PdfContent-sidebarTitle {
@@ -29,20 +31,22 @@
 }
 
 .PdfContent-sidebar.is-right {
-  width: 300px;
+  width: 250px;
   border-left: 1px solid #eeeeee;
 }
 
 .PdfContent-sidebar.is-left {
+  width: 250px;
   border-right: 1px solid #eeeeee;
 }
 
 .PdfContent-main {
   flex: 1;
+  display: flex;
   background: #dadada;
 }
 
-.PdfContent-main.is-tool-selected {
+.PdfContent-document.is-tool-selected {
   cursor: crosshair !important;
 }
 
@@ -64,6 +68,7 @@
 
 .PdfContent-header-left {
   flex: 1;
+  display: flex;
 }
 
 .PdfContent-header-right {
@@ -159,3 +164,28 @@
   border-top: 1px solid #eaeaea;
   padding: 8px;
 }
+
+.PdfContent-contextMenu {
+  position: relative;
+}
+
+.PdfContent-contextMenu > .ContextMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding: 8px;
+  display: none;
+}
+
+.PdfContent-contextMenu.is-open > .ContextMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.PdfContent-contextMenuOption {
+ display: flex;
+  align-items: center;
+  gap: 4px;
+}
+

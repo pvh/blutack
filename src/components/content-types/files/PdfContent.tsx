@@ -43,6 +43,7 @@ import { LookupResult } from "../../pushpin-code/ContentTypes"
 import ListItem from "../../ui/ListItem"
 import ContentDragHandle from "../../ui/ContentDragHandle"
 import Badge from "../../ui/Badge"
+import { useId } from "react"
 
 export interface PdfAnnotation {
   stroke: number[][]
@@ -55,6 +56,8 @@ export interface PdfDoc extends FileDoc {
   annotations: PdfAnnotation[]
   regions: Region[]
   openPageNumByPerson: { [id: DocumentId]: number } // todo: handle case where person has pdf open multiple times
+  showAnnotations: boolean
+  showViewers: boolean
 }
 
 const PAGE_WIDTH = 1600
@@ -110,8 +113,21 @@ export default function PdfContent(props: ContentProps) {
     undefined | "marker" | "region"
   >()
 
+  const [isContextMenuOpen, setIsContextMenuOpen] = React.useState(false)
   const isMarkerSelected = selectedTool === "marker"
   const isRegionToolSelected = selectedTool === "region"
+  const contextMenuId = useId()
+
+  useEffect(() => {
+    const onClick = () => {
+      setIsContextMenuOpen(false)
+    }
+    document.addEventListener("click", onClick)
+
+    return () => {
+      document.removeEventListener("click", onClick)
+    }
+  }, [setIsContextMenuOpen])
 
   const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback(
     (e: any) => {
@@ -298,6 +314,22 @@ export default function PdfContent(props: ContentProps) {
     [changePdf, pdf]
   )
 
+  const onToggleShowAnnotations = useCallback(() => {
+    changePdf((pdf) => (pdf.showAnnotations = !pdf.showAnnotations))
+  }, [changePdf])
+
+  const onToggleShowViewers = useCallback(() => {
+    changePdf((pdf) => (pdf.showViewers = !pdf.showViewers))
+  }, [changePdf])
+
+  const onToggleContextMenu = useCallback(
+    (event: React.SyntheticEvent) => {
+      stopPropagation(event)
+      setIsContextMenuOpen((isContextMenuOpen) => !isContextMenuOpen)
+    },
+    [setIsContextMenuOpen]
+  )
+
   if (!pdf) {
     return null
   }
@@ -333,86 +365,127 @@ export default function PdfContent(props: ContentProps) {
 
   return (
     <div className="PdfContent">
-      <div className="PdfContent-sidebar is-left">
-        <div className="PdfContent-sidebarTitle">Viewers</div>
-
-        <ListMenu>
-          {Object.entries(openPageNumByPerson)
-            .filter(([viewerId]) => viewerId !== props.selfId)
-            .map(([viewerId, pageNum]) => (
-              <ListMenuItem
-                onClick={() => {
-                  setPageNum(pageNum)
-                }}
+      <div className="PdfContent-header" onDoubleClick={stopPropagation}>
+        <div className="PdfContent-header-left">
+          {pdf.showAnnotations && (
+            <>
+              <button
+                disabled={forwardDisabled}
+                type="button"
+                onClick={toggleIsRegionToolSelected}
+                className={classNames("PdfContent-button ", {
+                  "is-selected": isRegionToolSelected,
+                })}
               >
-                <Content
-                  context="list"
-                  url={createDocumentLink("contact", viewerId as DocumentId)}
+                <i className="fa fa-plus-square" />
+              </button>
+              <button
+                disabled={forwardDisabled}
+                type="button"
+                onClick={toggleIsMarkerSelected}
+                className={classNames("PdfContent-button ", {
+                  "is-selected": isMarkerSelected,
+                })}
+              >
+                <i className="fa fa-pencil" />
+              </button>
+            </>
+          )}
+        </div>
+        <button
+          disabled={backDisabled}
+          type="button"
+          onClick={goBack}
+          className="PdfContent-button"
+        >
+          <i className="fa fa-angle-left" />
+        </button>
+        <input
+          className="PdfContent-headerInput"
+          value={pageInputValue}
+          type="number"
+          min={1}
+          max={numPages}
+          onChange={onPageInput}
+          onKeyDown={onPageInput}
+        />
+        <div className="PdfContent-headerNumPages">/ {numPages}</div>
+        <button
+          disabled={forwardDisabled}
+          type="button"
+          onClick={goForward}
+          className="PdfContent-button"
+        >
+          <i className="fa fa-angle-right" />
+        </button>
+
+        <div className="PdfContent-header-right">
+          <div
+            className={classNames("PdfContent-contextMenu", {
+              "is-open": isContextMenuOpen,
+            })}
+          >
+            <button className="PdfContent-button" onClick={onToggleContextMenu}>
+              <i className="fa fa-ellipsis-h" />
+            </button>
+
+            <div
+              id={contextMenuId}
+              className="ContextMenu"
+              onClick={stopPropagation}
+            >
+              <label className="PdfContent-contextMenuOption">
+                <input
+                  type="checkbox"
+                  checked={pdf.showAnnotations}
+                  onChange={onToggleShowAnnotations}
                 />
-              </ListMenuItem>
-            ))}
-        </ListMenu>
-      </div>
-
-      <div
-        className={classNames("PdfContent-main", {
-          "is-tool-selected": selectedTool !== undefined,
-        })}
-      >
-        <div className="PdfContent-header" onDoubleClick={stopPropagation}>
-          <div className="PdfContent-header-left"></div>
-          <button
-            disabled={backDisabled}
-            type="button"
-            onClick={goBack}
-            className="PdfContent-button"
-          >
-            <i className="fa fa-angle-left" />
-          </button>
-          <input
-            className="PdfContent-headerInput"
-            value={pageInputValue}
-            type="number"
-            min={1}
-            max={numPages}
-            onChange={onPageInput}
-            onKeyDown={onPageInput}
-          />
-          <div className="PdfContent-headerNumPages">/ {numPages}</div>
-          <button
-            disabled={forwardDisabled}
-            type="button"
-            onClick={goForward}
-            className="PdfContent-button"
-          >
-            <i className="fa fa-angle-right" />
-          </button>
-
-          <div className="PdfContent-header-right">
-            <button
-              disabled={forwardDisabled}
-              type="button"
-              onClick={toggleIsRegionToolSelected}
-              className={classNames("PdfContent-button ", {
-                "is-selected": isRegionToolSelected,
-              })}
-            >
-              <i className="fa fa-plus-square" />
-            </button>
-            <button
-              disabled={forwardDisabled}
-              type="button"
-              onClick={toggleIsMarkerSelected}
-              className={classNames("PdfContent-button ", {
-                "is-selected": isMarkerSelected,
-              })}
-            >
-              <i className="fa fa-pencil" />
-            </button>
+                show annotations
+              </label>
+              <label className="PdfContent-contextMenuOption">
+                <input
+                  type="checkbox"
+                  checked={pdf.showViewers}
+                  onChange={onToggleShowViewers}
+                />
+                show viewers
+              </label>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="PdfContent-document">
+      <div className="PdfContent-main">
+        {pdf.showViewers && (
+          <div className="PdfContent-sidebar is-left">
+            <div className="PdfContent-sidebarTitle">Viewers</div>
+
+            <ListMenu>
+              {Object.entries(openPageNumByPerson)
+                .filter(([viewerId]) => viewerId !== props.selfId)
+                .map(([viewerId, pageNum]) => (
+                  <ListMenuItem
+                    onClick={() => {
+                      setPageNum(pageNum)
+                    }}
+                  >
+                    <Content
+                      context="list"
+                      url={createDocumentLink(
+                        "contact",
+                        viewerId as DocumentId
+                      )}
+                    />
+                  </ListMenuItem>
+                ))}
+            </ListMenu>
+          </div>
+        )}
+        <div
+          className={classNames("PdfContent-document", {
+            "is-tool-selected": selectedTool !== undefined,
+          })}
+        >
           <Document
             file={createBinaryDataUrl(pdf.binaryDataId)}
             onLoadSuccess={onDocumentLoadSuccess}
@@ -441,6 +514,7 @@ export default function PdfContent(props: ContentProps) {
             }}
           >
             {pdf.annotations &&
+              pdf.showAnnotations &&
               pdf.annotations.map((annotation, index) => {
                 if (annotation.page !== pageNum) {
                   return
@@ -453,15 +527,16 @@ export default function PdfContent(props: ContentProps) {
                   />
                 )
               })}
-            {regionsOnPage.map(([region, index], number) => {
-              return (
-                <PdfRegionOverlayView
-                  region={region}
-                  number={number + 1}
-                  key={index}
-                />
-              )
-            })}
+            {pdf.showAnnotations &&
+              regionsOnPage.map(([region, index], number) => {
+                return (
+                  <PdfRegionOverlayView
+                    region={region}
+                    number={number + 1}
+                    key={index}
+                  />
+                )
+              })}
 
             {rectangle && (
               <rect
@@ -484,19 +559,21 @@ export default function PdfContent(props: ContentProps) {
             )}
           </svg>
         </div>
-      </div>
-
-      <div className="PdfContent-sidebar is-right">
-        {regionsOnPage.map(([region, index], number) => {
-          return (
-            <PdfRegionListItemView
-              onAddContent={(type) => addContentAtIndex(index, type)}
-              region={region}
-              number={number + 1}
-              key={index}
-            />
-          )
-        })}
+        {pdf.showAnnotations && (
+          <div className="PdfContent-sidebar is-right">
+            <div className="PdfContent-sidebarTitle">Annotations</div>
+            {regionsOnPage.map(([region, index], number) => {
+              return (
+                <PdfRegionListItemView
+                  onAddContent={(type) => addContentAtIndex(index, type)}
+                  region={region}
+                  number={number + 1}
+                  key={index}
+                />
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
   )
