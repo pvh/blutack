@@ -192,6 +192,7 @@ function create(unusedAttrs: any, handle: DocHandle<any>) {
   })
 }
 
+/*
 ContentTypes.register({
   type: "todolist",
   name: "Todo List",
@@ -203,3 +204,4 @@ ContentTypes.register({
   },
   create,
 })
+*/

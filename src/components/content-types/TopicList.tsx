@@ -242,6 +242,8 @@ function create(unusedAttrs: any, handle: DocHandle<any>) {
   })
 }
 
+/*
+
 ContentTypes.register({
   type: "topiclist",
   name: "Upvoter",
@@ -251,3 +253,5 @@ ContentTypes.register({
   },
   create,
 })
+
+ */
