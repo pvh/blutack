@@ -18,6 +18,10 @@
   flex-grow: 1;
 }
 
+.ThreadContent-clickable {
+  cursor: pointer;
+}
+
 .messageGroup {
   padding-top: 12px;
   display: flex;

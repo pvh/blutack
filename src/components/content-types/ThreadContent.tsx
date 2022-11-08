@@ -2,7 +2,11 @@ import React, { useCallback, useState } from "react"
 
 import * as ContentTypes from "../pushpin-code/ContentTypes"
 import Content, { ContentProps, EditableContentProps } from "../Content"
-import { createDocumentLink, isPushpinUrl } from "../pushpin-code/ShareLink"
+import {
+  createDocumentLink,
+  createWebLink,
+  isPushpinUrl,
+} from "../pushpin-code/ShareLink"
 import ListItem from "../ui/ListItem"
 import Badge from "../ui/Badge"
 import ContentDragHandle from "../ui/ContentDragHandle"
@@ -12,8 +16,8 @@ import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
 import { DocHandle } from "automerge-repo"
-import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants";
-import * as ImportData from "../pushpin-code/ImportData";
+import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
+import * as ImportData from "../pushpin-code/ImportData"
 
 interface Message {
   authorId: DocumentId
@@ -46,22 +50,19 @@ export default function ThreadContent(props: ContentProps) {
   const [message, setMessage] = useState("")
   const [doc, changeDoc] = useDocument<Doc>(props.documentId)
 
-  const onDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault()
+  const onDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
 
-      ImportData.importDataTransfer(e.dataTransfer, (url) => {
-        changeDoc((threadDoc: Doc) => {
-          threadDoc.messages.push({
-            authorId: props.selfId,
-            content: url,
-            time: new Date().getTime(),
-          })
+    ImportData.importDataTransfer(e.dataTransfer, (url) => {
+      changeDoc((threadDoc: Doc) => {
+        threadDoc.messages.push({
+          authorId: props.selfId,
+          content: url,
+          time: new Date().getTime(),
         })
       })
-    },
-    []
-  )
+    })
+  }, [])
 
   if (!doc || !doc.messages) {
     return null
@@ -120,7 +121,7 @@ export default function ThreadContent(props: ContentProps) {
   )
 }
 
-function preventDefault (e: React.SyntheticEvent) {
+function preventDefault(e: React.SyntheticEvent) {
   e.preventDefault()
 }
 
@@ -158,9 +159,18 @@ function renderMessage({ content, time }: Message, idx: number) {
   const date = new Date()
   date.setTime(time)
 
-  const result = isPushpinUrl(content)
-    ? <Content url={content} context="list" />
-    : content
+  const result = isPushpinUrl(content) ? (
+    <div
+      className="ThreadContent-clickable"
+      onClick={() => {
+        window.location.href = createWebLink(window.location, content)
+      }}
+    >
+      <Content url={content} context="list" />
+    </div>
+  ) : (
+    content
+  )
 
   return (
     <div className="message" key={idx}>
