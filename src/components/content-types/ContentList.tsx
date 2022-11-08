@@ -46,6 +46,20 @@ ContentList.defaultWidth = 24
 ContentList.maxWidth = 80
 ContentList.maxHeight = 36
 
+function getListMenuItemElement(
+  element: HTMLElement | null
+): HTMLElement | null {
+  if (!element) {
+    return null
+  }
+
+  if (element.classList.contains("ContentListItem")) {
+    return element
+  }
+
+  return getListMenuItemElement(element.parentElement)
+}
+
 export default function ContentList({ documentId }: ContentProps) {
   const [doc, changeDoc] = useDocument<ContentListDoc>(documentId)
   const [currentContent, selectContent] = useState<PushpinUrl | undefined>()
@@ -57,7 +71,12 @@ export default function ContentList({ documentId }: ContentProps) {
   const [draggedOverIndex, setDraggedOverIndex] = useState<number | undefined>()
 
   const onDragOver = useCallback((e: React.DragEvent, index: number) => {
-    const element = e.target as Element
+    const element = getListMenuItemElement(e.target as HTMLElement)
+
+    if (!element) {
+      return
+    }
+
     const percentage =
       (e.clientY - element.getBoundingClientRect().top) / element.clientHeight
 
@@ -80,6 +99,9 @@ export default function ContentList({ documentId }: ContentProps) {
       if (draggedOverIndex === undefined) {
         return
       }
+
+      e.preventDefault()
+      e.stopPropagation()
 
       const deleteIndex = parseInt(
         e.dataTransfer.getData(MIMETYPE_CONTENT_LIST_INDEX),
@@ -186,7 +208,7 @@ export default function ContentList({ documentId }: ContentProps) {
         <ListMenu>
           {content.map((url, index) => (
             <div
-              className={classNames({
+              className={classNames("ContentListItem", {
                 "ContentListItem--insertTop": draggedOverIndex === index,
               })}
               onDragStart={(evt) => onDragStart(evt, index)}
@@ -207,7 +229,7 @@ export default function ContentList({ documentId }: ContentProps) {
             </div>
           ))}
           <div
-            className={classNames({
+            className={classNames("ContentListItem", {
               "ContentListItem--insertTop": draggedOverIndex === content.length,
             })}
           />

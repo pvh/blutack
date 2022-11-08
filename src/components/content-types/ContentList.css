@@ -1,3 +1,14 @@
-.ContentListItem--insertTop {
-  border-top: 1px solid blue;
+.ContentListItem {
+  position: relative;
+  min-height: 1px;
+}
+
+.ContentListItem--insertTop:after {
+  content: "";
+  position: absolute;
+  top:0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--colorSecondaryGrey);
 }
