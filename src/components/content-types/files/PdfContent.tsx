@@ -44,6 +44,7 @@ import ListItem from "../../ui/ListItem"
 import ContentDragHandle from "../../ui/ContentDragHandle"
 import Badge from "../../ui/Badge"
 import { useId } from "react"
+import { useViewState } from "../../pushpin-code/ViewState"
 
 export interface PdfAnnotation {
   stroke: number[][]
@@ -55,9 +56,7 @@ export interface PdfDoc extends FileDoc {
   content: string
   annotations: PdfAnnotation[]
   regions: Region[]
-  openPageNumByPerson: { [id: DocumentId]: number } // todo: handle case where person has pdf open multiple times
   showAnnotations: boolean
-  showViewers: boolean
 }
 
 const PAGE_WIDTH = 1600
@@ -109,6 +108,7 @@ export default function PdfContent(props: ContentProps) {
   const [points, setPoints] = React.useState<Point[]>([])
   const [rectangle, setRectangle] = React.useState<Rectangle>()
   const [author] = useDocument<ContactDoc>(props.selfId)
+  const [pageNum, setPageNum] = useViewState(props.documentId, "pageNum", 1)
   const [selectedTool, setSelectedTool] = React.useState<
     undefined | "marker" | "region"
   >()
@@ -223,7 +223,6 @@ export default function PdfContent(props: ContentProps) {
   const pathData = getSvgPathFromStroke(stroke)
 
   const [pdf, changePdf] = useDocument<PdfDoc>(props.documentId)
-  const [pageNum, _setPageNum] = useState(1)
   const [numPages, setNumPages] = useState(0)
   const [pageInputValue, onPageInput] = useConfirmableInput(
     String(pageNum),
@@ -233,38 +232,6 @@ export default function PdfContent(props: ContentProps) {
       setPageNum(Math.min(numPages, Math.max(1, nextPageNum)))
     }
   )
-
-  const setPageNum = useCallback(
-    (number: number) => {
-      _setPageNum(number)
-
-      changePdf((pdf) => {
-        if (!pdf.openPageNumByPerson) {
-          pdf.openPageNumByPerson = {}
-        }
-
-        pdf.openPageNumByPerson[props.selfId] = pageNum
-      })
-    },
-    [_setPageNum]
-  )
-
-  // store openPdf number of user on mount and remove on unmount
-  useEffect(() => {
-    changePdf((pdf) => {
-      if (!pdf.openPageNumByPerson) {
-        pdf.openPageNumByPerson = {}
-      }
-
-      pdf.openPageNumByPerson[props.selfId] = pageNum
-    })
-
-    return () => {
-      changePdf((pdf) => {
-        delete pdf.openPageNumByPerson[props.selfId]
-      })
-    }
-  }, [])
 
   function goForward() {
     if (pageNum < numPages) {
@@ -318,10 +285,6 @@ export default function PdfContent(props: ContentProps) {
     changePdf((pdf) => (pdf.showAnnotations = !pdf.showAnnotations))
   }, [changePdf])
 
-  const onToggleShowViewers = useCallback(() => {
-    changePdf((pdf) => (pdf.showViewers = !pdf.showViewers))
-  }, [changePdf])
-
   const onToggleContextMenu = useCallback(
     (event: React.SyntheticEvent) => {
       stopPropagation(event)
@@ -348,14 +311,8 @@ export default function PdfContent(props: ContentProps) {
     })
   }
 
-  const { context } = props
-
-  const annotations = pdf.annotations ?? []
-
   const forwardDisabled = pageNum >= numPages
   const backDisabled = pageNum <= 1
-
-  const openPageNumByPerson = pdf.openPageNumByPerson ?? {}
 
   const regionsOnPage = pdf.regions
     ? pdf.regions
@@ -442,45 +399,12 @@ export default function PdfContent(props: ContentProps) {
                 />
                 show annotations
               </label>
-              <label className="PdfContent-contextMenuOption">
-                <input
-                  type="checkbox"
-                  checked={pdf.showViewers}
-                  onChange={onToggleShowViewers}
-                />
-                show viewers
-              </label>
             </div>
           </div>
         </div>
       </div>
 
       <div className="PdfContent-main">
-        {pdf.showViewers && (
-          <div className="PdfContent-sidebar is-left">
-            <div className="PdfContent-sidebarTitle">Viewers</div>
-
-            <ListMenu>
-              {Object.entries(openPageNumByPerson)
-                .filter(([viewerId]) => viewerId !== props.selfId)
-                .map(([viewerId, pageNum]) => (
-                  <ListMenuItem
-                    onClick={() => {
-                      setPageNum(pageNum)
-                    }}
-                  >
-                    <Content
-                      context="list"
-                      url={createDocumentLink(
-                        "contact",
-                        viewerId as DocumentId
-                      )}
-                    />
-                  </ListMenuItem>
-                ))}
-            </ListMenu>
-          </div>
-        )}
         <div
           className={classNames("PdfContent-document", {
             "is-tool-selected": selectedTool !== undefined,
