@@ -59,7 +59,6 @@ export function useAllHeartbeats(contact: DocumentId | undefined) {
     const interval = setInterval(() => {
       // Post a presence heartbeat on documents currently considered
       // to be open, allowing any kind of card to render a list of "present" folks.
-      console.log("myPresence", myPresence)
       Object.entries(heartbeats).forEach(([documentId, count]) => {
         // NB: casts below are because Object.entries gives us string-flavored keys
         if (count > 0) {
@@ -153,7 +152,6 @@ export function usePresence<P>(
       bumpTimeout(remotePresenceToLookupKey(presence))
       setSingleRemote(presence)
     } else if (departing) {
-      console.log("removing presence for ", presence)
       depart(remotePresenceToLookupKey(presence))
     }
   })
@@ -180,7 +178,6 @@ export function usePresence<P>(
     .filter((presence) => presence.data)
     .map((presence) => ({ ...presence, data: (presence.data || {})![key] }))
 
-  console.log(url, result)
   return result
 }
 
