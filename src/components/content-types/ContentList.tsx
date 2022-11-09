@@ -34,6 +34,7 @@ import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
 import Heading from "../ui/Heading"
+import { useViewState } from "../pushpin-code/ViewState"
 
 export interface ContentListDoc {
   title: string
@@ -62,7 +63,12 @@ function getListMenuItemElement(
 
 export default function ContentList({ documentId }: ContentProps) {
   const [doc, changeDoc] = useDocument<ContentListDoc>(documentId)
-  const [currentContent, selectContent] = useState<PushpinUrl | undefined>()
+
+  const [currentContent, selectContent] = useViewState<PushpinUrl | undefined>(
+    documentId,
+    "currentContent"
+  )
+
   const [addingNewItem, setAddingNewItem] = useState(false)
   const contentTypes = useMemo(
     () => ContentTypes.list({ context: "board" }),
