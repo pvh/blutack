@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@automerge/automerge": "^2.0.0-alpha.5",
-    "automerge-repo": "0.0.34",
+    "automerge-repo": "0.0.35",
     "automerge-repo-network-messagechannel": "0.0.31",
     "automerge-repo-network-websocket": "0.0.31",
     "automerge-repo-react-hooks": "0.0.31",

@@ -12,6 +12,8 @@ import {
 } from "./blobstore/Blob"
 
 console.log("shared-worker starting up")
+import debug from "debug"
+debug.enable("DocSynchronizer")
 
 export interface FrontendConnection {
   repoNetworkPort: MessagePort
