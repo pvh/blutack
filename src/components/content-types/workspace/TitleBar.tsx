@@ -24,6 +24,7 @@ import {
   getViewStateOfUser,
 } from "../../pushpin-code/ViewState"
 import { useSelfId } from "../../pushpin-code/SelfHooks"
+import * as ContentTypes from "../../pushpin-code/ContentTypes"
 
 export interface Props {
   documentId: DocumentId
@@ -108,6 +109,12 @@ export default function TitleBar(props: Props) {
     }
   }
 
+  function createNewContentList() {
+    ContentTypes.create("contentlist", {}, (contentUrl) => {
+      window.location.href = createWebLink(window.location, contentUrl)
+    })
+  }
+
   function showOmnibox() {
     setActive(true)
   }
@@ -122,15 +129,18 @@ export default function TitleBar(props: Props) {
 
   return (
     <div className="TitleBar">
+      <button
+        type="button"
+        onClick={createNewContentList}
+        className="TitleBar-menuItem"
+      >
+        <i className="fa fa-plus" />
+      </button>
       <div className="NavigationBar Inline">
-        <button
-          disabled={backDisabled}
-          type="button"
-          onClick={goBack}
-          className="TitleBar-menuItem"
-        >
+        <button type="button" onClick={goBack} className="TitleBar-menuItem">
           <i className="fa fa-angle-left" />
         </button>
+
         <button
           type="button"
           onClick={(e) => {
