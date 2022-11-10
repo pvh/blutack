@@ -33,6 +33,10 @@ import { CurrentDeviceContext } from "./Device"
 import WorkspaceInList from "./WorkspaceInList"
 import { importPlainText } from "../../pushpin-code/ImportData"
 import { ContentListDoc } from "../ContentList"
+import {
+  DocWithViewState,
+  loadViewStateForUser,
+} from "../../pushpin-code/ViewState"
 
 const log = Debug("pushpin:workspace")
 
@@ -47,24 +51,37 @@ export interface WorkspaceDoc {
 interface WorkspaceContentProps extends ContentProps {
   setWorkspaceUrl: (newWorkspaceUrl: PushpinUrl) => void
   createWorkspace: () => void
+  initialViewState: { [key: string]: any }
 }
 
-export default function Workspace({ documentId }: WorkspaceContentProps) {
+export default function Workspace({
+  documentId,
+  initialViewState,
+}: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
+  const currentDocId =
+    workspace &&
+    workspace.currentDocUrl &&
+    parseDocumentLink(workspace.currentDocUrl).documentId
+  const [currentDoc, changeCurrentDoc] =
+    useDocument<DocWithViewState>(currentDocId)
+
   const currentDeviceId = useContext(CurrentDeviceContext)
   const [self, changeSelf] = useDocument<ContactDoc>(workspace?.selfId)
 
   const selfId = workspace?.selfId
 
-  const [once, setOnce] = useState<boolean>(false)
+  const [isCurrentDocUrlChecked, setIsCurrentDocUrlChecked] =
+    useState<boolean>(false)
+  const [isStateSnapshotChecked, setIsStateSnapshotChecked] =
+    useState<boolean>(false)
 
-  var baseUrl = window.location.href.split("?")[0]
-
-  if (workspace?.currentDocUrl && !once) {
-    setOnce(true)
+  if (workspace?.currentDocUrl && !isCurrentDocUrlChecked) {
+    setIsCurrentDocUrlChecked(true)
     const maybePushpinUrl = new URLSearchParams(window.location.search).get(
       "document"
     )
+
     if (isPushpinUrl(maybePushpinUrl)) {
       // this is just to sanitize out any other bits of the URL
       const { scheme, type, documentId } = parseDocumentLink(maybePushpinUrl)
@@ -73,6 +90,22 @@ export default function Workspace({ documentId }: WorkspaceContentProps) {
       if (docLink !== currentDocUrl) {
         openDoc(docLink)
       }
+    }
+  }
+
+  if (
+    selfId &&
+    initialViewState &&
+    currentDoc?.__userStates &&
+    isCurrentDocUrlChecked &&
+    !isStateSnapshotChecked
+  ) {
+    setIsStateSnapshotChecked(true)
+
+    if (initialViewState) {
+      changeCurrentDoc((doc) => {
+        loadViewStateForUser(doc, initialViewState, selfId)
+      })
     }
   }
 
@@ -97,15 +130,10 @@ export default function Workspace({ documentId }: WorkspaceContentProps) {
     })
   }
 
-  const currentDocUrl =
-    workspace &&
-    workspace.currentDocUrl &&
-    parseDocumentLink(workspace.currentDocUrl).documentId
-
   useAllHeartbeats(selfId)
   useHeartbeat(selfId)
   useHeartbeat(currentDeviceId)
-  useHeartbeat(currentDocUrl)
+  useHeartbeat(currentDocId)
 
   useDeviceOnlineStatus(currentDeviceId)
   useContactOnlineStatus(selfId)

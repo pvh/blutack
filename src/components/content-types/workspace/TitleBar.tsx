@@ -9,6 +9,8 @@ import {
   PushpinUrl,
   createDocumentLink,
   createWebLink,
+  parseDocumentLink,
+  createWebLinkWithViewState,
 } from "../../pushpin-code/ShareLink"
 import { useEvent } from "../../pushpin-code/Hooks"
 
@@ -17,6 +19,11 @@ import { WorkspaceDoc as WorkspaceDoc } from "./Workspace"
 import Badge from "../../ui/Badge"
 
 import "./TitleBar.css"
+import {
+  DocWithViewState,
+  getViewStateOfUser,
+} from "../../pushpin-code/ViewState"
+import { useSelfId } from "../../pushpin-code/SelfHooks"
 
 export interface Props {
   documentId: DocumentId
@@ -28,7 +35,15 @@ export default function TitleBar(props: Props) {
   const [sessionHistory, setHistory] = useState<PushpinUrl[]>([])
   const [historyIndex, setIndex] = useState(0)
   const [activeOmnibox, setActive] = useState(false)
-  const [doc] = useDocument<WorkspaceDoc>(props.documentId)
+  const [workspaceDoc] = useDocument<WorkspaceDoc>(props.documentId)
+  const currentDocUrl = workspaceDoc?.currentDocUrl
+  const currentDocId = currentDocUrl
+    ? parseDocumentLink(currentDocUrl).documentId
+    : undefined
+  const [currentDoc, changeCurrentDoc] =
+    useDocument<DocWithViewState>(currentDocId)
+
+  const selfId = useSelfId()
 
   useEvent(document, "keydown", (e) => {
     if (e.key === "/" && document.activeElement === document.body) {
@@ -48,20 +63,23 @@ export default function TitleBar(props: Props) {
   const forwardDisabled = historyIndex === 0
 
   useEffect(() => {
-    if (!doc || !doc.currentDocUrl) {
+    if (!workspaceDoc || !workspaceDoc.currentDocUrl) {
       return
     }
 
     // Init sessionHistory
     if (sessionHistory.length === 0) {
-      setHistory([doc.currentDocUrl])
+      setHistory([workspaceDoc.currentDocUrl])
       // If we're opening a new document (as opposed to going back or forward),
       // add it to our sessionHistory and remove all docs 'forward' of the current index
-    } else if (doc.currentDocUrl !== sessionHistory[historyIndex]) {
-      setHistory([doc.currentDocUrl, ...sessionHistory.slice(historyIndex)])
+    } else if (workspaceDoc.currentDocUrl !== sessionHistory[historyIndex]) {
+      setHistory([
+        workspaceDoc.currentDocUrl,
+        ...sessionHistory.slice(historyIndex),
+      ])
       setIndex(0)
     }
-  }, [doc, historyIndex, sessionHistory])
+  }, [workspaceDoc, historyIndex, sessionHistory])
 
   function goBack() {
     if (backDisabled) {
@@ -82,9 +100,10 @@ export default function TitleBar(props: Props) {
   }
 
   function copyLink(e: React.MouseEvent) {
-    if (doc && doc.currentDocUrl) {
+    if (currentDoc && currentDocUrl) {
+      const viewState = getViewStateOfUser(currentDoc, selfId)
       navigator.clipboard.writeText(
-        createWebLink(window.location, doc.currentDocUrl)
+        createWebLinkWithViewState(window.location, currentDocUrl, viewState)
       )
     }
   }
@@ -97,7 +116,7 @@ export default function TitleBar(props: Props) {
     setActive(false)
   }
 
-  if (!doc || !doc.currentDocUrl) {
+  if (!workspaceDoc || !workspaceDoc.currentDocUrl) {
     return null
   }
 
@@ -134,16 +153,20 @@ export default function TitleBar(props: Props) {
       </div>
 
       <div className="ContentHeader Group">
-        <Content url={doc.currentDocUrl} context="title-bar" editable />
+        <Content
+          url={workspaceDoc.currentDocUrl}
+          context="title-bar"
+          editable
+        />
       </div>
       <div className="CollaboratorsBar Inline">
         <Authors
-          currentDocUrl={doc.currentDocUrl}
+          currentDocUrl={workspaceDoc.currentDocUrl}
           workspaceDocId={props.documentId}
         />
         <div className="TitleBar-self">
           <Content
-            url={createDocumentLink("contact", doc.selfId)}
+            url={createDocumentLink("contact", workspaceDoc.selfId)}
             context="title-bar"
             isPresent
           />

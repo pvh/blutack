@@ -30,6 +30,17 @@ export function createWebLink(
   return `${url}?document=${encodeURIComponent(pushPinUrl)}`
 }
 
+export function createWebLinkWithViewState(
+  windowLocation: Location,
+  pushPinUrl: PushpinUrl,
+  viewState: { [key: string]: any }
+) {
+  return `${createWebLink(
+    windowLocation,
+    pushPinUrl
+  )}&viewState=${encodeURIComponent(JSON.stringify(viewState))}`
+}
+
 // const url = "?document=web%2Bpushpin%3A%2F%2Fcontentlist%2Ffcfb63f5-777e-469b-a9bd-9f093d1ba2b7"
 // const url = "web+pushpin://contentlist/fcfb63f5-777e-469b-a9bd-9f093d1ba2b7"
 // isPushpinUrl(url) === true
