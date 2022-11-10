@@ -8,7 +8,11 @@ import React, {
   useCallback,
 } from "react"
 
-import { PushpinUrl } from "../pushpin-code/ShareLink"
+import {
+  createDocumentLink,
+  createWebLink,
+  PushpinUrl,
+} from "../pushpin-code/ShareLink"
 
 import Content, { ContentProps, EditableContentProps } from "../Content"
 import * as ContentTypes from "../pushpin-code/ContentTypes"
@@ -289,6 +293,14 @@ const icon = "list"
 export function ContentListInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
   const [doc] = useDocument<ContentListDoc>(documentId)
+  const onClick = useCallback((event: React.SyntheticEvent) => {
+    event.stopPropagation()
+    window.location.href = createWebLink(
+      window.location,
+      createDocumentLink("contentlist", documentId)
+    )
+  }, [])
+
   if (!doc || !doc.content) return null
 
   const title =
@@ -297,18 +309,20 @@ export function ContentListInList(props: EditableContentProps) {
   const subtitle = `${items} item${items !== 1 ? "s" : ""}`
 
   return (
-    <ListItem>
-      <ContentDragHandle url={url}>
-        <Badge size="medium" icon={icon} />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        titleEditorField="title"
-        title={title}
-        subtitle={subtitle}
-        documentId={documentId}
-        editable={editable}
-      />
-    </ListItem>
+    <div onClick={onClick}>
+      <ListItem>
+        <ContentDragHandle url={url}>
+          <Badge size="medium" icon={icon} />
+        </ContentDragHandle>
+        <TitleWithSubtitle
+          titleEditorField="title"
+          title={title}
+          subtitle={subtitle}
+          documentId={documentId}
+          editable={editable}
+        />
+      </ListItem>
+    </div>
   )
 }
 
