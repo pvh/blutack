@@ -6,7 +6,6 @@ import { createDocumentLink, createWebLink, PushpinUrl } from "./ShareLink"
 
 export interface DocWithViewState {
   __userStates: { [userId: DocumentId]: { [key: string]: any } }
-  __snapshotStates: { [hash: string]: { [key: string]: any } }
 }
 
 // equivalent to useState but stores state per user in the document
