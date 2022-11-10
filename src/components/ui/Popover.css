@@ -1,0 +1,30 @@
+.Popover {
+  position: relative;
+}
+
+.Popover > .ContextMenu {
+  position: absolute;
+  top: 100%;
+  display: none;
+}
+
+.Popover.right > .ContextMenu {
+  right: 0;
+}
+
+.Popover.left > .ContextMenu {
+  left: 0;
+}
+
+.Popover.is-open > .ContextMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.Popover-entry {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+

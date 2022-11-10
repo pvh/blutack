@@ -164,28 +164,3 @@
   border-top: 1px solid #eaeaea;
   padding: 8px;
 }
-
-.PdfContent-contextMenu {
-  position: relative;
-}
-
-.PdfContent-contextMenu > .ContextMenu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  padding: 8px;
-  display: none;
-}
-
-.PdfContent-contextMenu.is-open > .ContextMenu {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.PdfContent-contextMenuOption {
- display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
