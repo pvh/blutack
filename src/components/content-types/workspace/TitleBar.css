@@ -47,6 +47,7 @@ button[disabled].TitleBar-menuItem .fa {
   border: none;
   outline: none;
   position: relative;
+  cursor: pointer;
 }
 
 .TitleBar-menuItem:active,

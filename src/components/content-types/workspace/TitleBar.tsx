@@ -24,11 +24,7 @@ import {
   getViewStateOfUser,
 } from "../../pushpin-code/ViewState"
 import { useSelfId } from "../../pushpin-code/SelfHooks"
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import { Popover } from "../../ui/Popover"
-import ListMenuSection from "../../ui/ListMenuSection"
-import ListMenuItem from "../../ui/ListMenuItem"
-import classNames from "classnames"
+import NewDocumentButton from "../../NewDocumentButton"
 
 export interface Props {
   documentId: DocumentId
@@ -114,8 +110,6 @@ export default function TitleBar(props: Props) {
   }
 
   const onCreateDocument = useCallback((contentUrl: PushpinUrl) => {
-    console.log("NEW on create")
-
     window.location.href = createWebLink(window.location, contentUrl)
   }, [])
 
@@ -133,7 +127,14 @@ export default function TitleBar(props: Props) {
 
   return (
     <div className="TitleBar">
-      <NewDocumentButton onCreateDocument={onCreateDocument} />
+      <NewDocumentButton
+        onCreateDocument={onCreateDocument}
+        trigger={
+          <button type="button" className="TitleBar-menuItem">
+            <i className="fa fa-plus" />
+          </button>
+        }
+      />
 
       <div className="NavigationBar Inline">
         <button type="button" onClick={goBack} className="TitleBar-menuItem">
@@ -195,50 +196,5 @@ export default function TitleBar(props: Props) {
         onContent={props.onContent}
       />
     </div>
-  )
-}
-
-interface NewDocumentButtonProps {
-  onCreateDocument: (pushpinUrl: PushpinUrl) => void
-}
-
-function NewDocumentButton({ onCreateDocument }: NewDocumentButtonProps) {
-  const contentTypes = useMemo(
-    () => ContentTypes.list({ context: "board" }),
-    []
-  )
-
-  const createDoc = (contentType: ContentTypes.LookupResult) => {
-    ContentTypes.create(contentType.type, {}, (contentUrl) => {
-      onCreateDocument(contentUrl)
-    })
-  }
-
-  return (
-    <Popover
-      closeOnClick={true}
-      trigger={
-        <button type="button" className="TitleBar-menuItem">
-          <i className="fa fa-plus" />
-        </button>
-      }
-    >
-      <ListMenuSection>
-        {contentTypes.map((contentType) => (
-          <ListMenuItem
-            onClick={() => {
-              console.log("NEW", "click item", contentType.type)
-              createDoc(contentType)
-            }}
-            key={contentType.type}
-          >
-            <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-              <i className={classNames("fa", `fa-${contentType.icon}`)} />
-            </div>
-            <span className="ContextMenu__label">{contentType.name}</span>
-          </ListMenuItem>
-        ))}
-      </ListMenuSection>
-    </Popover>
   )
 }

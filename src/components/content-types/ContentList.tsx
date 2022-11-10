@@ -39,6 +39,7 @@ import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
 import Heading from "../ui/Heading"
 import { useViewState } from "../pushpin-code/ViewState"
+import NewDocumentButton from "../NewDocumentButton"
 
 export interface ContentListDoc {
   title: string
@@ -143,6 +144,16 @@ export default function ContentList({ documentId }: ContentProps) {
 
   const hiddenFileInput = useRef<HTMLInputElement>(null)
 
+  const onCreateContent = useCallback(
+    (contentUrl: PushpinUrl) => {
+      changeDoc((doc) => {
+        doc.content.push(contentUrl)
+        selectContent(contentUrl)
+      })
+    },
+    [changeDoc]
+  )
+
   if (!doc || !doc.content) {
     return null
   }
@@ -152,14 +163,6 @@ export default function ContentList({ documentId }: ContentProps) {
   }
 
   const { content } = doc
-
-  const addContent = (contentType: ContentTypes.LookupResult) => {
-    ContentTypes.create(contentType.type, {}, (contentUrl) => {
-      changeDoc((doc) => {
-        doc.content.push(contentUrl)
-      })
-    })
-  }
 
   const removeContent = (url: PushpinUrl) => {
     changeDoc((doc) => {
@@ -243,27 +246,17 @@ export default function ContentList({ documentId }: ContentProps) {
               "ContentListItem--insertTop": draggedOverIndex === content.length,
             })}
           />
-          <ListMenuItem onClick={() => setAddingNewItem((prev) => !prev)}>
-            + Create new item
-          </ListMenuItem>
-          {addingNewItem && (
-            <ListMenuSection>
-              {contentTypes.map((contentType) => (
-                <ListMenuItem
-                  onClick={() => {
-                    addContent(contentType)
-                    setAddingNewItem(false)
-                  }}
-                  key={contentType.type}
-                >
-                  <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-                    <i className={classNames("fa", `fa-${contentType.icon}`)} />
-                  </div>
-                  <span className="ContextMenu__label">{contentType.name}</span>
-                </ListMenuItem>
-              ))}
-            </ListMenuSection>
-          )}
+
+          <NewDocumentButton
+            trigger={
+              <div className="ContentList--newItem">
+                <span className="ContentList--newItem-icon fa fa-plus"></span>
+                New Item
+              </div>
+            }
+            onCreateDocument={onCreateContent}
+          />
+
           <ListMenuItem key="import" onClick={onImportClick}>
             <input
               type="file"
