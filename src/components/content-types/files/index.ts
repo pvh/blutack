@@ -35,7 +35,6 @@ async function createFrom(
 
   handle.change((doc: FileDoc) => {
     const parsed = path.parse(name)
-    console.log("parsed path", parsed, parsed.name, parsed.ext)
     doc.binaryDataId = binaryDataId
     doc.title = parsed.name
     doc.extension = parsed.ext.slice(1)

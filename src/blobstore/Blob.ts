@@ -50,9 +50,7 @@ export async function storeBinaryData(
   binary: ReadableStream,
   mimeType?: string
 ): Promise<BinaryDataId> {
-  console.log("storing binary data")
   const binaryDataId = await storeData(binary, mimeType)
-  console.log("stored it")
   return binaryDataId
 }
 
@@ -113,7 +111,6 @@ async function storeData(binary: ReadableStream<Buffer>, mimeType?: string) {
   handle.change((d) => {
     d.binary = new Uint8Array(concatArrayBuffers(buffers))
     d.mimeType = mimeType
-    console.log("done setting", mimeType, binary)
   })
 
   return ("web+binarydata://" + handle.documentId) as unknown as BinaryDataId

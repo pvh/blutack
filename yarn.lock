@@ -777,10 +777,10 @@ automerge-repo@*:
     ts-node "^10.9.1"
     uuid "^8.3.2"
 
-automerge-repo@0.0.35:
-  version "0.0.35"
-  resolved "https://registry.yarnpkg.com/automerge-repo/-/automerge-repo-0.0.35.tgz#fca3003776bd2ff4dbc4b98be62533a4153dcc8a"
-  integrity sha512-0fJOjZ64+f7HdcyAYrXC2eZZnybjVESc5uhGb6meCk0FaAwRhc1bTGQbkNOu89ngSfCl7rNwPK4e0el2dAod/Q==
+automerge-repo@0.0.36:
+  version "0.0.36"
+  resolved "https://registry.yarnpkg.com/automerge-repo/-/automerge-repo-0.0.36.tgz#e72e44110984d6b1ddb7f9882238aa571946b19e"
+  integrity sha512-OmopgdZoNj9EDBm4mDa8x9wrUU2aiDCWiUy6yJ7cMu+BBDl97tuOs9mdESMDVAfGtDEn0Il2/XQLVu41cqItDg==
   dependencies:
     cbor-x "^1.3.0"
     debug "^4.3.4"

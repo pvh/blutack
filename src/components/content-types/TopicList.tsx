@@ -57,8 +57,6 @@ export default function TopicList({ boardId, documentId, selfId }: Props) {
     evt: React.DragEvent<HTMLDivElement>,
     text: string
   ) => {
-    console.log("dragStart")
-
     stopPropagation(evt)
     evt.dataTransfer.setData("text/plain", text)
   }

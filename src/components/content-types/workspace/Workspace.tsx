@@ -260,7 +260,6 @@ export function create(_attrs: any, handle: DocHandle<any>) {
               workspace.contactIds = []
               workspace.currentDocUrl = listUrl
               workspace.viewedDocUrls = [listUrl]
-              console.log("done", workspace)
             })
           }
         )

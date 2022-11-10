@@ -166,7 +166,6 @@ export function useMessaging<M>(
   useEffect(() => {
     repo.ephemeralData.on("data", ({ peerId, channelId, data }) => {
       if (channelId == docAsChannel) {
-        console.log("ON DATA", peerId, channelId, data)
         onMsg(data as M)
       }
     })
