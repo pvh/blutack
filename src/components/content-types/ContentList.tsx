@@ -294,6 +294,10 @@ export function ContentListInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
   const [doc] = useDocument<ContentListDoc>(documentId)
   const onClick = useCallback((event: React.SyntheticEvent) => {
+    if (props.context !== "list") {
+      return
+    }
+
     event.stopPropagation()
     window.location.href = createWebLink(
       window.location,
