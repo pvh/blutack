@@ -11,6 +11,7 @@ import React, {
 import {
   createDocumentLink,
   createWebLink,
+  parseDocumentLink,
   PushpinUrl,
 } from "../pushpin-code/ShareLink"
 
@@ -148,7 +149,12 @@ export default function ContentList({ documentId }: ContentProps) {
     (contentUrl: PushpinUrl) => {
       changeDoc((doc) => {
         doc.content.push(contentUrl)
-        selectContent(contentUrl)
+
+        if (parseDocumentLink(contentUrl).type === "contentlist") {
+          window.location.href = createWebLink(window.location, contentUrl)
+        } else {
+          selectContent(contentUrl)
+        }
       })
     },
     [changeDoc]
