@@ -26,14 +26,20 @@ import "./content-types/TodoList"
 interface RootArgs {
   workspaceDocId: DocumentId
   deviceDocId: DocumentId
+  initialViewState?: { [key: string]: any }
 }
 
-export default function Root({ workspaceDocId, deviceDocId }: RootArgs) {
+export default function Root({
+  workspaceDocId,
+  deviceDocId,
+  initialViewState,
+}: RootArgs) {
   return (
     <CurrentDeviceContext.Provider value={deviceDocId}>
       <Content
         context="root"
         url={createDocumentLink("workspace", workspaceDocId)}
+        initialViewState={initialViewState}
       />
     </CurrentDeviceContext.Provider>
   )

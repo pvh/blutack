@@ -8,7 +8,12 @@ import React, {
   useCallback,
 } from "react"
 
-import { PushpinUrl } from "../pushpin-code/ShareLink"
+import {
+  createDocumentLink,
+  createWebLink,
+  parseDocumentLink,
+  PushpinUrl,
+} from "../pushpin-code/ShareLink"
 
 import Content, { ContentProps, EditableContentProps } from "../Content"
 import * as ContentTypes from "../pushpin-code/ContentTypes"
@@ -34,6 +39,8 @@ import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
 import Heading from "../ui/Heading"
+import { useViewState } from "../pushpin-code/ViewState"
+import NewDocumentButton from "../NewDocumentButton"
 
 export interface ContentListDoc {
   title: string
@@ -62,7 +69,12 @@ function getListMenuItemElement(
 
 export default function ContentList({ documentId }: ContentProps) {
   const [doc, changeDoc] = useDocument<ContentListDoc>(documentId)
-  const [currentContent, selectContent] = useState<PushpinUrl | undefined>()
+
+  const [currentContent, selectContent] = useViewState<PushpinUrl | undefined>(
+    documentId,
+    "currentContent"
+  )
+
   const [addingNewItem, setAddingNewItem] = useState(false)
   const contentTypes = useMemo(
     () => ContentTypes.list({ context: "board" }),
@@ -133,6 +145,21 @@ export default function ContentList({ documentId }: ContentProps) {
 
   const hiddenFileInput = useRef<HTMLInputElement>(null)
 
+  const onCreateContent = useCallback(
+    (contentUrl: PushpinUrl) => {
+      changeDoc((doc) => {
+        doc.content.push(contentUrl)
+
+        if (parseDocumentLink(contentUrl).type === "contentlist") {
+          window.location.href = createWebLink(window.location, contentUrl)
+        } else {
+          selectContent(contentUrl)
+        }
+      })
+    },
+    [changeDoc]
+  )
+
   if (!doc || !doc.content) {
     return null
   }
@@ -142,14 +169,6 @@ export default function ContentList({ documentId }: ContentProps) {
   }
 
   const { content } = doc
-
-  const addContent = (contentType: ContentTypes.LookupResult) => {
-    ContentTypes.create(contentType.type, {}, (contentUrl) => {
-      changeDoc((doc) => {
-        doc.content.push(contentUrl)
-      })
-    })
-  }
 
   const removeContent = (url: PushpinUrl) => {
     changeDoc((doc) => {
@@ -233,27 +252,17 @@ export default function ContentList({ documentId }: ContentProps) {
               "ContentListItem--insertTop": draggedOverIndex === content.length,
             })}
           />
-          <ListMenuItem onClick={() => setAddingNewItem((prev) => !prev)}>
-            + Create new item
-          </ListMenuItem>
-          {addingNewItem && (
-            <ListMenuSection>
-              {contentTypes.map((contentType) => (
-                <ListMenuItem
-                  onClick={() => {
-                    addContent(contentType)
-                    setAddingNewItem(false)
-                  }}
-                  key={contentType.type}
-                >
-                  <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-                    <i className={classNames("fa", `fa-${contentType.icon}`)} />
-                  </div>
-                  <span className="ContextMenu__label">{contentType.name}</span>
-                </ListMenuItem>
-              ))}
-            </ListMenuSection>
-          )}
+
+          <NewDocumentButton
+            trigger={
+              <div className="ContentList--newItem">
+                <span className="ContentList--newItem-icon fa fa-plus"></span>
+                New Item
+              </div>
+            }
+            onCreateDocument={onCreateContent}
+          />
+
           <ListMenuItem key="import" onClick={onImportClick}>
             <input
               type="file"
@@ -283,6 +292,18 @@ const icon = "list"
 export function ContentListInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
   const [doc] = useDocument<ContentListDoc>(documentId)
+  const onClick = useCallback((event: React.SyntheticEvent) => {
+    if (props.context !== "list") {
+      return
+    }
+
+    event.stopPropagation()
+    window.location.href = createWebLink(
+      window.location,
+      createDocumentLink("contentlist", documentId)
+    )
+  }, [])
+
   if (!doc || !doc.content) return null
 
   const title =
@@ -291,18 +312,20 @@ export function ContentListInList(props: EditableContentProps) {
   const subtitle = `${items} item${items !== 1 ? "s" : ""}`
 
   return (
-    <ListItem>
-      <ContentDragHandle url={url}>
-        <Badge size="medium" icon={icon} />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        titleEditorField="title"
-        title={title}
-        subtitle={subtitle}
-        documentId={documentId}
-        editable={editable}
-      />
-    </ListItem>
+    <div onClick={onClick}>
+      <ListItem>
+        <ContentDragHandle url={url}>
+          <Badge size="medium" icon={icon} />
+        </ContentDragHandle>
+        <TitleWithSubtitle
+          titleEditorField="title"
+          title={title}
+          subtitle={subtitle}
+          documentId={documentId}
+          editable={editable}
+        />
+      </ListItem>
+    </div>
   )
 }
 

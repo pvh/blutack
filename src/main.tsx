@@ -111,11 +111,19 @@ const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
 // bootstrapping: first try the window location, then check indexedDB, then make one
 const workspaceDocId = await findOrMakeDoc("workspaceDocId")
 const deviceDocId = await findOrMakeDoc("deviceDocId")
+const initialViewStateRaw =
+  new URLSearchParams(window.location.search).get("viewState") ?? undefined
+const initialViewState =
+  initialViewStateRaw && JSON.parse(decodeURIComponent(initialViewStateRaw))
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <RepoContext.Provider value={repo}>
-      <Root workspaceDocId={workspaceDocId} deviceDocId={deviceDocId} />
+      <Root
+        workspaceDocId={workspaceDocId}
+        deviceDocId={deviceDocId}
+        initialViewState={initialViewState}
+      />
     </RepoContext.Provider>
   </React.StrictMode>
 )
