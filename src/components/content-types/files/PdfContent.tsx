@@ -45,6 +45,7 @@ import ContentDragHandle from "../../ui/ContentDragHandle"
 import Badge from "../../ui/Badge"
 import { useId } from "react"
 import { useViewState } from "../../pushpin-code/ViewState"
+import { Popover } from "../../ui/Popover"
 
 export interface PdfAnnotation {
   stroke: number[][]
@@ -113,21 +114,9 @@ export default function PdfContent(props: ContentProps) {
     undefined | "marker" | "region"
   >()
 
-  const [isContextMenuOpen, setIsContextMenuOpen] = React.useState(false)
   const isMarkerSelected = selectedTool === "marker"
   const isRegionToolSelected = selectedTool === "region"
   const contextMenuId = useId()
-
-  useEffect(() => {
-    const onClick = () => {
-      setIsContextMenuOpen(false)
-    }
-    document.addEventListener("click", onClick)
-
-    return () => {
-      document.removeEventListener("click", onClick)
-    }
-  }, [setIsContextMenuOpen])
 
   const handlePointerDown: PointerEventHandler<SVGSVGElement> = useCallback(
     (e: any) => {
@@ -285,14 +274,6 @@ export default function PdfContent(props: ContentProps) {
     changePdf((pdf) => (pdf.showAnnotations = !pdf.showAnnotations))
   }, [changePdf])
 
-  const onToggleContextMenu = useCallback(
-    (event: React.SyntheticEvent) => {
-      stopPropagation(event)
-      setIsContextMenuOpen((isContextMenuOpen) => !isContextMenuOpen)
-    },
-    [setIsContextMenuOpen]
-  )
-
   if (!pdf) {
     return null
   }
@@ -377,21 +358,16 @@ export default function PdfContent(props: ContentProps) {
         </button>
 
         <div className="PdfContent-header-right">
-          <div
-            className={classNames("PdfContent-contextMenu", {
-              "is-open": isContextMenuOpen,
-            })}
+          <Popover
+            trigger={
+              <button className="PdfContent-button">
+                <i className="fa fa-ellipsis-h" />
+              </button>
+            }
+            alignment="right"
           >
-            <button className="PdfContent-button" onClick={onToggleContextMenu}>
-              <i className="fa fa-ellipsis-h" />
-            </button>
-
-            <div
-              id={contextMenuId}
-              className="ContextMenu"
-              onClick={stopPropagation}
-            >
-              <label className="PdfContent-contextMenuOption">
+            <div className="PdfContent-popover">
+              <label className="Popover-entry">
                 <input
                   type="checkbox"
                   checked={pdf.showAnnotations}
@@ -400,7 +376,7 @@ export default function PdfContent(props: ContentProps) {
                 show annotations
               </label>
             </div>
-          </div>
+          </Popover>
         </div>
       </div>
 

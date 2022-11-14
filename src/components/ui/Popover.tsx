@@ -1,5 +1,11 @@
 import classNames from "classnames"
-import React, { ComponentProps, useEffect, useRef, useState } from "react"
+import React, {
+  ComponentProps,
+  SyntheticEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import "./Popover.css"
 
 interface PopOverMenuProps extends React.PropsWithChildren {
@@ -30,19 +36,20 @@ export function Popover({
       setIsPopoverOpen(false)
     }
 
-    document.addEventListener("mousedown", listener)
-    document.addEventListener("touchstart", listener)
+    document.addEventListener("click", listener, true)
     return () => {
-      document.removeEventListener("mousedown", listener)
-      document.removeEventListener("touchstart", listener)
+      document.removeEventListener("click", listener, true)
     }
   }, [ref])
 
-  function onTogglePopover() {
+  function onClickTrigger(e: SyntheticEvent) {
+    e.stopPropagation()
+    e.nativeEvent.stopImmediatePropagation()
+
     setIsPopoverOpen((isOpen) => !isOpen)
   }
 
-  function onClickInside(e: React.MouseEvent) {
+  function onClickInside(e: SyntheticEvent) {
     e.stopPropagation()
     e.nativeEvent.stopImmediatePropagation()
 
@@ -53,12 +60,13 @@ export function Popover({
 
   return (
     <div
+      ref={ref}
       className={classNames("Popover", alignment, {
         "is-open": isPopoverOpen,
       })}
     >
-      <div onClick={onTogglePopover}>{trigger}</div>
-      <div className="ContextMenu" onClick={onClickInside} ref={ref}>
+      <div onClick={onClickTrigger}>{trigger}</div>
+      <div className="ContextMenu" onClick={onClickInside}>
         {children}
       </div>
     </div>
