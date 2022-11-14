@@ -30,7 +30,11 @@ export function useViewState<T>(
           userState = userStates[selfId] = {}
         }
 
-        userState[key] = newValue
+        if (newValue === undefined) {
+          delete userState[key]
+        } else {
+          userState[key] = newValue
+        }
       })
     },
     [key, changeDoc]
