@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react"
+import React, { useState, useCallback } from "react"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
@@ -9,8 +9,6 @@ import {
   PushpinUrl,
   createDocumentLink,
   createWebLink,
-  parseDocumentLink,
-  createWebLinkWithViewState,
 } from "../../pushpin-code/ShareLink"
 import { useEvent } from "../../pushpin-code/Hooks"
 
@@ -19,11 +17,6 @@ import { WorkspaceDoc as WorkspaceDoc } from "./Workspace"
 import Badge from "../../ui/Badge"
 
 import "./TitleBar.css"
-import {
-  DocWithViewState,
-  getViewStateOfUser,
-} from "../../pushpin-code/ViewState"
-import { useSelfId } from "../../pushpin-code/SelfHooks"
 import NewDocumentButton from "../../NewDocumentButton"
 
 export interface Props {
@@ -33,18 +26,8 @@ export interface Props {
 }
 
 export default function TitleBar(props: Props) {
-  const [sessionHistory, setHistory] = useState<PushpinUrl[]>([])
-  const [historyIndex, setIndex] = useState(0)
   const [activeOmnibox, setActive] = useState(false)
   const [workspaceDoc] = useDocument<WorkspaceDoc>(props.documentId)
-  const currentDocUrl = workspaceDoc?.currentDocUrl
-  const currentDocId = currentDocUrl
-    ? parseDocumentLink(currentDocUrl).documentId
-    : undefined
-  const [currentDoc, changeCurrentDoc] =
-    useDocument<DocWithViewState>(currentDocId)
-
-  const selfId = useSelfId()
 
   useEvent(document, "keydown", (e) => {
     if (e.key === "/" && document.activeElement === document.body) {
@@ -59,55 +42,6 @@ export default function TitleBar(props: Props) {
       e.preventDefault()
     }
   })
-
-  const backDisabled = historyIndex === sessionHistory.length - 1
-  const forwardDisabled = historyIndex === 0
-
-  useEffect(() => {
-    if (!workspaceDoc || !workspaceDoc.currentDocUrl) {
-      return
-    }
-
-    // Init sessionHistory
-    if (sessionHistory.length === 0) {
-      setHistory([workspaceDoc.currentDocUrl])
-      // If we're opening a new document (as opposed to going back or forward),
-      // add it to our sessionHistory and remove all docs 'forward' of the current index
-    } else if (workspaceDoc.currentDocUrl !== sessionHistory[historyIndex]) {
-      setHistory([
-        workspaceDoc.currentDocUrl,
-        ...sessionHistory.slice(historyIndex),
-      ])
-      setIndex(0)
-    }
-  }, [workspaceDoc, historyIndex, sessionHistory])
-
-  function goBack() {
-    if (backDisabled) {
-      throw new Error("Can not go back further than session history")
-    }
-    const newIndex = historyIndex + 1
-    props.openDoc(sessionHistory[newIndex])
-    setIndex(newIndex)
-  }
-
-  function goForward() {
-    if (forwardDisabled) {
-      throw new Error("Can not go forward past session history")
-    }
-    const newIndex = historyIndex - 1
-    props.openDoc(sessionHistory[newIndex])
-    setIndex(newIndex)
-  }
-
-  function copyLink(e: React.MouseEvent) {
-    if (currentDoc && currentDocUrl) {
-      const viewState = getViewStateOfUser(currentDoc, selfId)
-      navigator.clipboard.writeText(
-        createWebLinkWithViewState(window.location, currentDocUrl, viewState)
-      )
-    }
-  }
 
   const onCreateDocument = useCallback((contentUrl: PushpinUrl) => {
     window.location.href = createWebLink(window.location, contentUrl)
@@ -137,10 +71,6 @@ export default function TitleBar(props: Props) {
       />
 
       <div className="NavigationBar Inline">
-        <button type="button" onClick={goBack} className="TitleBar-menuItem">
-          <i className="fa fa-angle-left" />
-        </button>
-
         <button
           type="button"
           onClick={(e) => {
@@ -150,15 +80,6 @@ export default function TitleBar(props: Props) {
           className="TitleBar-menuItem"
         >
           <Badge icon="search" backgroundColor="#00000000" />
-        </button>
-
-        <button
-          disabled={forwardDisabled}
-          type="button"
-          onClick={goForward}
-          className="TitleBar-menuItem"
-        >
-          <i className="fa fa-angle-right" />
         </button>
       </div>
 
@@ -182,13 +103,6 @@ export default function TitleBar(props: Props) {
           />
         </div>
       </div>
-      <button
-        className="BoardTitle__clipboard BoardTitle__labeledIcon TitleBar-menuItem"
-        type="button"
-        onClick={copyLink}
-      >
-        <i className="fa fa-clipboard" />
-      </button>
       <Omnibox
         active={activeOmnibox}
         documentId={props.documentId}

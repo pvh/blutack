@@ -32,7 +32,6 @@ export default function NewDocumentButton({
         {contentTypes.map((contentType) => (
           <ListMenuItem
             onClick={() => {
-              console.log("NEW", "click item", contentType.type)
               createDoc(contentType)
             }}
             key={contentType.type}
