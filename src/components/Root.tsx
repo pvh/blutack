@@ -1,7 +1,8 @@
 import Content from "./Content"
 import { DocumentId } from "automerge-repo"
 import { CurrentDeviceContext } from "./content-types/workspace/Device"
-import { createDocumentLink, PushpinUrl } from "./pushpin-code/ShareLink"
+import { ViewStateContext } from "./pushpin-code/ViewState"
+import { createDocumentLink } from "./pushpin-code/ShareLink"
 
 // board in various contexts
 import "./content-types/board"
@@ -22,25 +23,25 @@ import "./content-types/files/VideoContent"
 
 import "./content-types/TopicList"
 import "./content-types/TodoList"
+import { useUrlParams } from "./Url"
 
 interface RootArgs {
   workspaceDocId: DocumentId
   deviceDocId: DocumentId
-  currentDocUrl?: PushpinUrl
 }
 
-export default function Root({
-  workspaceDocId,
-  deviceDocId,
-  currentDocUrl,
-}: RootArgs) {
+export default function Root({ workspaceDocId, deviceDocId }: RootArgs) {
+  const { currentDocUrl, viewState } = useUrlParams()
+
   return (
-    <CurrentDeviceContext.Provider value={deviceDocId}>
-      <Content
-        context="root"
-        currentDocUrl={currentDocUrl}
-        url={createDocumentLink("workspace", workspaceDocId)}
-      />
-    </CurrentDeviceContext.Provider>
+    <ViewStateContext.Provider value={viewState}>
+      <CurrentDeviceContext.Provider value={deviceDocId}>
+        <Content
+          context="root"
+          currentDocUrl={currentDocUrl}
+          url={createDocumentLink("workspace", workspaceDocId)}
+        />
+      </CurrentDeviceContext.Provider>
+    </ViewStateContext.Provider>
   )
 }

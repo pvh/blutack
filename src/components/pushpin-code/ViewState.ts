@@ -1,49 +1,16 @@
-import { useCallback } from "react"
+import React, { useCallback, useContext } from "react"
 import { DocumentId } from "../../../../automerge-repo"
+import { setViewStateValue } from "../Url"
 
-export interface DocWithViewState {
-  __userStates: { [userId: DocumentId]: { [key: string]: any } }
+export const ViewStateContext = React.createContext<ViewState | undefined>(
+  undefined
+)
+
+export interface ViewState {
+  [documentId: string]: { [key: string]: any }
 }
 
-export function getViewState() {
-  const raw = new URLSearchParams(window.location.search).get("viewState")
-
-  if (!raw) {
-    return {}
-  }
-
-  try {
-    return JSON.parse(decodeURIComponent(raw))
-  } catch (e) {
-    return {}
-  }
-}
-
-function setViewStateValue(documentId: DocumentId, key: string, value: any) {
-  const viewState = getViewState()
-
-  const url = new URL(window.location.href)
-
-  url.searchParams.set(
-    "viewState",
-    encodeURIComponent(
-      JSON.stringify({
-        ...viewState,
-        [documentId]: { ...viewState[documentId], [key]: value },
-      })
-    )
-  )
-
-  window.location.href = url.toString()
-}
-
-function getViewStateValue(documentId: DocumentId, key: string) {
-  const viewState = getViewState()
-
-  return viewState?.[documentId]?.[key]
-}
-
-// equivalent to useState but stores state per user in the document
+// equivalent to useState but stores state in the url
 export function useViewState<T>(
   documentId: DocumentId | undefined,
   key: string,
@@ -60,8 +27,13 @@ export function useViewState<T>(
     [documentId, key]
   )
 
-  const value =
-    (documentId && getViewStateValue(documentId, key)) ?? initialValue
+  const viewState = useContext(ViewStateContext)
+
+  if (!viewState) {
+    throw new Error("no ViewStateContext defined")
+  }
+
+  const value = (documentId && viewState?.[documentId]?.[key]) ?? initialValue
 
   return [value, setValue]
 }
