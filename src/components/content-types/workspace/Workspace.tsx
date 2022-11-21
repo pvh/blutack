@@ -22,7 +22,6 @@ import { CurrentDeviceContext } from "./Device"
 
 import WorkspaceInList from "./WorkspaceInList"
 import { ContentListDoc } from "../ContentList"
-import { DocWithViewState } from "../../pushpin-code/ViewState"
 
 const log = Debug("pushpin:workspace")
 
@@ -43,13 +42,9 @@ export default function Workspace({
   documentId,
   currentDocUrl,
 }: WorkspaceContentProps) {
-  const repo = useRepo()
-  const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
+  const [workspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDocId =
     currentDocUrl && parseDocumentLink(currentDocUrl).documentId
-  const [currentDoc, changeCurrentDoc] =
-    useDocument<DocWithViewState>(currentDocId)
-
   const currentDeviceId = useContext(CurrentDeviceContext)
   const [self, changeSelf] = useDocument<ContactDoc>(workspace?.selfId)
 
