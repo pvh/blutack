@@ -18,6 +18,7 @@ import Badge from "../../ui/Badge"
 
 import "./TitleBar.css"
 import NewDocumentButton from "../../NewDocumentButton"
+import { openDoc } from "../../Url"
 
 export interface Props {
   workspaceDocId: DocumentId
@@ -48,7 +49,7 @@ export default function TitleBar({
   })
 
   const onCreateDocument = useCallback((contentUrl: PushpinUrl) => {
-    window.location.href = createWebLink(window.location, contentUrl)
+    openDoc(contentUrl)
   }, [])
 
   function showOmnibox() {

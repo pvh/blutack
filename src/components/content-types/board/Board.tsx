@@ -40,6 +40,7 @@ import {
   MIMETYPE_BOARD_CARD_DATA,
 } from "../../constants"
 import { useDocumentReducer } from "../../pushpin-code/Hooks"
+import { openDoc } from "../../Url"
 
 const log = Debug("pushpin:board")
 
@@ -163,7 +164,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
   ) => {
     const card = doc.cards[id]
     if (card && card.url) {
-      window.location.href = createWebLink(window.location, card.url)
+      openDoc(card.url)
     }
     e.stopPropagation()
   }

@@ -18,6 +18,7 @@ import { useDocument } from "automerge-repo-react-hooks"
 import { DocHandle } from "automerge-repo"
 import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
+import { openDoc } from "../Url"
 
 interface Message {
   authorId: DocumentId
@@ -163,7 +164,7 @@ function renderMessage({ content, time }: Message, idx: number) {
     <div
       className="ThreadContent-clickable"
       onClick={() => {
-        window.location.href = createWebLink(window.location, content)
+        openDoc(content)
       }}
     >
       <Content url={content} context="list" />
