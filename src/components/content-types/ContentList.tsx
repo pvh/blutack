@@ -41,6 +41,7 @@ import * as ImportData from "../pushpin-code/ImportData"
 import Heading from "../ui/Heading"
 import { useViewState } from "../pushpin-code/ViewState"
 import NewDocumentButton from "../NewDocumentButton"
+import { openDoc } from "../Url"
 
 export interface ContentListDoc {
   title: string
@@ -139,7 +140,7 @@ export default function ContentList({ documentId }: ContentProps) {
 
   function selectContent(contentUrl: PushpinUrl) {
     if (parseDocumentLink(contentUrl).type === "contentlist") {
-      window.location.href = createWebLink(window.location, contentUrl)
+      openDoc(contentUrl)
     } else {
       setCurrentContent(contentUrl)
     }

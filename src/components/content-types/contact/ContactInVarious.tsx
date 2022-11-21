@@ -16,6 +16,7 @@ import ContentDragHandle from "../../ui/ContentDragHandle"
 import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import CenteredStack from "../../ui/CenteredStack"
 import Heading from "../../ui/Heading"
+import { changeUrl, openDoc } from "../../Url"
 
 const log = Debug("pushpin:settings")
 
@@ -50,7 +51,7 @@ export default function ContactInVarious(props: ContactProps) {
   )
 
   const onDoubleClick = (e: React.MouseEvent) => {
-    window.location.href = createWebLink(window.location, url) as string
+    openDoc(url)
     e.stopPropagation()
   }
 

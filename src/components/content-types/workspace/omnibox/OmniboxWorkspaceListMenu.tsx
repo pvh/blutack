@@ -27,7 +27,7 @@ import { useDocumentIds, useDocuments } from "../../../pushpin-code/Hooks"
 import Content from "../../../Content"
 import useInvitations, { Invitation } from "./InvitationsHook"
 import "./OmniboxWorkspaceListMenu.css"
-import { getCurrentDocUrl } from "../../../Url"
+import { getCurrentDocUrl, openDoc } from "../../../Url"
 
 const log = Debug("pushpin:omnibox")
 
@@ -380,7 +380,7 @@ export default function OmniboxWorkspaceListMenu(
   const navigate = (url: PushpinUrl) => {
     // this weird typecast is to work around a typescript bug,
     // maybe try removing it and see if it's better.
-    window.location.href = createWebLink(window.location, url)
+    openDoc(url)
     props.omniboxFinished()
   }
 
