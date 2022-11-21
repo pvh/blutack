@@ -32,6 +32,10 @@ export interface WorkspaceDoc {
   archivedDocUrls: PushpinUrl[]
 }
 
+export interface DocumentWithTitle {
+  title?: string
+}
+
 interface WorkspaceContentProps extends ContentProps {
   currentDocUrl?: PushpinUrl
   setWorkspaceUrl: (newWorkspaceUrl: PushpinUrl) => void
@@ -45,6 +49,8 @@ export default function Workspace({
   const [workspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDocId =
     currentDocUrl && parseDocumentLink(currentDocUrl).documentId
+  const [currentDoc] = useDocument<DocumentWithTitle>(currentDocId)
+
   const currentDeviceId = useContext(CurrentDeviceContext)
   const [self, changeSelf] = useDocument<ContactDoc>(workspace?.selfId)
 
@@ -57,6 +63,14 @@ export default function Workspace({
 
   useDeviceOnlineStatus(currentDeviceId)
   useContactOnlineStatus(selfId)
+
+  const currentDocTitle = currentDoc && currentDoc.title
+
+  useEffect(() => {
+    document.title = currentDocTitle ?? "Blutack"
+  }, [currentDocTitle])
+
+  useEffect(() => {}, [])
 
   // TODO: this is so grody
   // Add devices if not already on doc.

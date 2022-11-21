@@ -6,6 +6,7 @@ import React, {
   Ref,
   memo,
   ForwardRefRenderFunction,
+  ReactComponentElement,
 } from "react"
 
 import * as ContentTypes from "./pushpin-code/ContentTypes"
