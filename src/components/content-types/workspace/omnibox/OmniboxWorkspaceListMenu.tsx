@@ -20,26 +20,21 @@ import { WorkspaceDoc as WorkspaceDoc } from "../Workspace"
 import "./OmniboxWorkspaceListMenu.css"
 import ActionListItem from "./ActionListItem"
 import Heading from "../../../ui/Heading"
-import {
-  DocCollection,
-  DocHandle,
-  DocHandleChangeEvent,
-  DocumentId,
-} from "automerge-repo"
+import { DocumentId } from "automerge-repo"
 import { Doc } from "@automerge/automerge"
 import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import { useDocumentIds, useDocuments } from "../../../pushpin-code/Hooks"
 import Content from "../../../Content"
-import { useSelfId } from "../../../pushpin-code/SelfHooks"
 import useInvitations, { Invitation } from "./InvitationsHook"
 import "./OmniboxWorkspaceListMenu.css"
+import { getCurrentDocUrl } from "../../../../main"
 
 const log = Debug("pushpin:omnibox")
 
 export interface Props {
   active: boolean
   search: string
-  documentId: DocumentId
+  workspaceDocId: DocumentId
   omniboxFinished: Function
   onContent: (url: PushpinUrl) => boolean
 }
@@ -97,13 +92,13 @@ export default function OmniboxWorkspaceListMenu(
 ): ReactElement | null {
   const omniboxInput = useRef<HTMLInputElement>()
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(
-    props.documentId
+    props.workspaceDocId
   )
   const repo = useRepo()
 
   const [selectedIndex, setSelectedIndex] = useState(0)
 
-  const invitations = useInvitations(props.documentId)
+  const invitations = useInvitations(props.workspaceDocId)
 
   const viewedDocs = useDocuments<TitledDoc>(workspace?.viewedDocUrls)
   const contacts = useDocumentIds(workspace?.contactIds)
@@ -390,6 +385,12 @@ export default function OmniboxWorkspaceListMenu(
   }
 
   const offerDocumentToIdentity = async (recipientPushpinUrl: PushpinUrl) => {
+    const currentDocUrl = getCurrentDocUrl()
+
+    if (!currentDocUrl) {
+      return
+    }
+
     if (
       // eslint-disable-next-line
       !window.confirm(
@@ -429,7 +430,7 @@ export default function OmniboxWorkspaceListMenu(
 
       // TODO: prevent duplicate shares.
       // should be "box" we push
-      s.invites[recipientId].push(workspace.currentDocUrl)
+      s.invites[recipientId].push(currentDocUrl)
     })
   }
 

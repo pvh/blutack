@@ -13,6 +13,7 @@ import { RepoContext } from "automerge-repo-react-hooks"
 import * as ContentTypes from "./components/pushpin-code/ContentTypes"
 import { create as createWorkspace } from "./components/content-types/workspace/Workspace"
 import { create as createDevice } from "./components/content-types/workspace/Device"
+import { isPushpinUrl } from "./components/pushpin-code/ShareLink"
 
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
@@ -108,13 +109,17 @@ const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
   return docId as DocumentId
 }
 
+export function getCurrentDocUrl() {
+  const documentUrl = new URLSearchParams(window.location.search).get(
+    "document"
+  )
+  return isPushpinUrl(documentUrl) ? documentUrl : undefined
+}
+
 // bootstrapping: first try the window location, then check indexedDB, then make one
 const workspaceDocId = await findOrMakeDoc("workspaceDocId")
 const deviceDocId = await findOrMakeDoc("deviceDocId")
-const initialViewStateRaw =
-  new URLSearchParams(window.location.search).get("viewState") ?? undefined
-const initialViewState =
-  initialViewStateRaw && JSON.parse(decodeURIComponent(initialViewStateRaw))
+const currentDocUrl = getCurrentDocUrl()
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
@@ -122,7 +127,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       <Root
         workspaceDocId={workspaceDocId}
         deviceDocId={deviceDocId}
-        initialViewState={initialViewState}
+        currentDocUrl={currentDocUrl}
       />
     </RepoContext.Provider>
   </React.StrictMode>

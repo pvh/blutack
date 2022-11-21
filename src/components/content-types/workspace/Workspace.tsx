@@ -1,24 +1,14 @@
-import { useEffect, useContext, useRef, useState } from "react"
+import { useEffect, useContext, useRef } from "react"
 import Debug from "debug"
 import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import { DocumentId, DocHandle } from "automerge-repo"
 
-import {
-  parseDocumentLink,
-  PushpinUrl,
-  isPushpinUrl,
-  createDocumentLink,
-  createWebLinkWithViewState,
-} from "../../pushpin-code/ShareLink"
+import { parseDocumentLink, PushpinUrl } from "../../pushpin-code/ShareLink"
 import Content, { ContentProps, ContentHandle } from "../../Content"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import SelfContext from "../../pushpin-code/SelfHooks"
 import TitleBar from "./TitleBar"
 import { ContactDoc } from "../contact"
-
-// TODO: the navigation API is only available in newish chromes
-// we should track down a type for it
-declare var navigation: any
 
 import "./Workspace.css"
 import {
@@ -28,45 +18,35 @@ import {
   useDeviceOnlineStatus,
 } from "../../pushpin-code/PresenceHooks"
 
-import { BoardDoc, CardId } from "../board"
 import { CurrentDeviceContext } from "./Device"
 
 import WorkspaceInList from "./WorkspaceInList"
-import { importPlainText } from "../../pushpin-code/ImportData"
 import { ContentListDoc } from "../ContentList"
-import {
-  DocWithViewState,
-  getViewStateOfUser,
-  loadViewStateForUser,
-} from "../../pushpin-code/ViewState"
-import { Doc } from "@automerge/automerge"
+import { DocWithViewState } from "../../pushpin-code/ViewState"
 
 const log = Debug("pushpin:workspace")
 
 export interface WorkspaceDoc {
   selfId: DocumentId
   contactIds: DocumentId[]
-  currentDocUrl: PushpinUrl
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
 }
 
 interface WorkspaceContentProps extends ContentProps {
+  currentDocUrl?: PushpinUrl
   setWorkspaceUrl: (newWorkspaceUrl: PushpinUrl) => void
   createWorkspace: () => void
-  initialViewState: { [key: string]: any }
 }
 
 export default function Workspace({
   documentId,
-  initialViewState,
+  currentDocUrl,
 }: WorkspaceContentProps) {
   const repo = useRepo()
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDocId =
-    workspace &&
-    workspace.currentDocUrl &&
-    parseDocumentLink(workspace.currentDocUrl).documentId
+    currentDocUrl && parseDocumentLink(currentDocUrl).documentId
   const [currentDoc, changeCurrentDoc] =
     useDocument<DocWithViewState>(currentDocId)
 
@@ -74,97 +54,6 @@ export default function Workspace({
   const [self, changeSelf] = useDocument<ContactDoc>(workspace?.selfId)
 
   const selfId = workspace?.selfId
-
-  const [isCurrentDocUrlChecked, setIsCurrentDocUrlChecked] =
-    useState<boolean>(false)
-  const [isStateSnapshotChecked, setIsStateSnapshotChecked] =
-    useState<boolean>(false)
-
-  if (workspace?.currentDocUrl && selfId && !isCurrentDocUrlChecked) {
-    setIsCurrentDocUrlChecked(true)
-
-    const searchParams = new URLSearchParams(window.location.search)
-
-    const maybePushpinUrl = searchParams.get("document")
-    const rawViewState = searchParams.get("viewState")
-    const viewState = rawViewState && JSON.parse(rawViewState)
-
-    if (isPushpinUrl(maybePushpinUrl)) {
-      // this is just to sanitize out any other bits of the URL
-      const { scheme, type, documentId } = parseDocumentLink(maybePushpinUrl)
-      const docLink = createDocumentLink(type, documentId)
-      const currentDocUrl = workspace?.currentDocUrl
-      if (docLink !== currentDocUrl) {
-        openDoc(docLink, selfId, viewState)
-      }
-    }
-  }
-
-  if (
-    selfId &&
-    initialViewState &&
-    currentDoc?.__userStates &&
-    isCurrentDocUrlChecked &&
-    !isStateSnapshotChecked
-  ) {
-    setIsStateSnapshotChecked(true)
-
-    if (initialViewState) {
-      changeCurrentDoc((doc) => {
-        loadViewStateForUser(doc, initialViewState, selfId)
-      })
-    }
-  }
-
-  const viewState =
-    selfId && currentDoc && getViewStateOfUser(currentDoc, selfId)
-
-  useEffect(() => {
-    if (!workspace || !selfId || !viewState) {
-      return
-    }
-
-    const newUrl = createWebLinkWithViewState(
-      window.location,
-      workspace.currentDocUrl,
-      viewState
-    )
-
-    if (newUrl !== window.location.href) {
-      const prevViewState = new URL(window.location.href).searchParams.get(
-        "viewState"
-      )
-
-      if (!prevViewState) {
-        history.replaceState(null, "", newUrl)
-      } else {
-        history.pushState(null, "", newUrl)
-      }
-    }
-  }, [viewState])
-
-  if ("navigation" in window) {
-    window.navigation.addEventListener("navigate", (navigateEvent: any) => {
-      // Exit early if this navigation shouldn't be intercepted.
-      // The properties to look at are discussed later in the article.
-      //if (shouldNotIntercept(navigateEvent)) return;
-
-      const searchParams = new URL(navigateEvent.destination.url).searchParams
-
-      const destination = searchParams.get("document")
-      const rawViewState = searchParams.get("viewState")
-      const viewState = rawViewState && JSON.parse(rawViewState)
-      if (isPushpinUrl(destination)) {
-        navigateEvent.intercept({
-          handler: async () => {
-            openDoc(destination, selfId, viewState)
-          },
-        })
-      } else {
-        console.log("weird URL:", navigateEvent.destination.url)
-      }
-    })
-  }
 
   useAllHeartbeats(selfId)
   useHeartbeat(selfId)
@@ -194,57 +83,6 @@ export default function Workspace({
       })
     }
   }, [changeSelf, currentDeviceId, self])
-
-  function openDoc(
-    docUrl: string,
-    selfId?: DocumentId,
-    viewState?: { [key: string]: any }
-  ) {
-    if (!isPushpinUrl(docUrl)) {
-      return
-    }
-
-    const { type } = parseDocumentLink(docUrl)
-    if (type === "workspace") {
-      // we're going to have to deal with this specially...
-      throw new Error("workspace switching isn't supported at the moment")
-      return
-    }
-
-    if (!workspace) {
-      log(
-        "Trying to navigate to a document before the workspace doc is loaded!"
-      )
-      return
-    }
-
-    // Reset scroll position
-    window.scrollTo(0, 0)
-
-    if (docUrl === workspace.currentDocUrl) {
-      const documentId = parseDocumentLink(docUrl).documentId
-
-      if (viewState && selfId) {
-        repo.find(documentId).change((doc) => {
-          loadViewStateForUser(doc as Doc<DocWithViewState>, viewState, selfId)
-        })
-      }
-
-      log("Attempted to navigate to the same place we already are...")
-      return
-    }
-
-    changeWorkspace((ws: WorkspaceDoc) => {
-      ws.currentDocUrl = docUrl
-
-      ws.viewedDocUrls = ws.viewedDocUrls.filter((url) => url !== docUrl)
-      ws.viewedDocUrls.unshift(docUrl)
-
-      if (ws.archivedDocUrls) {
-        ws.archivedDocUrls = ws.archivedDocUrls.filter((url) => url !== docUrl)
-      }
-    })
-  }
 
   /*  function importClip(payload: ClipperPayload) {
     const creationCallback = (importedUrl) => {
@@ -298,14 +136,14 @@ export default function Workspace({
     )
   }
 
-  const content = renderContent(workspace.currentDocUrl)
+  const content = currentDocUrl && renderContent(currentDocUrl)
 
   return (
     <SelfContext.Provider value={workspace.selfId}>
       <div className="Workspace">
         <TitleBar
-          documentId={documentId}
-          openDoc={openDoc}
+          currentDocUrl={currentDocUrl}
+          workspaceDocId={documentId}
           onContent={onContent}
         />
         {content}

@@ -14,13 +14,13 @@ const log = Debug("pushpin:omnibox")
 
 export interface Props {
   active: boolean
-  documentId: DocumentId
+  workspaceDocId: DocumentId
   omniboxFinished: Function
   onContent: (url: PushpinUrl) => boolean
 }
 
 export default function Omnibox(props: Props) {
-  const { active, documentId, omniboxFinished, onContent } = props
+  const { active, workspaceDocId, omniboxFinished, onContent } = props
   const omniboxInput = useRef<HTMLInputElement>(null)
   const [search, setSearch] = useState("")
 
@@ -83,7 +83,7 @@ export default function Omnibox(props: Props) {
           active={active}
           search={search}
           onContent={onContent}
-          documentId={documentId}
+          workspaceDocId={workspaceDocId}
           omniboxFinished={omniboxFinished}
         />
       </div>

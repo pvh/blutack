@@ -1,7 +1,7 @@
 import Content from "./Content"
 import { DocumentId } from "automerge-repo"
 import { CurrentDeviceContext } from "./content-types/workspace/Device"
-import { createDocumentLink } from "./pushpin-code/ShareLink"
+import { createDocumentLink, PushpinUrl } from "./pushpin-code/ShareLink"
 
 // board in various contexts
 import "./content-types/board"
@@ -26,20 +26,20 @@ import "./content-types/TodoList"
 interface RootArgs {
   workspaceDocId: DocumentId
   deviceDocId: DocumentId
-  initialViewState?: { [key: string]: any }
+  currentDocUrl?: PushpinUrl
 }
 
 export default function Root({
   workspaceDocId,
   deviceDocId,
-  initialViewState,
+  currentDocUrl,
 }: RootArgs) {
   return (
     <CurrentDeviceContext.Provider value={deviceDocId}>
       <Content
         context="root"
+        currentDocUrl={currentDocUrl}
         url={createDocumentLink("workspace", workspaceDocId)}
-        initialViewState={initialViewState}
       />
     </CurrentDeviceContext.Provider>
   )
