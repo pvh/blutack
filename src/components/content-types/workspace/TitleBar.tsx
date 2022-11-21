@@ -20,14 +20,18 @@ import "./TitleBar.css"
 import NewDocumentButton from "../../NewDocumentButton"
 
 export interface Props {
-  documentId: DocumentId
-  openDoc: Function
+  workspaceDocId: DocumentId
+  currentDocUrl?: PushpinUrl
   onContent: (url: PushpinUrl) => boolean
 }
 
-export default function TitleBar(props: Props) {
+export default function TitleBar({
+  workspaceDocId,
+  currentDocUrl,
+  onContent,
+}: Props) {
   const [activeOmnibox, setActive] = useState(false)
-  const [workspaceDoc] = useDocument<WorkspaceDoc>(props.documentId)
+  const [workspaceDoc] = useDocument<WorkspaceDoc>(workspaceDocId)
 
   useEvent(document, "keydown", (e) => {
     if (e.key === "/" && document.activeElement === document.body) {
@@ -55,7 +59,7 @@ export default function TitleBar(props: Props) {
     setActive(false)
   }
 
-  if (!workspaceDoc || !workspaceDoc.currentDocUrl) {
+  if (!workspaceDoc || !workspaceDoc.selfId) {
     return null
   }
 
@@ -83,31 +87,31 @@ export default function TitleBar(props: Props) {
         </button>
       </div>
 
-      <div className="ContentHeader Group">
-        <Content
-          url={workspaceDoc.currentDocUrl}
-          context="title-bar"
-          editable
-        />
-      </div>
-      <div className="CollaboratorsBar Inline">
-        <Authors
-          currentDocUrl={workspaceDoc.currentDocUrl}
-          workspaceDocId={props.documentId}
-        />
-        <div className="TitleBar-self">
-          <Content
-            url={createDocumentLink("contact", workspaceDoc.selfId)}
-            context="title-bar"
-            isPresent
-          />
-        </div>
-      </div>
+      {currentDocUrl && (
+        <>
+          <div className="ContentHeader Group">
+            <Content url={currentDocUrl} context="title-bar" editable />
+          </div>
+          <div className="CollaboratorsBar Inline">
+            <Authors
+              currentDocUrl={currentDocUrl}
+              workspaceDocId={workspaceDocId}
+            />
+            <div className="TitleBar-self">
+              <Content
+                url={createDocumentLink("contact", workspaceDoc.selfId)}
+                context="title-bar"
+                isPresent
+              />
+            </div>
+          </div>
+        </>
+      )}
       <Omnibox
         active={activeOmnibox}
-        documentId={props.documentId}
+        workspaceDocId={workspaceDocId}
         omniboxFinished={hideOmnibox}
-        onContent={props.onContent}
+        onContent={onContent}
       />
     </div>
   )
