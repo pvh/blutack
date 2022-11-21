@@ -22,6 +22,7 @@ import {
   loadUrlOfUser,
   openDoc,
 } from "../../Url"
+import { useSelfId } from "../../pushpin-code/SelfHooks"
 
 const log = Debug("pushpin:settings")
 
@@ -34,6 +35,7 @@ export interface ContactProps extends ContentProps {
 }
 
 export default function ContactInVarious(props: ContactProps) {
+  const selfId = useSelfId()
   const repo = useRepo()
   const [contact] = useDocument<ContactDoc>(props.documentId)
 
@@ -56,13 +58,15 @@ export default function ContactInVarious(props: ContactProps) {
     <img alt="avatar" src={DEFAULT_AVATAR_PATH} />
   )
 
+  // TODO: resolve conflict between double and single click
+
   const onDoubleClick = (e: React.MouseEvent) => {
     openDoc(url)
     e.stopPropagation()
   }
 
   const onClick = () => {
-    if (!props.isPresent) {
+    if (!props.isPresent || props.documentId === selfId) {
       return
     }
 
