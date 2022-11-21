@@ -106,6 +106,7 @@ function BoardCard(props: BoardCardProps) {
 
   function onCardDoubleClicked(event: React.MouseEvent) {
     dispatch({ type: "CardDoubleClicked", cardId: id, event })
+    event.stopPropagation()
   }
 
   function onDragStart(event: React.DragEvent) {
