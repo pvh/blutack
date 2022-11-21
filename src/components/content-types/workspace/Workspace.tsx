@@ -1,6 +1,6 @@
 import { useEffect, useContext, useRef } from "react"
 import Debug from "debug"
-import { useDocument, useRepo } from "automerge-repo-react-hooks"
+import { useDocument } from "automerge-repo-react-hooks"
 import { DocumentId, DocHandle } from "automerge-repo"
 
 import { parseDocumentLink, PushpinUrl } from "../../pushpin-code/ShareLink"
@@ -46,7 +46,7 @@ export default function Workspace({
   documentId,
   currentDocUrl,
 }: WorkspaceContentProps) {
-  const [workspace] = useDocument<WorkspaceDoc>(documentId)
+  const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDocId =
     currentDocUrl && parseDocumentLink(currentDocUrl).documentId
   const [currentDoc] = useDocument<DocumentWithTitle>(currentDocId)
@@ -66,11 +66,28 @@ export default function Workspace({
 
   const currentDocTitle = currentDoc && currentDoc.title
 
+  // reflect title of current document in title bar of webpage
   useEffect(() => {
     document.title = currentDocTitle ?? "Blutack"
   }, [currentDocTitle])
 
-  useEffect(() => {}, [])
+  // add currentDocUrl to viewedDocUrls
+  useEffect(() => {
+    if (!currentDocUrl) {
+      return
+    }
+
+    changeWorkspace((ws: WorkspaceDoc) => {
+      ws.viewedDocUrls = ws.viewedDocUrls.filter((url) => url !== currentDocUrl)
+      ws.viewedDocUrls.unshift(currentDocUrl)
+
+      if (ws.archivedDocUrls) {
+        ws.archivedDocUrls = ws.archivedDocUrls.filter(
+          (url) => url !== currentDocUrl
+        )
+      }
+    })
+  }, [currentDocUrl])
 
   // TODO: this is so grody
   // Add devices if not already on doc.
