@@ -163,7 +163,9 @@ export default function ContentList({ documentId }: ContentProps) {
   const { content } = doc
 
   const removeContent = (url: PushpinUrl) => {
-    setCurrentContent(undefined)
+    if (currentContent === url) {
+      setCurrentContent(undefined)
+    }
     changeDoc((doc) => {
       const index = doc.content.findIndex((v) => v === url)
       if (index >= 0) {
