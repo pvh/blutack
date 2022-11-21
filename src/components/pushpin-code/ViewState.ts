@@ -1,10 +1,46 @@
 import { useCallback } from "react"
-import { useSelfId } from "./SelfHooks"
-import { useDocument } from "automerge-repo-react-hooks"
 import { DocumentId } from "../../../../automerge-repo"
 
 export interface DocWithViewState {
   __userStates: { [userId: DocumentId]: { [key: string]: any } }
+}
+
+export function getViewState() {
+  const raw = new URLSearchParams(window.location.search).get("viewState")
+
+  if (!raw) {
+    return {}
+  }
+
+  try {
+    return JSON.parse(decodeURIComponent(raw))
+  } catch (e) {
+    return {}
+  }
+}
+
+function setViewStateValue(documentId: DocumentId, key: string, value: any) {
+  const viewState = getViewState()
+
+  const url = new URL(window.location.href)
+
+  url.searchParams.set(
+    "viewState",
+    encodeURIComponent(
+      JSON.stringify({
+        ...viewState,
+        [documentId]: { ...viewState[documentId], [key]: value },
+      })
+    )
+  )
+
+  window.location.href = url.toString()
+}
+
+function getViewStateValue(documentId: DocumentId, key: string) {
+  const viewState = getViewState()
+
+  return viewState?.[documentId]?.[key]
 }
 
 // equivalent to useState but stores state per user in the document
@@ -13,55 +49,19 @@ export function useViewState<T>(
   key: string,
   initialValue?: T
 ): [T, (value: T) => void] {
-  const selfId = useSelfId()
-  const [doc, changeDoc] = useDocument<DocWithViewState>(documentId)
-
   const setValue = useCallback(
     (newValue: T) => {
-      changeDoc((doc) => {
-        let userStates = doc.__userStates
-        if (!userStates) {
-          doc.__userStates = {}
-          userStates = doc.__userStates
-        }
+      if (!documentId) {
+        return
+      }
 
-        let userState = userStates[selfId]
-        if (!userState) {
-          userStates[selfId] = {}
-          userState = userStates[selfId]
-        }
-
-        if (newValue === undefined) {
-          delete userState[key]
-        } else {
-          userState[key] = newValue
-        }
-      })
+      setViewStateValue(documentId, key, newValue)
     },
-    [key, changeDoc]
+    [documentId, key]
   )
 
-  const value = doc?.__userStates?.[selfId]?.[key] ?? initialValue
+  const value =
+    (documentId && getViewStateValue(documentId, key)) ?? initialValue
 
   return [value, setValue]
-}
-
-export function getViewStateOfUser(
-  doc: DocWithViewState,
-  userId: DocumentId
-): { [key: string]: any } {
-  return doc?.__userStates?.[userId]
-}
-
-export function loadViewStateForUser(
-  doc: DocWithViewState,
-  viewState: { [key: string]: any },
-  userId: DocumentId
-) {
-  let userStates = doc.__userStates
-  if (!userStates) {
-    userStates = doc.__userStates = {}
-  }
-
-  userStates[userId] = viewState
 }
