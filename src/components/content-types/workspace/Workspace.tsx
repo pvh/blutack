@@ -22,6 +22,8 @@ import { CurrentDeviceContext } from "./Device"
 
 import WorkspaceInList from "./WorkspaceInList"
 import { ContentListDoc } from "../ContentList"
+import { storeCurrentUrlOfUser } from "../../Url"
+import { ViewStateContext } from "../../pushpin-code/ViewState"
 
 const log = Debug("pushpin:workspace")
 
@@ -49,10 +51,12 @@ export default function Workspace({
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDocId =
     currentDocUrl && parseDocumentLink(currentDocUrl).documentId
-  const [currentDoc] = useDocument<DocumentWithTitle>(currentDocId)
+  const [currentDoc, changeCurrentDoc] =
+    useDocument<DocumentWithTitle>(currentDocId)
 
   const currentDeviceId = useContext(CurrentDeviceContext)
   const [self, changeSelf] = useDocument<ContactDoc>(workspace?.selfId)
+  const viewState = useContext(ViewStateContext)
 
   const selfId = workspace?.selfId
 
@@ -71,7 +75,7 @@ export default function Workspace({
     document.title = currentDocTitle ?? "Blutack"
   }, [currentDocTitle])
 
-  // add currentDocUrl to viewedDocUrls
+  // store currentDocUrl in viewedDocUrls
   useEffect(() => {
     if (!currentDocUrl) {
       return
@@ -88,6 +92,17 @@ export default function Workspace({
       }
     })
   }, [currentDocUrl])
+
+  // store currentUrl of user in document
+  useEffect(() => {
+    if (!selfId) {
+      return
+    }
+
+    changeCurrentDoc((doc) => {
+      storeCurrentUrlOfUser(doc as any, selfId)
+    })
+  }, [selfId, currentDocUrl, viewState])
 
   // TODO: this is so grody
   // Add devices if not already on doc.

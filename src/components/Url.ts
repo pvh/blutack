@@ -1,6 +1,7 @@
 import {
   createWebLink,
   isPushpinUrl,
+  parseDocumentLink,
   PushpinUrl,
 } from "./pushpin-code/ShareLink"
 import { ViewState } from "./pushpin-code/ViewState"
@@ -84,4 +85,39 @@ function parseViewState(raw: string): ViewState {
 
 export function getCurrentDocUrl(): PushpinUrl | undefined {
   return getUrlParams().currentDocUrl
+}
+
+export function getUrl() {
+  return `${location.pathname}${location.search}`
+}
+
+export function getCurrentDocId(): DocumentId | undefined {
+  const docUrl = getUrlParams().currentDocUrl
+  return !docUrl ? undefined : parseDocumentLink(docUrl)?.documentId
+}
+
+export interface DocWithUrlState {
+  __urlByUserId: { [userId: DocumentId]: string }
+}
+
+export function storeCurrentUrlOfUser(
+  document: DocWithUrlState,
+  userId: DocumentId
+) {
+  let urlByUser = document.__urlByUserId
+
+  if (!urlByUser) {
+    document.__urlByUserId = {}
+    urlByUser = document.__urlByUserId
+  }
+
+  urlByUser[userId] = getUrl()
+}
+
+export function loadUrlOfUser(document: DocWithUrlState, userId: DocumentId) {
+  const url = document.__urlByUserId?.[userId]
+
+  if (url) {
+    changeUrl(url)
+  }
 }
