@@ -5,18 +5,23 @@ import classNames from "classnames"
 import Content, { ContentProps } from "../../Content"
 import { ContactDoc } from "."
 
-import { createDocumentLink, createWebLink } from "../../pushpin-code/ShareLink"
+import { createDocumentLink } from "../../pushpin-code/ShareLink"
 import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
 
 import "./ContactInVarious.css"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import ConnectionStatusBadge from "./ConnectionStatusBadge"
 import ListItem from "../../ui/ListItem"
 import ContentDragHandle from "../../ui/ContentDragHandle"
 import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import CenteredStack from "../../ui/CenteredStack"
 import Heading from "../../ui/Heading"
-import { changeUrl, openDoc } from "../../Url"
+import {
+  DocWithUrlState,
+  getCurrentDocId,
+  loadUrlOfUser,
+  openDoc,
+} from "../../Url"
 
 const log = Debug("pushpin:settings")
 
@@ -29,6 +34,7 @@ export interface ContactProps extends ContentProps {
 }
 
 export default function ContactInVarious(props: ContactProps) {
+  const repo = useRepo()
   const [contact] = useDocument<ContactDoc>(props.documentId)
 
   const avatarDocId = contact ? contact.avatarDocId : null
@@ -55,8 +61,31 @@ export default function ContactInVarious(props: ContactProps) {
     e.stopPropagation()
   }
 
+  const onClick = () => {
+    if (!props.isPresent) {
+      return
+    }
+
+    const currentDocId = getCurrentDocId()
+
+    if (!currentDocId) {
+      return
+    }
+
+    repo
+      .find(currentDocId)
+      .value()
+      .then((doc) => {
+        loadUrlOfUser(doc as DocWithUrlState, props.documentId)
+      })
+  }
+
   const avatar = (
-    <div className="Contact-avatar" onDoubleClick={onDoubleClick}>
+    <div
+      className="Contact-avatar"
+      onClick={onClick}
+      onDoubleClick={onDoubleClick}
+    >
       <div
         className={classNames(
           "Avatar",
