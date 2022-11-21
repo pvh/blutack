@@ -27,7 +27,7 @@ import { useDocumentIds, useDocuments } from "../../../pushpin-code/Hooks"
 import Content from "../../../Content"
 import useInvitations, { Invitation } from "./InvitationsHook"
 import "./OmniboxWorkspaceListMenu.css"
-import { getCurrentDocUrl } from "../../../../main"
+import { getCurrentDocUrl } from "../../../Url"
 
 const log = Debug("pushpin:omnibox")
 

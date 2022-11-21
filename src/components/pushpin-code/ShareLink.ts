@@ -1,4 +1,5 @@
 import { DocumentId } from "automerge-repo"
+import { ViewState } from "./ViewState"
 
 export type PushpinUrl = string & { pushpin: true }
 
@@ -24,21 +25,18 @@ export function createDocumentLink(
 
 export function createWebLink(
   windowLocation: Location,
-  pushPinUrl: PushpinUrl
+  pushPinUrl: PushpinUrl,
+  viewState?: ViewState
 ) {
   var url = windowLocation.href.split("?")[0]
-  return `${url}?document=${encodeURIComponent(pushPinUrl)}`
-}
+  const urlWithDocument = `${url}?document=${encodeURIComponent(pushPinUrl)}`
 
-export function createWebLinkWithViewState(
-  windowLocation: Location,
-  pushPinUrl: PushpinUrl,
-  viewState: { [key: string]: any }
-) {
-  return `${createWebLink(
-    windowLocation,
-    pushPinUrl
-  )}&viewState=${encodeURIComponent(JSON.stringify(viewState))}`
+  if (!viewState) {
+    return urlWithDocument
+  }
+
+  const encodedViewState = encodeURIComponent(JSON.stringify(viewState))
+  return `${urlWithDocument}&viewState=${encodedViewState}`
 }
 
 // const url = "?document=web%2Bpushpin%3A%2F%2Fcontentlist%2Ffcfb63f5-777e-469b-a9bd-9f093d1ba2b7"
