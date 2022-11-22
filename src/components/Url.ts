@@ -9,7 +9,7 @@ import { useEffect, useState } from "react"
 import { DocumentId } from "../../../automerge-repo"
 
 // always use changeUrl instead of using the history api directly
-// because otherwise we won't be of the changes
+// because otherwise we won't be notified of the changes
 export function changeUrl(url: string) {
   history.pushState({}, "", url)
   window.dispatchEvent(new Event("popstate"))

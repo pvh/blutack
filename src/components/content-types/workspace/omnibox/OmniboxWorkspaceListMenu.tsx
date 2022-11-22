@@ -378,8 +378,6 @@ export default function OmniboxWorkspaceListMenu(
   /* end sections */
 
   const navigate = (url: PushpinUrl) => {
-    // this weird typecast is to work around a typescript bug,
-    // maybe try removing it and see if it's better.
     openDoc(url)
     props.omniboxFinished()
   }
