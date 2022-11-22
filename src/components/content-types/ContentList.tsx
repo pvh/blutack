@@ -145,8 +145,6 @@ export default function ContentList({ documentId }: ContentProps) {
     }
   }
 
-  const hiddenFileInput = useRef<HTMLInputElement>(null)
-
   const onCreateContent = useCallback(
     (contentUrl: PushpinUrl) => {
       changeDoc((doc) => {
@@ -196,19 +194,6 @@ export default function ContentList({ documentId }: ContentProps) {
     },
   ]
 
-  const onImportClick = () => {
-    if (hiddenFileInput.current) {
-      hiddenFileInput.current.click()
-    }
-  }
-  const onFilesChanged = (e: any) => {
-    ImportData.importFileList(e.target.files, (url, i) => {
-      changeDoc((doc) => {
-        doc.content.push(url)
-      })
-    })
-  }
-
   return (
     <CenteredStack direction="row" centerText={false}>
       <CenteredStackRowItem
@@ -256,18 +241,6 @@ export default function ContentList({ documentId }: ContentProps) {
             }
             onCreateDocument={onCreateContent}
           />
-
-          <ListMenuItem key="import" onClick={onImportClick}>
-            <input
-              type="file"
-              id="hiddender"
-              multiple
-              onChange={onFilesChanged}
-              ref={hiddenFileInput}
-              style={{ display: "none" }}
-            />
-            <Heading>Import file...</Heading>
-          </ListMenuItem>
         </ListMenu>
       </CenteredStackRowItem>
       <CenteredStackRowItem size={{ mode: "auto" }}>
