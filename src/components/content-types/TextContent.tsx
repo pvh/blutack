@@ -1,7 +1,11 @@
-import React, { useEffect, useRef, useMemo } from "react"
+import React, { useEffect, useRef, useMemo, useState } from "react"
 
 import * as Automerge from "@automerge/automerge"
-import Quill, { TextChangeHandler, QuillOptionsStatic } from "quill"
+import Quill, {
+  TextChangeHandler,
+  QuillOptionsStatic,
+  SelectionChangeHandler,
+} from "quill"
 import Delta from "quill-delta"
 import * as ContentTypes from "../pushpin-code/ContentTypes"
 import Content, { ContentProps, EditableContentProps } from "../Content"
@@ -16,6 +20,12 @@ import ContentDragHandle from "../ui/ContentDragHandle"
 import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { DocHandle } from "automerge-repo"
 import { createDocumentLink } from "../pushpin-code/ShareLink"
+import QuillCursors from "quill-cursors"
+import { usePresence } from "../pushpin-code/PresenceHooks"
+import IQuillRange from "quill-cursors/dist/quill-cursors/i-range"
+import { useSelfId } from "../pushpin-code/SelfHooks"
+
+Quill.register("modules/cursors", QuillCursors)
 
 export interface TextDoc {
   title: string
@@ -32,16 +42,42 @@ TextContent.defaultWidth = 15
 
 export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.documentId)
+  const [cursorPos, setCursorPos] = useState<IQuillRange | undefined>(undefined)
+  const selfId = useSelfId()
+
+  const presence = usePresence<IQuillRange | undefined>(
+    props.documentId,
+    cursorPos,
+    "cursorPos"
+  )
+
+  const cursors: Cursor[] = useMemo(
+    () =>
+      presence.flatMap((p) => {
+        if (p.data === undefined || p.contact === selfId) {
+          return []
+        }
+        return [{ range: p.data, id: p.contact }]
+      }),
+    [presence]
+  )
 
   const [ref] = useQuill({
     text: doc ? doc.text : null,
     change(fn) {
       changeDoc((doc: TextDoc) => fn(doc.text))
     },
+    selectionChange(range) {
+      setCursorPos(range)
+    },
+    cursors,
     selected: props.uniquelySelected,
     config: {
       formats: [],
       modules: {
+        cursors: {
+          transformOnTextChange: true,
+        },
         toolbar: false,
         history: {
           maxStack: 500,
@@ -52,27 +88,37 @@ export default function TextContent(props: Props) {
   })
 
   return (
-    <div
-      className="TextContent"
-      ref={ref}
-      onCopy={stopPropagation}
-      onCut={stopPropagation}
-      onPaste={stopPropagation}
-      onDoubleClick={stopPropagation}
-    />
+    <div className="TextContent">
+      <div
+        ref={ref}
+        onCopy={stopPropagation}
+        onCut={stopPropagation}
+        onPaste={stopPropagation}
+        onDoubleClick={stopPropagation}
+      />
+    </div>
   )
+}
+
+interface Cursor {
+  id: string
+  range: IQuillRange
 }
 
 interface QuillOpts {
   text: Automerge.Text | null
   change: (cb: (text: Automerge.Text) => void) => void
+  selectionChange: SelectionChangeHandler
   selected?: boolean
+  cursors: Cursor[]
   config?: QuillOptionsStatic
 }
 
 function useQuill({
   text,
   change,
+  selectionChange,
+  cursors,
   selected,
   config,
 }: QuillOpts): [React.Ref<HTMLDivElement>, Quill | null] {
@@ -81,6 +127,7 @@ function useQuill({
   // @ts-ignore-next-line
   const textString = useMemo(() => text && text.join(""), [text])
   const makeChange = useStaticCallback(change)
+  const onSelectionChange = useStaticCallback(selectionChange)
 
   useEffect(() => {
     if (!ref.current) return () => {}
@@ -109,6 +156,8 @@ function useQuill({
 
     q.on("text-change", onChange)
 
+    q.on("selection-change", onSelectionChange)
+
     /**
      * We bind this as a native event because of React's event delegation.
      * Quill will handle the keydown event and cause a react re-render before react has actually
@@ -133,6 +182,19 @@ function useQuill({
 
     quill.current.updateContents(diff)
   }, [textString])
+
+  useEffect(() => {
+    if (!quill.current) {
+      return
+    }
+
+    const quillCursors = quill.current?.getModule("cursors")
+
+    cursors.forEach(({ id, range }) => {
+      quillCursors.createCursor(id, "user", "#ff0000")
+      quillCursors.moveCursor(id, range)
+    })
+  }, [cursors])
 
   return [ref, quill.current]
 }
