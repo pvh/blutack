@@ -1,8 +1,7 @@
-import { useEffect, useCallback, createContext } from "react"
+import { useCallback } from "react"
 import { useSelfId } from "./SelfHooks"
 import { useDocument } from "automerge-repo-react-hooks"
 import { DocumentId } from "../../../../automerge-repo"
-import { createDocumentLink, createWebLink, PushpinUrl } from "./ShareLink"
 
 export interface DocWithViewState {
   __userStates: { [userId: DocumentId]: { [key: string]: any } }
@@ -22,15 +21,21 @@ export function useViewState<T>(
       changeDoc((doc) => {
         let userStates = doc.__userStates
         if (!userStates) {
-          userStates = doc.__userStates = {}
+          doc.__userStates = {}
+          userStates = doc.__userStates
         }
 
         let userState = userStates[selfId]
         if (!userState) {
-          userState = userStates[selfId] = {}
+          userStates[selfId] = {}
+          userState = userStates[selfId]
         }
 
-        userState[key] = newValue
+        if (newValue === undefined) {
+          delete userState[key]
+        } else {
+          userState[key] = newValue
+        }
       })
     },
     [key, changeDoc]

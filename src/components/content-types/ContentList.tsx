@@ -70,16 +70,10 @@ function getListMenuItemElement(
 export default function ContentList({ documentId }: ContentProps) {
   const [doc, changeDoc] = useDocument<ContentListDoc>(documentId)
 
-  const [currentContent, selectContent] = useViewState<PushpinUrl | undefined>(
-    documentId,
-    "currentContent"
-  )
+  const [currentContent, setCurrentContent] = useViewState<
+    PushpinUrl | undefined
+  >(documentId, "currentContent")
 
-  const [addingNewItem, setAddingNewItem] = useState(false)
-  const contentTypes = useMemo(
-    () => ContentTypes.list({ context: "board" }),
-    []
-  )
   const [draggedOverIndex, setDraggedOverIndex] = useState<number | undefined>()
 
   const onDragOver = useCallback((e: React.DragEvent, index: number) => {
@@ -143,18 +137,19 @@ export default function ContentList({ documentId }: ContentProps) {
     [draggedOverIndex]
   )
 
-  const hiddenFileInput = useRef<HTMLInputElement>(null)
+  function selectContent(contentUrl: PushpinUrl) {
+    if (parseDocumentLink(contentUrl).type === "contentlist") {
+      window.location.href = createWebLink(window.location, contentUrl)
+    } else {
+      setCurrentContent(contentUrl)
+    }
+  }
 
   const onCreateContent = useCallback(
     (contentUrl: PushpinUrl) => {
       changeDoc((doc) => {
         doc.content.push(contentUrl)
-
-        if (parseDocumentLink(contentUrl).type === "contentlist") {
-          window.location.href = createWebLink(window.location, contentUrl)
-        } else {
-          selectContent(contentUrl)
-        }
+        selectContent(contentUrl)
       })
     },
     [changeDoc]
@@ -164,13 +159,10 @@ export default function ContentList({ documentId }: ContentProps) {
     return null
   }
 
-  if (!currentContent && doc.content.length > 0) {
-    selectContent(doc.content[0])
-  }
-
   const { content } = doc
 
   const removeContent = (url: PushpinUrl) => {
+    setCurrentContent(undefined)
     changeDoc((doc) => {
       const index = doc.content.findIndex((v) => v === url)
       if (index >= 0) {
@@ -201,19 +193,6 @@ export default function ContentList({ documentId }: ContentProps) {
         (e.metaKey || e.ctrlKey) && e.key === "Backspace",
     },
   ]
-
-  const onImportClick = () => {
-    if (hiddenFileInput.current) {
-      hiddenFileInput.current.click()
-    }
-  }
-  const onFilesChanged = (e: any) => {
-    ImportData.importFileList(e.target.files, (url, i) => {
-      changeDoc((doc) => {
-        doc.content.push(url)
-      })
-    })
-  }
 
   return (
     <CenteredStack direction="row" centerText={false}>
@@ -262,18 +241,6 @@ export default function ContentList({ documentId }: ContentProps) {
             }
             onCreateDocument={onCreateContent}
           />
-
-          <ListMenuItem key="import" onClick={onImportClick}>
-            <input
-              type="file"
-              id="hiddender"
-              multiple
-              onChange={onFilesChanged}
-              ref={hiddenFileInput}
-              style={{ display: "none" }}
-            />
-            <Heading>Import file...</Heading>
-          </ListMenuItem>
         </ListMenu>
       </CenteredStackRowItem>
       <CenteredStackRowItem size={{ mode: "auto" }}>
@@ -292,18 +259,6 @@ const icon = "list"
 export function ContentListInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
   const [doc] = useDocument<ContentListDoc>(documentId)
-  const onClick = useCallback((event: React.SyntheticEvent) => {
-    if (props.context !== "list") {
-      return
-    }
-
-    event.stopPropagation()
-    window.location.href = createWebLink(
-      window.location,
-      createDocumentLink("contentlist", documentId)
-    )
-  }, [])
-
   if (!doc || !doc.content) return null
 
   const title =
@@ -312,20 +267,18 @@ export function ContentListInList(props: EditableContentProps) {
   const subtitle = `${items} item${items !== 1 ? "s" : ""}`
 
   return (
-    <div onClick={onClick}>
-      <ListItem>
-        <ContentDragHandle url={url}>
-          <Badge size="medium" icon={icon} />
-        </ContentDragHandle>
-        <TitleWithSubtitle
-          titleEditorField="title"
-          title={title}
-          subtitle={subtitle}
-          documentId={documentId}
-          editable={editable}
-        />
-      </ListItem>
-    </div>
+    <ListItem>
+      <ContentDragHandle url={url}>
+        <Badge size="medium" icon={icon} />
+      </ContentDragHandle>
+      <TitleWithSubtitle
+        titleEditorField="title"
+        title={title}
+        subtitle={subtitle}
+        documentId={documentId}
+        editable={editable}
+      />
+    </ListItem>
   )
 }
 

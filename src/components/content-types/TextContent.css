@@ -1,16 +1,3 @@
-.Workspace__container.Workspace__container--text {
-  box-sizing: border-box;
-  padding: 40px;
-  background: var(--colorInputGrey);
-  display: flex;
-  justify-content: center;
-}
-.Workspace__container.Workspace__container--text > * {
-  padding: 40px;
-  height: auto;
-  max-width: 720px;
-  background-color: white;
-}
 .Workspace__container.Workspace__container--text > *::-webkit-scrollbar-track {
   margin: 0;
 }
@@ -27,10 +14,17 @@
 .ql-editor {
   box-sizing: border-box;
   outline: 0;
+  max-width: 720px;
+  margin: auto;
   min-height: 100%;
   cursor: text;
-  overflow: hidden;
+  overflow: auto;
+  padding: 30px var(--halfCellSize);
+}
+
+.BoardCard .ql-editor {
   padding: var(--halfCellSize);
+  max-width: unset;
 }
 
 .ql-clipboard {
@@ -42,6 +36,7 @@
   position: fixed;
   top: 50%;
 }
+
 
 /* Scrollbar */
 

@@ -1,6 +1,6 @@
 import { useEffect, useContext, useRef, useState } from "react"
 import Debug from "debug"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import { DocumentId, DocHandle } from "automerge-repo"
 
 import {
@@ -8,6 +8,7 @@ import {
   PushpinUrl,
   isPushpinUrl,
   createDocumentLink,
+  createWebLinkWithViewState,
 } from "../../pushpin-code/ShareLink"
 import Content, { ContentProps, ContentHandle } from "../../Content"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
@@ -35,8 +36,10 @@ import { importPlainText } from "../../pushpin-code/ImportData"
 import { ContentListDoc } from "../ContentList"
 import {
   DocWithViewState,
+  getViewStateOfUser,
   loadViewStateForUser,
 } from "../../pushpin-code/ViewState"
+import { Doc } from "@automerge/automerge"
 
 const log = Debug("pushpin:workspace")
 
@@ -58,6 +61,7 @@ export default function Workspace({
   documentId,
   initialViewState,
 }: WorkspaceContentProps) {
+  const repo = useRepo()
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
   const currentDocId =
     workspace &&
@@ -76,11 +80,14 @@ export default function Workspace({
   const [isStateSnapshotChecked, setIsStateSnapshotChecked] =
     useState<boolean>(false)
 
-  if (workspace?.currentDocUrl && !isCurrentDocUrlChecked) {
+  if (workspace?.currentDocUrl && selfId && !isCurrentDocUrlChecked) {
     setIsCurrentDocUrlChecked(true)
-    const maybePushpinUrl = new URLSearchParams(window.location.search).get(
-      "document"
-    )
+
+    const searchParams = new URLSearchParams(window.location.search)
+
+    const maybePushpinUrl = searchParams.get("document")
+    const rawViewState = searchParams.get("viewState")
+    const viewState = rawViewState && JSON.parse(rawViewState)
 
     if (isPushpinUrl(maybePushpinUrl)) {
       // this is just to sanitize out any other bits of the URL
@@ -88,7 +95,7 @@ export default function Workspace({
       const docLink = createDocumentLink(type, documentId)
       const currentDocUrl = workspace?.currentDocUrl
       if (docLink !== currentDocUrl) {
-        openDoc(docLink)
+        openDoc(docLink, selfId, viewState)
       }
     }
   }
@@ -109,19 +116,48 @@ export default function Workspace({
     }
   }
 
+  const viewState =
+    selfId && currentDoc && getViewStateOfUser(currentDoc, selfId)
+
+  useEffect(() => {
+    if (!workspace || !selfId || !viewState) {
+      return
+    }
+
+    const newUrl = createWebLinkWithViewState(
+      window.location,
+      workspace.currentDocUrl,
+      viewState
+    )
+
+    if (newUrl !== window.location.href) {
+      const prevViewState = new URL(window.location.href).searchParams.get(
+        "viewState"
+      )
+
+      if (!prevViewState) {
+        history.replaceState(null, "", newUrl)
+      } else {
+        history.pushState(null, "", newUrl)
+      }
+    }
+  }, [viewState])
+
   if ("navigation" in window) {
     window.navigation.addEventListener("navigate", (navigateEvent: any) => {
       // Exit early if this navigation shouldn't be intercepted.
       // The properties to look at are discussed later in the article.
       //if (shouldNotIntercept(navigateEvent)) return;
 
-      const destination = new URL(
-        navigateEvent.destination.url
-      ).searchParams.get("document")
+      const searchParams = new URL(navigateEvent.destination.url).searchParams
+
+      const destination = searchParams.get("document")
+      const rawViewState = searchParams.get("viewState")
+      const viewState = rawViewState && JSON.parse(rawViewState)
       if (isPushpinUrl(destination)) {
         navigateEvent.intercept({
           handler: async () => {
-            openDoc(destination)
+            openDoc(destination, selfId, viewState)
           },
         })
       } else {
@@ -159,7 +195,11 @@ export default function Workspace({
     }
   }, [changeSelf, currentDeviceId, self])
 
-  function openDoc(docUrl: string) {
+  function openDoc(
+    docUrl: string,
+    selfId?: DocumentId,
+    viewState?: { [key: string]: any }
+  ) {
     if (!isPushpinUrl(docUrl)) {
       return
     }
@@ -182,6 +222,14 @@ export default function Workspace({
     window.scrollTo(0, 0)
 
     if (docUrl === workspace.currentDocUrl) {
+      const documentId = parseDocumentLink(docUrl).documentId
+
+      if (viewState && selfId) {
+        repo.find(documentId).change((doc) => {
+          loadViewStateForUser(doc as Doc<DocWithViewState>, viewState, selfId)
+        })
+      }
+
       log("Attempted to navigate to the same place we already are...")
       return
     }
