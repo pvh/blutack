@@ -1,5 +1,5 @@
 import React from "react"
-import { parseDocumentLink, PushpinUrl } from "../../pushpin-code/ShareLink"
+import { parseDocumentLink, PushpinUrl } from "../../pushpin-code/Url"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import Badge from "../../ui/Badge"
 import { useDocument } from "automerge-repo-react-hooks"

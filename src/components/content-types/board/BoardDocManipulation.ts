@@ -1,5 +1,5 @@
 import { BoardDoc, CardId, BoardDocCard } from "."
-import { parseDocumentLink } from "../../pushpin-code/ShareLink"
+import { parseDocumentLink } from "../../pushpin-code/Url"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import {
   gridCellsToPixels,

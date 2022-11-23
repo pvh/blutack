@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { createDocumentLink } from "../../pushpin-code/ShareLink"
+import { createDocumentLink } from "../../pushpin-code/Url"
 import { DocumentId } from "automerge-repo"
 import { useDocument, Change } from "automerge-repo-react-hooks"
 import Content from "../../Content"

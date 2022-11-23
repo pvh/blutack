@@ -1,6 +1,6 @@
 import React from "react"
 import Content from "../../Content"
-import { createDocumentLink } from "../../pushpin-code/ShareLink"
+import { createDocumentLink } from "../../pushpin-code/Url"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 

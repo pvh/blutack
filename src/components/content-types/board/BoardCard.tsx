@@ -4,7 +4,7 @@ import mime from "mime-types"
 
 import Content from "../../Content"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import { parseDocumentLink } from "../../pushpin-code/ShareLink"
+import { parseDocumentLink } from "../../pushpin-code/Url"
 
 import { BoardDocCard, CardId } from "."
 import { Position, Dimension } from "./BoardGrid"

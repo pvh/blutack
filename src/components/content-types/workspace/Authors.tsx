@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import Debug from "debug"
 
-import { PushpinUrl, parseDocumentLink } from "../../pushpin-code/ShareLink"
+import { PushpinUrl, parseDocumentLink } from "../../pushpin-code/Url"
 import { WorkspaceDoc as WorkspaceDoc } from "./Workspace"
 import Author from "./Author"
 

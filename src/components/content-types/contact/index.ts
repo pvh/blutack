@@ -7,7 +7,7 @@ import { USER_COLORS } from "./Constants"
 import "./Avatar.css"
 import { DocumentId } from "automerge-repo"
 import { DocHandle } from "automerge-repo"
-import { PushpinUrl } from "../../pushpin-code/ShareLink"
+import { PushpinUrl } from "../../pushpin-code/Url"
 
 export type ContactDocInvites = {
   [url: string]: PushpinUrl[] /* Crypto.Box[] */

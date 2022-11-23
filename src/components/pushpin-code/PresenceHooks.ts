@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react"
-import { parseDocumentLink, createDocumentLink, PushpinUrl } from "./ShareLink"
+import { parseDocumentLink, createDocumentLink, PushpinUrl } from "./Url"
 import { useTimeouts, useMessaging } from "./Hooks"
 import { useSelfId } from "./SelfHooks"
 import { CurrentDeviceContext } from "../content-types/workspace/Device"

@@ -1,4 +1,4 @@
-import { isPushpinUrl, parseDocumentLink, PushpinUrl } from "./ShareLink"
+import { isPushpinUrl, parseDocumentLink, PushpinUrl } from "./Url"
 import * as ContentTypes from "./ContentTypes"
 import * as ContentData from "./ContentData"
 import * as URIList from "./UriList"

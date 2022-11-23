@@ -2,7 +2,7 @@ import React, { useRef, useState, useCallback, useEffect } from "react"
 import Debug from "debug"
 import classNames from "classnames"
 
-import { PushpinUrl } from "../../../pushpin-code/ShareLink"
+import { PushpinUrl } from "../../../pushpin-code/Url"
 import { useEvent } from "../../../pushpin-code/Hooks"
 import { DocumentId } from "automerge-repo"
 import { useRepo } from "automerge-repo-react-hooks"

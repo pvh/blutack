@@ -15,7 +15,6 @@ import ListItem from "../ui/ListItem"
 import ContentDragHandle from "../ui/ContentDragHandle"
 import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { DocHandle } from "automerge-repo"
-import { createDocumentLink } from "../pushpin-code/ShareLink"
 
 export interface TextDoc {
   title: string

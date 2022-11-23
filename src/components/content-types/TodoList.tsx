@@ -8,7 +8,7 @@ import {
   createDocumentLink,
   parseDocumentLink,
   PushpinUrl,
-} from "../pushpin-code/ShareLink"
+} from "../pushpin-code/Url"
 import "./TopicList.css"
 import ListItem from "../ui/ListItem"
 import ContentDragHandle from "../ui/ContentDragHandle"

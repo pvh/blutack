@@ -27,7 +27,7 @@ import {
   createDocumentLink,
   parseDocumentLink,
   PushpinUrl,
-} from "../../pushpin-code/ShareLink"
+} from "../../pushpin-code/Url"
 import ContentList, { ContentListDoc, ContentListInList } from "../ContentList"
 import { DocHandle, DocumentId } from "automerge-repo"
 import { ContactDoc } from "../contact"

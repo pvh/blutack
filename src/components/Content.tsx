@@ -9,7 +9,7 @@ import React, {
 } from "react"
 
 import * as ContentTypes from "./pushpin-code/ContentTypes"
-import { parseDocumentLink, PushpinUrl } from "./pushpin-code/ShareLink"
+import { parseDocumentLink, PushpinUrl } from "./pushpin-code/Url"
 import Crashable from "./Crashable"
 import { DocumentId } from "automerge-repo"
 import { useSelfId } from "./pushpin-code/SelfHooks"

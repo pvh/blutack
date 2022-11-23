@@ -5,7 +5,7 @@ import classNames from "classnames"
 import Content, { ContentProps } from "../../Content"
 import { ContactDoc } from "."
 
-import { createDocumentLink } from "../../pushpin-code/ShareLink"
+import { createDocumentLink } from "../../pushpin-code/Url"
 import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
 
 import "./ContactInVarious.css"
@@ -21,7 +21,7 @@ import {
   getCurrentDocId,
   loadUrlOfUser,
   openDoc,
-} from "../../Url"
+} from "../../pushpin-code/Url"
 import { useSelfId } from "../../pushpin-code/SelfHooks"
 
 const log = Debug("pushpin:settings")

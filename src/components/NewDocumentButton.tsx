@@ -1,4 +1,4 @@
-import { PushpinUrl } from "./pushpin-code/ShareLink"
+import { PushpinUrl } from "./pushpin-code/Url"
 import React, { ReactElement, useMemo } from "react"
 import * as ContentTypes from "./pushpin-code/ContentTypes"
 import { Popover } from "./ui/Popover"

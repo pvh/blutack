@@ -8,12 +8,7 @@ import React, {
   useCallback,
 } from "react"
 
-import {
-  createDocumentLink,
-  createWebLink,
-  parseDocumentLink,
-  PushpinUrl,
-} from "../pushpin-code/ShareLink"
+import { parseDocumentLink, PushpinUrl } from "../pushpin-code/Url"
 
 import Content, { ContentProps, EditableContentProps } from "../Content"
 import * as ContentTypes from "../pushpin-code/ContentTypes"
@@ -41,7 +36,7 @@ import * as ImportData from "../pushpin-code/ImportData"
 import Heading from "../ui/Heading"
 import { useViewState } from "../pushpin-code/ViewState"
 import NewDocumentButton from "../NewDocumentButton"
-import { openDoc } from "../Url"
+import { openDoc } from "../pushpin-code/Url"
 
 export interface ContentListDoc {
   title: string

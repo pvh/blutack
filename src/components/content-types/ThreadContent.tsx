@@ -2,11 +2,7 @@ import React, { useCallback, useState } from "react"
 
 import * as ContentTypes from "../pushpin-code/ContentTypes"
 import Content, { ContentProps, EditableContentProps } from "../Content"
-import {
-  createDocumentLink,
-  createWebLink,
-  isPushpinUrl,
-} from "../pushpin-code/ShareLink"
+import { createDocumentLink, isPushpinUrl } from "../pushpin-code/Url"
 import ListItem from "../ui/ListItem"
 import Badge from "../ui/Badge"
 import ContentDragHandle from "../ui/ContentDragHandle"
@@ -18,7 +14,7 @@ import { useDocument } from "automerge-repo-react-hooks"
 import { DocHandle } from "automerge-repo"
 import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
-import { openDoc } from "../Url"
+import { openDoc } from "../pushpin-code/Url"
 
 interface Message {
   authorId: DocumentId
