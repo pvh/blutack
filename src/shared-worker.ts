@@ -38,8 +38,8 @@ self.Automerge = Automerge
 // $ mkdir .amrg
 // $ yarn start
 // uncomment this and comment out the one below:
-// const url = "ws://localhost:3030"
-const url = "wss://automerge-repo-sync-server.fly.dev"
+// const url = "ws://localhost:3030" // local sync server
+const url = "ws://67.207.95.169" // cloud sync server on DigitalOcean
 const repo = new Repo({
   storage: new LocalForageStorageAdapter(),
   network: [new BrowserWebSocketClientAdapter(url)],
