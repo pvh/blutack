@@ -10,7 +10,7 @@ import Delta from "quill-delta"
 import * as ContentTypes from "../pushpin-code/ContentTypes"
 import Content, { ContentProps, EditableContentProps } from "../Content"
 import { useDocument } from "automerge-repo-react-hooks"
-import { useStaticCallback } from "../pushpin-code/Hooks"
+import { useDocumentIds, useStaticCallback } from "../pushpin-code/Hooks"
 import "./TextContent.css"
 import Badge from "../ui/Badge"
 import * as ContentData from "../pushpin-code/ContentData"
@@ -18,12 +18,13 @@ import * as WebStreamLogic from "../pushpin-code/WebStreamLogic"
 import ListItem from "../ui/ListItem"
 import ContentDragHandle from "../ui/ContentDragHandle"
 import TitleWithSubtitle from "../ui/TitleWithSubtitle"
-import { DocHandle } from "automerge-repo"
+import { DocHandle, DocumentId } from "automerge-repo"
 import { createDocumentLink } from "../pushpin-code/ShareLink"
 import QuillCursors from "quill-cursors"
 import { usePresence } from "../pushpin-code/PresenceHooks"
 import IQuillRange from "quill-cursors/dist/quill-cursors/i-range"
 import { useSelfId } from "../pushpin-code/SelfHooks"
+import { ContactDoc } from "./contact"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -57,7 +58,7 @@ export default function TextContent(props: Props) {
         if (p.data === undefined || p.contact === selfId) {
           return []
         }
-        return [{ range: p.data, id: p.contact }]
+        return [{ range: p.data, contactId: p.contact }]
       }),
     [presence]
   )
@@ -76,6 +77,7 @@ export default function TextContent(props: Props) {
       formats: [],
       modules: {
         cursors: {
+          hideDelayMs: 500,
           transformOnTextChange: true,
         },
         toolbar: false,
@@ -101,7 +103,7 @@ export default function TextContent(props: Props) {
 }
 
 interface Cursor {
-  id: string
+  contactId: DocumentId
   range: IQuillRange
 }
 
@@ -128,6 +130,12 @@ function useQuill({
   const textString = useMemo(() => text && text.join(""), [text])
   const makeChange = useStaticCallback(change)
   const onSelectionChange = useStaticCallback(selectionChange)
+
+  const contactIds = useMemo(
+    () => cursors.map(({ contactId }) => contactId),
+    [cursors]
+  )
+  const contactsById = useDocumentIds<ContactDoc>(contactIds)
 
   useEffect(() => {
     if (!ref.current) return () => {}
@@ -190,10 +198,26 @@ function useQuill({
 
     const quillCursors = quill.current?.getModule("cursors")
 
-    cursors.forEach(({ id, range }) => {
-      quillCursors.createCursor(id, "user", "#ff0000")
-      quillCursors.moveCursor(id, range)
+    const cursorsToDelete: { [id: string]: boolean } = {}
+    for (const cursor of quillCursors.cursors()) {
+      cursorsToDelete[cursor.id] = true
+    }
+
+    cursors.forEach(({ contactId, range }) => {
+      const contact = contactsById[contactId]
+
+      if (!contact) {
+        return
+      }
+
+      delete cursorsToDelete[contactId]
+      quillCursors.createCursor(contactId, contact.name, contact.color)
+      quillCursors.moveCursor(contactId, range)
     })
+
+    for (const cursorId of Object.keys(cursorsToDelete)) {
+      quillCursors.removeCursor(cursorId)
+    }
   }, [cursors])
 
   return [ref, quill.current]

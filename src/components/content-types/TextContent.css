@@ -85,9 +85,8 @@
 
 .ql-cursor-name {
   position: absolute;
-  background: gray;
   top: -20px;
   left: -5px;
+  background: var(--colorSecondaryGrey);
   padding: 0 5px;
-  background: #ff0000;
 }
