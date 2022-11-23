@@ -18,7 +18,7 @@ declare module "react-contextmenu" {
 
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import * as ImportData from "../../pushpin-code/ImportData"
-import { createWebLink, PushpinUrl } from "../../pushpin-code/ShareLink"
+import { createWebLink, PushpinUrl } from "../../pushpin-code/Url"
 import { ContentProps } from "../../Content"
 import { BoardDoc, BoardDocCard, CardId } from "."
 import BoardCard, { BoardCardAction } from "./BoardCard"
@@ -40,7 +40,7 @@ import {
   MIMETYPE_BOARD_CARD_DATA,
 } from "../../constants"
 import { useDocumentReducer } from "../../pushpin-code/Hooks"
-import { openDoc } from "../../Url"
+import { openDoc } from "../../pushpin-code/Url"
 
 const log = Debug("pushpin:board")
 

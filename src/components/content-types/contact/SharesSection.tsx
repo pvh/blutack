@@ -1,7 +1,7 @@
 import React from "react"
 import { DocumentId } from "automerge-repo"
 
-import { createDocumentLink } from "../../pushpin-code/ShareLink"
+import { createDocumentLink } from "../../pushpin-code/Url"
 import Content from "../../Content"
 import Heading from "../../ui/Heading"
 import SecondaryText from "../../ui/SecondaryText"

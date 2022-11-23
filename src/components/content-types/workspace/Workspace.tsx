@@ -3,7 +3,7 @@ import Debug from "debug"
 import { useDocument } from "automerge-repo-react-hooks"
 import { DocumentId, DocHandle } from "automerge-repo"
 
-import { parseDocumentLink, PushpinUrl } from "../../pushpin-code/ShareLink"
+import { parseDocumentLink, PushpinUrl } from "../../pushpin-code/Url"
 import Content, { ContentProps, ContentHandle } from "../../Content"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import SelfContext from "../../pushpin-code/SelfHooks"
@@ -22,7 +22,7 @@ import { CurrentDeviceContext } from "./Device"
 
 import WorkspaceInList from "./WorkspaceInList"
 import { ContentListDoc } from "../ContentList"
-import { storeCurrentUrlOfUser } from "../../Url"
+import { storeCurrentUrlOfUser } from "../../pushpin-code/Url"
 import { ViewStateContext } from "../../pushpin-code/ViewState"
 
 const log = Debug("pushpin:workspace")

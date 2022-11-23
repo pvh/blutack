@@ -1,7 +1,7 @@
 import React from "react"
 import Badge from "../../../ui/Badge"
 import ListItem from "../../../ui/ListItem"
-import { PushpinUrl } from "../../../pushpin-code/ShareLink"
+import { PushpinUrl } from "../../../pushpin-code/Url"
 import ContentDragHandle from "../../../ui/ContentDragHandle"
 import TitleWithSubtitle from "../../../ui/TitleWithSubtitle"
 import { DocumentId } from "automerge-repo"

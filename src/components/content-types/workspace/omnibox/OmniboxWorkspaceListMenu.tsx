@@ -6,7 +6,7 @@ import {
   createWebLink,
   parseDocumentLink,
   PushpinUrl,
-} from "../../../pushpin-code/ShareLink"
+} from "../../../pushpin-code/Url"
 
 import { ContactDoc } from "../../contact"
 import Badge from "../../../ui/Badge"
@@ -27,7 +27,7 @@ import { useDocumentIds, useDocuments } from "../../../pushpin-code/Hooks"
 import Content from "../../../Content"
 import useInvitations, { Invitation } from "./InvitationsHook"
 import "./OmniboxWorkspaceListMenu.css"
-import { getCurrentDocUrl, openDoc } from "../../../Url"
+import { getCurrentDocUrl, openDoc } from "../../../pushpin-code/Url"
 
 const log = Debug("pushpin:omnibox")
 

@@ -9,7 +9,7 @@ import {
   PushpinUrl,
   createDocumentLink,
   createWebLink,
-} from "../../pushpin-code/ShareLink"
+} from "../../pushpin-code/Url"
 import { useEvent } from "../../pushpin-code/Hooks"
 
 import "./TitleBar.css"
@@ -18,7 +18,7 @@ import Badge from "../../ui/Badge"
 
 import "./TitleBar.css"
 import NewDocumentButton from "../../NewDocumentButton"
-import { openDoc } from "../../Url"
+import { openDoc } from "../../pushpin-code/Url"
 
 export interface Props {
   workspaceDocId: DocumentId

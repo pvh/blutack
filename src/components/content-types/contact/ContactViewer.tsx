@@ -1,4 +1,4 @@
-import { createDocumentLink, PushpinUrl } from "../../pushpin-code/ShareLink"
+import { createDocumentLink, PushpinUrl } from "../../pushpin-code/Url"
 
 import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
 import Content, { ContentProps } from "../../Content"

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 // import Fs from 'fs'
 // import Os from 'os'
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import { PushpinUrl } from "../../pushpin-code/ShareLink"
+import { PushpinUrl } from "../../pushpin-code/Url"
 import { ContentProps } from "../../Content"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"

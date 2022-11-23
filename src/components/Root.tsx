@@ -2,7 +2,7 @@ import Content from "./Content"
 import { DocumentId } from "automerge-repo"
 import { CurrentDeviceContext } from "./content-types/workspace/Device"
 import { ViewStateContext } from "./pushpin-code/ViewState"
-import { createDocumentLink } from "./pushpin-code/ShareLink"
+import { createDocumentLink } from "./pushpin-code/Url"
 
 // board in various contexts
 import "./content-types/board"
@@ -23,7 +23,7 @@ import "./content-types/files/VideoContent"
 
 import "./content-types/TopicList"
 import "./content-types/TodoList"
-import { useUrlParams } from "./Url"
+import { useUrlParams } from "./pushpin-code/Url"
 
 interface RootArgs {
   workspaceDocId: DocumentId

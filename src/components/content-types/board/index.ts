@@ -1,6 +1,6 @@
 import { DocumentId, DocHandle } from "automerge-repo"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import { PushpinUrl } from "../../pushpin-code/ShareLink"
+import { PushpinUrl } from "../../pushpin-code/Url"
 
 // board in various contexts
 import Board, { BOARD_COLORS } from "./Board"

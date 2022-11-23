@@ -1,6 +1,6 @@
 import Debug from "debug"
 import { ComponentType } from "react"
-import { createDocumentLink, PushpinUrl } from "./ShareLink"
+import { createDocumentLink, PushpinUrl } from "./Url"
 import { ContentData } from "./ContentData"
 import { DocumentId } from "automerge-repo"
 import { DocCollection, DocHandle } from "automerge-repo"

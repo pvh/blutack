@@ -9,7 +9,7 @@ import {
   createContext,
   useContext,
 } from "react"
-import { parseDocumentLink, PushpinUrl } from "./ShareLink"
+import { parseDocumentLink, PushpinUrl } from "./Url"
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 

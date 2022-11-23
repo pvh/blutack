@@ -1,11 +1,10 @@
-import { PushpinUrl } from "./pushpin-code/ShareLink"
+import { PushpinUrl } from "./pushpin-code/Url"
 import React, { ReactElement, useMemo, useRef } from "react"
 import * as ContentTypes from "./pushpin-code/ContentTypes"
 import { Popover } from "./ui/Popover"
 import ListMenuSection from "./ui/ListMenuSection"
 import ListMenuItem from "./ui/ListMenuItem"
 import classNames from "classnames"
-import Heading from "./ui/Heading"
 import * as ImportData from "./pushpin-code/ImportData"
 
 interface NewDocumentButtonProps {

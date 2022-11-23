@@ -1,6 +1,6 @@
 import React, { useContext, useRef, Ref, ChangeEvent } from "react"
 
-import { parseDocumentLink } from "../../pushpin-code/ShareLink"
+import { parseDocumentLink } from "../../pushpin-code/Url"
 
 import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
 import { ContentProps } from "../../Content"

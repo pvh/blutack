@@ -1,6 +1,6 @@
 import React, { useCallback, useContext } from "react"
 import { DocumentId } from "../../../../automerge-repo"
-import { setViewStateValue } from "../Url"
+import { setViewStateValue } from "./Url"
 
 export const ViewStateContext = React.createContext<ViewState | undefined>(
   undefined
