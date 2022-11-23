@@ -1587,6 +1587,11 @@ punycode@^2.1.0:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
+quill-cursors@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/quill-cursors/-/quill-cursors-4.0.0.tgz#40158d3eeac0b35d734e50c42bef16ae2c65c15b"
+  integrity sha512-nCwCZtQPl4EnxJSheHtb067Jo48A6mc8/t7waGSLqXvbE68a5vHBFfMOQPZI7jxjksbDhpfzQta3a3/MoPvKzQ==
+
 quill-delta@^3.6.2:
   version "3.6.3"
   resolved "https://registry.yarnpkg.com/quill-delta/-/quill-delta-3.6.3.tgz#b19fd2b89412301c60e1ff213d8d860eac0f1032"
