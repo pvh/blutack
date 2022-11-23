@@ -39,7 +39,7 @@ self.Automerge = Automerge
 // $ yarn start
 // uncomment this and comment out the one below:
 // const url = "ws://localhost:3030" // local sync server
-const url = "ws://67.207.95.169" // cloud sync server on DigitalOcean
+const url = "ws://67.207.88.83" // cloud sync server on DigitalOcean
 const repo = new Repo({
   storage: new LocalForageStorageAdapter(),
   network: [new BrowserWebSocketClientAdapter(url)],
