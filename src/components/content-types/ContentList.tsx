@@ -241,7 +241,10 @@ export default function ContentList({ documentId }: ContentProps) {
           />
         </ListMenu>
       </CenteredStackRowItem>
-      <CenteredStackRowItem size={{ mode: "auto" }}>
+      <CenteredStackRowItem
+        size={{ mode: "auto" }}
+        className="ContentList--main"
+      >
         {currentContent ? (
           <Content context="workspace" url={currentContent} />
         ) : (

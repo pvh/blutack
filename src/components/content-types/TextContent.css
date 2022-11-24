@@ -14,15 +14,18 @@
 .ql-editor {
   box-sizing: border-box;
   outline: 0;
-  max-width: 720px;
   margin: auto;
   min-height: 100%;
   cursor: text;
-  padding: 30px var(--halfCellSize);
+  padding: var(--halfCellSize);
+}
+.Workspace__container--text .ql-editor,
+.ContentList--main > .TextContent .ql-editor {
+  max-width: 720px;
+  padding: var(--doubleCellSize) var(--cellSize);
 }
 
 .BoardCard .ql-editor {
-  padding: var(--halfCellSize);
   max-width: unset;
 }
 

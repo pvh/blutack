@@ -142,6 +142,7 @@ table {
   /* Sizing */
   --cellSize: 20px;
   --halfCellSize: 10px;
+  --doubleCellSize: 40px;
 }
 
 /* Global */
