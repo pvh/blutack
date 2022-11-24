@@ -20,6 +20,8 @@ import "./content-types/files/PdfContent"
 import "./content-types/files/AudioContent"
 import "./content-types/files/VideoContent"
 
+import "./content-types/RawView"
+
 import "./content-types/TopicList"
 import "./content-types/TodoList"
 import "./content-types/ContentList"
