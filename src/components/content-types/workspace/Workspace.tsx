@@ -85,6 +85,11 @@ export default function Workspace({
       return
     }
 
+    // don't add raw view urls
+    if (parseDocumentLink(currentDocUrl).type === "raw") {
+      return
+    }
+
     changeWorkspace((ws: WorkspaceDoc) => {
       ws.viewedDocUrls = ws.viewedDocUrls.filter((url) => url !== currentDocUrl)
       ws.viewedDocUrls.unshift(currentDocUrl)
