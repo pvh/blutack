@@ -10,11 +10,53 @@ import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { DocumentWithTitle } from "./workspace/Workspace"
 import { ContentProps, EditableContentProps } from "../Content"
 import "./RawView.css"
+import {
+  createDocumentLink,
+  createWebLink,
+  isPushpinUrl,
+} from "../pushpin-code/Url"
+import { DocumentId } from "../../../../automerge-repo"
 
 export default function RawView(props: ContentProps) {
   const [doc] = useDocument(props.documentId)
 
-  return <pre className="RawView">{JSON.stringify(doc, null, 2)}</pre>
+  const jsonString = JSON.stringify(
+    doc,
+    (key, value) => {
+      if (typeof value !== "string") {
+        return value
+      }
+
+      if (isPushpinUrl(value)) {
+        return `<a href=${createWebLink(window.location, value)}>${value}</a>`
+      }
+
+      if (isDocumentId(value)) {
+        const href = createWebLink(
+          window.location,
+          createDocumentLink("raw", value as DocumentId)
+        )
+
+        return `<a href=${href}>${value}</a>`
+      }
+
+      return value
+    },
+    2
+  )
+
+  return (
+    <pre
+      className="RawView"
+      dangerouslySetInnerHTML={{ __html: jsonString }}
+    ></pre>
+  )
+}
+
+function isDocumentId(value: any) {
+  return /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/.test(
+    value
+  )
 }
 
 function JsonInList(props: EditableContentProps) {
