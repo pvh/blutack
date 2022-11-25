@@ -22,7 +22,7 @@ function JsonInList(props: EditableContentProps) {
   const [doc] = useDocument<DocumentWithTitle>(documentId)
   if (!doc) return null
 
-  const title = doc.title || "Untitled document"
+  const title = doc.title || documentId
 
   return (
     <ListItem>
@@ -39,6 +39,7 @@ function JsonInList(props: EditableContentProps) {
 }
 
 ContentTypes.register({
+  unlisted: true,
   type: "raw",
   name: "Raw",
   icon: "file-code",
