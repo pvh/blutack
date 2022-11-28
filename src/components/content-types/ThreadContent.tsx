@@ -15,6 +15,10 @@ import { DocHandle } from "automerge-repo"
 import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
 import { openDoc } from "../pushpin-code/Url"
+import {
+  hasDocumentChangedSince,
+  useLastSeenHeads,
+} from "../pushpin-code/Changes"
 
 interface Message {
   authorId: DocumentId
@@ -124,7 +128,11 @@ function preventDefault(e: React.SyntheticEvent) {
 
 export function ThreadInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
+  const [lastSeenHeads] = useLastSeenHeads(documentId)
   const [doc] = useDocument<Doc>(documentId)
+  const hasUnseenChanges =
+    doc && lastSeenHeads && hasDocumentChangedSince(doc, lastSeenHeads)
+
   if (!doc || !doc.messages) return null
 
   const title =
@@ -135,7 +143,11 @@ export function ThreadInList(props: EditableContentProps) {
   return (
     <ListItem>
       <ContentDragHandle url={url}>
-        <Badge size="medium" icon={icon} />
+        <Badge
+          size="medium"
+          icon={icon}
+          color={hasUnseenChanges ? "#FF0000" : undefined}
+        />
       </ContentDragHandle>
       <TitleWithSubtitle
         titleEditorField="title"

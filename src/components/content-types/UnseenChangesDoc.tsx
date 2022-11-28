@@ -1,24 +1,28 @@
 import * as ContentTypes from "../pushpin-code/ContentTypes"
-import { DocHandle } from "../../../../automerge-repo"
+import { DocHandle, DocumentId } from "automerge-repo"
 import ListItem from "../ui/ListItem"
 import ContentDragHandle from "../ui/ContentDragHandle"
 import Badge from "../ui/Badge"
 import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import React from "react"
-import { EditableContentProps } from "../Content"
+import { ContentProps, EditableContentProps } from "../Content"
+import { Heads } from "@automerge/automerge"
 
 function create(unusedAttrs: any, handle: DocHandle<any>) {
-  handle.change((doc) => {
-    doc.votesByTitle = {}
-    doc.isSorted = false
+  handle.change((doc: UnseenChangesDoc) => {
+    doc.headsByDocId = {}
   })
 }
 
-function UnseenChangesDoc() {
+export interface UnseenChangesDoc {
+  headsByDocId: { [docId: DocumentId]: Heads }
+}
+
+function UnseenChanges(props: ContentProps) {
   return <div>TODO: implement UnseenChangesDoc</div>
 }
 
-function UnseenChangesDocInList(props: EditableContentProps) {
+function UnseenChangesInList(props: EditableContentProps) {
   const { documentId, url } = props
 
   return (
@@ -37,10 +41,10 @@ ContentTypes.register({
   icon: "bell",
   unlisted: true,
   contexts: {
-    workspace: UnseenChangesDoc,
-    board: UnseenChangesDoc,
-    list: UnseenChangesDocInList,
-    "title-bar": UnseenChangesDocInList,
+    workspace: UnseenChanges,
+    board: UnseenChanges,
+    list: UnseenChangesInList,
+    "title-bar": UnseenChangesInList,
   },
   create,
 })

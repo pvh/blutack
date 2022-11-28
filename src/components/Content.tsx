@@ -14,6 +14,8 @@ import Crashable from "./Crashable"
 import { DocumentId } from "automerge-repo"
 import { useSelfId } from "./pushpin-code/SelfHooks"
 import { useHeartbeat } from "./pushpin-code/PresenceHooks"
+import { useLastSeenHeads } from "./pushpin-code/Changes"
+import { useDocument } from "../../../automerge-repo/packages/automerge-repo-react-hooks"
 
 // this is the interface imported by Content types
 export interface ContentProps {
@@ -53,7 +55,17 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
 
   const { type, documentId } = parseDocumentLink(url)
 
+  const [doc] = useDocument(documentId)
+  const [, forwardLastSeenHeads] = useLastSeenHeads(documentId)
+
   useHeartbeat(["workspace"].includes(context) ? documentId : undefined)
+
+  const isMainContent = context === "workspace" || context === "board"
+  useEffect(() => {
+    if (isMainContent && doc) {
+      forwardLastSeenHeads()
+    }
+  }, [doc, isMainContent])
 
   useEffect(() => {
     setCrashed(false)
