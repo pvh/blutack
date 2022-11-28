@@ -174,6 +174,7 @@ export function create(
 ): void {
   const entry = registry[type]
   if (!entry) {
+    console.error(`Cannot create unknown type ${type}`)
     return
   }
 
