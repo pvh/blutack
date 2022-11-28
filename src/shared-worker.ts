@@ -52,7 +52,6 @@ self.addEventListener("connect", (e: MessageEvent) => {
   var mainPort = e.ports[0]
   mainPort.postMessage("READY")
   mainPort.onmessage = function (e: MessageEvent<SharedWorkerMessage>) {
-    console.log("got a message", e)
     const data = e.data
     if ("serviceWorkerPort" in data) {
       configureServiceWorkerPort(data.serviceWorkerPort)
@@ -90,8 +89,17 @@ function configureServiceWorkerPort(port: MessagePort) {
 
 async function configureRepoNetworkPort(port: MessagePort) {
   repo.networkSubsystem.addNetworkAdapter(
-    new MessageChannelNetworkAdapter(port)
+    new MessageChannelNetworkAdapter(port, true)
   )
 }
+
+// monitor active network adapters
+/* setInterval(() => {
+  console.log(
+    "active network adapters",
+    Object.values(repo.networkSubsystem.peerIdToAdapter).length
+  )
+}, 100)
+*/
 
 console.log("ran shared-worker to end")
