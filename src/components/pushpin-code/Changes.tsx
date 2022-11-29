@@ -4,7 +4,16 @@ import { WorkspaceDoc } from "../content-types/workspace/Workspace"
 import { useDocument } from "automerge-repo-react-hooks"
 import * as ContentTypes from "../pushpin-code/ContentTypes"
 import { parseDocumentLink } from "./Url"
-import { Doc, getHeads, Heads } from "@automerge/automerge"
+import {
+  Doc,
+  getHeads,
+  Heads,
+  view,
+  getChanges,
+  applyChanges,
+  clone,
+  Patch,
+} from "@automerge/automerge"
 import { UnseenChangesDoc } from "../content-types/UnseenChangesDoc"
 
 const UnseenChangesDocIdContext = createContext<DocumentId | undefined>(
@@ -92,4 +101,23 @@ export function hasDocumentChangedSince(document: Doc<any>, heads: Heads) {
   return !heads.every((head) => {
     return docHeads.includes(head)
   })
+}
+
+export function getPatchesSince(doc: Doc<any>, heads: Heads) {
+  const patches: Patch[] = []
+
+  try {
+    const oldDoc = clone(view(doc, heads))
+
+    applyChanges(oldDoc, getChanges(oldDoc, doc), {
+      patchCallback: (patch: Patch) => {
+        patches.push(patch)
+      },
+    })
+
+    return patches
+  } catch (err) {
+    console.error(err)
+    return []
+  }
 }

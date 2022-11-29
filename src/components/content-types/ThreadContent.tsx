@@ -16,6 +16,7 @@ import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
 import { openDoc } from "../pushpin-code/Url"
 import {
+  getPatchesSince,
   hasDocumentChangedSince,
   useLastSeenHeads,
 } from "../pushpin-code/Changes"
@@ -131,7 +132,18 @@ export function ThreadInList(props: EditableContentProps) {
   const [lastSeenHeads] = useLastSeenHeads(documentId)
   const [doc] = useDocument<Doc>(documentId)
   const hasUnseenChanges =
-    doc && lastSeenHeads && hasDocumentChangedSince(doc, lastSeenHeads)
+    (doc && lastSeenHeads && hasDocumentChangedSince(doc, lastSeenHeads)) ||
+    !lastSeenHeads
+
+  const unreadMessageCount =
+    lastSeenHeads && doc
+      ? getPatchesSince(doc, lastSeenHeads).filter(
+          (patch) =>
+            patch.action === "splice" &&
+            patch.path.length === 2 &&
+            patch.path[0] === "messages"
+        ).length
+      : 0
 
   if (!doc || !doc.messages) return null
 
@@ -139,8 +151,6 @@ export function ThreadInList(props: EditableContentProps) {
     doc.title != null && doc.title !== "" ? doc.title : "Untitled conversation"
   const subtitle = (doc.messages[doc.messages.length - 1] || { content: "" })
     .content
-
-  console.log(hasUnseenChanges)
 
   return (
     <ListItem>
@@ -152,6 +162,7 @@ export function ThreadInList(props: EditableContentProps) {
             hasUnseenChanges
               ? {
                   color: "var(--colorChangeDot)",
+                  number: unreadMessageCount,
                 }
               : undefined
           }
