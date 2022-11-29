@@ -26,7 +26,8 @@
 
 .ListMenuItem-stretch {
   flex: 1;
-  overflow: hidden;
+  width: 100%;
+  min-width: 0;
 }
 
 .ListMenuItem .Actions {

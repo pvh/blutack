@@ -56,14 +56,14 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
   const { type, documentId } = parseDocumentLink(url)
 
   const [doc] = useDocument(documentId)
-  const [, forwardLastSeenHeads] = useLastSeenHeads(documentId)
+  const [, advanceLastSeenHeads] = useLastSeenHeads(documentId)
 
   useHeartbeat(["workspace"].includes(context) ? documentId : undefined)
 
   const isMainContent = context === "workspace" || context === "board"
   useEffect(() => {
     if (isMainContent && doc) {
-      forwardLastSeenHeads()
+      advanceLastSeenHeads()
     }
   }, [doc, isMainContent])
 

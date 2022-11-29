@@ -16,8 +16,8 @@
 .TitleBar .ContentHeader {
   display: flex;
   flex: 1;
-  overflow: hidden;
   background: inherit;
+  min-width: 0;
 }
 
 .Inline {

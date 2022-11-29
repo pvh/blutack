@@ -65,7 +65,7 @@ export function useLastSeenHeads(
     useDocument<UnseenChangesDoc>(unseenChangesDocId)
   const [doc] = useDocument(docId)
 
-  const forwardLastSeenHeads = useCallback(() => {
+  const advanceLastSeenHeads = useCallback(() => {
     changeUnseenChangesDoc((unseenChangesDoc) => {
       if (!doc) {
         return
@@ -76,10 +76,10 @@ export function useLastSeenHeads(
   }, [doc, changeUnseenChangesDoc])
 
   if (!doc || !unseenChangesDoc || !unseenChangesDoc.headsByDocId) {
-    return [undefined, forwardLastSeenHeads]
+    return [undefined, advanceLastSeenHeads]
   }
 
-  return [unseenChangesDoc.headsByDocId[docId], forwardLastSeenHeads]
+  return [unseenChangesDoc.headsByDocId[docId], advanceLastSeenHeads]
 }
 
 export function hasDocumentChangedSince(document: Doc<any>, heads: Heads) {

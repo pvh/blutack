@@ -140,13 +140,21 @@ export function ThreadInList(props: EditableContentProps) {
   const subtitle = (doc.messages[doc.messages.length - 1] || { content: "" })
     .content
 
+  console.log(hasUnseenChanges)
+
   return (
     <ListItem>
       <ContentDragHandle url={url}>
         <Badge
           size="medium"
           icon={icon}
-          color={hasUnseenChanges ? "#FF0000" : undefined}
+          dot={
+            hasUnseenChanges
+              ? {
+                  color: "var(--colorChangeDot)",
+                }
+              : undefined
+          }
         />
       </ContentDragHandle>
       <TitleWithSubtitle

@@ -3,6 +3,6 @@
   flex: 1;
   flex-direction: row;
   align-items: center;
-  overflow: hidden;
   background: inherit;
+  min-width: 0;
 }

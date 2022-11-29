@@ -138,6 +138,8 @@ table {
   --colorWarning: #ffbb33; /* material design warning */
   --colorLink: #0645ad;
   --colorDestructive: #f87060;
+  --colorChangeDot: #f87060;
+  --colorNewDot: #33ab77;
 
   /* Sizing */
   --cellSize: 20px;
