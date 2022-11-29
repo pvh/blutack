@@ -128,15 +128,13 @@ function preventDefault(e: React.SyntheticEvent) {
 }
 
 export function ThreadInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
-  const [lastSeenHeads] = useLastSeenHeads(documentId)
+  const { documentId, url, editable, hasUnseenChanges, lastSeenHeads } = props
   const [doc] = useDocument<Doc>(documentId)
-  const hasUnseenChanges =
-    (doc && lastSeenHeads && hasDocumentChangedSince(doc, lastSeenHeads)) ||
-    !lastSeenHeads
+
+  console.log(hasUnseenChanges, lastSeenHeads)
 
   const unreadMessageCount =
-    lastSeenHeads && doc
+    hasUnseenChanges && lastSeenHeads && doc
       ? getPatchesSince(doc, lastSeenHeads).filter(
           (patch) =>
             patch.action === "splice" &&

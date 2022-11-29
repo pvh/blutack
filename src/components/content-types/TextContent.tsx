@@ -275,12 +275,8 @@ function create({ text }: any, handle: DocHandle<any>) {
 }
 
 function TextInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
-  const [lastSeenHeads] = useLastSeenHeads(documentId)
+  const { documentId, url, editable, hasUnseenChanges } = props
   const [doc] = useDocument<TextDoc>(documentId)
-  const hasUnseenChanges =
-    (doc && lastSeenHeads && hasDocumentChangedSince(doc, lastSeenHeads)) ||
-    !lastSeenHeads
 
   if (!doc || !doc.text) return null
 

@@ -5,17 +5,24 @@ import ContentDragHandle from "../ui/ContentDragHandle"
 import Badge from "../ui/Badge"
 import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import React from "react"
-import { ContentProps, EditableContentProps } from "../Content"
+import Content, { ContentProps, EditableContentProps } from "../Content"
 import { Heads } from "@automerge/automerge"
+import { Popover } from "../ui/Popover"
+import { useDocument } from "../../../../automerge-repo/packages/automerge-repo-react-hooks"
+import { useDocumentIds } from "../pushpin-code/Hooks"
+import { hasDocumentChangedSince } from "../pushpin-code/Changes"
+import { openDoc, parseDocumentLink, PushpinUrl } from "../pushpin-code/Url"
+import ListMenuItem from "../ui/ListMenuItem"
+import "./UnseenChangesDoc.css"
 
 function create(unusedAttrs: any, handle: DocHandle<any>) {
   handle.change((doc: UnseenChangesDoc) => {
-    doc.headsByDocId = {}
+    doc.headsByDocUrl = {}
   })
 }
 
 export interface UnseenChangesDoc {
-  headsByDocId: { [docId: DocumentId]: Heads }
+  headsByDocUrl: { [url: PushpinUrl]: Heads }
 }
 
 function UnseenChanges(props: ContentProps) {
@@ -35,6 +42,66 @@ function UnseenChangesInList(props: EditableContentProps) {
   )
 }
 
+function UnseenChangesInTitle(props: EditableContentProps) {
+  const { documentId, url } = props
+  const [document] = useDocument<UnseenChangesDoc>(documentId)
+
+  const trackedDocuments = useDocumentIds(
+    document && document.headsByDocUrl
+      ? Object.keys(document.headsByDocUrl).map(
+          (url) => parseDocumentLink(url).documentId
+        )
+      : []
+  )
+
+  if (!document || !document.headsByDocUrl) {
+    return
+  }
+
+  const documentUrlsWithUnseenChanges = Object.entries(document.headsByDocUrl)
+    .filter(([documentUrl, lastSeenHead]) => {
+      const doc = trackedDocuments[parseDocumentLink(documentUrl).documentId]
+
+      return doc && hasDocumentChangedSince(doc, lastSeenHead)
+    })
+    .map(([url]) => url)
+
+  const hasDocumentsWithUnseenChanges =
+    documentUrlsWithUnseenChanges.length !== 0
+
+  return (
+    <Popover
+      closeOnClick={true}
+      trigger={
+        <Badge
+          size="medium"
+          icon="bell"
+          dot={
+            hasDocumentsWithUnseenChanges
+              ? {
+                  color: "var(--colorChangeDot)",
+                  number: documentUrlsWithUnseenChanges.length,
+                }
+              : undefined
+          }
+        />
+      }
+      alignment="right"
+    >
+      {documentUrlsWithUnseenChanges.map((url, index) => {
+        return (
+          <ListMenuItem key={url} onClick={() => openDoc(url as PushpinUrl)}>
+            <Content url={url} context="list" />
+          </ListMenuItem>
+        )
+      })}
+      {!hasDocumentsWithUnseenChanges && (
+        <div className="UnseenChangesDoc-emptyState">no new changes</div>
+      )}
+    </Popover>
+  )
+}
+
 ContentTypes.register({
   type: "unseenChangesDoc",
   name: "Unseen changes",
@@ -44,7 +111,7 @@ ContentTypes.register({
     workspace: UnseenChanges,
     board: UnseenChanges,
     list: UnseenChangesInList,
-    "title-bar": UnseenChangesInList,
+    "title-bar": UnseenChangesInTitle,
   },
   create,
 })

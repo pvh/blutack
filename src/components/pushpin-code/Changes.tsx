@@ -3,7 +3,7 @@ import { DocumentId } from "automerge-repo"
 import { WorkspaceDoc } from "../content-types/workspace/Workspace"
 import { useDocument } from "automerge-repo-react-hooks"
 import * as ContentTypes from "../pushpin-code/ContentTypes"
-import { parseDocumentLink } from "./Url"
+import { parseDocumentLink, PushpinUrl } from "./Url"
 import {
   Doc,
   getHeads,
@@ -24,7 +24,7 @@ interface UnseenChangesDocProviderProps extends React.PropsWithChildren {
   workspaceDocId: DocumentId
 }
 
-interface WorkspaceDocWithUnseenChangesDoc extends WorkspaceDoc {
+export interface WorkspaceDocWithUnseenChangesDoc extends WorkspaceDoc {
   unseenChangesDocId?: DocumentId
 }
 
@@ -67,11 +67,12 @@ export function UnseenChangesDocProvider({
 }
 
 export function useLastSeenHeads(
-  docId: DocumentId
+  docUrl: PushpinUrl
 ): [Heads | undefined, () => void] {
   const unseenChangesDocId = useContext(UnseenChangesDocIdContext)
   const [unseenChangesDoc, changeUnseenChangesDoc] =
     useDocument<UnseenChangesDoc>(unseenChangesDocId)
+  const docId = parseDocumentLink(docUrl).documentId
   const [doc] = useDocument(docId)
 
   const advanceLastSeenHeads = useCallback(() => {
@@ -80,15 +81,17 @@ export function useLastSeenHeads(
         return
       }
 
-      unseenChangesDoc.headsByDocId[docId] = getHeads(doc)
+      console.log("advance")
+
+      unseenChangesDoc.headsByDocUrl[docUrl] = getHeads(doc)
     })
   }, [doc, changeUnseenChangesDoc])
 
-  if (!doc || !unseenChangesDoc || !unseenChangesDoc.headsByDocId) {
+  if (!doc || !unseenChangesDoc || !unseenChangesDoc.headsByDocUrl) {
     return [undefined, advanceLastSeenHeads]
   }
 
-  return [unseenChangesDoc.headsByDocId[docId], advanceLastSeenHeads]
+  return [unseenChangesDoc.headsByDocUrl[docUrl], advanceLastSeenHeads]
 }
 
 export function hasDocumentChangedSince(document: Doc<any>, heads: Heads) {
@@ -98,8 +101,8 @@ export function hasDocumentChangedSince(document: Doc<any>, heads: Heads) {
     return false
   }
 
-  return !heads.every((head) => {
-    return docHeads.includes(head)
+  return !heads.every((head, index) => {
+    return docHeads[index] === head
   })
 }
 

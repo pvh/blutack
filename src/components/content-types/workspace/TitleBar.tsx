@@ -19,6 +19,8 @@ import Badge from "../../ui/Badge"
 import "./TitleBar.css"
 import NewDocumentButton from "../../NewDocumentButton"
 import { openDoc } from "../../pushpin-code/Url"
+import { UnseenChangesDoc } from "../UnseenChangesDoc"
+import { WorkspaceDocWithUnseenChangesDoc } from "../../pushpin-code/Changes"
 
 export interface Props {
   workspaceDocId: DocumentId
@@ -32,7 +34,8 @@ export default function TitleBar({
   onContent,
 }: Props) {
   const [activeOmnibox, setActive] = useState(false)
-  const [workspaceDoc] = useDocument<WorkspaceDoc>(workspaceDocId)
+  const [workspaceDoc] =
+    useDocument<WorkspaceDocWithUnseenChangesDoc>(workspaceDocId)
 
   useEvent(document, "keydown", (e) => {
     if (e.key === "/" && document.activeElement === document.body) {
@@ -105,6 +108,15 @@ export default function TitleBar({
                 isPresent
               />
             </div>
+            {workspaceDoc.unseenChangesDocId && (
+              <Content
+                url={createDocumentLink(
+                  "unseenChangesDoc",
+                  workspaceDoc.unseenChangesDocId
+                )}
+                context="title-bar"
+              />
+            )}
           </div>
         </>
       )}

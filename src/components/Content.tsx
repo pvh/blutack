@@ -14,8 +14,12 @@ import Crashable from "./Crashable"
 import { DocumentId } from "automerge-repo"
 import { useSelfId } from "./pushpin-code/SelfHooks"
 import { useHeartbeat } from "./pushpin-code/PresenceHooks"
-import { useLastSeenHeads } from "./pushpin-code/Changes"
+import {
+  hasDocumentChangedSince,
+  useLastSeenHeads,
+} from "./pushpin-code/Changes"
 import { useDocument } from "../../../automerge-repo/packages/automerge-repo-react-hooks"
+import { Heads } from "@automerge/automerge"
 
 // this is the interface imported by Content types
 export interface ContentProps {
@@ -25,6 +29,8 @@ export interface ContentProps {
   documentId: DocumentId
   selfId: DocumentId
   contentRef?: Ref<ContentHandle>
+  hasUnseenChanges: boolean
+  lastSeenHeads?: Heads
 }
 
 // I don't think this is a good longterm solution but it'll do for now.
@@ -56,13 +62,14 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
   const { type, documentId } = parseDocumentLink(url)
 
   const [doc] = useDocument(documentId)
-  const [, advanceLastSeenHeads] = useLastSeenHeads(documentId)
+  const [lastSeenHeads, advanceLastSeenHeads] = useLastSeenHeads(url)
 
   useHeartbeat(["workspace"].includes(context) ? documentId : undefined)
 
   const isMainContent = context === "workspace" || context === "board"
   useEffect(() => {
     if (isMainContent && doc) {
+      console.log("advance")
       advanceLastSeenHeads()
     }
   }, [doc, isMainContent])
@@ -85,6 +92,9 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
     return renderError(type)
   }
 
+  const hasUnseenChanges =
+    doc && lastSeenHeads && hasDocumentChangedSince(doc, lastSeenHeads)
+
   return (
     <Crashable onCatch={onCatch}>
       <contentType.component
@@ -94,6 +104,8 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
         type={type}
         documentId={documentId}
         selfId={selfId}
+        hasUnseenChanges={hasUnseenChanges}
+        lastSeenHeads={lastSeenHeads}
       />
     </Crashable>
   )
