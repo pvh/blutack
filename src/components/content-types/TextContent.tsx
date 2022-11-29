@@ -24,6 +24,10 @@ import { usePresence } from "../pushpin-code/PresenceHooks"
 import IQuillRange from "quill-cursors/dist/quill-cursors/i-range"
 import { useSelfId } from "../pushpin-code/SelfHooks"
 import { ContactDoc } from "./contact"
+import {
+  hasDocumentChangedSince,
+  useLastSeenHeads,
+} from "../pushpin-code/Changes"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -272,7 +276,12 @@ function create({ text }: any, handle: DocHandle<any>) {
 
 function TextInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
+  const [lastSeenHeads] = useLastSeenHeads(documentId)
   const [doc] = useDocument<TextDoc>(documentId)
+  const hasUnseenChanges =
+    (doc && lastSeenHeads && hasDocumentChangedSince(doc, lastSeenHeads)) ||
+    !lastSeenHeads
+
   if (!doc || !doc.text) return null
 
   const lines = doc.text
@@ -287,7 +296,17 @@ function TextInList(props: EditableContentProps) {
   return (
     <ListItem>
       <ContentDragHandle url={url}>
-        <Badge icon="sticky-note" size="medium" />
+        <Badge
+          icon="sticky-note"
+          size="medium"
+          dot={
+            hasUnseenChanges
+              ? {
+                  color: "var(--colorChangeDot)",
+                }
+              : undefined
+          }
+        />
       </ContentDragHandle>
       <TitleWithSubtitle
         title={title}
