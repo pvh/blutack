@@ -1,3 +1,4 @@
 .UnseenChangesDoc-emptyState {
-  padding: var(--doubleCellSize)
+  padding: var(--cellSize);
+  text-align: center;
 }

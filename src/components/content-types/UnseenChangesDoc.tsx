@@ -1,5 +1,5 @@
 import * as ContentTypes from "../pushpin-code/ContentTypes"
-import { DocHandle, DocumentId } from "automerge-repo"
+import { DocHandle } from "automerge-repo"
 import ListItem from "../ui/ListItem"
 import ContentDragHandle from "../ui/ContentDragHandle"
 import Badge from "../ui/Badge"
@@ -14,6 +14,8 @@ import { hasDocumentChangedSince } from "../pushpin-code/Changes"
 import { openDoc, parseDocumentLink, PushpinUrl } from "../pushpin-code/Url"
 import ListMenuItem from "../ui/ListMenuItem"
 import "./UnseenChangesDoc.css"
+import { hasTextDocUnseenChanges, TextDoc } from "./TextContent"
+import { hasThreadDocUnseenChanges, ThreadDoc } from "./ThreadContent"
 
 function create(unusedAttrs: any, handle: DocHandle<any>) {
   handle.change((doc: UnseenChangesDoc) => {
@@ -55,14 +57,24 @@ function UnseenChangesInTitle(props: EditableContentProps) {
   )
 
   if (!document || !document.headsByDocUrl) {
-    return
+    return null
   }
 
   const documentUrlsWithUnseenChanges = Object.entries(document.headsByDocUrl)
     .filter(([documentUrl, lastSeenHead]) => {
       const doc = trackedDocuments[parseDocumentLink(documentUrl).documentId]
 
-      return doc && hasDocumentChangedSince(doc, lastSeenHead)
+      // todo: this is not great that we hardcode all supported document types here
+      switch (parseDocumentLink(documentUrl).type) {
+        case "thread":
+          return hasThreadDocUnseenChanges(doc as ThreadDoc, lastSeenHead)
+
+        case "text":
+          return hasTextDocUnseenChanges(doc as TextDoc, lastSeenHead)
+
+        default:
+          return false
+      }
     })
     .map(([url]) => url)
 

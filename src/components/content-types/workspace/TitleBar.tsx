@@ -69,16 +69,15 @@ export default function TitleBar({
 
   return (
     <div className="TitleBar">
-      <NewDocumentButton
-        onCreateDocument={onCreateDocument}
-        trigger={
-          <button type="button" className="TitleBar-menuItem">
-            <i className="fa fa-plus" />
-          </button>
-        }
-      />
-
       <div className="NavigationBar Inline">
+        <NewDocumentButton
+          onCreateDocument={onCreateDocument}
+          trigger={
+            <button type="button" className="TitleBar-menuItem">
+              <i className="fa fa-plus" />
+            </button>
+          }
+        />
         <button
           type="button"
           onClick={(e) => {
@@ -108,18 +107,21 @@ export default function TitleBar({
                 isPresent
               />
             </div>
-            {workspaceDoc.unseenChangesDocId && (
-              <Content
-                url={createDocumentLink(
-                  "unseenChangesDoc",
-                  workspaceDoc.unseenChangesDocId
-                )}
-                context="title-bar"
-              />
-            )}
           </div>
         </>
       )}
+      <div className="TitleBar-unseenChanges">
+        {workspaceDoc.unseenChangesDocId && (
+          <Content
+            url={createDocumentLink(
+              "unseenChangesDoc",
+              workspaceDoc.unseenChangesDocId
+            )}
+            context="title-bar"
+          />
+        )}
+      </div>
+
       <Omnibox
         active={activeOmnibox}
         workspaceDocId={workspaceDocId}

@@ -25,9 +25,12 @@ import IQuillRange from "quill-cursors/dist/quill-cursors/i-range"
 import { useSelfId } from "../pushpin-code/SelfHooks"
 import { ContactDoc } from "./contact"
 import {
-  hasDocumentChangedSince,
+  getPatchesSince,
+  useAutoAdvanceLastSeenHeads,
   useLastSeenHeads,
 } from "../pushpin-code/Changes"
+import { createDocumentLink } from "../pushpin-code/Url"
+import { Heads } from "@automerge/automerge"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -48,6 +51,8 @@ export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.documentId)
   const [cursorPos, setCursorPos] = useState<IQuillRange | undefined>(undefined)
   const selfId = useSelfId()
+
+  useAutoAdvanceLastSeenHeads(createDocumentLink("text", props.documentId))
 
   const presence = usePresence<IQuillRange | undefined>(
     props.documentId,
@@ -275,8 +280,9 @@ function create({ text }: any, handle: DocHandle<any>) {
 }
 
 function TextInList(props: EditableContentProps) {
-  const { documentId, url, editable, hasUnseenChanges } = props
+  const { documentId, url, editable } = props
   const [doc] = useDocument<TextDoc>(documentId)
+  const lastSeenHeads = useLastSeenHeads(createDocumentLink("text", documentId))
 
   if (!doc || !doc.text) return null
 
@@ -296,7 +302,7 @@ function TextInList(props: EditableContentProps) {
           icon="sticky-note"
           size="medium"
           dot={
-            hasUnseenChanges
+            hasTextDocUnseenChanges(doc, lastSeenHeads)
               ? {
                   color: "var(--colorChangeDot)",
                 }
@@ -310,6 +316,19 @@ function TextInList(props: EditableContentProps) {
         editable={editable}
       />
     </ListItem>
+  )
+}
+
+export function hasTextDocUnseenChanges(
+  doc: TextDoc,
+  lastSeenHeads?: Heads
+): boolean {
+  // count any splice on the text property of the text document as a change
+  return getPatchesSince(doc, lastSeenHeads).some(
+    (patch) =>
+      patch.action === "splice" &&
+      patch.path.length === 2 &&
+      patch.path[0] === "text"
   )
 }
 
