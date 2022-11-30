@@ -10,7 +10,7 @@ import { Heads } from "@automerge/automerge"
 import { Popover } from "../ui/Popover"
 import { useDocument } from "../../../../automerge-repo/packages/automerge-repo-react-hooks"
 import { useDocumentIds } from "../pushpin-code/Hooks"
-import { hasDocumentChangedSince } from "../pushpin-code/Changes"
+import { isDocUrlCurrentlyViewed } from "../pushpin-code/Changes"
 import { openDoc, parseDocumentLink, PushpinUrl } from "../pushpin-code/Url"
 import ListMenuItem from "../ui/ListMenuItem"
 import "./UnseenChangesDoc.css"
@@ -45,7 +45,7 @@ function UnseenChangesInList(props: EditableContentProps) {
 }
 
 function UnseenChangesInTitle(props: EditableContentProps) {
-  const { documentId, url } = props
+  const { documentId } = props
   const [document] = useDocument<UnseenChangesDoc>(documentId)
 
   const trackedDocuments = useDocumentIds(
@@ -62,7 +62,15 @@ function UnseenChangesInTitle(props: EditableContentProps) {
 
   const documentUrlsWithUnseenChanges = Object.entries(document.headsByDocUrl)
     .filter(([documentUrl, lastSeenHead]) => {
+      if (isDocUrlCurrentlyViewed(documentUrl as PushpinUrl)) {
+        return false
+      }
+
       const doc = trackedDocuments[parseDocumentLink(documentUrl).documentId]
+
+      if (!doc) {
+        return false
+      }
 
       // todo: this is not great that we hardcode all supported document types here
       switch (parseDocumentLink(documentUrl).type) {
@@ -100,7 +108,7 @@ function UnseenChangesInTitle(props: EditableContentProps) {
       }
       alignment="right"
     >
-      {documentUrlsWithUnseenChanges.map((url, index) => {
+      {documentUrlsWithUnseenChanges.map((url) => {
         return (
           <ListMenuItem key={url} onClick={() => openDoc(url as PushpinUrl)}>
             <Content url={url} context="list" />

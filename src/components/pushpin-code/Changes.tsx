@@ -83,32 +83,60 @@ export function useAdvanceLastSeenHeads(docUrl: PushpinUrl) {
   }, [doc, changeUnseenChangesDoc])
 }
 
+const CURRENTLY_VIEWED_DOC_URLS: { [url: PushpinUrl]: boolean } = {}
+
+export function isDocUrlCurrentlyViewed(url: PushpinUrl): boolean {
+  return CURRENTLY_VIEWED_DOC_URLS[url] ?? false
+}
+
 export function useAutoAdvanceLastSeenHeads(docUrl: PushpinUrl) {
   const [doc] = useDocument(parseDocumentLink(docUrl).documentId)
   const advanceLastSeenHeads = useAdvanceLastSeenHeads(docUrl)
+
+  useEffect(() => {
+    CURRENTLY_VIEWED_DOC_URLS[docUrl] = true
+
+    return () => {
+      delete CURRENTLY_VIEWED_DOC_URLS[docUrl]
+    }
+  }, [docUrl])
 
   useEffect(() => {
     advanceLastSeenHeads()
   }, [doc])
 }
 
-export function useLastSeenHeads(docUrl: PushpinUrl): Heads | undefined {
+export type LastSeenHeads = Heads | "latestHeads"
+
+export function useLastSeenHeads(
+  docUrl: PushpinUrl
+): LastSeenHeads | undefined {
   const unseenChangesDocId = useContext(UnseenChangesDocIdContext)
   const [unseenChangesDoc] = useDocument<UnseenChangesDoc>(unseenChangesDocId)
 
-  return unseenChangesDoc?.headsByDocUrl?.[docUrl]
+  if (CURRENTLY_VIEWED_DOC_URLS[docUrl]) {
+    return "latestHeads"
+  }
+
+  if (!unseenChangesDoc || !unseenChangesDoc.headsByDocUrl) {
+    return undefined
+  }
+
+  return unseenChangesDoc.headsByDocUrl[docUrl]
 }
 
-export function getPatchesSince(doc: Doc<any>, heads?: Heads): Patch[] {
+export function getUnseenPatches(
+  doc: Doc<any>,
+  lastSeenHeads?: LastSeenHeads
+): Patch[] {
   const patches: Patch[] = []
 
-  // TODO: if no head is defined use the head that points to the first version of the document
-  if (!heads) {
+  if (!hasDocUnseenChanges(doc, lastSeenHeads)) {
     return []
   }
 
   try {
-    const oldDoc = clone(view(doc, heads))
+    const oldDoc = clone(view(doc, lastSeenHeads as Heads))
 
     applyChanges(oldDoc, getChanges(oldDoc, doc), {
       patchCallback: (patch: Patch) => {
@@ -123,14 +151,22 @@ export function getPatchesSince(doc: Doc<any>, heads?: Heads): Patch[] {
   }
 }
 
-export function hasDocumentChangedSince(document: Doc<any>, heads: Heads) {
-  const docHeads = getHeads(document)
-
-  if (docHeads.length !== heads.length) {
+export function hasDocUnseenChanges(
+  doc: Doc<any>,
+  lastSeenHeads?: LastSeenHeads
+): boolean {
+  // if the lastSeenHeads are unknown return false, this avoids showing changes initially if the unseenChangesDoc isn't loaded yet
+  if (!lastSeenHeads || lastSeenHeads === "latestHeads") {
     return false
   }
 
-  return !heads.every((head, index) => {
+  const docHeads = getHeads(doc)
+
+  if (docHeads.length !== lastSeenHeads.length) {
+    return false
+  }
+
+  return !lastSeenHeads.every((head, index) => {
     return docHeads[index] === head
   })
 }

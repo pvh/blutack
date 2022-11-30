@@ -16,12 +16,11 @@ import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
 import { openDoc } from "../pushpin-code/Url"
 import {
-  getPatchesSince,
-  hasDocumentChangedSince,
+  getUnseenPatches,
+  LastSeenHeads,
   useAutoAdvanceLastSeenHeads,
   useLastSeenHeads,
 } from "../pushpin-code/Changes"
-import { Heads } from "@automerge/automerge"
 
 interface Message {
   authorId: DocumentId
@@ -175,10 +174,10 @@ export function ThreadInList(props: EditableContentProps) {
 
 function getUnreadMessageCountOfThread(
   doc: ThreadDoc,
-  lastSeenHeads?: Heads
+  lastSeenHeads?: LastSeenHeads
 ): number {
   // count any splice on the messages property of the thread document as a change
-  return getPatchesSince(doc, lastSeenHeads).filter(
+  return getUnseenPatches(doc, lastSeenHeads).filter(
     (patch) =>
       patch.action === "splice" &&
       patch.path.length === 2 &&
@@ -188,7 +187,7 @@ function getUnreadMessageCountOfThread(
 
 export function hasThreadDocUnseenChanges(
   doc: ThreadDoc,
-  lastSeenHeads?: Heads
+  lastSeenHeads: LastSeenHeads
 ) {
   return getUnreadMessageCountOfThread(doc, lastSeenHeads) > 0
 }

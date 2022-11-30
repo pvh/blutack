@@ -25,12 +25,12 @@ import IQuillRange from "quill-cursors/dist/quill-cursors/i-range"
 import { useSelfId } from "../pushpin-code/SelfHooks"
 import { ContactDoc } from "./contact"
 import {
-  getPatchesSince,
+  getUnseenPatches,
+  LastSeenHeads,
   useAutoAdvanceLastSeenHeads,
   useLastSeenHeads,
 } from "../pushpin-code/Changes"
 import { createDocumentLink } from "../pushpin-code/Url"
-import { Heads } from "@automerge/automerge"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -321,10 +321,10 @@ function TextInList(props: EditableContentProps) {
 
 export function hasTextDocUnseenChanges(
   doc: TextDoc,
-  lastSeenHeads?: Heads
+  lastSeenHeads?: LastSeenHeads
 ): boolean {
   // count any splice on the text property of the text document as a change
-  return getPatchesSince(doc, lastSeenHeads).some(
+  return getUnseenPatches(doc, lastSeenHeads).some(
     (patch) =>
       patch.action === "splice" &&
       patch.path.length === 2 &&
