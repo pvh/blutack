@@ -6,10 +6,9 @@ import { useDocumentIds } from "../../pushpin-code/Hooks"
 import { openDoc, parseDocumentLink, PushpinUrl } from "../../pushpin-code/Url"
 import ListMenuItem from "../../ui/ListMenuItem"
 import "./ChangedDocsList.css"
-import { hasTextDocUnseenChanges, TextDoc } from "../TextContent"
-import { hasThreadDocUnseenChanges, ThreadDoc } from "../ThreadContent"
 import { LastSeenHeadsMap } from "../../pushpin-code/Changes"
-
+import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import { Doc } from "@automerge/automerge"
 interface ChangedDocsListProps {
   lastSeenHeads: LastSeenHeadsMap
 }
@@ -27,17 +26,14 @@ export function ChangedDocsList({ lastSeenHeads }: ChangedDocsListProps) {
         return false
       }
 
-      // todo: this is not great that we hardcode all currently supported document types here
-      switch (parseDocumentLink(documentUrl).type) {
-        case "thread":
-          return hasThreadDocUnseenChanges(doc as ThreadDoc, lastSeenHead)
+      const contentType = ContentTypes.typeNameToContentType(
+        parseDocumentLink(documentUrl).type
+      )
 
-        case "text":
-          return hasTextDocUnseenChanges(doc as TextDoc, lastSeenHead)
-
-        default:
-          return false
+      if (!contentType || !contentType.hasUnseenChanges) {
+        return false
       }
+      return contentType.hasUnseenChanges(doc as Doc<unknown>, lastSeenHead)
     })
     .map(([url]) => url)
 

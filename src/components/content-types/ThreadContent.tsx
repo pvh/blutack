@@ -21,6 +21,7 @@ import {
   useAutoAdvanceLastSeenHeads,
   useLastSeenHeads,
 } from "../pushpin-code/Changes"
+import { Doc } from "@automerge/automerge"
 
 interface Message {
   authorId: DocumentId
@@ -185,11 +186,12 @@ function getUnreadMessageCountOfThread(
   ).length
 }
 
-export function hasThreadDocUnseenChanges(
-  doc: ThreadDoc,
+export function hasUnseenChanges(
+  doc: Doc<unknown>,
   lastSeenHeads: LastSeenHeads
 ) {
-  return getUnreadMessageCountOfThread(doc, lastSeenHeads) > 0
+  // TODO: one of these days we should figure out the typing
+  return getUnreadMessageCountOfThread(doc as ThreadDoc, lastSeenHeads) > 0
 }
 
 function stopPropagation(e: React.SyntheticEvent) {
@@ -278,4 +280,5 @@ ContentTypes.register({
     "title-bar": ThreadInList,
   },
   create,
+  hasUnseenChanges,
 })

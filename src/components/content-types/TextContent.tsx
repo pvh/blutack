@@ -302,7 +302,7 @@ function TextInList(props: EditableContentProps) {
           icon="sticky-note"
           size="medium"
           dot={
-            hasTextDocUnseenChanges(doc, lastSeenHeads)
+            hasUnseenChanges(doc, lastSeenHeads)
               ? {
                   color: "var(--colorChangeDot)",
                 }
@@ -319,8 +319,8 @@ function TextInList(props: EditableContentProps) {
   )
 }
 
-export function hasTextDocUnseenChanges(
-  doc: TextDoc,
+export function hasUnseenChanges(
+  doc: Automerge.Doc<unknown>,
   lastSeenHeads?: LastSeenHeads
 ): boolean {
   // count any splice on the text property of the text document as a change
@@ -347,4 +347,5 @@ ContentTypes.register({
   create,
   createFrom,
   supportsMimeType,
+  hasUnseenChanges,
 })
