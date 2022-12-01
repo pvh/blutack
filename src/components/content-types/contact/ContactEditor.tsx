@@ -1,13 +1,17 @@
 import React, { useContext, useRef, Ref, ChangeEvent } from "react"
 
-import { parseDocumentLink } from "../../pushpin-code/Url"
+import {
+  createDocumentLink,
+  createWebLink,
+  parseDocumentLink,
+} from "../../pushpin-code/Url"
 
 import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
 import { ContentProps } from "../../Content"
 import { ContactDoc } from "."
 
 import { DocumentId } from "automerge-repo"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import Heading from "../../ui/Heading"
 import SecondaryText from "../../ui/SecondaryText"
 
@@ -29,6 +33,8 @@ import SharesSection from "./SharesSection"
 import "./ContactEditor.css"
 import ColorPicker from "../../ui/ColorPicker"
 import { BinaryDataId, createBinaryDataUrl } from "../../../blobstore/Blob"
+import localforage from "localforage"
+import { WorkspaceDoc } from "../workspace/Workspace"
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.documentId)
@@ -97,8 +103,80 @@ export default function ContactEditor(props: ContentProps) {
         {renderPresenceColorSelector(color, setColor)}
         {renderDevices(devices, status, selfUrl, removeDevice, currentDeviceId)}
         <SharesSection invites={invites} />
+        <MergeProfileSection />
       </ListMenu>
     </CenteredStack>
+  )
+}
+
+const MergeProfileSection = () => {
+  const repo = useRepo()
+
+  async function mergeWithOtherProfile() {
+    const newProfileDocId = prompt(
+      "Please enter the profileId that you want to merge with"
+    )
+
+    if (!newProfileDocId) {
+      return
+    }
+
+    const currentProfileDoc = (await repo
+      .find((await localforage.getItem("workspaceDocId")) as DocumentId)
+      .value()) as WorkspaceDoc
+
+    const newProfileDocHandle = repo.find(newProfileDocId as DocumentId)
+
+    const newProfileDoc = (await newProfileDocHandle.value()) as WorkspaceDoc
+
+    newProfileDocHandle.change((doc) => {
+      const newProfileDoc = doc as WorkspaceDoc
+
+      if (!newProfileDoc.viewedDocUrls) {
+        alert("The entered id is not a valid profile doc id")
+        return
+      }
+
+      for (const contactId of currentProfileDoc.contactIds) {
+        if (!newProfileDoc.contactIds.includes(contactId)) {
+          newProfileDoc.contactIds.push(contactId)
+        }
+      }
+
+      for (const viewedDocUrl of currentProfileDoc.viewedDocUrls) {
+        if (!newProfileDoc.viewedDocUrls.includes(viewedDocUrl)) {
+          newProfileDoc.viewedDocUrls.push(viewedDocUrl)
+        }
+      }
+    })
+
+    // reload with new workspaceDocId after data has been copied over
+    newProfileDocHandle.addListener("change", async () => {
+      await localforage.setItem("workspaceDocId", newProfileDocId)
+
+      location.href = createWebLink(
+        location,
+        createDocumentLink("contact", newProfileDoc.selfId)
+      )
+    })
+  }
+
+  async function copyProfileId() {
+    const id = (await localforage.getItem("workspaceDocId")) as string
+    navigator.clipboard.writeText(id)
+  }
+
+  return (
+    <ListMenuSection title="Merging Profiles">
+      <ListMenuItem>
+        <div className="ContactEditor-buttonGroup">
+          <button onClick={copyProfileId}>Copy profile id</button>
+          <button onClick={mergeWithOtherProfile}>
+            Merge with other profile
+          </button>
+        </div>
+      </ListMenuItem>
+    </ListMenuSection>
   )
 }
 
@@ -128,6 +206,7 @@ const renderAvatarEditor = (
         />
         <CenteredStack direction="row">
           <input
+            style={{ display: "hidden" }}
             type="file"
             id="hiddenImporter"
             accept="image/*"

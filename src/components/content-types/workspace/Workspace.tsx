@@ -106,7 +106,7 @@ export default function Workspace({
 
   // TODO: this is so grody
   // Add devices if not already on doc.
-  useEffect(() => {
+  /* useEffect(() => {
     if (!currentDeviceId || !self || !changeSelf) {
       return
     }
@@ -116,14 +116,13 @@ export default function Workspace({
       (!self.devices || !self.devices.includes(currentDeviceId))
     ) {
       changeSelf((doc: ContactDoc) => {
-        doc.devices = []
         if (!doc.devices) {
           doc.devices = []
         }
         doc.devices.push(currentDeviceId)
       })
     }
-  }, [changeSelf, currentDeviceId, self])
+  }, [changeSelf, currentDeviceId, self]) */
 
   /*  function importClip(payload: ClipperPayload) {
     const creationCallback = (importedUrl) => {
