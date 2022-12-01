@@ -1,8 +1,9 @@
-import { createContext, useCallback, useContext, useEffect } from "react"
-import { DocumentId } from "automerge-repo"
-import { WorkspaceDoc } from "../content-types/workspace/Workspace"
+import { useCallback, useContext, useEffect } from "react"
+import {
+  WorkspaceContext,
+  WorkspaceDoc,
+} from "../content-types/workspace/Workspace"
 import { useDocument } from "automerge-repo-react-hooks"
-import * as ContentTypes from "../pushpin-code/ContentTypes"
 import { parseDocumentLink, PushpinUrl } from "./Url"
 import {
   Doc,
@@ -14,78 +15,33 @@ import {
   clone,
   Patch,
 } from "@automerge/automerge"
-import { UnseenChangesDoc } from "../content-types/UnseenChangesDoc"
-
-const UnseenChangesDocIdContext = createContext<DocumentId | undefined>(
-  undefined
-)
-
-interface UnseenChangesDocProviderProps extends React.PropsWithChildren {
-  workspaceDocId: DocumentId
-}
-
-export interface WorkspaceDocWithUnseenChangesDoc extends WorkspaceDoc {
-  unseenChangesDocId?: DocumentId
-}
-
-export function UnseenChangesDocProvider({
-  workspaceDocId,
-  children,
-}: UnseenChangesDocProviderProps) {
-  const [workspaceDoc, changeWorkspaceDoc] =
-    useDocument<WorkspaceDocWithUnseenChangesDoc>(workspaceDocId)
-
-  useEffect(() => {
-    if (
-      !workspaceDoc ||
-      !workspaceDoc.selfId ||
-      workspaceDoc.unseenChangesDocId
-    ) {
-      return
-    }
-
-    ContentTypes.create("unseenChangesDoc", {}, (unseenChangesDocUrl) => {
-      changeWorkspaceDoc((ws) => {
-        ws.viewedDocUrls = ws.viewedDocUrls.filter(
-          (url) => url !== unseenChangesDocUrl
-        )
-        ws.viewedDocUrls.unshift(unseenChangesDocUrl)
-
-        ws.unseenChangesDocId =
-          parseDocumentLink(unseenChangesDocUrl).documentId
-      })
-    })
-  }, [workspaceDoc])
-
-  const value = workspaceDoc && workspaceDoc.unseenChangesDocId
-
-  return (
-    <UnseenChangesDocIdContext.Provider value={value}>
-      {children}
-    </UnseenChangesDocIdContext.Provider>
-  )
-}
 
 export function useAdvanceLastSeenHeads(docUrl: PushpinUrl) {
-  const unseenChangesDocId = useContext(UnseenChangesDocIdContext)
-  const [, changeUnseenChangesDoc] =
-    useDocument<UnseenChangesDoc>(unseenChangesDocId)
+  const workspaceId = useContext(WorkspaceContext)
+  const [, changeWorkspaceDoc] = useDocument<WorkspaceDoc>(workspaceId)
   const [doc] = useDocument(parseDocumentLink(docUrl).documentId)
 
   return useCallback(() => {
-    changeUnseenChangesDoc((unseenChangesDoc) => {
+    changeWorkspaceDoc((workspaceDoc) => {
       if (!doc) {
         return
       }
 
-      unseenChangesDoc.headsByDocUrl[docUrl] = getHeads(doc)
+      let lastSeenHeadsByDocUrl = workspaceDoc.persistedLastSeenHeads
+      if (!lastSeenHeadsByDocUrl) {
+        workspaceDoc.persistedLastSeenHeads = {}
+        // need to read persistedLastSeenHeads from workspaceDoc again, so we get the proxied automerge object
+        lastSeenHeadsByDocUrl = workspaceDoc.persistedLastSeenHeads
+      }
+
+      lastSeenHeadsByDocUrl[docUrl] = getHeads(doc)
     })
-  }, [doc, changeUnseenChangesDoc])
+  }, [doc, changeWorkspaceDoc])
 }
 
 const CURRENTLY_VIEWED_DOC_URLS: { [url: PushpinUrl]: boolean } = {}
 
-export function isDocUrlCurrentlyViewed(url: PushpinUrl): boolean {
+function isDocUrlCurrentlyViewed(url: PushpinUrl): boolean {
   return CURRENTLY_VIEWED_DOC_URLS[url] ?? false
 }
 
@@ -108,21 +64,29 @@ export function useAutoAdvanceLastSeenHeads(docUrl: PushpinUrl) {
 
 export type LastSeenHeads = Heads | "latestHeads"
 
+export interface LastSeenHeadsMap {
+  [url: PushpinUrl]: LastSeenHeads
+}
+
+export interface PersistedLastSeenHeadsMap {
+  [url: PushpinUrl]: Heads
+}
+
 export function useLastSeenHeads(
   docUrl: PushpinUrl
 ): LastSeenHeads | undefined {
-  const unseenChangesDocId = useContext(UnseenChangesDocIdContext)
-  const [unseenChangesDoc] = useDocument<UnseenChangesDoc>(unseenChangesDocId)
+  const workspaceId = useContext(WorkspaceContext)
+  const [workspaceDoc] = useDocument<WorkspaceDoc>(workspaceId)
 
   if (CURRENTLY_VIEWED_DOC_URLS[docUrl]) {
     return "latestHeads"
   }
 
-  if (!unseenChangesDoc || !unseenChangesDoc.headsByDocUrl) {
+  if (!workspaceDoc || !workspaceDoc.persistedLastSeenHeads) {
     return undefined
   }
 
-  return unseenChangesDoc.headsByDocUrl[docUrl]
+  return workspaceDoc.persistedLastSeenHeads[docUrl]
 }
 
 export function getUnseenPatches(
@@ -155,8 +119,11 @@ export function hasDocUnseenChanges(
   doc: Doc<any>,
   lastSeenHeads?: LastSeenHeads
 ): boolean {
-  // if the lastSeenHeads are unknown return false, this avoids showing changes initially if the unseenChangesDoc isn't loaded yet
-  if (!lastSeenHeads || lastSeenHeads === "latestHeads") {
+  if (!lastSeenHeads) {
+    return true
+  }
+
+  if (lastSeenHeads === "latestHeads") {
     return false
   }
 
@@ -169,4 +136,25 @@ export function hasDocUnseenChanges(
   return !lastSeenHeads.every((head, index) => {
     return docHeads[index] === head
   })
+}
+
+export function getLastSeenHeadsMapOfWorkspace(workspace: WorkspaceDoc) {
+  if (!workspace.persistedLastSeenHeads) {
+    return {}
+  }
+
+  const lastSeenHeadsByDocUrl: LastSeenHeadsMap = {}
+
+  // replace persisted head with special value "latestHeads" if view is currently being viewed
+  Object.entries(workspace.persistedLastSeenHeads).forEach(
+    ([docUrl, lastSeenHeads]) => {
+      lastSeenHeadsByDocUrl[docUrl as PushpinUrl] = isDocUrlCurrentlyViewed(
+        docUrl as PushpinUrl
+      )
+        ? "latestHeads"
+        : lastSeenHeads
+    }
+  )
+
+  return lastSeenHeadsByDocUrl
 }

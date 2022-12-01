@@ -1,4 +1,4 @@
-import { useEffect, useContext, useRef } from "react"
+import { useEffect, useContext, useRef, createContext } from "react"
 import Debug from "debug"
 import { useDocument } from "automerge-repo-react-hooks"
 import { DocumentId, DocHandle } from "automerge-repo"
@@ -24,14 +24,18 @@ import WorkspaceInList from "./WorkspaceInList"
 import { ContentListDoc } from "../ContentList"
 import { storeCurrentUrlOfUser } from "../../pushpin-code/Url"
 import { ViewStateContext } from "../../pushpin-code/ViewState"
+import { PersistedLastSeenHeadsMap } from "../../pushpin-code/Changes"
 
 const log = Debug("pushpin:workspace")
+
+export const WorkspaceContext = createContext<DocumentId | undefined>(undefined)
 
 export interface WorkspaceDoc {
   selfId: DocumentId
   contactIds: DocumentId[]
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
+  persistedLastSeenHeads: PersistedLastSeenHeadsMap
 }
 
 export interface DocumentWithTitle {
@@ -180,16 +184,18 @@ export default function Workspace({
   const content = currentDocUrl && renderContent(currentDocUrl)
 
   return (
-    <SelfContext.Provider value={workspace.selfId}>
-      <div className="Workspace">
-        <TitleBar
-          currentDocUrl={currentDocUrl}
-          workspaceDocId={documentId}
-          onContent={onContent}
-        />
-        {content}
-      </div>
-    </SelfContext.Provider>
+    <WorkspaceContext.Provider value={documentId}>
+      <SelfContext.Provider value={workspace.selfId}>
+        <div className="Workspace">
+          <TitleBar
+            currentDocUrl={currentDocUrl}
+            workspaceDocId={documentId}
+            onContent={onContent}
+          />
+          {content}
+        </div>
+      </SelfContext.Provider>
+    </WorkspaceContext.Provider>
   )
 }
 export function create(_attrs: any, handle: DocHandle<any>) {

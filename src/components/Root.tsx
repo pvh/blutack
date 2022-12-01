@@ -4,7 +4,6 @@ import { CurrentDeviceContext } from "./content-types/workspace/Device"
 import { ViewStateContext } from "./pushpin-code/ViewState"
 import { createDocumentLink } from "./pushpin-code/Url"
 import { useUrlParams } from "./pushpin-code/Url"
-import { UnseenChangesDocProvider } from "./pushpin-code/Changes"
 
 // board in various contexts
 import "./content-types/board"
@@ -24,7 +23,7 @@ import "./content-types/files/VideoContent"
 import "./content-types/TopicList"
 import "./content-types/TodoList"
 import "./content-types/ContentList"
-import "./content-types/UnseenChangesDoc"
+import "./content-types/workspace/ChangedDocsList"
 
 interface RootArgs {
   workspaceDocId: DocumentId
@@ -35,16 +34,14 @@ export default function Root({ workspaceDocId, deviceDocId }: RootArgs) {
   const { currentDocUrl, viewState } = useUrlParams()
 
   return (
-    <UnseenChangesDocProvider workspaceDocId={workspaceDocId}>
-      <ViewStateContext.Provider value={viewState}>
-        <CurrentDeviceContext.Provider value={deviceDocId}>
-          <Content
-            context="root"
-            currentDocUrl={currentDocUrl}
-            url={createDocumentLink("workspace", workspaceDocId)}
-          />
-        </CurrentDeviceContext.Provider>
-      </ViewStateContext.Provider>
-    </UnseenChangesDocProvider>
+    <ViewStateContext.Provider value={viewState}>
+      <CurrentDeviceContext.Provider value={deviceDocId}>
+        <Content
+          context="root"
+          currentDocUrl={currentDocUrl}
+          url={createDocumentLink("workspace", workspaceDocId)}
+        />
+      </CurrentDeviceContext.Provider>
+    </ViewStateContext.Provider>
   )
 }
