@@ -15,6 +15,13 @@ import { DocHandle } from "automerge-repo"
 import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
 import { openDoc } from "../pushpin-code/Url"
+import {
+  getUnseenPatches,
+  LastSeenHeads,
+  useAutoAdvanceLastSeenHeads,
+  useLastSeenHeads,
+} from "../pushpin-code/Changes"
+import { Doc } from "@automerge/automerge"
 
 interface Message {
   authorId: DocumentId
@@ -22,7 +29,7 @@ interface Message {
   time: number // Unix timestamp
 }
 
-interface Doc {
+export interface ThreadDoc {
   title?: string
   messages: Message[]
 }
@@ -45,13 +52,15 @@ ThreadContent.maxHeight = 36
 
 export default function ThreadContent(props: ContentProps) {
   const [message, setMessage] = useState("")
-  const [doc, changeDoc] = useDocument<Doc>(props.documentId)
+  const [doc, changeDoc] = useDocument<ThreadDoc>(props.documentId)
+
+  useAutoAdvanceLastSeenHeads(createDocumentLink("thread", props.documentId))
 
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
 
     ImportData.importDataTransfer(e.dataTransfer, (url) => {
-      changeDoc((threadDoc: Doc) => {
+      changeDoc((threadDoc: ThreadDoc) => {
         threadDoc.messages.push({
           authorId: props.selfId,
           content: url,
@@ -78,7 +87,7 @@ export default function ThreadContent(props: ContentProps) {
     if (e.key === "Enter" && !e.shiftKey && message) {
       e.preventDefault()
 
-      changeDoc((threadDoc: Doc) => {
+      changeDoc((threadDoc: ThreadDoc) => {
         threadDoc.messages.push({
           authorId: props.selfId,
           content: message,
@@ -124,8 +133,14 @@ function preventDefault(e: React.SyntheticEvent) {
 
 export function ThreadInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
-  const [doc] = useDocument<Doc>(documentId)
+  const [doc] = useDocument<ThreadDoc>(documentId)
+  const lastSeenHeads = useLastSeenHeads(
+    createDocumentLink("thread", documentId)
+  )
+
   if (!doc || !doc.messages) return null
+
+  const unreadMessageCount = getUnreadMessageCountOfThread(doc, lastSeenHeads)
 
   const title =
     doc.title != null && doc.title !== "" ? doc.title : "Untitled conversation"
@@ -135,7 +150,18 @@ export function ThreadInList(props: EditableContentProps) {
   return (
     <ListItem>
       <ContentDragHandle url={url}>
-        <Badge size="medium" icon={icon} />
+        <Badge
+          size="medium"
+          icon={icon}
+          dot={
+            unreadMessageCount > 0
+              ? {
+                  color: "var(--colorChangeDot)",
+                  number: unreadMessageCount,
+                }
+              : undefined
+          }
+        />
       </ContentDragHandle>
       <TitleWithSubtitle
         titleEditorField="title"
@@ -145,6 +171,27 @@ export function ThreadInList(props: EditableContentProps) {
       />
     </ListItem>
   )
+}
+
+function getUnreadMessageCountOfThread(
+  doc: ThreadDoc,
+  lastSeenHeads?: LastSeenHeads
+): number {
+  // count any splice on the messages property of the thread document as a change
+  return getUnseenPatches(doc, lastSeenHeads).filter(
+    (patch) =>
+      patch.action === "splice" &&
+      patch.path.length === 2 &&
+      patch.path[0] === "messages"
+  ).length
+}
+
+export function hasUnseenChanges(
+  doc: Doc<unknown>,
+  lastSeenHeads: LastSeenHeads
+) {
+  // TODO: one of these days we should figure out the typing
+  return getUnreadMessageCountOfThread(doc as ThreadDoc, lastSeenHeads) > 0
 }
 
 function stopPropagation(e: React.SyntheticEvent) {
@@ -233,4 +280,5 @@ ContentTypes.register({
     "title-bar": ThreadInList,
   },
   create,
+  hasUnseenChanges,
 })

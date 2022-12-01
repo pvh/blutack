@@ -16,8 +16,8 @@
 .TitleBar .ContentHeader {
   display: flex;
   flex: 1;
-  overflow: hidden;
   background: inherit;
+  min-width: 0;
 }
 
 .Inline {
@@ -63,6 +63,11 @@ button[disabled].TitleBar-menuItem .fa {
   padding-left: 4px;
   border-left: 1px solid var(--colorPaleGrey);
 }
+
+.TitleBar-unseenChanges {
+  padding: 0 4px;
+}
+
 
 @keyframes color-flash {
   from {

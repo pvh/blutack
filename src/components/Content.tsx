@@ -14,6 +14,7 @@ import Crashable from "./Crashable"
 import { DocumentId } from "automerge-repo"
 import { useSelfId } from "./pushpin-code/SelfHooks"
 import { useHeartbeat } from "./pushpin-code/PresenceHooks"
+import { useDocument } from "../../../automerge-repo/packages/automerge-repo-react-hooks"
 
 // this is the interface imported by Content types
 export interface ContentProps {

@@ -24,6 +24,13 @@ import { usePresence } from "../pushpin-code/PresenceHooks"
 import IQuillRange from "quill-cursors/dist/quill-cursors/i-range"
 import { useSelfId } from "../pushpin-code/SelfHooks"
 import { ContactDoc } from "./contact"
+import {
+  getUnseenPatches,
+  LastSeenHeads,
+  useAutoAdvanceLastSeenHeads,
+  useLastSeenHeads,
+} from "../pushpin-code/Changes"
+import { createDocumentLink } from "../pushpin-code/Url"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -44,6 +51,8 @@ export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.documentId)
   const [cursorPos, setCursorPos] = useState<IQuillRange | undefined>(undefined)
   const selfId = useSelfId()
+
+  useAutoAdvanceLastSeenHeads(createDocumentLink("text", props.documentId))
 
   const presence = usePresence<IQuillRange | undefined>(
     props.documentId,
@@ -273,6 +282,8 @@ function create({ text }: any, handle: DocHandle<any>) {
 function TextInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
   const [doc] = useDocument<TextDoc>(documentId)
+  const lastSeenHeads = useLastSeenHeads(createDocumentLink("text", documentId))
+
   if (!doc || !doc.text) return null
 
   const lines = doc.text
@@ -287,7 +298,17 @@ function TextInList(props: EditableContentProps) {
   return (
     <ListItem>
       <ContentDragHandle url={url}>
-        <Badge icon="sticky-note" size="medium" />
+        <Badge
+          icon="sticky-note"
+          size="medium"
+          dot={
+            hasUnseenChanges(doc, lastSeenHeads)
+              ? {
+                  color: "var(--colorChangeDot)",
+                }
+              : undefined
+          }
+        />
       </ContentDragHandle>
       <TitleWithSubtitle
         title={title}
@@ -295,6 +316,19 @@ function TextInList(props: EditableContentProps) {
         editable={editable}
       />
     </ListItem>
+  )
+}
+
+export function hasUnseenChanges(
+  doc: Automerge.Doc<unknown>,
+  lastSeenHeads?: LastSeenHeads
+): boolean {
+  // count any splice on the text property of the text document as a change
+  return getUnseenPatches(doc, lastSeenHeads).some(
+    (patch) =>
+      patch.action === "splice" &&
+      patch.path.length === 2 &&
+      patch.path[0] === "text"
   )
 }
 
@@ -313,4 +347,5 @@ ContentTypes.register({
   create,
   createFrom,
   supportsMimeType,
+  hasUnseenChanges,
 })

@@ -4,6 +4,8 @@ import { createDocumentLink, PushpinUrl } from "./Url"
 import { ContentData } from "./ContentData"
 import { DocumentId } from "automerge-repo"
 import { DocCollection, DocHandle } from "automerge-repo"
+import { LastSeenHeads } from "./Changes"
+import { Doc } from "@automerge/automerge"
 
 const log = Debug("pushpin:content-types")
 
@@ -42,6 +44,8 @@ interface ContentType {
     handle: DocHandle<any>
   ) => Promise<void> | void
   supportsMimeType?: (type: string) => boolean
+  // TODO: i don't love this, but we'll put it here for now
+  hasUnseenChanges?: (heads: Doc<unknown>, lastHeads: LastSeenHeads) => boolean
 }
 
 const registry: { [type: string]: ContentType } = {}
@@ -99,6 +103,7 @@ export interface LookupResult {
   component: Component
 }
 
+// TODO: this could be simplified to not include a context
 export function lookup({ type, context }: LookupQuery): LookupResult | null {
   const entry = registry[type]
   const component =
@@ -116,6 +121,10 @@ export function lookup({ type, context }: LookupQuery): LookupResult | null {
   } = entry || {}
 
   return { type, name, icon, component, unlisted, resizable }
+}
+
+export function typeNameToContentType(type: string): ContentType | undefined {
+  return registry[type]
 }
 
 export function mimeTypeToContentType(mimeType?: string): ContentType {
@@ -174,6 +183,7 @@ export function create(
 ): void {
   const entry = registry[type]
   if (!entry) {
+    console.error(`Cannot create unknown type ${type}`)
     return
   }
 

@@ -19,6 +19,8 @@ import Badge from "../../ui/Badge"
 import "./TitleBar.css"
 import NewDocumentButton from "../../NewDocumentButton"
 import { openDoc } from "../../pushpin-code/Url"
+import { ChangedDocsList } from "./ChangedDocsList"
+import { getLastSeenHeadsMapOfWorkspace } from "../../pushpin-code/Changes"
 
 export interface Props {
   workspaceDocId: DocumentId
@@ -66,16 +68,15 @@ export default function TitleBar({
 
   return (
     <div className="TitleBar">
-      <NewDocumentButton
-        onCreateDocument={onCreateDocument}
-        trigger={
-          <button type="button" className="TitleBar-menuItem">
-            <i className="fa fa-plus" />
-          </button>
-        }
-      />
-
       <div className="NavigationBar Inline">
+        <NewDocumentButton
+          onCreateDocument={onCreateDocument}
+          trigger={
+            <button type="button" className="TitleBar-menuItem">
+              <i className="fa fa-plus" />
+            </button>
+          }
+        />
         <button
           type="button"
           onClick={(e) => {
@@ -108,6 +109,12 @@ export default function TitleBar({
           </div>
         </>
       )}
+      <div className="TitleBar-unseenChanges">
+        <ChangedDocsList
+          lastSeenHeads={getLastSeenHeadsMapOfWorkspace(workspaceDoc)}
+        ></ChangedDocsList>
+      </div>
+
       <Omnibox
         active={activeOmnibox}
         workspaceDocId={workspaceDocId}
