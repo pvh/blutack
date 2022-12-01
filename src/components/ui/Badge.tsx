@@ -24,6 +24,7 @@ export interface Props {
   icon?: string
   img?: string
   hover?: string
+  color?: string
   backgroundColor?: string
   shape?: BadgeShape
   size?: BadgeSize
@@ -34,6 +35,7 @@ export default React.forwardRef(
   (props: Props, ref: React.Ref<HTMLDivElement>) => {
     const {
       icon,
+      color,
       backgroundColor,
       size = "large",
       shape = "circle",
@@ -48,6 +50,7 @@ export default React.forwardRef(
           img ? "Badge--image" : null
         } ${hover ? "Badge--hover" : null}`}
         style={{
+          color,
           backgroundColor,
           backgroundImage: img ? `url(${img})` : undefined,
         }}
