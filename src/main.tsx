@@ -13,6 +13,7 @@ import { RepoContext } from "automerge-repo-react-hooks"
 import * as ContentTypes from "./components/pushpin-code/ContentTypes"
 import { create as createWorkspace } from "./components/content-types/workspace/Workspace"
 import { create as createDevice } from "./components/content-types/workspace/Device"
+import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
 
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
@@ -77,6 +78,7 @@ function setupSharedWorkerAndRepo() {
   ])
 
   const repo = new Repo({
+    storage: new LocalForageStorageAdapter(),
     network: [new MessageChannelNetworkAdapter(repoNetworkChannel.port1)],
     sharePolicy: (peerId) => peerId.includes("shared-worker"),
   })
