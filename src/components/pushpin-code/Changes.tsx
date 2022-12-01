@@ -76,7 +76,8 @@ export function useLastSeenHeads(
   docUrl: PushpinUrl
 ): LastSeenHeads | undefined {
   const workspaceId = useContext(WorkspaceContext)
-  const [workspaceDoc] = useDocument<WorkspaceDoc>(workspaceId)
+  const [workspaceDoc, changeWorkspaceDoc] =
+    useDocument<WorkspaceDoc>(workspaceId)
 
   if (CURRENTLY_VIEWED_DOC_URLS[docUrl]) {
     return "latestHeads"
@@ -86,7 +87,22 @@ export function useLastSeenHeads(
     return undefined
   }
 
-  return workspaceDoc.persistedLastSeenHeads[docUrl]
+  const lastSeenHeads = workspaceDoc.persistedLastSeenHeads[docUrl]
+
+  if (!lastSeenHeads) {
+    changeWorkspaceDoc((workspaceDoc) => {
+      let lastSeenHeadsByDocUrl = workspaceDoc.persistedLastSeenHeads
+      if (!lastSeenHeadsByDocUrl) {
+        workspaceDoc.persistedLastSeenHeads = {}
+        // need to read persistedLastSeenHeads from workspaceDoc again, so we get the proxied automerge object
+        lastSeenHeadsByDocUrl = workspaceDoc.persistedLastSeenHeads
+      }
+
+      lastSeenHeadsByDocUrl[docUrl] = []
+    })
+  }
+
+  return lastSeenHeads
 }
 
 export function getUnseenPatches(
@@ -119,18 +135,14 @@ export function hasDocUnseenChanges(
   doc: Doc<any>,
   lastSeenHeads?: LastSeenHeads
 ): boolean {
-  if (!lastSeenHeads) {
-    return true
-  }
-
-  if (lastSeenHeads === "latestHeads") {
+  if (!lastSeenHeads || lastSeenHeads === "latestHeads") {
     return false
   }
 
   const docHeads = getHeads(doc)
 
   if (docHeads.length !== lastSeenHeads.length) {
-    return false
+    return true
   }
 
   return !lastSeenHeads.every((head, index) => {
