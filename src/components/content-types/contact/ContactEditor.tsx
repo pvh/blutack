@@ -114,15 +114,24 @@ const MergeProfileSection = () => {
 
   async function mergeWithOtherProfile() {
     const newProfileDocId = prompt(
-      "Please enter the profileId that you want to merge with"
+      "Please enter the id of the profile that you want to merge"
     )
 
     if (!newProfileDocId) {
       return
     }
 
+    const currentProfileDocId = (await localforage.getItem(
+      "workspaceDocId"
+    )) as DocumentId
+
+    if (newProfileDocId === currentProfileDocId) {
+      alert("You entered your current profile id")
+      return
+    }
+
     const currentProfileDoc = (await repo
-      .find((await localforage.getItem("workspaceDocId")) as DocumentId)
+      .find(currentProfileDocId)
       .value()) as WorkspaceDoc
 
     const newProfileDocHandle = repo.find(newProfileDocId as DocumentId)
