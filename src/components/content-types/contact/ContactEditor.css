@@ -1,9 +1,23 @@
 .ContactEditor-heading {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 36px;
-  height: 40px;
-  border-bottom: 1px solid var(--colorPaleGrey);
   margin-bottom: 8px;
+  border-bottom: 1px solid var(--colorPaleGrey);
+  padding: var(--cellSize) 0;
+}
+
+.ContactEditor-buttonGroup {
+  display: flex;
+  gap: var(--halfCellSize)
+}
+
+.ContactEditor-button {
+  padding: 8px;
+  border:  1px solid var(--colorPaleGrey);
+  background: var(--colorInputGrey);
+  border-radius: 4px;
+}
+
+.ContactEditor-button:hover {
+  cursor: pointer;
+  background: var(--colorPaleGrey);
 }

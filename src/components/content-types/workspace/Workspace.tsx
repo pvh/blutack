@@ -120,7 +120,6 @@ export default function Workspace({
       (!self.devices || !self.devices.includes(currentDeviceId))
     ) {
       changeSelf((doc: ContactDoc) => {
-        doc.devices = []
         if (!doc.devices) {
           doc.devices = []
         }
