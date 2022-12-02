@@ -134,10 +134,12 @@ const MergeProfileSection = () => {
       .find(currentProfileDocId)
       .value()) as WorkspaceDoc
 
-    const newProfileDocHandle = repo.find(newProfileDocId as DocumentId)
-
+    const newProfileDocHandle = repo.find<WorkspaceDoc>(
+      newProfileDocId as DocumentId
+    )
     const newProfileDoc = (await newProfileDocHandle.value()) as WorkspaceDoc
 
+    // copy over contacts and viewed docs
     newProfileDocHandle.change((doc) => {
       const newProfileDoc = doc as WorkspaceDoc
 
@@ -192,7 +194,7 @@ const MergeProfileSection = () => {
             className="ContactEditor-button"
             onClick={mergeWithOtherProfile}
           >
-            Merge with other profile
+            Merge into other profile
           </button>
         </CenteredStack>
       </ListMenuItem>

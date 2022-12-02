@@ -87,30 +87,47 @@ function setupSharedWorkerAndRepo() {
 
 const repo = setupSharedWorkerAndRepo()
 
-// TODO: Yikes on bikes, ought to redesign this
-const findOrMakeDoc = async (key: string): Promise<DocumentId> => {
-  let docId = new URLSearchParams(window.location.search).get(key)
+async function findOrMakeDeviceDoc(): Promise<DocumentId> {
+  const deviceDocId = await localforage.getItem("deviceDocId")
 
-  if (!docId) {
-    docId = await localforage.getItem(key)
+  if (deviceDocId) {
+    return deviceDocId as DocumentId
   }
-  if (!docId) {
-    const handle = repo.create()
-    docId = handle.documentId
-    if (key == "workspaceDocId") {
-      createWorkspace({}, handle)
-    }
-    if (key == "deviceDocId") {
-      createDevice({}, handle)
-    }
-    await localforage.setItem(key, docId)
+
+  const handle = repo.create()
+  const newDeviceDocId = handle.documentId
+
+  createDevice({}, handle)
+
+  await localforage.setItem("deviceDocId", newDeviceDocId)
+
+  return newDeviceDocId
+}
+
+async function findOrMakeProfileDoc(): Promise<DocumentId> {
+  // profiles used to be called workspaces, for backwards compatibility keep the old name here
+  const profileDocId = await localforage.getItem("workspaceDocId")
+
+  if (profileDocId) {
+    return profileDocId as DocumentId
   }
-  return docId as DocumentId
+
+  const handle = repo.create()
+  const newProfileDocId = handle.documentId
+
+  await localforage.setItem("workspaceDocId", newProfileDocId)
+
+  createWorkspace({}, handle)
+
+  return newProfileDocId
 }
 
 // bootstrapping: first try the window location, then check indexedDB, then make one
-const workspaceDocId = await findOrMakeDoc("workspaceDocId")
-const deviceDocId = await findOrMakeDoc("deviceDocId")
+const deviceDocId = await findOrMakeDeviceDoc()
+const workspaceDocId = await findOrMakeProfileDoc()
+
+console.log("deviceDocId", deviceDocId)
+console.log("workspaceDocId", workspaceDocId)
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
