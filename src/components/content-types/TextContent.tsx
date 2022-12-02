@@ -8,7 +8,7 @@ import Quill, {
 } from "quill"
 import Delta from "quill-delta"
 import * as ContentTypes from "../pushpin-code/ContentTypes"
-import Content, { ContentProps, EditableContentProps } from "../Content"
+import { ContentProps, EditableContentProps } from "../Content"
 import { useDocument } from "automerge-repo-react-hooks"
 import { useDocumentIds, useStaticCallback } from "../pushpin-code/Hooks"
 import "./TextContent.css"
@@ -31,6 +31,8 @@ import {
   useLastSeenHeads,
 } from "../pushpin-code/Changes"
 import { createDocumentLink } from "../pushpin-code/Url"
+import memoize from "lodash.memoize"
+import { Doc, getHeads } from "@automerge/automerge"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -295,6 +297,8 @@ function TextInList(props: EditableContentProps) {
   const title = doc.title || lines.shift() || "[empty text note]"
   const subtitle = lines.slice(0, 2).join("\n")
 
+  const unseenChanges = doc && hasUnseenChanges(doc, lastSeenHeads)
+
   return (
     <ListItem>
       <ContentDragHandle url={url}>
@@ -302,7 +306,7 @@ function TextInList(props: EditableContentProps) {
           icon="sticky-note"
           size="medium"
           dot={
-            hasUnseenChanges(doc, lastSeenHeads)
+            unseenChanges
               ? {
                   color: "var(--colorChangeDot)",
                 }
@@ -319,18 +323,18 @@ function TextInList(props: EditableContentProps) {
   )
 }
 
-export function hasUnseenChanges(
-  doc: Automerge.Doc<unknown>,
-  lastSeenHeads?: LastSeenHeads
-): boolean {
-  // count any splice on the text property of the text document as a change
-  return getUnseenPatches(doc, lastSeenHeads).some(
-    (patch) =>
-      patch.action === "splice" &&
-      patch.path.length === 2 &&
-      patch.path[0] === "text"
-  )
-}
+export const hasUnseenChanges = memoize(
+  (doc: Doc<unknown>, lastSeenHeads?: LastSeenHeads) => {
+    return getUnseenPatches(doc, lastSeenHeads).some(
+      (patch) =>
+        patch.action === "splice" &&
+        patch.path.length === 2 &&
+        patch.path[0] === "text"
+    )
+  },
+  (doc, lastSeenHeads) =>
+    `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
+)
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match("text/")
 

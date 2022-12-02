@@ -21,7 +21,8 @@ import {
   useAutoAdvanceLastSeenHeads,
   useLastSeenHeads,
 } from "../pushpin-code/Changes"
-import { Doc } from "@automerge/automerge"
+import { Doc, getHeads } from "@automerge/automerge"
+import memoize from "lodash.memoize"
 
 interface Message {
   authorId: DocumentId
@@ -138,9 +139,11 @@ export function ThreadInList(props: EditableContentProps) {
     createDocumentLink("thread", documentId)
   )
 
-  if (!doc || !doc.messages) return null
+  const unreadMessageCount = doc
+    ? getUnreadMessageCountOfThread(doc, lastSeenHeads)
+    : 0
 
-  const unreadMessageCount = getUnreadMessageCountOfThread(doc, lastSeenHeads)
+  if (!doc || !doc.messages) return null
 
   const title =
     doc.title != null && doc.title !== "" ? doc.title : "Untitled conversation"
@@ -173,18 +176,19 @@ export function ThreadInList(props: EditableContentProps) {
   )
 }
 
-function getUnreadMessageCountOfThread(
-  doc: ThreadDoc,
-  lastSeenHeads?: LastSeenHeads
-): number {
-  // count any splice on the messages property of the thread document as a change
-  return getUnseenPatches(doc, lastSeenHeads).filter(
-    (patch) =>
-      patch.action === "splice" &&
-      patch.path.length === 2 &&
-      patch.path[0] === "messages"
-  ).length
-}
+const getUnreadMessageCountOfThread = memoize(
+  (doc: ThreadDoc, lastSeenHeads?: LastSeenHeads) => {
+    // count any splice on the messages property of the thread document as a change
+    return getUnseenPatches(doc, lastSeenHeads).filter(
+      (patch) =>
+        patch.action === "splice" &&
+        patch.path.length === 2 &&
+        patch.path[0] === "messages"
+    ).length
+  },
+  (doc, lastSeenHeads) =>
+    `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
+)
 
 export function hasUnseenChanges(
   doc: Doc<unknown>,

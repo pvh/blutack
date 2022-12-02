@@ -45,7 +45,7 @@ interface ContentType {
   ) => Promise<void> | void
   supportsMimeType?: (type: string) => boolean
   // TODO: i don't love this, but we'll put it here for now
-  hasUnseenChanges?: (heads: Doc<unknown>, lastHeads: LastSeenHeads) => boolean
+  hasUnseenChanges?: (doc: Doc<unknown>, lastHeads: LastSeenHeads) => boolean
 }
 
 const registry: { [type: string]: ContentType } = {}
