@@ -122,7 +122,7 @@ async function findOrMakeProfileDoc(): Promise<DocumentId> {
   return newProfileDocId
 }
 
-// bootstrapping: first try the window location, then check indexedDB, then make one
+// bootstrapping: first try the indexedDB, then make one
 const deviceDocId = await findOrMakeDeviceDoc()
 const workspaceDocId = await findOrMakeProfileDoc()
 
