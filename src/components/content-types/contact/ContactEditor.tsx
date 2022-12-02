@@ -169,12 +169,23 @@ const MergeProfileSection = () => {
   return (
     <ListMenuSection title="Merging Profiles">
       <ListMenuItem>
-        <div className="ContactEditor-buttonGroup">
-          <button onClick={copyProfileId}>Copy profile id</button>
-          <button onClick={mergeWithOtherProfile}>
+        <CenteredStack
+          direction="row"
+          style={{
+            gap: "var(--halfCellSize)",
+            marginTop: "var(--halfCellSize)",
+          }}
+        >
+          <button className="ContactEditor-button" onClick={copyProfileId}>
+            Copy profile id
+          </button>
+          <button
+            className="ContactEditor-button"
+            onClick={mergeWithOtherProfile}
+          >
             Merge with other profile
           </button>
-        </div>
+        </CenteredStack>
       </ListMenuItem>
     </ListMenuSection>
   )
@@ -197,23 +208,33 @@ const renderAvatarEditor = (
   return (
     <ListMenuSection title="Avatar">
       <ListMenuItem>
-        <Badge
-          img={
-            avatarBinaryId
-              ? createBinaryDataUrl(avatarBinaryId)
-              : DEFAULT_AVATAR_PATH
-          }
-        />
-        <CenteredStack direction="row">
+        <CenteredStack
+          direction="row"
+          style={{
+            gap: "var(--halfCellSize)",
+            marginTop: "var(--halfCellSize)",
+          }}
+        >
+          <Badge
+            img={
+              avatarBinaryId
+                ? createBinaryDataUrl(avatarBinaryId)
+                : DEFAULT_AVATAR_PATH
+            }
+          />
           <input
-            style={{ display: "hidden" }}
+            style={{ display: "none" }}
             type="file"
             id="hiddenImporter"
             accept="image/*"
             onChange={onFilesChanged}
             ref={hiddenFileInput}
           />
-          <button type="button" onClick={onImportClick}>
+          <button
+            className="ContactEditor-button"
+            type="button"
+            onClick={onImportClick}
+          >
             Choose from file...
           </button>
         </CenteredStack>
