@@ -142,7 +142,7 @@ export default function OmniboxWorkspaceListMenu(
     return () => {
       document.removeEventListener("keydown", handleCommandKeys)
     }
-  }, [props.active, selectedIndex])
+  }, [props.active, props.search, selectedIndex])
 
   if (!workspace) {
     return null
@@ -256,7 +256,9 @@ export default function OmniboxWorkspaceListMenu(
     label: "View",
     shortcut: "⏎",
     keysForActionPressed: (e) => !e.shiftKey && e.key === "Enter",
-    callback: (url) => () => navigate(url),
+    callback: (url) => () => {
+      navigate(url)
+    },
   }
 
   const invite: MenuAction = {
