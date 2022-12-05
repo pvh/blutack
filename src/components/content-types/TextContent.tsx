@@ -33,6 +33,7 @@ import {
 import { createDocumentLink } from "../pushpin-code/Url"
 import memoize from "lodash.memoize"
 import { Doc, getHeads } from "@automerge/automerge"
+import { evalSearch, registerSearch } from "../pushpin-code/Searches"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -48,6 +49,21 @@ interface Props extends ContentProps {
 TextContent.minWidth = 6
 TextContent.minHeight = 2
 TextContent.defaultWidth = 15
+
+registerSearch("mention", {
+  pattern: /@[a-zA-Z]+/,
+  style: {
+    color: "#999",
+    isBold: true,
+  },
+})
+
+registerSearch("headline", {
+  pattern: /^#.*$/,
+  style: {
+    isBold: true,
+  },
+})
 
 export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.documentId)
@@ -87,7 +103,6 @@ export default function TextContent(props: Props) {
     cursors,
     selected: props.uniquelySelected,
     config: {
-      formats: [],
       modules: {
         cursors: {
           hideDelayMs: 500,
@@ -203,12 +218,36 @@ function useQuill({
   }, [ref.current]) // eslint-disable-line
 
   useEffect(() => {
-    if (!textString || !quill.current) return
+    const q = quill.current
+
+    if (!textString || !q) return
 
     const delta = new Delta().insert(textString)
-    const diff = quill.current.getContents().diff(delta as any)
+    const diff = q.getContents().diff(delta as any)
 
-    quill.current.updateContents(diff)
+    q.updateContents(diff)
+
+    const matches = evalSearch(textString)
+
+    q.removeFormat(0, textString.length, "api")
+
+    matches.forEach((formatting) => {
+      const index = formatting.from
+      const length = formatting.to - index
+      const { color, isBold, isItalic } = formatting.style
+
+      if (color) {
+        q.formatText(index, length, "color", formatting.style.color, "api")
+      }
+
+      if (isBold) {
+        q.formatText(index, length, "bold", true, "api")
+      }
+
+      if (isItalic) {
+        q.formatText(index, length, "italic", true, "api")
+      }
+    })
   }, [textString])
 
   useEffect(() => {
