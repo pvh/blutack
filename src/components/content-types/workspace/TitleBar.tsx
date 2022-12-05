@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useEffect } from "react"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
@@ -35,6 +35,12 @@ export default function TitleBar({
 }: Props) {
   const [activeOmnibox, setActive] = useState(false)
   const [workspaceDoc] = useDocument<WorkspaceDoc>(workspaceDocId)
+
+  useEffect(() => {
+    if (!currentDocUrl) {
+      setActive(true)
+    }
+  }, [currentDocUrl])
 
   useEvent(document, "keydown", (e) => {
     if (e.key === "/" && document.activeElement === document.body) {
@@ -120,6 +126,7 @@ export default function TitleBar({
         workspaceDocId={workspaceDocId}
         omniboxFinished={hideOmnibox}
         onContent={onContent}
+        closeOnClickOutside={currentDocUrl !== undefined}
       />
     </div>
   )

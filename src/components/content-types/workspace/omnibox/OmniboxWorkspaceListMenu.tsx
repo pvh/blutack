@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from "react"
+import { ReactElement, useCallback, useEffect, useMemo, useState } from "react"
 import Debug from "debug"
 
 import {
@@ -90,7 +90,6 @@ interface TitledDoc {
 export default function OmniboxWorkspaceListMenu(
   props: Props
 ): ReactElement | null {
-  const omniboxInput = useRef<HTMLInputElement>()
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(
     props.workspaceDocId
   )
@@ -103,72 +102,151 @@ export default function OmniboxWorkspaceListMenu(
   const viewedDocs = useDocuments<TitledDoc>(workspace?.viewedDocUrls)
   const contacts = useDocumentIds(workspace?.contactIds)
 
-  const handleCommandKeys = (e: KeyboardEvent) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault()
-      moveDown(selectedIndex)
-    }
-
-    if (e.key === "ArrowUp") {
-      e.preventDefault()
-      moveUp(selectedIndex)
-    }
-
-    const { items } = menuSections()
-
-    const selected = items[selectedIndex]
-    if (!selected) {
-      return null
-    }
-
-    // see if any of the actions for the currently selected item are triggered by the keypress
-    // XXX: we might want to use the mousetrap library for this
-    if (selected.actions) {
-      selected.actions.forEach((action) => {
-        if (action.keysForActionPressed(e)) {
-          action.callback(selected.url)()
-          endSession()
-        }
-      })
-    }
+  /* begin actions */
+  const view: MenuAction = {
+    name: "view",
+    faIcon: "fa-compass",
+    label: "View",
+    shortcut: "⏎",
+    keysForActionPressed: (e) => !e.shiftKey && e.key === "Enter",
+    callback: (url) => () => {
+      navigate(url)
+    },
   }
 
-  useEffect(() => {
-    if (props.active) {
-      document.addEventListener("keydown", handleCommandKeys)
-    } else {
-      document.removeEventListener("keydown", handleCommandKeys)
-    }
-    return () => {
-      document.removeEventListener("keydown", handleCommandKeys)
-    }
-  }, [props.active, props.search, selectedIndex])
-
-  if (!workspace) {
-    return null
+  const invite: MenuAction = {
+    name: "invite",
+    faIcon: "fa-share-alt",
+    label: "Invite",
+    shortcut: "⏎",
+    keysForActionPressed: (e) => !e.shiftKey && e.key === "Enter",
+    callback: (url) => () => offerDocumentToIdentity(url),
   }
 
-  const { archivedDocUrls = [] } = workspace
-
-  const endSession = () => {
-    setSelectedIndex(0)
-    props.omniboxFinished()
+  const archive: MenuAction = {
+    name: "archive",
+    destructive: true,
+    faIcon: "fa-trash",
+    label: "Archive",
+    shortcut: "⌘+⌫",
+    keysForActionPressed: (e) =>
+      (e.metaKey || e.ctrlKey) && e.key === "Backspace",
+    callback: (url) => () => archiveDocument(url),
   }
 
-  const moveUp = (selectedIndex: number) => {
-    if (selectedIndex > 0) {
-      setSelectedIndex(selectedIndex - 1)
+  const unarchive: MenuAction = {
+    name: "unarchive",
+    faIcon: "fa-trash-restore",
+    label: "Unarchive",
+    shortcut: "⌘+⌫",
+    keysForActionPressed: (e) =>
+      (e.metaKey || e.ctrlKey) && e.key === "Backspace",
+    callback: (url) => () => unarchiveDocument(url),
+  }
+
+  const place: MenuAction = {
+    name: "place",
+    faIcon: "fa-download",
+    label: "Place",
+    shortcut: "⇧+⏎",
+    keysForActionPressed: (e) => e.shiftKey && e.key === "Enter",
+    callback: (url) => () => {
+      props.onContent(url)
+    },
+  }
+
+  /* end actions */
+
+  const sectionDefinitions: Section[] = useMemo(() => {
+    if (!workspace) {
+      return []
     }
-  }
 
-  const moveDown = (selectedIndex: number) => {
-    const { items } = menuSections()
-    if (selectedIndex < items.length - 1) {
-      setSelectedIndex(selectedIndex + 1)
-    }
-  }
+    return [
+      {
+        name: "viewedDocUrls",
+        label: "Documents",
+        actions: [view, place, archive],
+        items: (props) =>
+          Object.entries(viewedDocs)
+            .filter(
+              ([url, _doc]) =>
+                !workspace?.archivedDocUrls ||
+                !workspace?.archivedDocUrls.includes(url as PushpinUrl)
+            )
+            .filter(
+              ([_url, doc]) =>
+                doc &&
+                ((doc.title &&
+                  doc.title.match(new RegExp(props.search, "i"))) ||
+                  (doc.text &&
+                    doc.text.join("").match(new RegExp(props.search, "i"))))
+            )
+            .reduce(
+              (prev, current) => {
+                if (current[0].match("board|contentlist|pdf")) {
+                  prev[0].push(current)
+                } else {
+                  prev[1].push(current)
+                }
+                return prev
+              },
+              [[], []] as [any[], any[]]
+            )
+            .flat()
+            .map(([url, _doc]) => ({ url: url as PushpinUrl })),
+      },
+      {
+        name: "archivedDocUrls",
+        label: "Archived",
+        actions: [view, unarchive],
+        items: (props) =>
+          props.search === "" || !workspace
+            ? [] // don't show archived URLs unless there's a current search term
+            : (workspace.archivedDocUrls || [])
+                .map((url): [PushpinUrl, Doc<any>] => [url, viewedDocs[url]])
+                .filter(
+                  ([_url, doc]) =>
+                    doc &&
+                    doc.title &&
+                    doc.title.match(new RegExp(props.search, "i"))
+                )
+                .map(([url, doc]) => ({ url })),
+      },
+      {
+        name: "docUrls",
+        actions: [view],
+        items: (props) => {
+          // try parsing the "search" to see if it is a valid document URL
+          try {
+            parseDocumentLink(props.search)
+            return [{ url: props.search as PushpinUrl }]
+          } catch {
+            return []
+          }
+        },
+      },
+      {
+        name: "contacts",
+        label: "Contacts",
+        actions: [invite, place],
+        items: (props) =>
+          Object.entries(contacts)
+            .filter(([id, doc]) => doc.name)
+            .filter(([id, doc]) =>
+              doc.name.match(new RegExp(props.search, "i"))
+            )
+            .map(([id, doc]) => ({
+              url: createDocumentLink("contact", id as DocumentId),
+            })),
+      },
+    ]
+  }, [workspace, props.search, viewedDocs])
 
-  const menuSections = (): { items: Item[]; sectionIndices: SectionIndex } => {
+  const menuSections = useMemo((): {
+    items: Item[]
+    sectionIndices: SectionIndex
+  } => {
     if (!workspace) {
       return { items: [], sectionIndices: {} }
     }
@@ -236,10 +314,82 @@ export default function OmniboxWorkspaceListMenu(
     }
 
     return { items, sectionIndices }
+  }, [props.search, sectionDefinitions, workspace])
+
+  const moveUp = (selectedIndex: number) => {
+    if (selectedIndex > 0) {
+      setSelectedIndex(selectedIndex - 1)
+    }
+  }
+
+  const moveDown = useCallback(
+    (selectedIndex: number) => {
+      const { items } = menuSections
+
+      if (selectedIndex < items.length - 1) {
+        setSelectedIndex(selectedIndex + 1)
+      }
+    },
+    [menuSections]
+  )
+
+  const handleCommandKeys = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault()
+        moveDown(selectedIndex)
+      }
+
+      if (e.key === "ArrowUp") {
+        e.preventDefault()
+        moveUp(selectedIndex)
+      }
+
+      const { items } = menuSections
+
+      const selected = items[selectedIndex]
+      if (!selected) {
+        return null
+      }
+
+      // see if any of the actions for the currently selected item are triggered by the keypress
+      // XXX: we might want to use the mousetrap library for this
+      if (selected.actions) {
+        selected.actions.forEach((action) => {
+          if (action.keysForActionPressed(e)) {
+            action.callback(selected.url)()
+            endSession()
+          }
+        })
+      }
+    },
+    [moveDown, moveUp, menuSections]
+  )
+
+  useEffect(() => {
+    if (props.active) {
+      document.addEventListener("keydown", handleCommandKeys)
+    } else {
+      document.removeEventListener("keydown", handleCommandKeys)
+    }
+    return () => {
+      document.removeEventListener("keydown", handleCommandKeys)
+    }
+  }, [handleCommandKeys])
+
+  if (!workspace) {
+    return null
+  }
+
+  const { archivedDocUrls = [] } = workspace
+
+  const endSession = () => {
+    setSelectedIndex(0)
+    props.omniboxFinished()
   }
 
   const sectionItems = (name: string) => {
-    const { items, sectionIndices } = menuSections()
+    const { items, sectionIndices } = menuSections
     const sectionRange = sectionIndices[name]
 
     if (sectionRange) {
@@ -248,136 +398,6 @@ export default function OmniboxWorkspaceListMenu(
 
     return []
   }
-
-  /* begin actions */
-  const view: MenuAction = {
-    name: "view",
-    faIcon: "fa-compass",
-    label: "View",
-    shortcut: "⏎",
-    keysForActionPressed: (e) => !e.shiftKey && e.key === "Enter",
-    callback: (url) => () => {
-      navigate(url)
-    },
-  }
-
-  const invite: MenuAction = {
-    name: "invite",
-    faIcon: "fa-share-alt",
-    label: "Invite",
-    shortcut: "⏎",
-    keysForActionPressed: (e) => !e.shiftKey && e.key === "Enter",
-    callback: (url) => () => offerDocumentToIdentity(url),
-  }
-
-  const archive: MenuAction = {
-    name: "archive",
-    destructive: true,
-    faIcon: "fa-trash",
-    label: "Archive",
-    shortcut: "⌘+⌫",
-    keysForActionPressed: (e) =>
-      (e.metaKey || e.ctrlKey) && e.key === "Backspace",
-    callback: (url) => () => archiveDocument(url),
-  }
-
-  const unarchive: MenuAction = {
-    name: "unarchive",
-    faIcon: "fa-trash-restore",
-    label: "Unarchive",
-    shortcut: "⌘+⌫",
-    keysForActionPressed: (e) =>
-      (e.metaKey || e.ctrlKey) && e.key === "Backspace",
-    callback: (url) => () => unarchiveDocument(url),
-  }
-
-  const place: MenuAction = {
-    name: "place",
-    faIcon: "fa-download",
-    label: "Place",
-    shortcut: "⇧+⏎",
-    keysForActionPressed: (e) => e.shiftKey && e.key === "Enter",
-    callback: (url) => () => {
-      props.onContent(url)
-    },
-  }
-
-  /* end actions */
-
-  /* sections begin */
-  const sectionDefinitions: Section[] = [
-    {
-      name: "viewedDocUrls",
-      label: "Documents",
-      actions: [view, place, archive],
-      items: (props) =>
-        Object.entries(viewedDocs)
-          .filter(([url, _doc]) => !archivedDocUrls.includes(url as PushpinUrl))
-          .filter(
-            ([_url, doc]) =>
-              doc &&
-              ((doc.title && doc.title.match(new RegExp(props.search, "i"))) ||
-                (doc.text &&
-                  doc.text.join("").match(new RegExp(props.search, "i"))))
-          )
-          .reduce(
-            (prev, current) => {
-              if (current[0].match("board|contentlist|pdf")) {
-                prev[0].push(current)
-              } else {
-                prev[1].push(current)
-              }
-              return prev
-            },
-            [[], []] as [any[], any[]]
-          )
-          .flat()
-          .map(([url, _doc]) => ({ url: url as PushpinUrl })),
-    },
-    {
-      name: "archivedDocUrls",
-      label: "Archived",
-      actions: [view, unarchive],
-      items: (props) =>
-        props.search === "" || !workspace
-          ? [] // don't show archived URLs unless there's a current search term
-          : (workspace.archivedDocUrls || [])
-              .map((url): [PushpinUrl, Doc<any>] => [url, viewedDocs[url]])
-              .filter(
-                ([_url, doc]) =>
-                  doc &&
-                  doc.title &&
-                  doc.title.match(new RegExp(props.search, "i"))
-              )
-              .map(([url, doc]) => ({ url })),
-    },
-    {
-      name: "docUrls",
-      actions: [view],
-      items: (props) => {
-        // try parsing the "search" to see if it is a valid document URL
-        try {
-          parseDocumentLink(props.search)
-          return [{ url: props.search as PushpinUrl }]
-        } catch {
-          return []
-        }
-      },
-    },
-    {
-      name: "contacts",
-      label: "Contacts",
-      actions: [invite, place],
-      items: (props) =>
-        Object.entries(contacts)
-          .filter(([id, doc]) => doc.name)
-          .filter(([id, doc]) => doc.name.match(new RegExp(props.search, "i")))
-          .map(([id, doc]) => ({
-            url: createDocumentLink("contact", id as DocumentId),
-          })),
-    },
-  ]
-  /* end sections */
 
   const navigate = (url: PushpinUrl) => {
     openDoc(url)
