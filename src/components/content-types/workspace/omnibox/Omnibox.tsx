@@ -17,10 +17,16 @@ export interface Props {
   workspaceDocId: DocumentId
   omniboxFinished: Function
   onContent: (url: PushpinUrl) => boolean
+  closeOnClickOutside?: boolean
 }
 
-export default function Omnibox(props: Props) {
-  const { active, workspaceDocId, omniboxFinished, onContent } = props
+export default function Omnibox({
+  active,
+  workspaceDocId,
+  omniboxFinished,
+  onContent,
+  closeOnClickOutside = true,
+}: Props) {
   const omniboxInput = useRef<HTMLInputElement>(null)
   const [search, setSearch] = useState("")
 
@@ -36,7 +42,8 @@ export default function Omnibox(props: Props) {
     if (
       active &&
       event.target !== omniboxRef.current &&
-      !omniboxRef.current.contains(event.target)
+      !omniboxRef.current.contains(event.target) &&
+      closeOnClickOutside
     ) {
       omniboxFinished()
     }

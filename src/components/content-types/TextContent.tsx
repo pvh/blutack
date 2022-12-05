@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, useState } from "react"
+import React, { useEffect, useRef, useMemo, useState, useId } from "react"
 
 import * as Automerge from "@automerge/automerge"
 import Quill, {
@@ -53,6 +53,9 @@ export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.documentId)
   const [cursorPos, setCursorPos] = useState<IQuillRange | undefined>(undefined)
   const selfId = useSelfId()
+  // need to remove first and last char because id starts and ends with ":" which is not allowed in a html id
+  const scrollingContainerId = `scroll-container-${useId().slice(1, -1)}`
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useAutoAdvanceLastSeenHeads(createDocumentLink("text", props.documentId))
 
@@ -73,7 +76,7 @@ export default function TextContent(props: Props) {
     [presence]
   )
 
-  const [ref] = useQuill({
+  const [ref, quill] = useQuill({
     text: doc ? doc.text : null,
     change(fn) {
       changeDoc((doc: TextDoc) => fn(doc.text))
@@ -96,13 +99,20 @@ export default function TextContent(props: Props) {
           userOnly: true,
         },
       },
+      scrollingContainer: `#${scrollingContainerId}`,
     },
   })
 
   return (
-    <div className="TextContent">
+    <div
+      className="TextContent"
+      id={scrollingContainerId}
+      onClick={() => quill?.focus()}
+      ref={containerRef}
+    >
       <div
         ref={ref}
+        onClick={stopPropagation}
         onCopy={stopPropagation}
         onCut={stopPropagation}
         onPaste={stopPropagation}

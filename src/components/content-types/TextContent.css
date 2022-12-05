@@ -9,24 +9,19 @@
   font-size: 1rem;
   white-space: pre-wrap;
   line-height: 1.5rem;
+  cursor: text;
 }
 
 .ql-editor {
   box-sizing: border-box;
   outline: 0;
-  margin: auto;
-  min-height: 100%;
   cursor: text;
   padding: var(--halfCellSize);
 }
 .Workspace__container--text .ql-editor,
 .ContentList--main > .TextContent .ql-editor {
+  padding: var(--doubleCellSize);
   max-width: 720px;
-  padding: var(--doubleCellSize) var(--cellSize);
-}
-
-.BoardCard .ql-editor {
-  max-width: unset;
 }
 
 .ql-clipboard {

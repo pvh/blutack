@@ -296,7 +296,7 @@ function create(attrs: any, handle: DocHandle<any>) {
 ContentTypes.register({
   type: "contentlist",
   name: "List",
-  icon: "sticky-note",
+  icon,
   contexts: {
     root: ContentList,
     board: ContentList,

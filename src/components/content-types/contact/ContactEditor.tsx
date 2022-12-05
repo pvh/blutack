@@ -194,7 +194,7 @@ const MergeProfileSection = () => {
             className="ContactEditor-button"
             onClick={mergeWithOtherProfile}
           >
-            Merge into other profile
+            Abandon and merge profile
           </button>
         </CenteredStack>
       </ListMenuItem>
