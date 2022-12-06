@@ -1,5 +1,8 @@
+// adapted from: https://github.com/quill-mention/quill-mention
+
 import Quill from "quill"
-import "./AutoCompletion.css"
+import "./Autocompletion.css"
+import { evalAutocompletion } from "../pushpin-code/Searches"
 
 function attachDataValues(element, data, dataAttributes) {
   const mention = element
@@ -11,40 +14,6 @@ function attachDataValues(element, data, dataAttributes) {
     }
   })
   return mention
-}
-
-function getMentionCharIndex(text, mentionDenotationChars) {
-  return mentionDenotationChars.reduce(
-    (prev, mentionChar) => {
-      const mentionCharIndex = text.lastIndexOf(mentionChar)
-
-      if (mentionCharIndex > prev.mentionCharIndex) {
-        return {
-          mentionChar,
-          mentionCharIndex,
-        }
-      }
-      return {
-        mentionChar: prev.mentionChar,
-        mentionCharIndex: prev.mentionCharIndex,
-      }
-    },
-    { mentionChar: null, mentionCharIndex: -1 }
-  )
-}
-
-function hasValidChars(text, allowedChars) {
-  return allowedChars.test(text)
-}
-
-function hasValidMentionCharIndex(mentionCharIndex, text, isolateChar) {
-  if (mentionCharIndex > -1) {
-    return !(
-      isolateChar &&
-      !(mentionCharIndex === 0 || !!text[mentionCharIndex - 1].match(/\s/g))
-    )
-  }
-  return false
 }
 
 const Keys = {
@@ -74,7 +43,7 @@ class Mention {
     this.options = {
       source: null,
       renderItem(item) {
-        return `${item.value}`
+        return `${item}`
       },
       renderLoading() {
         return null
@@ -91,7 +60,7 @@ class Mention {
       offsetLeft: 0,
       isolateCharacter: false,
       fixMentionsToQuill: false,
-      positioningStrategy: "normal",
+      positioningStrategy: "fixed",
       defaultMenuOrientation: "bottom",
       blotName: "mention",
       dataAttributes: [
@@ -433,7 +402,7 @@ class Mention {
     }
   }
 
-  renderList(mentionChar, data, searchTerm) {
+  renderList(data) {
     if (data && data.length > 0) {
       this.removeLoading()
 
@@ -455,7 +424,7 @@ class Mention {
           initialSelection = i
         }
         li.dataset.index = i
-        li.innerHTML = this.options.renderItem(data[i], searchTerm)
+        li.innerHTML = this.options.renderItem(data[i])
         if (!data[i].disabled) {
           li.onmouseenter = this.onItemMouseEnter.bind(this)
           li.onmouseup = this.onItemClick.bind(this)
@@ -463,7 +432,6 @@ class Mention {
         } else {
           li.onmouseenter = this.onDisabledItemMouseEnter.bind(this)
         }
-        li.dataset.denotationChar = mentionChar
         this.mentionList.appendChild(
           attachDataValues(li, data[i], this.options.dataAttributes)
         )
@@ -731,11 +699,7 @@ class Mention {
 
   getTextBeforeCursor() {
     const startPos = Math.max(0, this.cursorPos - this.options.maxChars)
-    const textBeforeCursorPos = this.quill.getText(
-      startPos,
-      this.cursorPos - startPos
-    )
-    return textBeforeCursorPos
+    return this.quill.getText(startPos, this.cursorPos - startPos)
   }
 
   onSomethingChange() {
@@ -744,53 +708,13 @@ class Mention {
 
     this.cursorPos = range.index
     const textBeforeCursor = this.getTextBeforeCursor()
-    const { mentionChar, mentionCharIndex } = getMentionCharIndex(
-      textBeforeCursor,
-      this.options.mentionDenotationChars
-    )
 
-    if (
-      hasValidMentionCharIndex(
-        mentionCharIndex,
-        textBeforeCursor,
-        this.options.isolateCharacter
-      )
-    ) {
-      const mentionCharPos =
-        this.cursorPos - (textBeforeCursor.length - mentionCharIndex)
-      this.mentionCharPos = mentionCharPos
-      const textAfter = textBeforeCursor.substring(
-        mentionCharIndex + mentionChar.length
-      )
-      if (
-        textAfter.length >= this.options.minChars &&
-        hasValidChars(textAfter, this.getAllowedCharsRegex(mentionChar))
-      ) {
-        if (this.existingSourceExecutionToken) {
-          this.existingSourceExecutionToken.abandoned = true
-        }
-        this.renderLoading()
-        var sourceRequestToken = {
-          abandoned: false,
-        }
-        this.existingSourceExecutionToken = sourceRequestToken
-        this.options.source(
-          textAfter,
-          (data, searchTerm) => {
-            if (sourceRequestToken.abandoned) {
-              return
-            }
-            this.existingSourceExecutionToken = null
-            this.renderList(mentionChar, data, searchTerm)
-          },
-          mentionChar
-        )
-      } else {
-        if (this.existingSourceExecutionToken) {
-          this.existingSourceExecutionToken.abandoned = true
-        }
-        this.hideMentionList()
-      }
+    const { suggestions, matchOffset } = evalAutocompletion(textBeforeCursor)
+
+    this.mentionCharPos = this.cursorPos + matchOffset
+
+    if (suggestions.length !== 0) {
+      this.renderList(suggestions)
     } else {
       if (this.existingSourceExecutionToken) {
         this.existingSourceExecutionToken.abandoned = true

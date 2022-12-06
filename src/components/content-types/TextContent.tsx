@@ -33,8 +33,12 @@ import {
 import { createDocumentLink } from "../pushpin-code/Url"
 import memoize from "lodash.memoize"
 import { Doc, getHeads } from "@automerge/automerge"
-import { evalSearch, registerSearch } from "../pushpin-code/Searches"
-import "./AutoCompletion.js"
+import {
+  evalSearch,
+  registerAutocompletion,
+  registerSearch,
+} from "../pushpin-code/Searches"
+import "./Autocompletion.js"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -63,6 +67,15 @@ registerSearch("headline", {
   pattern: /^#.*$/,
   style: {
     isBold: true,
+  },
+})
+
+registerAutocompletion("mention", {
+  pattern: /@([a-zA-Z])+$/,
+  suggestions: ([match]) => {
+    return ["@pvh", "@paul", "@geoffrey"].filter((suggestion) =>
+      suggestion.startsWith(match)
+    )
   },
 })
 
@@ -105,35 +118,7 @@ export default function TextContent(props: Props) {
     selected: props.uniquelySelected,
     config: {
       modules: {
-        mention: {
-          allowedChars: /^[A-Za-z\sÅÄÖåäö]*$/,
-          mentionDenotationChars: ["@"],
-          source: function (
-            searchTerm: string,
-            renderList: any,
-            mentionChar: string
-          ) {
-            let values = [
-              { id: 1, value: "bob" },
-              { id: 2, value: "frank" },
-              { id: 3, value: "alex" },
-            ]
-
-            if (searchTerm.length === 0) {
-              renderList(values, searchTerm)
-            } else {
-              const matches = []
-              for (let i = 0; i < values.length; i++)
-                if (
-                  ~values[i].value
-                    .toLowerCase()
-                    .indexOf(searchTerm.toLowerCase())
-                )
-                  matches.push(values[i])
-              renderList(matches, searchTerm)
-            }
-          },
-        },
+        mention: {},
         cursors: {
           hideDelayMs: 500,
           transformOnTextChange: true,
