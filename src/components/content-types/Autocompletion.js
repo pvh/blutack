@@ -696,12 +696,29 @@ class Mention {
     return this.quill.getText(startPos, this.cursorPos - startPos)
   }
 
+  getCharAfterCursor() {
+    return this.quill.getText(this.cursorPos, 1)
+  }
+
   onSomethingChange() {
     const range = this.quill.getSelection()
     if (range == null) return
 
     this.cursorPos = range.index
     const textBeforeCursor = this.getTextBeforeCursor()
+
+    const textAfterCursor = this.getCharAfterCursor()
+
+    // don't show if cursor if in the middle of some existing autocompletion
+    if (
+      textAfterCursor !== "\n" &&
+      textAfterCursor !== "" &&
+      textAfterCursor !== " " &&
+      textAfterCursor !== "\t"
+    ) {
+      this.hideMentionList()
+      return
+    }
 
     const { suggestions, matchOffset } = evalAutocompletion(textBeforeCursor)
 

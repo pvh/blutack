@@ -57,7 +57,9 @@ export function evalAutocompletion(text: string): {
       // todo: doesn't handle case where multiple autocompletions match on different prefix
       matchOffset = -match[0].length
 
-      return autocompletion.suggestions(match)
+      return autocompletion
+        .suggestions(match)
+        .filter(({ value }) => value !== match[0])
     }
   )
 
