@@ -43,7 +43,7 @@ class Mention {
     this.options = {
       source: null,
       renderItem(item) {
-        return `${item}`
+        return `${item.value}`
       },
       renderLoading() {
         return null
@@ -52,7 +52,6 @@ class Mention {
         insertItem(item)
       },
       mentionDenotationChars: ["@"],
-      showDenotationChar: true,
       allowedChars: /^[a-zA-Z0-9_]*$/,
       minChars: 0,
       maxChars: 31,
@@ -62,7 +61,6 @@ class Mention {
       fixMentionsToQuill: false,
       positioningStrategy: "fixed",
       defaultMenuOrientation: "bottom",
-      blotName: "mention",
       dataAttributes: [
         "id",
         "value",
@@ -298,15 +296,11 @@ class Mention {
   }
 
   insertItem(data, programmaticInsert) {
-    const render = data
-    if (render === null) {
+    if (data === null) {
       return
     }
-    if (!this.options.showDenotationChar) {
-      render.denotationChar = ""
-    }
 
-    var insertAtPos
+    let insertAtPos
 
     if (!programmaticInsert) {
       insertAtPos = this.mentionCharPos
@@ -318,19 +312,19 @@ class Mention {
     } else {
       insertAtPos = this.cursorPos
     }
-    this.quill.insertEmbed(
-      insertAtPos,
-      this.options.blotName,
-      render,
-      Quill.sources.USER
-    )
+
+    this.quill.insertText(insertAtPos, data.value, Quill.sources.USER)
+
+    const newCursorPos = insertAtPos + data.value.length
+
     if (this.options.spaceAfterInsert) {
-      this.quill.insertText(insertAtPos + 1, " ", Quill.sources.USER)
+      this.quill.insertText(newCursorPos, " ", Quill.sources.USER)
       // setSelection here sets cursor position
-      this.quill.setSelection(insertAtPos + 2, Quill.sources.USER)
+      this.quill.setSelection(newCursorPos + 1, Quill.sources.USER)
     } else {
-      this.quill.setSelection(insertAtPos + 1, Quill.sources.USER)
+      this.quill.setSelection(newCursorPos, Quill.sources.USER)
     }
+
     this.hideMentionList()
   }
 

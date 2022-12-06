@@ -15,9 +15,13 @@ export function registerSearch(name: string, search: Search) {
   SEARCHES[name] = search
 }
 
+interface AutocompletionSuggestion {
+  value: string
+}
+
 interface Autocompletion {
   pattern: RegExp
-  suggestions: (matches: string[]) => string[]
+  suggestions: (matches: string[]) => AutocompletionSuggestion[]
 }
 
 const AUTOCOMPLETIONS: { [name: string]: Autocompletion } = {}
@@ -37,7 +41,7 @@ export function registerAutocompletion(
 }
 
 export function evalAutocompletion(text: string): {
-  suggestions: string[]
+  suggestions: AutocompletionSuggestion[]
   matchOffset: number
 } {
   let matchOffset = 0

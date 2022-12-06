@@ -73,9 +73,11 @@ registerSearch("headline", {
 registerAutocompletion("mention", {
   pattern: /@([a-zA-Z])+$/,
   suggestions: ([match]) => {
-    return ["@pvh", "@paul", "@geoffrey"].filter((suggestion) =>
-      suggestion.startsWith(match)
-    )
+    return [
+      { value: "@pvh" },
+      { value: "@paul" },
+      { value: "@geoffrey" },
+    ].filter((suggestion) => suggestion.value.startsWith(match))
   },
 })
 
