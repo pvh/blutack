@@ -35,6 +35,7 @@ import memoize from "lodash.memoize"
 import { Doc, getHeads } from "@automerge/automerge"
 import {
   evalSearch,
+  Formatting,
   registerAutocompletion,
   registerSearch,
 } from "../pushpin-code/Searches"
@@ -71,13 +72,28 @@ registerSearch("headline", {
 })
 
 registerAutocompletion("mention", {
-  pattern: /@([a-zA-Z])+$/,
-  suggestions: ([match]) => {
+  pattern: /@([a-zA-Z])*$/,
+  suggestions: ([match]: string[]) => {
     return [
       { value: "@pvh" },
       { value: "@paul" },
       { value: "@geoffrey" },
     ].filter((suggestion) => suggestion.value.startsWith(match))
+  },
+})
+
+registerAutocompletion("soc", {
+  pattern: /([0-9]{1,2}):([0-9]{2})$/,
+  suggestions: ([, hours, minutes]: string[]) => {
+    const soc = (parseInt(hours, 10) - 18) % 24
+    const fraction = parseInt(minutes) / 60
+
+    return [
+      {
+        value:
+          `SOC ${soc}` + (fraction === 0 ? "" : fraction.toString().slice(1)),
+      },
+    ]
   },
 })
 
@@ -248,7 +264,7 @@ function useQuill({
 
     q.removeFormat(0, textString.length, "api")
 
-    matches.forEach((formatting) => {
+    matches.forEach((formatting: Formatting) => {
       const index = formatting.from
       const length = formatting.to - index
       const { color, isBold, isItalic } = formatting.style

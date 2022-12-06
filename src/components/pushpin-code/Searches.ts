@@ -69,7 +69,7 @@ export function evalAutocompletion(text: string): {
   }
 }
 
-interface Formatting {
+export interface Formatting {
   from: number
   to: number
   style: TextStyle
