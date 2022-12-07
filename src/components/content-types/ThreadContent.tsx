@@ -58,9 +58,12 @@ export default function ThreadContent(props: ContentProps) {
   useAutoAdvanceLastSeenHeads(createDocumentLink("thread", props.documentId))
 
   const onDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-
     ImportData.importDataTransfer(e.dataTransfer, (url) => {
+      if (url == props.url) {
+        return
+      }
+
+      e.preventDefault()
       changeDoc((threadDoc: ThreadDoc) => {
         threadDoc.messages.push({
           authorId: props.selfId,
