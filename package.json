@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@automerge/automerge": "^2.0.1-alpha.1",
+    "@popperjs/core": "^2.11.6",
     "@types/lodash.memoize": "^4.1.7",
     "automerge-repo": "0.0.36",
     "automerge-repo-network-messagechannel": "0.0.31",
@@ -33,6 +34,7 @@
     "react-dom": "^18.2.0",
     "react-dropdown-select": "^4.9.0",
     "react-pdf": "^5.7.2",
+    "react-popper": "^2.3.0",
     "react-tag-autocomplete": "^6.3.0",
     "uuid": "^9.0.0"
   },

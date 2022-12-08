@@ -7,28 +7,57 @@ import React, {
   useState,
 } from "react"
 import "./Popover.css"
+import { usePopper } from "react-popper"
+import { Placement, Boundary } from "@popperjs/core"
 
 interface PopOverMenuProps extends React.PropsWithChildren {
   trigger: React.ReactElement
   closeOnClick?: boolean
-  alignment?: "left" | "right"
+  placement?: Placement
 }
 
 export function Popover({
-  alignment = "left",
   trigger,
   closeOnClick = false,
   children,
+  placement = "auto",
 }: PopOverMenuProps) {
+  const [referenceElement, setReferenceElement] =
+    useState<HTMLDivElement | null>(null)
+  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(
+    null
+  )
+  const [arrowElement, setArrowElement] = useState<HTMLDivElement | null>(null)
+  const { styles } = usePopper(referenceElement, popperElement, {
+    placement,
+    strategy: "fixed",
+    modifiers: [
+      { name: "arrow", options: { element: arrowElement } },
+      {
+        name: "preventOverflow",
+        options: { boundary: document.body },
+      },
+      {
+        name: "flip",
+        options: { boundary: document.body },
+      },
+    ],
+  })
+
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (!popperElement) {
+      return
+    }
+
     const listener = (event: TouchEvent | MouseEvent) => {
       // Do nothing if clicking ref's element or descendent elements
+
       if (
-        !ref.current ||
-        (event.target && ref.current.contains(event.target as Node))
+        !isPopoverOpen ||
+        (event.target && popperElement.contains(event.target as Node))
       ) {
         return
       }
@@ -40,7 +69,7 @@ export function Popover({
     return () => {
       document.removeEventListener("click", listener, true)
     }
-  }, [ref])
+  }, [ref, isPopoverOpen, popperElement])
 
   function onClickTrigger(e: SyntheticEvent) {
     e.stopPropagation()
@@ -59,16 +88,21 @@ export function Popover({
   }
 
   return (
-    <div
-      ref={ref}
-      className={classNames("Popover", alignment, {
-        "is-open": isPopoverOpen,
-      })}
-    >
-      <div onClick={onClickTrigger}>{trigger}</div>
-      <div className="ContextMenu" onClick={onClickInside}>
-        {children}
+    <>
+      <div ref={setReferenceElement} onClick={onClickTrigger}>
+        {trigger}
       </div>
-    </div>
+      {isPopoverOpen && (
+        <div
+          ref={setPopperElement}
+          className="ContextMenu"
+          onClick={onClickInside}
+          style={styles.popper}
+        >
+          <div ref={setArrowElement} style={styles.arrow} />
+          {children}
+        </div>
+      )}
+    </>
   )
 }

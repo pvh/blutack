@@ -41,7 +41,7 @@ export default function NewDocumentButton({
   }
 
   return (
-    <Popover closeOnClick={true} trigger={trigger}>
+    <Popover closeOnClick={true} trigger={trigger} placement={"bottom-start"}>
       <ListMenuSection>
         {contentTypes.map((contentType) => (
           <ListMenuItem
