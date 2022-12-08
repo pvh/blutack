@@ -213,6 +213,7 @@ export default function ContentList({ documentId }: ContentProps) {
                   }
                   placement="right-start"
                   closeOnClick={true}
+                  skidding={-4}
                 >
                   <ListMenuSection>
                     <ListMenuItem

@@ -14,6 +14,8 @@ interface PopOverMenuProps extends React.PropsWithChildren {
   trigger: React.ReactElement
   closeOnClick?: boolean
   placement?: Placement
+  distance?: number // add a gap between the trigger and the popover
+  skidding?: number // shift the popover relative to the trigger
 }
 
 export function Popover({
@@ -21,18 +23,24 @@ export function Popover({
   closeOnClick = false,
   children,
   placement = "auto",
+  distance = 5,
+  skidding = 0,
 }: PopOverMenuProps) {
   const [referenceElement, setReferenceElement] =
     useState<HTMLDivElement | null>(null)
   const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(
     null
   )
-  const [arrowElement, setArrowElement] = useState<HTMLDivElement | null>(null)
   const { styles } = usePopper(referenceElement, popperElement, {
     placement,
     strategy: "fixed",
     modifiers: [
-      { name: "arrow", options: { element: arrowElement } },
+      {
+        name: "offset",
+        options: {
+          offset: [skidding, distance],
+        },
+      },
       {
         name: "preventOverflow",
         options: { boundary: document.body },
@@ -99,7 +107,6 @@ export function Popover({
           onClick={onClickInside}
           style={styles.popper}
         >
-          <div ref={setArrowElement} style={styles.arrow} />
           {children}
         </div>
       )}
