@@ -28,3 +28,11 @@
 .ContentList--newItem-icon {
   padding: 0 6px;
 }
+
+.ContentListItem .PdfContent-button {
+  display: none;
+}
+
+.ContentListItem:hover .PdfContent-button {
+  display: inherit;
+}
