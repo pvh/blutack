@@ -78,8 +78,6 @@ function setupSharedWorkerAndRepo() {
   ])
 
   const repo = new Repo({
-    // TODO: disable for now, because this is causing a bug where documents no longer sync correctly if you view them a second time
-    // storage: new LocalForageStorageAdapter(),
     network: [new MessageChannelNetworkAdapter(repoNetworkChannel.port1)],
     sharePolicy: (peerId) => peerId.includes("shared-worker"),
   })
