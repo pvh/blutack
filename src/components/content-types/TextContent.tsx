@@ -377,7 +377,8 @@ function TextInList(props: EditableContentProps) {
     .filter((l: string) => l.length > 0)
 
   const title = doc.title || lines.shift() || "[empty text note]"
-  const subtitle = lines.slice(0, 2).join("\n")
+
+  const hasUnseenMentions = false
 
   const unseenChanges = doc && hasUnseenChanges(doc, lastSeenHeads)
 
@@ -388,7 +389,7 @@ function TextInList(props: EditableContentProps) {
           icon="sticky-note"
           size="medium"
           dot={
-            unseenChanges
+            hasUnseenMentions
               ? {
                   color: "var(--colorChangeDot)",
                 }

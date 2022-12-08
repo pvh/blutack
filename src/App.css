@@ -129,7 +129,7 @@ table {
 :root {
   /* Colors */
   --colorBlueBlack: #102542;
-  --colorBlack: var(--colorBlack);
+  --colorBlack: #000000;
   --colorSecondaryGrey: #637389;
   --colorPaleGrey: #d5dfe5;
   --colorInputGrey: #e9edf0;

@@ -36,7 +36,9 @@ export default function TitleWithSubtitle(props: Props) {
           documentId={documentId}
         />
       ) : (
-        <Heading wrap={wrapTitle}>{title}</Heading>
+        <Heading wrap={wrapTitle}>
+          {title}
+        </Heading>
       )}
       {subtitle && (
         <SecondaryText>

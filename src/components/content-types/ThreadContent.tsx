@@ -142,16 +142,18 @@ export function ThreadInList(props: EditableContentProps) {
     createDocumentLink("thread", documentId)
   )
 
+  const hasUnreadMentions = false
+
   const unreadMessageCount = doc
     ? getUnreadMessageCountOfThread(doc, lastSeenHeads)
     : 0
 
   if (!doc || !doc.messages) return null
 
+  const hasUnreadMessages = unreadMessageCount > 0
+
   const title =
     doc.title != null && doc.title !== "" ? doc.title : "Untitled conversation"
-  const subtitle = (doc.messages[doc.messages.length - 1] || { content: "" })
-    .content
 
   return (
     <ListItem>
@@ -160,12 +162,7 @@ export function ThreadInList(props: EditableContentProps) {
           size="medium"
           icon={icon}
           dot={
-            unreadMessageCount > 0
-              ? {
-                  color: "var(--colorChangeDot)",
-                  number: unreadMessageCount,
-                }
-              : undefined
+            hasUnreadMentions ? { color: "var(--colorChangeDot)" } : undefined
           }
         />
       </ContentDragHandle>
