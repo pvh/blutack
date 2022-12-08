@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback, useState } from "react"
 import "./Heading.css"
 import Heading from "./Heading"
 import SecondaryText from "./SecondaryText"
@@ -14,6 +14,7 @@ export interface Props {
   editable?: boolean
   href?: string // this is because URL Content wants to have a link as its secondary text :/
   documentId: DocumentId
+  onBlur?: () => void
 }
 
 export default function TitleWithSubtitle(props: Props) {
@@ -25,7 +26,10 @@ export default function TitleWithSubtitle(props: Props) {
     subtitle,
     href,
     documentId,
+    onBlur,
   } = props
+
+  const [initialEditable] = useState(editable)
 
   return (
     <div className="TitleWithSubtitle">
@@ -34,6 +38,8 @@ export default function TitleWithSubtitle(props: Props) {
           field={titleEditorField}
           placeholder={title}
           documentId={documentId}
+          onBlur={onBlur}
+          autoselect={!initialEditable}
         />
       ) : (
         <Heading wrap={wrapTitle}>{title}</Heading>

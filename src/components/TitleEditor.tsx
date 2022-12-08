@@ -1,7 +1,13 @@
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
-import React, { useRef } from "react"
+import React, {
+  MutableRefObject,
+  Ref,
+  RefCallback,
+  useCallback,
+  useRef,
+} from "react"
 
 import "./TitleEditor.css"
 
@@ -14,14 +20,21 @@ interface Props {
   field?: string
   placeholder?: string
   preventDrag?: boolean
+  onBlur?: () => void
+  autoselect?: boolean
 }
 
 // `preventDrag` is a little kludgey, but is required to enable text selection if the
 // input is in a draggable element.
 export default function TitleEditor(props: Props) {
   const [doc, changeDoc] = useDocument<AnyDoc>(props.documentId)
-  const input = useRef<HTMLInputElement>(null)
-  const { field = "title", preventDrag = false, placeholder = "" } = props
+  const input: MutableRefObject<HTMLInputElement | null> = useRef(null)
+  const {
+    field = "title",
+    preventDrag = false,
+    placeholder = "",
+    onBlur,
+  } = props
 
   function onKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter" || e.key === "Escape") {
@@ -43,6 +56,17 @@ export default function TitleEditor(props: Props) {
     }
   }
 
+  const onRef = useCallback(
+    (element: HTMLInputElement) => {
+      if (props.autoselect && element) {
+        element.select()
+      }
+
+      input.current = element
+    },
+    [input]
+  )
+
   if (!doc) {
     return null
   }
@@ -52,7 +76,7 @@ export default function TitleEditor(props: Props) {
   return (
     <>
       <input
-        ref={input}
+        ref={onRef}
         draggable={preventDrag}
         onDragStart={onDragStart}
         type="text"
@@ -61,6 +85,7 @@ export default function TitleEditor(props: Props) {
         placeholder={placeholder}
         onKeyDown={onKeyDown}
         onChange={onChange}
+        onBlur={onBlur}
       />
       <span className="TitleEditor">{doc[field]}</span>
     </>

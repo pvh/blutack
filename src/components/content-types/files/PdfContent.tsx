@@ -364,7 +364,7 @@ export default function PdfContent(props: ContentProps) {
                 <i className="fa fa-ellipsis-h" />
               </button>
             }
-            alignment="right"
+            placement="right"
           >
             <div className="PdfContent-popover">
               <label className="Popover-entry">

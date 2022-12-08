@@ -37,6 +37,7 @@ import Heading from "../ui/Heading"
 import { useViewState } from "../pushpin-code/ViewState"
 import NewDocumentButton from "../NewDocumentButton"
 import { openDoc } from "../pushpin-code/Url"
+import { Popover } from "../ui/Popover"
 
 export interface ContentListDoc {
   title: string
@@ -71,6 +72,9 @@ export default function ContentList({ documentId }: ContentProps) {
   >(documentId, "currentContent")
 
   const [draggedOverIndex, setDraggedOverIndex] = useState<number | undefined>()
+  const [contentUrlBeingEdited, setContentUrlBeingEdited] = useState<
+    PushpinUrl | undefined
+  >()
 
   const onDragOver = useCallback((e: React.DragEvent, index: number) => {
     const element = getListMenuItemElement(e.target as HTMLElement)
@@ -169,29 +173,6 @@ export default function ContentList({ documentId }: ContentProps) {
     })
   }
 
-  // XXX: Would be better to not recreate this every render.
-  const actions = [
-    {
-      name: "view",
-      faIcon: "fa-compass",
-      label: "View",
-      shortcut: "⏎",
-      keysForActionPressed: (e: KeyboardEvent) =>
-        !e.shiftKey && e.key === "Enter",
-      callback: (url: PushpinUrl) => () => selectContent(url),
-    },
-    {
-      name: "remove",
-      destructive: true,
-      callback: (url: PushpinUrl) => () => removeContent(url),
-      faIcon: "fa-trash",
-      label: "Remove",
-      shortcut: "⌘+⌫",
-      keysForActionPressed: (e: KeyboardEvent) =>
-        (e.metaKey || e.ctrlKey) && e.key === "Backspace",
-    },
-  ]
-
   return (
     <CenteredStack direction="row" centerText={false}>
       <CenteredStackRowItem
@@ -214,14 +195,39 @@ export default function ContentList({ documentId }: ContentProps) {
               onDrop={(evt) => onDrop(evt)}
               key={url}
             >
-              <ActionListItem
-                contentUrl={url}
-                defaultAction={actions[0]}
-                actions={actions}
+              <ListMenuItem
+                onClick={() => selectContent(url)}
                 selected={url === currentContent}
               >
-                <Content context="list" url={url} editable={true} />
-              </ActionListItem>
+                <Content
+                  context="list"
+                  url={url}
+                  editable={contentUrlBeingEdited === url} // todo: this should be done in a more principled way
+                  onBlur={() => setContentUrlBeingEdited(undefined)}
+                />
+                <Popover
+                  trigger={
+                    <button className="PdfContent-button">
+                      <i className="fa fa-ellipsis-h" />
+                    </button>
+                  }
+                  placement="right-start"
+                  closeOnClick={true}
+                >
+                  <ListMenuSection>
+                    <ListMenuItem
+                      onClick={() => {
+                        setContentUrlBeingEdited(url)
+                      }}
+                    >
+                      Rename
+                    </ListMenuItem>
+                    <ListMenuItem onClick={() => removeContent(url)}>
+                      Delete
+                    </ListMenuItem>
+                  </ListMenuSection>
+                </Popover>
+              </ListMenuItem>
             </div>
           ))}
           <div
@@ -257,8 +263,8 @@ export default function ContentList({ documentId }: ContentProps) {
 
 const icon = "list"
 
-export function ContentListInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
+export function ContentListInList(props: ContentListItemProps) {
+  const { documentId, url, editable, onBlur } = props
   const [doc] = useDocument<ContentListDoc>(documentId)
   if (!doc || !doc.content) return null
 
@@ -278,9 +284,14 @@ export function ContentListInList(props: EditableContentProps) {
         subtitle={subtitle}
         documentId={documentId}
         editable={editable}
+        onBlur={onBlur}
       />
     </ListItem>
   )
+}
+
+export interface ContentListItemProps extends EditableContentProps {
+  onBlur: () => void
 }
 
 function create(attrs: any, handle: DocHandle<any>) {

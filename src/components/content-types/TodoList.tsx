@@ -20,6 +20,7 @@ import "./TodoList.css"
 import ActionListItem from "./workspace/omnibox/ActionListItem"
 import Actions from "./workspace/omnibox/Actions"
 import Action from "./workspace/omnibox/Action"
+import { ContentListItemProps } from "./ContentList"
 
 interface Source {
   url: PushpinUrl
@@ -163,8 +164,8 @@ function preventDefault(e: React.SyntheticEvent) {
   e.preventDefault()
 }
 
-export function TodoListInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
+export function TodoListInList(props: ContentListItemProps) {
+  const { documentId, url, editable, onBlur } = props
   const [doc] = useDocument<TodoListDoc>(documentId)
   if (!doc || !doc.todos) return null
 
@@ -181,6 +182,7 @@ export function TodoListInList(props: EditableContentProps) {
         title={title}
         documentId={documentId}
         editable={editable}
+        onBlur={onBlur}
       />
     </ListItem>
   )

@@ -6,9 +6,10 @@ import Badge, { Props as BadgeProps } from "../../ui/Badge"
 import ListItem from "../../ui/ListItem"
 import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import ContentDragHandle from "../../ui/ContentDragHandle"
+import { ContentListItemProps } from "../ContentList"
 
-export default function BoardInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
+export default function BoardInList(props: ContentListItemProps) {
+  const { documentId, url, editable, onBlur } = props
   const [doc] = useDocument<BoardDoc>(documentId)
 
   if (!doc || !doc.cards) {
@@ -36,6 +37,7 @@ export default function BoardInList(props: EditableContentProps) {
         subtitle={subtitle}
         documentId={documentId}
         editable={editable}
+        onBlur={onBlur}
       />
     </ListItem>
   )

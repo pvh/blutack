@@ -37,12 +37,8 @@ VVV permanent and unchanging (and required to render) VVV
 fileId: { "mimetype": "binary/pdf", length: 8000, "extension": "PDF"}
 */
 
-export default function FileContent({
-  documentId,
-  context,
-  editable,
-  url,
-}: Props) {
+export default function FileContent(props: Props) {
+  const { documentId, context, editable, url } = props
   const [doc] = useDocument<FileDoc>(documentId)
   const badgeRef = useRef<HTMLDivElement>(null)
 
@@ -76,6 +72,7 @@ export default function FileContent({
               subtitle={subtitle}
               documentId={documentId}
               editable={editable}
+              onBlur={"onBlur" in props ? (props as any).onBlur : undefined} // todo: this is not great
             />
           </ListItem>
         )

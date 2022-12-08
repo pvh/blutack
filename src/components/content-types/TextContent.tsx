@@ -33,6 +33,7 @@ import {
 import { createDocumentLink } from "../pushpin-code/Url"
 import memoize from "lodash.memoize"
 import { Doc, getHeads } from "@automerge/automerge"
+import { ContentListItemProps } from "./ContentList"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -291,8 +292,8 @@ function create({ text }: any, handle: DocHandle<any>) {
   })
 }
 
-function TextInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
+function TextInList(props: ContentListItemProps) {
+  const { documentId, url, editable, onBlur } = props
   const [doc] = useDocument<TextDoc>(documentId)
   const lastSeenHeads = useLastSeenHeads(createDocumentLink("text", documentId))
 
@@ -328,6 +329,7 @@ function TextInList(props: EditableContentProps) {
         title={title}
         documentId={documentId}
         editable={editable}
+        onBlur={onBlur}
       />
     </ListItem>
   )

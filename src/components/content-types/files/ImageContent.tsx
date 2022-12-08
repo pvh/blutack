@@ -15,6 +15,7 @@ import {
   createBinaryDataUrl,
   useBinaryDataHeader,
 } from "../../../blobstore/Blob"
+import { ContentListItemProps } from "../ContentList"
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
@@ -36,12 +37,8 @@ export default function ImageContent({ documentId }: ContentProps) {
   )
 }
 
-interface Props extends ContentProps {
-  editable: boolean
-}
-
-function ImageInList(props: Props) {
-  const { documentId, editable, url } = props
+function ImageInList(props: ContentListItemProps) {
+  const { documentId, editable, url, onBlur } = props
   const [doc] = useDocument<FileDoc>(documentId)
 
   const { title = "", binaryDataId, extension } = doc || {}
@@ -74,6 +71,7 @@ function ImageInList(props: Props) {
         subtitle={subtitle}
         documentId={documentId}
         editable={editable}
+        onBlur={onBlur}
       />
     </ListItem>
   )

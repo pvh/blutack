@@ -23,6 +23,7 @@ import {
 } from "../pushpin-code/Changes"
 import { Doc, getHeads } from "@automerge/automerge"
 import memoize from "lodash.memoize"
+import { ContentListItemProps } from "./ContentList"
 
 interface Message {
   authorId: DocumentId
@@ -135,8 +136,8 @@ function preventDefault(e: React.SyntheticEvent) {
   e.preventDefault()
 }
 
-export function ThreadInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
+export function ThreadInList(props: ContentListItemProps) {
+  const { documentId, url, editable, onBlur } = props
   const [doc] = useDocument<ThreadDoc>(documentId)
   const lastSeenHeads = useLastSeenHeads(
     createDocumentLink("thread", documentId)
@@ -174,6 +175,7 @@ export function ThreadInList(props: EditableContentProps) {
         title={title}
         documentId={documentId}
         editable={editable}
+        onBlur={onBlur}
       />
     </ListItem>
   )
