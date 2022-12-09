@@ -23,6 +23,8 @@ import {
 } from "../pushpin-code/Changes"
 import { Doc, getHeads } from "@automerge/automerge"
 import memoize from "lodash.memoize"
+import { evalSearchFor } from "../pushpin-code/Searches"
+import { useSelf } from "../pushpin-code/SelfHooks"
 
 interface Message {
   authorId: DocumentId
@@ -138,19 +140,15 @@ function preventDefault(e: React.SyntheticEvent) {
 export function ThreadInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
   const [doc] = useDocument<ThreadDoc>(documentId)
+  const [self] = useSelf()
   const lastSeenHeads = useLastSeenHeads(
     createDocumentLink("thread", documentId)
   )
 
-  const hasUnreadMentions = false
+  if (!doc || !doc.messages || !self) return null
 
-  const unreadMessageCount = doc
-    ? getUnreadMessageCountOfThread(doc, lastSeenHeads)
-    : 0
-
-  if (!doc || !doc.messages) return null
-
-  const hasUnreadMessages = unreadMessageCount > 0
+  const unseenMentions = hasUnseenMentions(doc, self.name, lastSeenHeads)
+  const unseenChanges = hasUnseenChanges(doc, lastSeenHeads)
 
   const title =
     doc.title != null && doc.title !== "" ? doc.title : "Untitled conversation"
@@ -161,9 +159,7 @@ export function ThreadInList(props: EditableContentProps) {
         <Badge
           size="medium"
           icon={icon}
-          dot={
-            hasUnreadMentions ? { color: "var(--colorChangeDot)" } : undefined
-          }
+          dot={unseenMentions ? { color: "var(--colorChangeDot)" } : undefined}
         />
       </ContentDragHandle>
       <TitleWithSubtitle
@@ -176,15 +172,9 @@ export function ThreadInList(props: EditableContentProps) {
   )
 }
 
-const getUnreadMessageCountOfThread = memoize(
+const getUnseenPatchesOfThread = memoize(
   (doc: ThreadDoc, lastSeenHeads?: LastSeenHeads) => {
-    // count any splice on the messages property of the thread document as a change
-    return getUnseenPatches(doc, lastSeenHeads).filter(
-      (patch) =>
-        patch.action === "splice" &&
-        patch.path.length === 2 &&
-        patch.path[0] === "messages"
-    ).length
+    return getUnseenPatches(doc, lastSeenHeads)
   },
   (doc, lastSeenHeads) =>
     `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
@@ -192,10 +182,33 @@ const getUnreadMessageCountOfThread = memoize(
 
 export function hasUnseenChanges(
   doc: Doc<unknown>,
-  lastSeenHeads: LastSeenHeads
+  lastSeenHeads?: LastSeenHeads
 ) {
   // TODO: one of these days we should figure out the typing
-  return getUnreadMessageCountOfThread(doc as ThreadDoc, lastSeenHeads) > 0
+  return getUnseenPatchesOfThread(doc as ThreadDoc, lastSeenHeads).some(
+    (patch) =>
+      patch.action === "splice" &&
+      patch.path.length === 2 &&
+      patch.path[0] === "messages"
+  )
+}
+
+export function hasUnseenMentions(
+  doc: Doc<unknown>,
+  name: string,
+  lastSeenHeads?: LastSeenHeads
+) {
+  // TODO: one of these days we should figure out the typing
+  return getUnseenPatchesOfThread(doc as ThreadDoc, lastSeenHeads).some(
+    (patch) =>
+      patch.action === "put" &&
+      patch.path.length === 3 &&
+      patch.path[0] === "messages" &&
+      typeof patch.value === "string" &&
+      evalSearchFor("mention", patch.value).some(
+        (match) => match.data.name.toLowerCase() === name.toLowerCase()
+      )
+  )
 }
 
 function stopPropagation(e: React.SyntheticEvent) {

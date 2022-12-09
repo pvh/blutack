@@ -1,5 +1,17 @@
 const SEARCHES: { [name: string]: Search } = {}
 
+interface MatchData {
+  [name: string]: any
+}
+
+export interface Match {
+  type: string
+  from: number
+  to: number
+  data: MatchData
+  style: TextStyle
+}
+
 interface TextStyle {
   color?: string
   isBold?: boolean
@@ -9,6 +21,7 @@ interface TextStyle {
 interface Search {
   pattern: RegExp
   style: TextStyle
+  data?: (match: string[]) => MatchData
 }
 
 export function registerSearch(name: string, search: Search) {
@@ -69,36 +82,45 @@ export function evalAutocompletion(text: string): {
   }
 }
 
-export interface Formatting {
-  from: number
-  to: number
-  style: TextStyle
+export function evalAllSearches(text: string): Match[] {
+  return Object.keys(SEARCHES).flatMap((name) => evalSearchFor(text, name))
 }
 
-export function evalSearch(text: string): Formatting[] {
-  const matches: Formatting[] = []
+export function evalSearchFor(name: string, text: string): Match[] {
+  const matches: Match[] = []
 
-  Object.entries(SEARCHES).forEach(([name, search]) => {
-    const regex = new RegExp(search.pattern, "igm")
+  const search = SEARCHES[name]
 
-    let match, prevIndex
+  if (!search) {
+    console.error(`unknown search: ${name}`)
+    return []
+  }
 
-    while ((match = regex.exec(text)) != null) {
-      const value = match[0]
-      const from = match.index
-      const to = from + value.length
+  const regex = new RegExp(search.pattern, "igm")
 
-      if (from === prevIndex) {
-        throw new Error(
-          "regex causes infinite loop because it matches empty string"
-        )
-      }
+  let match, prevIndex
 
-      prevIndex = from
+  while ((match = regex.exec(text)) != null) {
+    const value = match[0]
+    const from = match.index
+    const to = from + value.length
 
-      matches.push({ from, to, style: search.style })
+    if (from === prevIndex) {
+      throw new Error(
+        "regex causes infinite loop because it matches empty string"
+      )
     }
-  })
+
+    prevIndex = from
+
+    matches.push({
+      type: name,
+      from,
+      to,
+      style: search.style,
+      data: search.data ? search.data(match) : match,
+    })
+  }
 
   return matches
 }
