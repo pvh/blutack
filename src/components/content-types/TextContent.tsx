@@ -22,7 +22,7 @@ import { DocHandle, DocumentId } from "automerge-repo"
 import QuillCursors from "quill-cursors"
 import { usePresence } from "../pushpin-code/PresenceHooks"
 import IQuillRange from "quill-cursors/dist/quill-cursors/i-range"
-import { useSelfId } from "../pushpin-code/SelfHooks"
+import { useSelf, useSelfId } from "../pushpin-code/SelfHooks"
 import { ContactDoc } from "./contact"
 import {
   getUnseenPatches,
@@ -31,11 +31,11 @@ import {
   useLastSeenHeads,
 } from "../pushpin-code/Changes"
 import { createDocumentLink } from "../pushpin-code/Url"
-import memoize from "lodash.memoize"
-import { Doc, getHeads } from "@automerge/automerge"
+import { Doc, getHeads, Heads, view } from "@automerge/automerge"
 import {
-  evalSearch,
-  Formatting,
+  evalAllSearches,
+  evalSearchFor,
+  Match,
   registerAutocompletion,
   registerSearch,
 } from "../pushpin-code/Searches"
@@ -57,10 +57,13 @@ TextContent.minHeight = 2
 TextContent.defaultWidth = 15
 
 registerSearch("mention", {
-  pattern: /@[a-zA-Z]+/,
+  pattern: /@([a-zA-Z]+)/,
   style: {
     color: "#999",
     isBold: true,
+  },
+  data: ([, name]) => {
+    return { name }
   },
 })
 
@@ -260,11 +263,11 @@ function useQuill({
 
     q.updateContents(diff)
 
-    const matches = evalSearch(textString)
+    const matches = evalAllSearches(textString)
 
     q.removeFormat(0, textString.length, "api")
 
-    matches.forEach((formatting: Formatting) => {
+    matches.forEach((formatting: Match) => {
       const index = formatting.from
       const length = formatting.to - index
       const { color, isBold, isItalic } = formatting.style
@@ -366,9 +369,10 @@ function create({ text }: any, handle: DocHandle<any>) {
 function TextInList(props: EditableContentProps) {
   const { documentId, url, editable } = props
   const [doc] = useDocument<TextDoc>(documentId)
+  const [self] = useSelf()
   const lastSeenHeads = useLastSeenHeads(createDocumentLink("text", documentId))
 
-  if (!doc || !doc.text) return null
+  if (!doc || !doc.text || !self) return null
 
   const lines = doc.text
     //  @ts-ignore-next-line
@@ -378,9 +382,8 @@ function TextInList(props: EditableContentProps) {
 
   const title = doc.title || lines.shift() || "[empty text note]"
 
-  const hasUnseenMentions = false
-
-  const unseenChanges = doc && hasUnseenChanges(doc, lastSeenHeads)
+  const unseenMentions = hasUnseenMentions(doc, self.name, lastSeenHeads)
+  const unseenChanges = hasUnseenChanges(doc, lastSeenHeads)
 
   return (
     <ListItem>
@@ -389,7 +392,7 @@ function TextInList(props: EditableContentProps) {
           icon="sticky-note"
           size="medium"
           dot={
-            hasUnseenMentions
+            unseenMentions
               ? {
                   color: "var(--colorChangeDot)",
                 }
@@ -406,18 +409,32 @@ function TextInList(props: EditableContentProps) {
   )
 }
 
-export const hasUnseenChanges = memoize(
-  (doc: Doc<unknown>, lastSeenHeads?: LastSeenHeads) => {
-    return getUnseenPatches(doc, lastSeenHeads).some(
-      (patch) =>
-        patch.action === "splice" &&
-        patch.path.length === 2 &&
-        patch.path[0] === "text"
+function hasUnseenChanges(doc: Doc<unknown>, lastSeenHeads?: LastSeenHeads) {
+  return getUnseenPatches(doc, lastSeenHeads).some((patch) => {
+    console.log(patch)
+
+    return (
+      patch.action === "splice" &&
+      patch.path.length === 2 &&
+      patch.path[0] === "text"
     )
-  },
-  (doc, lastSeenHeads) =>
-    `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
-)
+  })
+}
+
+// TODO: this is not really checking if the user has been mentioned since the doc was last seen
+// as long as the user is mentioned in the doc once we consider any new changes to be unseen mentions
+function hasUnseenMentions(
+  doc: Doc<unknown>,
+  name: string,
+  lastSeenHeads?: LastSeenHeads
+) {
+  const isUserMentionedInText = evalSearchFor(
+    "mention",
+    (doc as TextDoc).text.toString()
+  ).some((match) => match.data.name.toLowerCase() === name.toLowerCase())
+
+  return isUserMentionedInText && hasUnseenChanges(doc, lastSeenHeads)
+}
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match("text/")
 
