@@ -83,7 +83,7 @@ export function evalAutocompletion(text: string): {
 }
 
 export function evalAllSearches(text: string): Match[] {
-  return Object.keys(SEARCHES).flatMap((name) => evalSearchFor(text, name))
+  return Object.keys(SEARCHES).flatMap((name) => evalSearchFor(name, text))
 }
 
 export function evalSearchFor(name: string, text: string): Match[] {

@@ -15,6 +15,8 @@ import {
   clone,
   Patch,
 } from "@automerge/automerge"
+import memoize from "lodash.memoize"
+import { ThreadDoc } from "../content-types/ThreadContent"
 
 export function useAdvanceLastSeenHeads(docUrl: PushpinUrl) {
   const workspaceId = useContext(WorkspaceContext)
@@ -105,31 +107,32 @@ export function useLastSeenHeads(
   return lastSeenHeads
 }
 
-export function getUnseenPatches(
-  doc: Doc<any>,
-  lastSeenHeads?: LastSeenHeads
-): Patch[] {
-  const patches: Patch[] = []
+export const getUnseenPatches = memoize(
+  (doc: Doc<any>, lastSeenHeads?: LastSeenHeads): Patch[] => {
+    const patches: Patch[] = []
 
-  if (!hasDocUnseenChanges(doc, lastSeenHeads)) {
-    return []
-  }
+    if (!hasDocUnseenChanges(doc, lastSeenHeads)) {
+      return []
+    }
 
-  try {
-    const oldDoc = clone(view(doc, lastSeenHeads as Heads))
+    try {
+      const oldDoc = clone(view(doc, lastSeenHeads as Heads))
 
-    applyChanges(oldDoc, getChanges(oldDoc, doc), {
-      patchCallback: (patch: Patch) => {
-        patches.push(patch)
-      },
-    })
+      applyChanges(oldDoc, getChanges(oldDoc, doc), {
+        patchCallback: (patch: Patch) => {
+          patches.push(patch)
+        },
+      })
 
-    return patches
-  } catch (err) {
-    console.error(err)
-    return []
-  }
-}
+      return patches
+    } catch (err) {
+      console.error(err)
+      return []
+    }
+  },
+  (doc, lastSeenHeads) =>
+    `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
+)
 
 export function hasDocUnseenChanges(
   doc: Doc<any>,

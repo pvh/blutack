@@ -382,7 +382,7 @@ function TextInList(props: EditableContentProps) {
 
   const title = doc.title || lines.shift() || "[empty text note]"
 
-  const unseenMentions = hasUnseenMentions(doc, self.name, lastSeenHeads)
+  const unseenMentions = hasUnseenMentions(doc, lastSeenHeads, self.name)
   const unseenChanges = hasUnseenChanges(doc, lastSeenHeads)
 
   return (
@@ -410,23 +410,20 @@ function TextInList(props: EditableContentProps) {
 }
 
 function hasUnseenChanges(doc: Doc<unknown>, lastSeenHeads?: LastSeenHeads) {
-  return getUnseenPatches(doc, lastSeenHeads).some((patch) => {
-    console.log(patch)
-
-    return (
+  return getUnseenPatches(doc, lastSeenHeads).some(
+    (patch) =>
       patch.action === "splice" &&
       patch.path.length === 2 &&
       patch.path[0] === "text"
-    )
-  })
+  )
 }
 
 // TODO: this is not really checking if the user has been mentioned since the doc was last seen
 // as long as the user is mentioned in the doc once we consider any new changes to be unseen mentions
 function hasUnseenMentions(
   doc: Doc<unknown>,
-  name: string,
-  lastSeenHeads?: LastSeenHeads
+  lastSeenHeads: LastSeenHeads | undefined,
+  name: string
 ) {
   const isUserMentionedInText = evalSearchFor(
     "mention",
@@ -452,4 +449,5 @@ ContentTypes.register({
   createFrom,
   supportsMimeType,
   hasUnseenChanges,
+  hasUnseenMentions,
 })

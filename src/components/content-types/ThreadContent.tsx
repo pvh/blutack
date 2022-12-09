@@ -21,8 +21,7 @@ import {
   useAutoAdvanceLastSeenHeads,
   useLastSeenHeads,
 } from "../pushpin-code/Changes"
-import { Doc, getHeads } from "@automerge/automerge"
-import memoize from "lodash.memoize"
+import { Doc } from "@automerge/automerge"
 import { evalSearchFor } from "../pushpin-code/Searches"
 import { useSelf } from "../pushpin-code/SelfHooks"
 
@@ -147,7 +146,7 @@ export function ThreadInList(props: EditableContentProps) {
 
   if (!doc || !doc.messages || !self) return null
 
-  const unseenMentions = hasUnseenMentions(doc, self.name, lastSeenHeads)
+  const unseenMentions = hasUnseenMentions(doc, lastSeenHeads, self.name)
   const unseenChanges = hasUnseenChanges(doc, lastSeenHeads)
 
   const title =
@@ -172,20 +171,12 @@ export function ThreadInList(props: EditableContentProps) {
   )
 }
 
-const getUnseenPatchesOfThread = memoize(
-  (doc: ThreadDoc, lastSeenHeads?: LastSeenHeads) => {
-    return getUnseenPatches(doc, lastSeenHeads)
-  },
-  (doc, lastSeenHeads) =>
-    `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
-)
-
 export function hasUnseenChanges(
   doc: Doc<unknown>,
   lastSeenHeads?: LastSeenHeads
 ) {
   // TODO: one of these days we should figure out the typing
-  return getUnseenPatchesOfThread(doc as ThreadDoc, lastSeenHeads).some(
+  return getUnseenPatches(doc as ThreadDoc, lastSeenHeads).some(
     (patch) =>
       patch.action === "splice" &&
       patch.path.length === 2 &&
@@ -195,11 +186,11 @@ export function hasUnseenChanges(
 
 export function hasUnseenMentions(
   doc: Doc<unknown>,
-  name: string,
-  lastSeenHeads?: LastSeenHeads
+  lastSeenHeads: LastSeenHeads | undefined,
+  name: string
 ) {
   // TODO: one of these days we should figure out the typing
-  return getUnseenPatchesOfThread(doc as ThreadDoc, lastSeenHeads).some(
+  return getUnseenPatches(doc as ThreadDoc, lastSeenHeads).some(
     (patch) =>
       patch.action === "put" &&
       patch.path.length === 3 &&
@@ -298,4 +289,5 @@ ContentTypes.register({
   },
   create,
   hasUnseenChanges,
+  hasUnseenMentions,
 })
