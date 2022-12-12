@@ -56,6 +56,8 @@ self.addEventListener("connect", (e: MessageEvent) => {
     if ("serviceWorkerPort" in data) {
       configureServiceWorkerPort(data.serviceWorkerPort)
     } else if ("repoNetworkPort" in data) {
+      // be careful to not accidentally create a strong reference to repoNetworkPort
+      // that will prevent dead ports from being garbage collected
       configureRepoNetworkPort(data.repoNetworkPort)
     }
   }
@@ -88,8 +90,10 @@ function configureServiceWorkerPort(port: MessagePort) {
 }
 
 async function configureRepoNetworkPort(port: MessagePort) {
+  // be careful to not accidentally create a strong reference to port
+  // that will prevent dead ports from being garbage collected
   repo.networkSubsystem.addNetworkAdapter(
-    new MessageChannelNetworkAdapter(port, true)
+    new MessageChannelNetworkAdapter(port, { useWeakRef: true })
   )
 }
 
