@@ -74,12 +74,17 @@ export function parseDocumentLink(link: string): Parts {
 
 export function parts(str: string) {
   const matches = str.match(
-    /(.+):\/\/(?:www\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)*(\/[\/\d\w\.-]*)*(?:[\?])*(.+)*/
+    /([a-zA-Z\+\.\-]+):\/\/(?:www\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)*(\/[\/\d\w\.-]*)*(?:[\?])*(.+)*/
   )
   if (!matches) return { scheme: "", type: "", documentId: "" }
   const [, protocol, , , path] = matches
 
   const scheme = protocol
+
+  if (path === undefined) {
+    return { scheme: "", type: "", documentId: "" }
+  }
+
   const [type, documentId] = path.split("/")
 
   return { scheme, type, documentId }
