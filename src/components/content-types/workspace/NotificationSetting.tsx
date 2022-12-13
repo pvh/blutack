@@ -11,6 +11,7 @@ import { LastSeenHeads } from "../../pushpin-code/Changes"
 import { Doc } from "@automerge/automerge"
 import { useViewState } from "../../pushpin-code/ViewState"
 import { useSelfId } from "../../pushpin-code/SelfHooks"
+import ListMenuSection from "../../ui/ListMenuSection"
 
 type NotificationMode = "all" | "never" | "mentions"
 
@@ -80,36 +81,29 @@ export default function NotificationSetting({
       }
       alignment="right"
     >
-      <div
-        style={{
-          margin: "var(--halfCellSize)",
-          marginBottom: 0,
-          fontWeight: "bold",
-        }}
-      >
-        Notify of changes
-      </div>
-      <ListMenu>
-        <ListMenuItem
-          selected={notificationMode === "all"}
-          onClick={() => changeMode("all")}
-        >
-          {notificationMode === "all" && <span className="check" />} all
-        </ListMenuItem>
-        <ListMenuItem
-          selected={notificationMode === "never"}
-          onClick={() => changeMode("never")}
-        >
-          {notificationMode === "never" && <span className="check" />} never
-        </ListMenuItem>
-        <ListMenuItem
-          selected={notificationMode === "mentions"}
-          onClick={() => changeMode("mentions")}
-        >
-          {notificationMode === "mentions" && <span className="check" />} when
-          mentioned
-        </ListMenuItem>
-      </ListMenu>
+      <ListMenuSection title="Notify of changes">
+        <ListMenu>
+          <ListMenuItem
+            selected={notificationMode === "all"}
+            onClick={() => changeMode("all")}
+          >
+            {notificationMode === "all" && <span className="check" />} always
+          </ListMenuItem>
+          <ListMenuItem
+            selected={notificationMode === "mentions"}
+            onClick={() => changeMode("mentions")}
+          >
+            {notificationMode === "mentions" && <span className="check" />} when
+            mentioned
+          </ListMenuItem>
+          <ListMenuItem
+            selected={notificationMode === "never"}
+            onClick={() => changeMode("never")}
+          >
+            {notificationMode === "never" && <span className="check" />} never
+          </ListMenuItem>
+        </ListMenu>
+      </ListMenuSection>
     </Popover>
   )
 }

@@ -1,4 +1,9 @@
-.UnseenChangesDoc-emptyState {
+.ChangedDocsList--emptyState {
   padding: var(--cellSize);
   text-align: center;
+}
+
+.ChangedDocsList--content {
+  max-height: 420px;
+  overflow: auto;
 }
