@@ -38,10 +38,6 @@ export default function TitleBar({
   const [activeOmnibox, setActive] = useState(false)
   const [workspaceDoc] = useDocument<WorkspaceDoc>(workspaceDocId)
 
-  const currentDocId = currentDocUrl
-    ? parseDocumentLink(currentDocUrl).documentId
-    : undefined
-
   useEffect(() => {
     if (!currentDocUrl) {
       setActive(true)
@@ -119,9 +115,11 @@ export default function TitleBar({
           context="title-bar"
           isPresent
         />
-        {currentDocId && <NotificationSetting documentId={currentDocId} />}
+        {currentDocUrl && (
+          <NotificationSetting currentDocumentUrl={currentDocUrl} />
+        )}
         <ChangedDocsList
-          lastSeenHeads={getLastSeenHeadsMapOfWorkspace(workspaceDoc)}
+          lastSeenHeadsMap={getLastSeenHeadsMapOfWorkspace(workspaceDoc)}
         ></ChangedDocsList>
       </div>
 

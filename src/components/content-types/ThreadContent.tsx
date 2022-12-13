@@ -24,6 +24,7 @@ import {
 import { Doc } from "@automerge/automerge"
 import { evalSearchFor } from "../pushpin-code/Searches"
 import { useSelf } from "../pushpin-code/SelfHooks"
+import { shouldNotifyAboutDocChanges } from "./workspace/NotificationSetting"
 
 interface Message {
   authorId: DocumentId
@@ -146,8 +147,13 @@ export function ThreadInList(props: EditableContentProps) {
 
   if (!doc || !doc.messages || !self) return null
 
-  const unseenMentions = hasUnseenMentions(doc, lastSeenHeads, self.name)
   const unseenChanges = hasUnseenChanges(doc, lastSeenHeads)
+  const showChangedDot = shouldNotifyAboutDocChanges(
+    "thread",
+    doc,
+    lastSeenHeads,
+    self.name
+  )
 
   const title =
     doc.title != null && doc.title !== "" ? doc.title : "Untitled conversation"
@@ -158,7 +164,7 @@ export function ThreadInList(props: EditableContentProps) {
         <Badge
           size="medium"
           icon={icon}
-          dot={unseenMentions ? { color: "var(--colorChangeDot)" } : undefined}
+          dot={showChangedDot ? { color: "var(--colorChangeDot)" } : undefined}
         />
       </ContentDragHandle>
       <TitleWithSubtitle

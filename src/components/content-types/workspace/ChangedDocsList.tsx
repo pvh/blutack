@@ -10,40 +10,34 @@ import { LastSeenHeadsMap } from "../../pushpin-code/Changes"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import { Doc } from "@automerge/automerge"
 import { useSelf } from "../../pushpin-code/SelfHooks"
+import { shouldNotifyAboutDocChanges } from "./NotificationSetting"
 interface ChangedDocsListProps {
-  lastSeenHeads: LastSeenHeadsMap
+  lastSeenHeadsMap: LastSeenHeadsMap
 }
 
-export function ChangedDocsList({ lastSeenHeads }: ChangedDocsListProps) {
+export function ChangedDocsList({ lastSeenHeadsMap }: ChangedDocsListProps) {
   const [self] = useSelf()
   const trackedDocuments = useDocumentIds(
-    Object.keys(lastSeenHeads).map((url) => parseDocumentLink(url).documentId)
+    Object.keys(lastSeenHeadsMap).map(
+      (url) => parseDocumentLink(url).documentId
+    )
   )
 
   if (!self) {
     return null
   }
 
-  const documentUrlsWithUnseenMentions = Object.entries(lastSeenHeads)
-    .filter(([documentUrl, lastSeenHead]) => {
+  const documentUrlsWithUnseenMentions = Object.entries(lastSeenHeadsMap)
+    .filter(([documentUrl, lastSeenHeads]) => {
       const doc = trackedDocuments[parseDocumentLink(documentUrl).documentId]
 
       if (!doc) {
         return false
       }
 
-      const contentType = ContentTypes.typeNameToContentType(
-        parseDocumentLink(documentUrl).type
-      )
+      const type = parseDocumentLink(documentUrl).type
 
-      if (!contentType || !contentType.hasUnseenMentions) {
-        return false
-      }
-      return contentType.hasUnseenMentions(
-        doc as Doc<unknown>,
-        lastSeenHead,
-        self.name
-      )
+      return shouldNotifyAboutDocChanges(type, doc, lastSeenHeads, self.name)
     })
     .map(([url]) => url)
 
