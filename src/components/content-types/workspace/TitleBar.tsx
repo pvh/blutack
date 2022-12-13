@@ -9,6 +9,7 @@ import {
   PushpinUrl,
   createDocumentLink,
   createWebLink,
+  parseDocumentLink,
 } from "../../pushpin-code/Url"
 import { useEvent } from "../../pushpin-code/Hooks"
 
@@ -21,6 +22,7 @@ import NewDocumentButton from "../../NewDocumentButton"
 import { openDoc } from "../../pushpin-code/Url"
 import { ChangedDocsList } from "./ChangedDocsList"
 import { getLastSeenHeadsMapOfWorkspace } from "../../pushpin-code/Changes"
+import NotificationSetting from "./NotificationSetting"
 
 export interface Props {
   workspaceDocId: DocumentId
@@ -35,6 +37,10 @@ export default function TitleBar({
 }: Props) {
   const [activeOmnibox, setActive] = useState(false)
   const [workspaceDoc] = useDocument<WorkspaceDoc>(workspaceDocId)
+
+  const currentDocId = currentDocUrl
+    ? parseDocumentLink(currentDocUrl).documentId
+    : undefined
 
   useEffect(() => {
     if (!currentDocUrl) {
@@ -74,12 +80,12 @@ export default function TitleBar({
 
   return (
     <div className="TitleBar">
-      <div className="NavigationBar Inline">
+      <div className="TitleBar-section">
         <NewDocumentButton
           onCreateDocument={onCreateDocument}
           trigger={
             <button type="button" className="TitleBar-menuItem">
-              <i className="fa fa-plus" />
+              <Badge icon="plus" backgroundColor="transparent" />
             </button>
           }
         />
@@ -91,31 +97,29 @@ export default function TitleBar({
           }}
           className="TitleBar-menuItem"
         >
-          <Badge icon="search" backgroundColor="#00000000" />
+          <Badge icon="search" backgroundColor="transparent" />
         </button>
       </div>
 
-      {currentDocUrl && (
-        <>
-          <div className="ContentHeader Group">
+      <div className="TitleBar-section stretch">
+        {currentDocUrl && (
+          <>
             <Content url={currentDocUrl} context="title-bar" editable />
-          </div>
-          <div className="CollaboratorsBar Inline">
             <Authors
               currentDocUrl={currentDocUrl}
               workspaceDocId={workspaceDocId}
             />
-            <div className="TitleBar-self">
-              <Content
-                url={createDocumentLink("contact", workspaceDoc.selfId)}
-                context="title-bar"
-                isPresent
-              />
-            </div>
-          </div>
-        </>
-      )}
-      <div className="TitleBar-unseenChanges">
+          </>
+        )}
+      </div>
+
+      <div className="TitleBar-section leftDivider">
+        <Content
+          url={createDocumentLink("contact", workspaceDoc.selfId)}
+          context="title-bar"
+          isPresent
+        />
+        {currentDocId && <NotificationSetting documentId={currentDocId} />}
         <ChangedDocsList
           lastSeenHeads={getLastSeenHeadsMapOfWorkspace(workspaceDoc)}
         ></ChangedDocsList>

@@ -56,7 +56,7 @@ export function ChangedDocsList({ lastSeenHeads }: ChangedDocsListProps) {
       trigger={
         <Badge
           size="medium"
-          icon="bell"
+          icon="history"
           dot={
             hasDocumentsWithUnseenMentions
               ? {
