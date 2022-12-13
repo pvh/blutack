@@ -7,6 +7,8 @@ import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import ListItem from "../../ui/ListItem"
 import { useDocument } from "automerge-repo-react-hooks"
 import { docToListItem } from "../../../lenses/ListItem"
+import { useLastSeenHeads } from "../../pushpin-code/Changes"
+import { createDocumentLink } from "../../pushpin-code/Url"
 
 interface Doc {
   title?: string
@@ -15,31 +17,43 @@ interface Doc {
 export default function DefaultInList(props: ContentProps) {
   const { url, documentId } = props
   const [doc] = useDocument<Doc>(documentId)
+  const { type } = props
+  const contentType = ContentTypes.lookup({ type, context: "list" })
+  const lastSeenHeads = useLastSeenHeads(createDocumentLink(type, documentId))
 
   if (!doc) {
     return null
   }
 
-  const { type } = props
-  const contentType = ContentTypes.lookup({ type, context: "list" })
-
   const { icon = "question", name = `Unidentified type: ${type}` } =
     contentType || {}
 
-  const listItem = docToListItem(doc, type)
-
-  console.log({ listItem })
+  const { title, titleEditorField, unseenChanges } = docToListItem(
+    doc,
+    type,
+    lastSeenHeads
+  )
 
   return (
     <ListItem>
       <ContentDragHandle url={url}>
-        <Badge icon={icon} />
+        <Badge
+          icon={icon}
+          dot={
+            unseenChanges.changes
+              ? {
+                  color: "var(--colorChangeDot)",
+                  number: unseenChanges.count,
+                }
+              : undefined
+          }
+        />
       </ContentDragHandle>
       <TitleWithSubtitle
-        title={listItem.title}
-        titleEditorField={listItem.titleEditorField ?? ""}
+        title={title}
+        titleEditorField={titleEditorField ?? ""}
         documentId={documentId}
-        editable={listItem.titleEditorField !== null}
+        editable={titleEditorField !== null}
       />
     </ListItem>
   )
