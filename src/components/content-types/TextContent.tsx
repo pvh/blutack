@@ -69,7 +69,7 @@ registerSearch("mention", {
 })
 
 registerSearch("headline", {
-  pattern: /^#.*$/,
+  pattern: /^#{1,5}.*$/,
   style: {
     isBold: true,
   },
@@ -139,6 +139,7 @@ export default function TextContent(props: Props) {
     cursors,
     selected: props.uniquelySelected,
     config: {
+      formats: ["bold", "color", "italic"],
       modules: {
         mention: {},
         cursors: {
@@ -149,6 +150,9 @@ export default function TextContent(props: Props) {
         history: {
           maxStack: 500,
           userOnly: true,
+        },
+        clipboard: {
+          disableFormattingOnPaste: true,
         },
       },
       scrollingContainer: `#${scrollingContainerId}`,
