@@ -6,6 +6,7 @@ import ContentDragHandle from "../../ui/ContentDragHandle"
 import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import ListItem from "../../ui/ListItem"
 import { useDocument } from "automerge-repo-react-hooks"
+import { docToListItem } from "../../../lenses/ListItem"
 
 interface Doc {
   title?: string
@@ -25,15 +26,26 @@ export default function DefaultInList(props: ContentProps) {
   const { icon = "question", name = `Unidentified type: ${type}` } =
     contentType || {}
 
+  const listItem = docToListItem(doc, type)
+
+  console.log({ listItem })
+
   return (
     <ListItem>
       <ContentDragHandle url={url}>
         <Badge icon={icon} />
       </ContentDragHandle>
-      <TitleWithSubtitle title={doc.title || name} documentId={documentId} />
+      <TitleWithSubtitle
+        title={listItem.title}
+        titleEditorField={listItem.titleEditorField ?? ""}
+        documentId={documentId}
+        editable={listItem.titleEditorField !== null}
+      />
     </ListItem>
   )
 }
+
+console.log("registering default")
 
 ContentTypes.registerDefault({
   component: ListItem,

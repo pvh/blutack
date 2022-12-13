@@ -23,6 +23,7 @@ import {
 } from "../pushpin-code/Changes"
 import { Doc, getHeads } from "@automerge/automerge"
 import memoize from "lodash.memoize"
+import DefaultInList from "./defaults/DefaultInList"
 
 interface Message {
   authorId: DocumentId
@@ -283,7 +284,7 @@ ContentTypes.register({
   contexts: {
     workspace: ThreadContent,
     board: ThreadContent,
-    list: ThreadInList,
+    list: DefaultInList,
     "title-bar": ThreadInList,
   },
   create,

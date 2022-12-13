@@ -33,6 +33,7 @@ import {
 import { createDocumentLink } from "../pushpin-code/Url"
 import memoize from "lodash.memoize"
 import { Doc, getHeads } from "@automerge/automerge"
+import DefaultInList from "./defaults/DefaultInList"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -355,7 +356,7 @@ ContentTypes.register({
   contexts: {
     board: TextContent,
     workspace: TextContent,
-    list: TextInList,
+    list: DefaultInList,
     "title-bar": TextInList,
   },
   create,

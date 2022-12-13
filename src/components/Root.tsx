@@ -24,6 +24,7 @@ import "./content-types/TopicList"
 import "./content-types/TodoList"
 import "./content-types/ContentList"
 import "./content-types/workspace/ChangedDocsList"
+import "./content-types/defaults/DefaultInList"
 
 interface RootArgs {
   workspaceDocId: DocumentId
