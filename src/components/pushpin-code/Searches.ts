@@ -1,3 +1,10 @@
+import { useEffect } from "react"
+import { WorkspaceDoc } from "../content-types/workspace/Workspace"
+import { useDocumentIds } from "./Hooks"
+import { ContactDoc } from "../content-types/contact"
+import { DocumentId } from "automerge-repo"
+import { useDocument } from "automerge-repo-react-hooks"
+
 const SEARCHES: { [name: string]: Search } = {}
 
 interface MatchData {
@@ -123,4 +130,73 @@ export function evalSearchFor(name: string, text: string): Match[] {
   }
 
   return matches
+}
+
+// search definitions
+
+export const MENTION = "mention"
+
+registerSearch(MENTION, {
+  pattern: /@([a-zA-Z]+)/,
+  style: {
+    color: "#999",
+    isBold: true,
+  },
+  data: ([, name]) => {
+    return { name }
+  },
+})
+
+export const HEADLINE = "headline"
+
+registerSearch(HEADLINE, {
+  pattern: /^#{1,5}.*$/,
+  style: {
+    isBold: true,
+  },
+})
+
+export const SOC = "soc"
+
+registerAutocompletion(SOC, {
+  pattern: /([0-9]{1,2}):([0-9]{2})$/,
+  suggestions: ([, hours, minutes]: string[]) => {
+    const soc = (parseInt(hours, 10) - 18) % 24
+    const fraction = parseInt(minutes) / 60
+
+    return [
+      {
+        value:
+          `SOC ${soc}` + (fraction === 0 ? "" : fraction.toString().slice(1)),
+      },
+    ]
+  },
+})
+
+export function useMentionAutocompletion(workspaceId: DocumentId) {
+  const [workspace] = useDocument<WorkspaceDoc>(workspaceId)
+  const contacts = useDocumentIds<ContactDoc>(
+    workspace && workspace.contactIds ? workspace.contactIds : []
+  )
+
+  useEffect(() => {
+    console.log("register mention search")
+
+    registerAutocompletion(MENTION, {
+      pattern: /@([a-zA-Z])*$/,
+      suggestions: ([search]: string[]) => {
+        const names = new Set<string>()
+
+        for (const contact of Object.values(contacts)) {
+          names.add(`@${contact.name.toLowerCase()}`)
+        }
+
+        return Array.from(names)
+          .filter((name) => name.startsWith(search))
+          .map((name) => ({
+            value: name,
+          }))
+      },
+    })
+  }, [contacts])
 }

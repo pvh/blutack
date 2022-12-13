@@ -36,8 +36,7 @@ import {
   evalAllSearches,
   evalSearchFor,
   Match,
-  registerAutocompletion,
-  registerSearch,
+  MENTION,
 } from "../pushpin-code/Searches"
 import "./Autocompletion.js"
 import { shouldNotifyAboutDocChanges } from "./workspace/NotificationSetting"
@@ -56,50 +55,6 @@ interface Props extends ContentProps {
 TextContent.minWidth = 6
 TextContent.minHeight = 2
 TextContent.defaultWidth = 15
-
-registerSearch("mention", {
-  pattern: /@([a-zA-Z]+)/,
-  style: {
-    color: "#999",
-    isBold: true,
-  },
-  data: ([, name]) => {
-    return { name }
-  },
-})
-
-registerSearch("headline", {
-  pattern: /^#{1,5}.*$/,
-  style: {
-    isBold: true,
-  },
-})
-
-registerAutocompletion("mention", {
-  pattern: /@([a-zA-Z])*$/,
-  suggestions: ([match]: string[]) => {
-    return [
-      { value: "@pvh" },
-      { value: "@paul" },
-      { value: "@geoffrey" },
-    ].filter((suggestion) => suggestion.value.startsWith(match))
-  },
-})
-
-registerAutocompletion("soc", {
-  pattern: /([0-9]{1,2}):([0-9]{2})$/,
-  suggestions: ([, hours, minutes]: string[]) => {
-    const soc = (parseInt(hours, 10) - 18) % 24
-    const fraction = parseInt(minutes) / 60
-
-    return [
-      {
-        value:
-          `SOC ${soc}` + (fraction === 0 ? "" : fraction.toString().slice(1)),
-      },
-    ]
-  },
-})
 
 export default function TextContent(props: Props) {
   const [doc, changeDoc] = useDocument<TextDoc>(props.documentId)
@@ -437,7 +392,7 @@ function hasUnseenMentions(
   name: string
 ) {
   const isUserMentionedInText = evalSearchFor(
-    "mention",
+    MENTION,
     (doc as TextDoc).text.toString()
   ).some((match) => match.data.name.toLowerCase() === name.toLowerCase())
 

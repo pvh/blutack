@@ -22,7 +22,7 @@ import {
   useLastSeenHeads,
 } from "../pushpin-code/Changes"
 import { Doc } from "@automerge/automerge"
-import { evalSearchFor } from "../pushpin-code/Searches"
+import { evalSearchFor, MENTION } from "../pushpin-code/Searches"
 import { useSelf } from "../pushpin-code/SelfHooks"
 import { shouldNotifyAboutDocChanges } from "./workspace/NotificationSetting"
 
@@ -203,7 +203,7 @@ export function hasUnseenMentions(
       patch.path.length === 3 &&
       patch.path[0] === "messages" &&
       typeof patch.value === "string" &&
-      evalSearchFor("mention", patch.value).some(
+      evalSearchFor(MENTION, patch.value).some(
         (match) => match.data.name.toLowerCase() === name.toLowerCase()
       )
   )
