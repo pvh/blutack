@@ -138,7 +138,7 @@ function preventDefault(e: React.SyntheticEvent) {
 }
 
 export function ThreadInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
+  const { documentId, url, editable, selfId } = props
   const [doc] = useDocument<ThreadDoc>(documentId)
   const [self] = useSelf()
   const lastSeenHeads = useLastSeenHeads(
@@ -152,6 +152,7 @@ export function ThreadInList(props: EditableContentProps) {
     "thread",
     doc,
     lastSeenHeads,
+    selfId,
     self.name
   )
 

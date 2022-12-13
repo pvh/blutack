@@ -11,11 +11,13 @@ import { hasDocUnseenChanges, LastSeenHeads } from "../../pushpin-code/Changes"
 import { Doc } from "@automerge/automerge"
 import content from "../../Content"
 import { useViewState } from "../../pushpin-code/ViewState"
+import { useSelfId } from "../../pushpin-code/SelfHooks"
+import { ContactDoc } from "../contact"
 
 type NotificationMode = "all" | "never" | "mentions"
 
 interface DocWithNotificationSettings {
-  notificationMode: NotificationMode
+  __notificationModeByUser: { [userId: DocumentId]: NotificationMode }
 }
 
 interface NotificationSettingProps {
@@ -46,16 +48,23 @@ export default function NotificationSetting({
   }
 
   const [doc, changeDoc] = useDocument<DocWithNotificationSettings>(docId)
+  const selfId = useSelfId()
 
   if (!doc) {
     return null
   }
 
   const changeMode = (mode: NotificationMode) => {
-    changeDoc((doc) => (doc.notificationMode = mode))
+    changeDoc((doc) => {
+      if (!doc.__notificationModeByUser) {
+        doc.__notificationModeByUser = {}
+      }
+
+      doc.__notificationModeByUser[selfId] = mode
+    })
   }
 
-  const notificationMode = doc.notificationMode ?? "mentions"
+  const notificationMode = getNotificationModeOfDocForUser(doc, selfId)
 
   const icon = notificationMode === "never" ? "bell-slash" : "bell"
 
@@ -71,7 +80,7 @@ export default function NotificationSetting({
           }
         />
       }
-      placement="bottom"
+      alignment="right"
     >
       <div
         style={{
@@ -111,6 +120,7 @@ export function shouldNotifyAboutDocChanges(
   type: string,
   doc: Doc<unknown>,
   lastSeenHeads: LastSeenHeads | undefined,
+  contactId: DocumentId,
   name: string
 ) {
   const contentType = ContentTypes.typeNameToContentType(type)
@@ -119,10 +129,12 @@ export function shouldNotifyAboutDocChanges(
     return false
   }
 
-  const notificationMode =
-    (doc as DocWithNotificationSettings).notificationMode ?? "mentions"
-
-  switch (notificationMode) {
+  switch (
+    getNotificationModeOfDocForUser(
+      doc as DocWithNotificationSettings,
+      contactId
+    )
+  ) {
     case "all":
       return contentType.hasUnseenChanges
         ? contentType.hasUnseenChanges(doc, lastSeenHeads)
@@ -134,4 +146,11 @@ export function shouldNotifyAboutDocChanges(
         ? contentType.hasUnseenMentions(doc, lastSeenHeads, name)
         : false
   }
+}
+
+function getNotificationModeOfDocForUser(
+  doc: DocWithNotificationSettings,
+  userId: DocumentId
+): NotificationMode {
+  return doc.__notificationModeByUser?.[userId] ?? "mentions"
 }

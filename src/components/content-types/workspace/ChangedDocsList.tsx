@@ -9,13 +9,14 @@ import "./ChangedDocsList.css"
 import { LastSeenHeadsMap } from "../../pushpin-code/Changes"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import { Doc } from "@automerge/automerge"
-import { useSelf } from "../../pushpin-code/SelfHooks"
+import { useSelf, useSelfId } from "../../pushpin-code/SelfHooks"
 import { shouldNotifyAboutDocChanges } from "./NotificationSetting"
 interface ChangedDocsListProps {
   lastSeenHeadsMap: LastSeenHeadsMap
 }
 
 export function ChangedDocsList({ lastSeenHeadsMap }: ChangedDocsListProps) {
+  const selfId = useSelfId()
   const [self] = useSelf()
   const trackedDocuments = useDocumentIds(
     Object.keys(lastSeenHeadsMap).map(
@@ -37,7 +38,13 @@ export function ChangedDocsList({ lastSeenHeadsMap }: ChangedDocsListProps) {
 
       const type = parseDocumentLink(documentUrl).type
 
-      return shouldNotifyAboutDocChanges(type, doc, lastSeenHeads, self.name)
+      return shouldNotifyAboutDocChanges(
+        type,
+        doc,
+        lastSeenHeads,
+        selfId,
+        self.name
+      )
     })
     .map(([url]) => url)
 
