@@ -40,6 +40,7 @@ import {
   registerSearch,
 } from "../pushpin-code/Searches"
 import "./Autocompletion.js"
+import { shouldNotifyAboutDocChanges } from "./workspace/NotificationSetting"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -367,7 +368,7 @@ function create({ text }: any, handle: DocHandle<any>) {
 }
 
 function TextInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
+  const { documentId, url, editable, selfId } = props
   const [doc] = useDocument<TextDoc>(documentId)
   const [self] = useSelf()
   const lastSeenHeads = useLastSeenHeads(createDocumentLink("text", documentId))
@@ -382,7 +383,13 @@ function TextInList(props: EditableContentProps) {
 
   const title = doc.title || lines.shift() || "[empty text note]"
 
-  const unseenMentions = hasUnseenMentions(doc, lastSeenHeads, self.name)
+  const showChangedDot = shouldNotifyAboutDocChanges(
+    "text",
+    doc,
+    lastSeenHeads,
+    selfId,
+    self.name
+  )
   const unseenChanges = hasUnseenChanges(doc, lastSeenHeads)
 
   return (
@@ -392,7 +399,7 @@ function TextInList(props: EditableContentProps) {
           icon="sticky-note"
           size="medium"
           dot={
-            unseenMentions
+            showChangedDot
               ? {
                   color: "var(--colorChangeDot)",
                 }

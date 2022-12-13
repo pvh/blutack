@@ -7,12 +7,10 @@ import React from "react"
 import ListMenu from "../../ui/ListMenu"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import { parseDocumentLink, PushpinUrl } from "../../pushpin-code/Url"
-import { hasDocUnseenChanges, LastSeenHeads } from "../../pushpin-code/Changes"
+import { LastSeenHeads } from "../../pushpin-code/Changes"
 import { Doc } from "@automerge/automerge"
-import content from "../../Content"
 import { useViewState } from "../../pushpin-code/ViewState"
 import { useSelfId } from "../../pushpin-code/SelfHooks"
-import { ContactDoc } from "../contact"
 
 type NotificationMode = "all" | "never" | "mentions"
 
