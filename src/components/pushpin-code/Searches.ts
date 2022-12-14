@@ -137,7 +137,7 @@ export function evalSearchFor(name: string, text: string): Match[] {
 export const MENTION = "mention"
 
 registerSearch(MENTION, {
-  pattern: /@([a-zA-Z]+)/,
+  pattern: /@([^\s]+)/,
   style: {
     color: "#999",
     isBold: true,
@@ -180,10 +180,8 @@ export function useMentionAutocompletion(workspaceId: DocumentId) {
   )
 
   useEffect(() => {
-    console.log("register mention search")
-
     registerAutocompletion(MENTION, {
-      pattern: /@([a-zA-Z])*$/,
+      pattern: /@([^\s])*$/,
       suggestions: ([search]: string[]) => {
         const names = new Set<string>()
 
