@@ -292,48 +292,6 @@ function create({ text }: any, handle: DocHandle<any>) {
   })
 }
 
-function TextInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
-  const [doc] = useDocument<TextDoc>(documentId)
-  const lastSeenHeads = useLastSeenHeads(createDocumentLink("text", documentId))
-
-  if (!doc || !doc.text) return null
-
-  const lines = doc.text
-    //  @ts-ignore-next-line
-    .join("")
-    .split("\n")
-    .filter((l: string) => l.length > 0)
-
-  const title = doc.title || lines.shift() || "[empty text note]"
-  const subtitle = lines.slice(0, 2).join("\n")
-
-  const unseenChanges = doc && hasUnseenChanges(doc, lastSeenHeads)
-
-  return (
-    <ListItem>
-      <ContentDragHandle url={url}>
-        <Badge
-          icon="sticky-note"
-          size="medium"
-          dot={
-            unseenChanges
-              ? {
-                  color: "var(--colorChangeDot)",
-                }
-              : undefined
-          }
-        />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        title={title}
-        documentId={documentId}
-        editable={editable}
-      />
-    </ListItem>
-  )
-}
-
 export const hasUnseenChanges = memoize(
   (doc: Doc<unknown>, lastSeenHeads?: LastSeenHeads) => {
     return getUnseenPatches(doc, lastSeenHeads).some(
@@ -356,8 +314,6 @@ ContentTypes.register({
   contexts: {
     board: TextContent,
     workspace: TextContent,
-    list: DefaultInList,
-    "title-bar": TextInList,
   },
   create,
   createFrom,

@@ -163,29 +163,6 @@ function preventDefault(e: React.SyntheticEvent) {
   e.preventDefault()
 }
 
-export function TodoListInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
-  const [doc] = useDocument<TodoListDoc>(documentId)
-  if (!doc || !doc.todos) return null
-
-  const title =
-    doc.title != null && doc.title !== "" ? doc.title : "Untitled todo list"
-
-  return (
-    <ListItem>
-      <ContentDragHandle url={url}>
-        <Badge size="medium" icon={"list-alt"} />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        titleEditorField="title"
-        title={title}
-        documentId={documentId}
-        editable={editable}
-      />
-    </ListItem>
-  )
-}
-
 function create(unusedAttrs: any, handle: DocHandle<any>) {
   handle.change((doc) => {
     doc.todos = []
@@ -200,7 +177,6 @@ ContentTypes.register({
   contexts: {
     board: TodoList,
     workspace: TodoList,
-    list: TodoListInList,
   },
   create,
 })

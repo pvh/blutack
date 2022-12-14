@@ -136,51 +136,7 @@ function preventDefault(e: React.SyntheticEvent) {
   e.preventDefault()
 }
 
-export function ThreadInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
-  const [doc] = useDocument<ThreadDoc>(documentId)
-  const lastSeenHeads = useLastSeenHeads(
-    createDocumentLink("thread", documentId)
-  )
-
-  const unreadMessageCount = doc
-    ? getUnreadMessageCountOfThread(doc, lastSeenHeads)
-    : 0
-
-  if (!doc || !doc.messages) return null
-
-  const title =
-    doc.title != null && doc.title !== "" ? doc.title : "Untitled conversation"
-  const subtitle = (doc.messages[doc.messages.length - 1] || { content: "" })
-    .content
-
-  return (
-    <ListItem>
-      <ContentDragHandle url={url}>
-        <Badge
-          size="medium"
-          icon={icon}
-          dot={
-            unreadMessageCount > 0
-              ? {
-                  color: "var(--colorChangeDot)",
-                  number: unreadMessageCount,
-                }
-              : undefined
-          }
-        />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        titleEditorField="title"
-        title={title}
-        documentId={documentId}
-        editable={editable}
-      />
-    </ListItem>
-  )
-}
-
-const getUnreadMessageCountOfThread = memoize(
+export const getUnreadMessageCountOfThread = memoize(
   (doc: ThreadDoc, lastSeenHeads?: LastSeenHeads) => {
     // count any splice on the messages property of the thread document as a change
     return getUnseenPatches(doc, lastSeenHeads).filter(
@@ -284,9 +240,11 @@ ContentTypes.register({
   contexts: {
     workspace: ThreadContent,
     board: ThreadContent,
-    list: DefaultInList,
-    "title-bar": ThreadInList,
   },
   create,
+
+  // TODO: figure out where this function should live;
+  // can it live outside the content type on a lens or something?
+  // Would need to return not just a boolean but also the count
   hasUnseenChanges,
 })

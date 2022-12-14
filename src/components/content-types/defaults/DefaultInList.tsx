@@ -28,17 +28,15 @@ export default function DefaultInList(props: ContentProps) {
   const { icon = "question", name = `Unidentified type: ${type}` } =
     contentType || {}
 
-  const { title, titleEditorField, unseenChanges } = docToListItem(
-    doc,
-    type,
-    lastSeenHeads
-  )
+  const { title, titleEditorField, subtitle, unseenChanges, badgeColor } =
+    docToListItem(doc, type, lastSeenHeads)
 
   return (
     <ListItem>
       <ContentDragHandle url={url}>
         <Badge
           icon={icon}
+          backgroundColor={badgeColor}
           dot={
             unseenChanges.changes
               ? {
@@ -52,6 +50,7 @@ export default function DefaultInList(props: ContentProps) {
       <TitleWithSubtitle
         title={title}
         titleEditorField={titleEditorField ?? ""}
+        subtitle={subtitle}
         documentId={documentId}
         editable={titleEditorField !== null}
       />
@@ -62,6 +61,11 @@ export default function DefaultInList(props: ContentProps) {
 console.log("registering default")
 
 ContentTypes.registerDefault({
-  component: ListItem,
+  component: DefaultInList,
   context: "list",
+})
+
+ContentTypes.registerDefault({
+  component: DefaultInList,
+  context: "title-bar",
 })

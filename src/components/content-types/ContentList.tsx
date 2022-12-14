@@ -257,32 +257,6 @@ export default function ContentList({ documentId }: ContentProps) {
 
 const icon = "list"
 
-export function ContentListInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
-  const [doc] = useDocument<ContentListDoc>(documentId)
-  if (!doc || !doc.content) return null
-
-  const title =
-    doc.title != null && doc.title !== "" ? doc.title : "Untitled List"
-  const items = doc.content.length
-  const subtitle = `${items} item${items !== 1 ? "s" : ""}`
-
-  return (
-    <ListItem>
-      <ContentDragHandle url={url}>
-        <Badge size="medium" icon={icon} />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        titleEditorField="title"
-        title={title}
-        subtitle={subtitle}
-        documentId={documentId}
-        editable={editable}
-      />
-    </ListItem>
-  )
-}
-
 function create(attrs: any, handle: DocHandle<any>) {
   handle.change((doc: ContentListDoc) => {
     if (attrs.title) {
@@ -301,8 +275,6 @@ ContentTypes.register({
     root: ContentList,
     board: ContentList,
     workspace: ContentList,
-    list: ContentListInList,
-    "title-bar": ContentListInList,
   },
   create,
 })

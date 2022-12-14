@@ -2,18 +2,16 @@
 // It's meant to be a crude approximation of a set of cambria lenses that would
 // bidirectionally (ie, read/writeable) map any doc to a list item
 
-import { Doc, getHeads } from "@automerge/automerge"
-import { memoize } from "lodash"
-import { ThreadDoc } from "../components/content-types/ThreadContent"
-import {
-  getUnseenPatches,
-  LastSeenHeads,
-} from "../components/pushpin-code/Changes"
+import { hasUnseenChanges as textHasUnseenChanges } from "../components/content-types/TextContent"
+import { getUnreadMessageCountOfThread } from "../components/content-types/ThreadContent"
+import { LastSeenHeads } from "../components/pushpin-code/Changes"
 
 type ListItem = {
-  title: string // todo: should this be optional?
+  title: string
+  subtitle?: string
   titleEditorField: string | null
   unseenChanges: { changes: true; count?: number } | { changes: false }
+  badgeColor?: string
 }
 
 export const docToListItem = (
@@ -21,20 +19,23 @@ export const docToListItem = (
   type: string,
   lastSeenHeads: LastSeenHeads | undefined
 ): ListItem => {
-  const { title, titleEditorField } = getTitle(doc, type)
-  const unseenChanges = getUnseenChanges(doc, type)
+  const { title, titleEditorField, subtitle } = getTitle(doc, type)
+  const unseenChanges = getUnseenChanges(doc, type, lastSeenHeads)
+  const badgeColor = getBadgeColor(doc, type)
 
   return {
     title,
     titleEditorField,
+    subtitle,
     unseenChanges,
+    badgeColor,
   }
 }
 
 const getTitle = (
   doc: any,
   type: string
-): { title: string; titleEditorField: string | null } => {
+): { title: string; titleEditorField: string | null; subtitle?: string } => {
   if (type === "text") {
     const lines = doc.text
       //  @ts-ignore-next-line
@@ -46,9 +47,32 @@ const getTitle = (
       title: doc.title || lines.shift() || "[empty text note]",
       titleEditorField: "title",
     }
-  } else if (Object.keys(doc).includes("title")) {
+  } else if (type === "contentlist") {
+    const title =
+      doc.title != null && doc.title !== "" ? doc.title : "Untitled List"
+    const items = doc.content.length
+    const subtitle = `${items} item${items !== 1 ? "s" : ""}`
+
     return {
-      title: doc.title,
+      title,
+      titleEditorField: "title",
+      subtitle,
+    }
+  } else if (type === "board") {
+    const title =
+      doc.title != null && doc.title !== "" ? doc.title : "Untitled Board"
+    const cardLength = Object.keys(doc.cards).length
+    const subtitle = `${cardLength} item${cardLength !== 1 ? "s" : ""}`
+
+    return {
+      title,
+      titleEditorField: "title",
+      subtitle,
+    }
+  } else if (Object.keys(doc).includes("title")) {
+    const title = doc.title != null && doc.title !== "" ? doc.title : "Untitled"
+    return {
+      title,
       titleEditorField: "title",
     }
   } else {
@@ -82,29 +106,13 @@ const getUnseenChanges = (
   }
 }
 
-const getUnreadMessageCountOfThread = memoize(
-  (doc: ThreadDoc, lastSeenHeads?: LastSeenHeads) => {
-    // count any splice on the messages property of the thread document as a change
-    return getUnseenPatches(doc, lastSeenHeads).filter(
-      (patch) =>
-        patch.action === "splice" &&
-        patch.path.length === 2 &&
-        patch.path[0] === "messages"
-    ).length
-  },
-  (doc, lastSeenHeads) =>
-    `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
-)
-
-const textHasUnseenChanges = memoize(
-  (doc: Doc<unknown>, lastSeenHeads?: LastSeenHeads) => {
-    return getUnseenPatches(doc, lastSeenHeads).some(
-      (patch) =>
-        patch.action === "splice" &&
-        patch.path.length === 2 &&
-        patch.path[0] === "text"
-    )
-  },
-  (doc, lastSeenHeads) =>
-    `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
-)
+const getBadgeColor = (doc: any, type: string): string | undefined => {
+  switch (type) {
+    case "board": {
+      return doc.backgroundColor
+    }
+    default: {
+      return undefined
+    }
+  }
+}
