@@ -82,9 +82,7 @@ export default function TitleBar({
           context="title-bar"
           isPresent
         />
-        <ChangedDocsList
-          lastSeenHeadsMap={getLastSeenHeadsMapOfWorkspace(workspaceDoc)}
-        ></ChangedDocsList>
+        <ChangedDocsList workspaceDocId={workspaceDocId}></ChangedDocsList>
         <NewDocumentButton
           onCreateDocument={onCreateDocument}
           trigger={

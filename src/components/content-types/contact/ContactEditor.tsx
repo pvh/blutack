@@ -35,6 +35,7 @@ import ColorPicker from "../../ui/ColorPicker"
 import { BinaryDataId, createBinaryDataUrl } from "../../../blobstore/Blob"
 import localforage from "localforage"
 import { WorkspaceDoc } from "../workspace/Workspace"
+import Button from "../../ui/Button"
 
 export default function ContactEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<ContactDoc>(props.documentId)
@@ -187,15 +188,10 @@ const MergeProfileSection = () => {
             marginTop: "var(--halfCellSize)",
           }}
         >
-          <button className="ContactEditor-button" onClick={copyProfileId}>
-            Copy profile id
-          </button>
-          <button
-            className="ContactEditor-button"
-            onClick={mergeWithOtherProfile}
-          >
+          <Button onClick={copyProfileId}>Copy profile id</Button>
+          <Button onClick={mergeWithOtherProfile}>
             Abandon and merge profile
-          </button>
+          </Button>
         </CenteredStack>
       </ListMenuItem>
     </ListMenuSection>
@@ -241,13 +237,7 @@ const renderAvatarEditor = (
             onChange={onFilesChanged}
             ref={hiddenFileInput}
           />
-          <button
-            className="ContactEditor-button"
-            type="button"
-            onClick={onImportClick}
-          >
-            Choose from file...
-          </button>
+          <Button onClick={onImportClick}>Choose from file...</Button>
         </CenteredStack>
       </ListMenuItem>
     </ListMenuSection>

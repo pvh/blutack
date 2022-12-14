@@ -6,17 +6,33 @@ import { useDocumentIds } from "../../pushpin-code/Hooks"
 import { openDoc, parseDocumentLink, PushpinUrl } from "../../pushpin-code/Url"
 import ListMenuItem from "../../ui/ListMenuItem"
 import "./ChangedDocsList.css"
-import { LastSeenHeadsMap } from "../../pushpin-code/Changes"
+import {
+  areHeadsEqual,
+  getLastSeenHeadsMapOfWorkspace,
+} from "../../pushpin-code/Changes"
 import { useSelf, useSelfId } from "../../pushpin-code/SelfHooks"
 import { shouldNotifyAboutDocChanges } from "./NotificationSetting"
 import ListMenuSection from "../../ui/ListMenuSection"
+import Button from "../../ui/Button"
+import { DocumentId } from "automerge-repo"
+import { useDocument } from "automerge-repo-react-hooks"
+import { WorkspaceDoc } from "./Workspace"
+import { getHeads } from "@automerge/automerge"
 interface ChangedDocsListProps {
-  lastSeenHeadsMap: LastSeenHeadsMap
+  workspaceDocId: DocumentId
 }
 
-export function ChangedDocsList({ lastSeenHeadsMap }: ChangedDocsListProps) {
+export function ChangedDocsList({ workspaceDocId }: ChangedDocsListProps) {
+  const [workspaceDoc, changeWorkspaceDoc] =
+    useDocument<WorkspaceDoc>(workspaceDocId)
+
+  const lastSeenHeadsMap = workspaceDoc
+    ? getLastSeenHeadsMapOfWorkspace(workspaceDoc)
+    : {}
+
   const selfId = useSelfId()
   const [self] = useSelf()
+
   const trackedDocuments = useDocumentIds(
     Object.keys(lastSeenHeadsMap).map(
       (url) => parseDocumentLink(url).documentId
@@ -27,7 +43,27 @@ export function ChangedDocsList({ lastSeenHeadsMap }: ChangedDocsListProps) {
     return null
   }
 
-  const documentUrlsWithUnseenMentions = Object.entries(lastSeenHeadsMap)
+  const markAllDocumentAsRead = () => {
+    changeWorkspaceDoc((workspaceDoc) => {
+      workspaceDoc.persistedLastSeenHeads
+
+      for (const [url, lastSeenHead] of Object.entries(lastSeenHeadsMap)) {
+        const doc = trackedDocuments[parseDocumentLink(url).documentId]
+
+        if (!doc) {
+          continue
+        }
+
+        const latestHeads = getHeads(doc)
+
+        if (!areHeadsEqual(latestHeads, lastSeenHead)) {
+          workspaceDoc.persistedLastSeenHeads[url as PushpinUrl] = latestHeads
+        }
+      }
+    })
+  }
+
+  const documentsToNotifyAbout = Object.entries(lastSeenHeadsMap)
     .filter(([documentUrl, lastSeenHeads]) => {
       const doc = trackedDocuments[parseDocumentLink(documentUrl).documentId]
 
@@ -47,8 +83,7 @@ export function ChangedDocsList({ lastSeenHeadsMap }: ChangedDocsListProps) {
     })
     .map(([url]) => url)
 
-  const hasDocumentsWithUnseenMentions =
-    documentUrlsWithUnseenMentions.length !== 0
+  const hasDocumentsToNotifyAbout = documentsToNotifyAbout.length !== 0
 
   return (
     <Popover
@@ -58,10 +93,10 @@ export function ChangedDocsList({ lastSeenHeadsMap }: ChangedDocsListProps) {
           size="medium"
           icon="inbox"
           dot={
-            hasDocumentsWithUnseenMentions
+            hasDocumentsToNotifyAbout
               ? {
                   color: "var(--colorChangeDot)",
-                  number: documentUrlsWithUnseenMentions.length,
+                  number: documentsToNotifyAbout.length,
                 }
               : undefined
           }
@@ -71,7 +106,7 @@ export function ChangedDocsList({ lastSeenHeadsMap }: ChangedDocsListProps) {
     >
       <ListMenuSection title="Inbox">
         <div className="ChangedDocsList--content">
-          {documentUrlsWithUnseenMentions.map((url) => {
+          {documentsToNotifyAbout.map((url) => {
             return (
               <ListMenuItem
                 key={url}
@@ -81,11 +116,16 @@ export function ChangedDocsList({ lastSeenHeadsMap }: ChangedDocsListProps) {
               </ListMenuItem>
             )
           })}
-          {!hasDocumentsWithUnseenMentions && (
-            <div className="UnseenChangesDoc-emptyState">no new changes</div>
+          {!hasDocumentsToNotifyAbout && (
+            <div className="ChangedDocsList--emptyState">no new changes</div>
           )}
         </div>
       </ListMenuSection>
+      {hasDocumentsToNotifyAbout && (
+        <div className="ChangedDocsList--footer">
+          <Button onClick={markAllDocumentAsRead}>Mark all as read</Button>
+        </div>
+      )}
     </Popover>
   )
 }

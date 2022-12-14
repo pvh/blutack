@@ -148,9 +148,7 @@ export function hasDocUnseenChanges(
     return true
   }
 
-  return !lastSeenHeads.every((head, index) => {
-    return docHeads[index] === head
-  })
+  return !areHeadsEqual(lastSeenHeads, docHeads)
 }
 
 export function getLastSeenHeadsMapOfWorkspace(workspace: WorkspaceDoc) {
@@ -172,4 +170,10 @@ export function getLastSeenHeadsMapOfWorkspace(workspace: WorkspaceDoc) {
   )
 
   return lastSeenHeadsByDocUrl
+}
+
+export function areHeadsEqual(a: Heads, b: Heads): boolean {
+  return a.every((head, index) => {
+    return b[index] === head
+  })
 }
