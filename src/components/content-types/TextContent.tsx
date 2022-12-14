@@ -367,6 +367,7 @@ function TextInList(props: EditableContentProps) {
         />
       </ContentDragHandle>
       <TitleWithSubtitle
+        bold={unseenChanges}
         title={title}
         documentId={documentId}
         editable={editable}

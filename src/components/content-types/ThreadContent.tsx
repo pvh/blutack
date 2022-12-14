@@ -169,6 +169,7 @@ export function ThreadInList(props: EditableContentProps) {
         />
       </ContentDragHandle>
       <TitleWithSubtitle
+        bold={unseenChanges}
         titleEditorField="title"
         title={title}
         documentId={documentId}

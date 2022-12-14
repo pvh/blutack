@@ -14,6 +14,7 @@ export interface Props {
   editable?: boolean
   href?: string // this is because URL Content wants to have a link as its secondary text :/
   documentId: DocumentId
+  bold?: boolean
 }
 
 export default function TitleWithSubtitle(props: Props) {
@@ -25,6 +26,7 @@ export default function TitleWithSubtitle(props: Props) {
     subtitle,
     href,
     documentId,
+    bold = false,
   } = props
 
   return (
@@ -34,9 +36,15 @@ export default function TitleWithSubtitle(props: Props) {
           field={titleEditorField}
           placeholder={title}
           documentId={documentId}
+          bold={bold}
         />
       ) : (
-        <Heading wrap={wrapTitle}>
+        <Heading
+          wrap={wrapTitle}
+          style={{
+            fontWeight: bold ? undefined : "normal",
+          }}
+        >
           {title}
         </Heading>
       )}

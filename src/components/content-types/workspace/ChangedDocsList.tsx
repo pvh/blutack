@@ -67,7 +67,7 @@ export function ChangedDocsList({ lastSeenHeadsMap }: ChangedDocsListProps) {
           }
         />
       }
-      placement="bottom"
+      alignment="right"
     >
       <ListMenuSection title="Inbox">
         <div className="ChangedDocsList--content">
