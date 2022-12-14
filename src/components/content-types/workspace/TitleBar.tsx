@@ -77,27 +77,31 @@ export default function TitleBar({
   return (
     <div className="TitleBar">
       <div className="TitleBar-section">
+        <Content
+          url={createDocumentLink("contact", workspaceDoc.selfId)}
+          context="title-bar"
+          isPresent
+        />
+        <ChangedDocsList
+          lastSeenHeadsMap={getLastSeenHeadsMapOfWorkspace(workspaceDoc)}
+        ></ChangedDocsList>
         <NewDocumentButton
           onCreateDocument={onCreateDocument}
           trigger={
-            <button type="button" className="TitleBar-menuItem">
-              <Badge icon="plus" backgroundColor="transparent" />
-            </button>
+            <Badge icon="plus" size="medium" backgroundColor="transparent" />
           }
         />
-        <button
-          type="button"
+        <div
           onClick={(e) => {
             showOmnibox()
             e.stopPropagation()
           }}
-          className="TitleBar-menuItem"
         >
-          <Badge icon="search" backgroundColor="transparent" />
-        </button>
+          <Badge icon="search" size="medium" backgroundColor="transparent" />
+        </div>
       </div>
 
-      <div className="TitleBar-section stretch">
+      <div className="TitleBar-section stretch withDividers">
         {currentDocUrl && (
           <>
             <Content url={currentDocUrl} context="title-bar" editable />
@@ -109,18 +113,10 @@ export default function TitleBar({
         )}
       </div>
 
-      <div className="TitleBar-section leftDivider">
-        <Content
-          url={createDocumentLink("contact", workspaceDoc.selfId)}
-          context="title-bar"
-          isPresent
-        />
+      <div className="TitleBar-section">
         {currentDocUrl && (
           <NotificationSetting currentDocumentUrl={currentDocUrl} />
         )}
-        <ChangedDocsList
-          lastSeenHeadsMap={getLastSeenHeadsMapOfWorkspace(workspaceDoc)}
-        ></ChangedDocsList>
       </div>
 
       <Omnibox

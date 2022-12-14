@@ -81,13 +81,14 @@ export default function NotificationSetting({
       }
       alignment="right"
     >
-      <ListMenuSection title="Notify of changes">
+      <ListMenuSection title="Notify me about this document">
         <ListMenu>
           <ListMenuItem
             selected={notificationMode === "all"}
             onClick={() => changeMode("all")}
           >
-            {notificationMode === "all" && <span className="check" />} always
+            {notificationMode === "all" && <span className="check" />} on every
+            change
           </ListMenuItem>
           <ListMenuItem
             selected={notificationMode === "mentions"}

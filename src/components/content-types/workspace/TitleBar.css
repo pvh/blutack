@@ -36,9 +36,11 @@ button[disabled].TitleBar-menuItem .fa {
   gap: var(--halfCellSize);
 }
 
-.TitleBar-section.leftDivider {
+.TitleBar-section.withDividers {
   border-left: 1px solid var(--colorPaleGrey);
-  padding-left: var(--halfCellSize)
+  border-right: 1px solid var(--colorPaleGrey);
+  padding-left: var(--halfCellSize);
+  padding-right: var(--halfCellSize);
 }
 
 .TitleBar-section.stretch {
