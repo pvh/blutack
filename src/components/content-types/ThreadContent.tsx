@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useId, useRef, useState } from "react"
 
 import * as ContentTypes from "../pushpin-code/ContentTypes"
 import Content, { ContentProps, EditableContentProps } from "../Content"
@@ -21,10 +21,12 @@ import {
   useAutoAdvanceLastSeenHeads,
   useLastSeenHeads,
 } from "../pushpin-code/Changes"
-import { Doc } from "@automerge/automerge"
+import { Doc, Text } from "@automerge/automerge"
 import { evalSearchFor, MENTION } from "../pushpin-code/Searches"
 import { useSelf } from "../pushpin-code/SelfHooks"
 import { shouldNotifyAboutDocChanges } from "./workspace/NotificationSetting"
+import { useQuill } from "./TextContent"
+import { useStaticCallback } from "../pushpin-code/Hooks"
 
 interface Message {
   authorId: DocumentId
@@ -54,9 +56,8 @@ ThreadContent.maxWidth = 24
 ThreadContent.maxHeight = 36
 
 export default function ThreadContent(props: ContentProps) {
-  const [message, setMessage] = useState("")
+  const containerRef = useRef<HTMLDivElement>(null)
   const [doc, changeDoc] = useDocument<ThreadDoc>(props.documentId)
-
   useAutoAdvanceLastSeenHeads(createDocumentLink("thread", props.documentId))
 
   const onDrop = useCallback((e: React.DragEvent) => {
@@ -76,34 +77,61 @@ export default function ThreadContent(props: ContentProps) {
     })
   }, [])
 
+  const onEnterKey = useStaticCallback(() => {
+    if (!quill.current) {
+      return
+    }
+
+    const content = quill.current.getText().toString()
+
+    changeDoc((threadDoc: ThreadDoc) => {
+      threadDoc.messages.push({
+        authorId: props.selfId,
+        content,
+        time: new Date().getTime(),
+      })
+    })
+
+    quill.current.deleteText(0, quill.current.getText().length)
+  })
+
+  const [ref, quill] = useQuill({
+    text: new Text(""),
+    config: {
+      formats: ["bold", "color", "italic"],
+      modules: {
+        mention: {},
+        cursors: {
+          hideDelayMs: 500,
+          transformOnTextChange: true,
+        },
+        toolbar: false,
+        history: {
+          maxStack: 500,
+          userOnly: true,
+        },
+        clipboard: {
+          disableFormattingOnPaste: true,
+        },
+        keyboard: {
+          bindings: {
+            enter: {
+              key: 13,
+              shiftKey: false,
+              handler: onEnterKey,
+            },
+          },
+        },
+      },
+    },
+  })
+
   if (!doc || !doc.messages) {
     return null
   }
 
   const { messages } = doc
   const groupedMessages = groupBy(messages, "authorId")
-
-  function onInput(e: React.ChangeEvent<HTMLInputElement>) {
-    setMessage(e.target.value)
-  }
-
-  function onKeyDown(e: React.KeyboardEvent) {
-    e.stopPropagation()
-
-    if (e.key === "Enter" && !e.shiftKey && message) {
-      e.preventDefault()
-
-      changeDoc((threadDoc: ThreadDoc) => {
-        threadDoc.messages.push({
-          authorId: props.selfId,
-          content: message,
-          time: new Date().getTime(),
-        })
-      })
-
-      setMessage("")
-    }
-  }
 
   return (
     <div
@@ -117,16 +145,18 @@ export default function ThreadContent(props: ContentProps) {
           {groupedMessages.map(renderGroupedMessages)}
         </div>
       </div>
-      <div className="inputWrapper">
-        <input
-          className="messageInput"
-          value={message}
-          onKeyDown={onKeyDown}
-          onChange={onInput}
-          onPaste={stopPropagation}
-          onCut={stopPropagation}
+      <div
+        className="inputWrapper"
+        onClick={() => quill.current?.focus()}
+        ref={containerRef}
+      >
+        <div
+          ref={ref}
+          onClick={stopPropagation}
           onCopy={stopPropagation}
-          placeholder="Enter your message..."
+          onCut={stopPropagation}
+          onPaste={stopPropagation}
+          onDoubleClick={stopPropagation}
         />
       </div>
     </div>
@@ -234,7 +264,7 @@ function renderMessage({ content, time }: Message, idx: number) {
 
   return (
     <div className="message" key={idx}>
-      <div className="content">{result}</div>
+      <pre className="content">{result}</pre>
       {idx === 0 ? (
         <div className="time">{dateFormatter.format(date)}</div>
       ) : null}

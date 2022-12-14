@@ -118,7 +118,7 @@ export default function TextContent(props: Props) {
     <div
       className="TextContent"
       id={scrollingContainerId}
-      onClick={() => quill?.focus()}
+      onClick={() => quill.current?.focus()}
       ref={containerRef}
     >
       <div
@@ -140,27 +140,27 @@ interface Cursor {
 
 interface QuillOpts {
   text: Automerge.Text | null
-  change: (cb: (text: Automerge.Text) => void) => void
-  selectionChange: SelectionChangeHandler
+  change?: (cb: (text: Automerge.Text) => void) => void
+  selectionChange?: SelectionChangeHandler
   selected?: boolean
-  cursors: Cursor[]
+  cursors?: Cursor[]
   config?: QuillOptionsStatic
 }
 
-function useQuill({
+export function useQuill({
   text,
   change,
   selectionChange,
-  cursors,
+  cursors = [],
   selected,
   config,
-}: QuillOpts): [React.Ref<HTMLDivElement>, Quill | null] {
+}: QuillOpts): [React.Ref<HTMLDivElement>, React.RefObject<Quill | null>] {
   const ref = useRef<HTMLDivElement>(null)
   const quill = useRef<Quill | null>(null)
   // @ts-ignore-next-line
   const textString = useMemo(() => text && text.join(""), [text])
-  const makeChange = useStaticCallback(change)
-  const onSelectionChange = useStaticCallback(selectionChange)
+  const makeChange = useStaticCallback(change ?? (() => {}))
+  const onSelectionChange = useStaticCallback(selectionChange ?? (() => {}))
 
   const contactIds = useMemo(
     () => cursors.map(({ contactId }) => contactId),
@@ -275,7 +275,7 @@ function useQuill({
     }
   }, [cursors])
 
-  return [ref, quill.current]
+  return [ref, quill]
 }
 
 function stopPropagation(e: React.SyntheticEvent) {
