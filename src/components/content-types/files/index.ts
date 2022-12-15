@@ -52,6 +52,7 @@ ContentTypes.register({
   contexts: {
     workspace: FileContent,
     board: FileContent,
+    badge: FileContent,
   },
   create,
   createFrom,
