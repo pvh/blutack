@@ -8,13 +8,9 @@ import { createDocumentLink } from "../../pushpin-code/Url"
 import { readWithSchema } from "../../../lenses"
 import { HasTitle } from "../../../lenses/HasTitle"
 
-interface Doc {
-  title?: string
-}
-
 export default function DefaultInTitle(props: ContentProps) {
-  const { url, documentId } = props
-  const [rawDoc] = useDocument<Doc>(documentId)
+  const { documentId } = props
+  const [rawDoc] = useDocument<any>(documentId)
   const { type } = props
   const lastSeenHeads = useLastSeenHeads(createDocumentLink(type, documentId))
 
