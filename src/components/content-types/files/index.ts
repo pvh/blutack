@@ -52,8 +52,6 @@ ContentTypes.register({
   contexts: {
     workspace: FileContent,
     board: FileContent,
-    list: FileContent,
-    "title-bar": FileContent,
   },
   create,
   createFrom,

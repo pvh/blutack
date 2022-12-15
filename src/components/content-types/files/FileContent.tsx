@@ -59,25 +59,16 @@ export default function FileContent({
 
   function renderUnidentifiedFile() {
     switch (context) {
-      case "list":
-      case "title-bar":
+      case "badge":
         return (
-          <ListItem>
-            <ContentDragHandle
-              url={url}
-              filename={title}
-              extension={extension}
-              binaryDataId={binaryDataId}
-            >
-              <Badge shape="square" icon="file-o" />
-            </ContentDragHandle>
-            <TitleWithSubtitle
-              title={title}
-              subtitle={subtitle}
-              documentId={documentId}
-              editable={editable}
-            />
-          </ListItem>
+          <ContentDragHandle
+            url={url}
+            filename={title}
+            extension={extension}
+            binaryDataId={binaryDataId}
+          >
+            <Badge shape="square" icon="file-o" />
+          </ContentDragHandle>
         )
       default:
         return (

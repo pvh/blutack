@@ -108,17 +108,8 @@ export default function ContactInVarious(props: ContactProps) {
   )
 
   switch (context) {
-    case "list":
-      return (
-        <ListItem>
-          <ContentDragHandle url={url}>{avatar}</ContentDragHandle>
-          <TitleWithSubtitle
-            title={name || "Unknown Contact"}
-            documentId={documentId}
-          />
-        </ListItem>
-      )
-
+    case "badge":
+      return <ContentDragHandle url={url}>{avatar}</ContentDragHandle>
     case "thread":
       return (
         <div className="Contact-user">
