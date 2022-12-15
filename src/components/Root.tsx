@@ -25,6 +25,8 @@ import "./content-types/TodoList"
 import "./content-types/ContentList"
 import "./content-types/workspace/ChangedDocsList"
 import "./content-types/defaults/DefaultInList"
+import "./content-types/defaults/DefaultInTitle"
+import "./content-types/defaults/DefaultInBadge"
 
 interface RootArgs {
   workspaceDocId: DocumentId

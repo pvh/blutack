@@ -20,6 +20,8 @@ export type Context =
   | "root"
   | "workspace"
   | "list"
+  | "title"
+  | "badge"
   | "board"
   | "thread"
   | "title-bar"

@@ -28,7 +28,6 @@ import {
   parseDocumentLink,
   PushpinUrl,
 } from "../../pushpin-code/Url"
-import ContentList, { ContentListDoc, ContentListInList } from "../ContentList"
 import { DocHandle, DocumentId } from "automerge-repo"
 import { ContactDoc } from "../contact"
 import classNames from "classnames"
