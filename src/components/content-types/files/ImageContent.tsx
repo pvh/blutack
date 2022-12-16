@@ -90,7 +90,6 @@ ContentTypes.register({
     workspace: ImageContent,
     board: ImageContent,
     list: ImageInList,
-    "title-bar": ImageInList,
   },
   supportsMimeType,
 })

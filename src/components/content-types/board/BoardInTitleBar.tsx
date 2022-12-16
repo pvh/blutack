@@ -15,6 +15,8 @@ interface Props extends ContentProps {
 
 type KeyedCard = [CardId, BoardDocCard]
 
+// TODO: maybe i should move this into the title-bar itself?
+
 export default function BoardInTitleBar(props: Props) {
   const { documentId } = props
   const [doc] = useDocument<BoardDoc>(documentId)

@@ -236,7 +236,6 @@ ContentTypes.register({
     root: Workspace,
     list: WorkspaceInList,
     board: WorkspaceInList,
-    "title-bar": WorkspaceInList,
   },
   resizable: false,
   unlisted: true,

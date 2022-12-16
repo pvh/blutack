@@ -28,51 +28,30 @@ function Device(props: Props) {
   if (!doc) return null
   const { icon = "desktop", name } = doc
 
-  switch (props.context) {
-    case "title-bar":
-      return (
-        <div
-          className={
-            isOnline ? "Device Device--online" : "Device Device--offline"
-          }
-        >
-          <Badge
-            icon={doc.icon || "desktop"}
-            shape="circle"
-            size="large"
-            backgroundColor={`var(${
-              isOnline ? "--colorOnline" : "--colorOffline"
-            })`}
-          />
-        </div>
-      )
-    default:
-      return (
-        <div
-          className={
-            isOnline
-              ? "DeviceListItem DeviceListItem--online"
-              : "DeviceListItem"
-          }
-        >
-          <div className="DeviceListItem-badge">
-            <Badge
-              icon={icon}
-              shape="circle"
-              backgroundColor={`var(${
-                isOnline ? "--colorOnline" : "--colorOffline"
-              })`}
-            />
-          </div>
-          <TitleWithSubtitle
-            title={name}
-            titleEditorField="name"
-            editable={props.editable}
-            documentId={props.documentId}
-          />
-        </div>
-      )
-  }
+  return (
+    <div
+      className={
+        isOnline ? "DeviceListItem DeviceListItem--online" : "DeviceListItem"
+      }
+    >
+      <div className="DeviceListItem-badge">
+        <Badge
+          icon={icon}
+          shape="circle"
+          size="large"
+          backgroundColor={`var(${
+            isOnline ? "--colorOnline" : "--colorOffline"
+          })`}
+        />
+      </div>
+      <TitleWithSubtitle
+        title={name}
+        titleEditorField="name"
+        editable={props.editable}
+        documentId={props.documentId}
+      />
+    </div>
+  )
 }
 
 export function create(deviceAttrs: any, handle: DocHandle<any>) {
@@ -80,6 +59,8 @@ export function create(deviceAttrs: any, handle: DocHandle<any>) {
     doc.name = "computer"
     doc.icon = "desktop"
   })
+  // TODO: this stuff relied on electron magic to pick an icon and set a useful hostname
+  //       really we should look at the user agent or something instead
   const isLaptop = true
   const icon = isLaptop ? "laptop" : "desktop"
   handle.change((doc: DeviceDoc) => {
@@ -94,8 +75,6 @@ ContentTypes.register({
   icon: "desktop",
   contexts: {
     list: Device,
-    "title-bar": Device,
-    contact: Device,
     board: Device,
   },
   resizable: false,

@@ -5,7 +5,6 @@ import { PushpinUrl } from "../../pushpin-code/Url"
 // board in various contexts
 import Board, { BOARD_COLORS } from "./Board"
 import BoardInBoard from "./BoardInBoard"
-import BoardInTitleBar from "./BoardInTitleBar"
 
 export type CardId = string & { cardId: true }
 
@@ -61,7 +60,6 @@ ContentTypes.register({
   contexts: {
     workspace: Board,
     board: BoardInBoard,
-    "title-bar": BoardInTitleBar,
   },
   name: "Board",
   icon,

@@ -24,10 +24,6 @@ export type Context =
   | "badge"
   | "board"
   | "thread"
-  | "title-bar"
-  | "contact"
-  | "source"
-  | "source-link"
 
 type Contexts = {
   [K in Context]?: Component

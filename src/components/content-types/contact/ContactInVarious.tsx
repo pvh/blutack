@@ -110,17 +110,6 @@ export default function ContactInVarious(props: ContactProps) {
   switch (context) {
     case "badge":
       return <ContentDragHandle url={url}>{avatar}</ContentDragHandle>
-    case "thread":
-      return (
-        <div className="Contact-user">
-          {avatar}
-          <div className="username Contact-username">{name}</div>
-        </div>
-      )
-
-    case "title-bar":
-      return <ContentDragHandle url={url}>{avatar}</ContentDragHandle>
-
     case "board":
       return (
         <CenteredStack>
@@ -128,7 +117,6 @@ export default function ContactInVarious(props: ContactProps) {
           <Heading wrap>{name || ""}</Heading>
         </CenteredStack>
       )
-
     default:
       log("contact render called in an unexpected context")
       return null

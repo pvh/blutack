@@ -41,7 +41,6 @@ ContentTypes.register({
   contexts: {
     workspace: ContactWorkspace,
     board: ContactInVarious,
-    "title-bar": ContactInVarious,
     badge: ContactInVarious,
   },
 })

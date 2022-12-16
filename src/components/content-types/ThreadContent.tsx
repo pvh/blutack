@@ -195,7 +195,11 @@ function renderGroupedMessages(groupOfMessages: Message[], idx: number) {
     <div className="messageGroup" key={idx}>
       <div style={{ width: "40px" }}>
         <Content
-          context="thread"
+          context="badge"
+          url={createDocumentLink("contact", groupOfMessages[0].authorId)}
+        />
+        <Content
+          context="title"
           url={createDocumentLink("contact", groupOfMessages[0].authorId)}
         />
       </div>

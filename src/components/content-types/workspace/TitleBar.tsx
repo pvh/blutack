@@ -98,7 +98,7 @@ export default function TitleBar({
       {currentDocUrl && (
         <>
           <div className="ContentHeader Group">
-            <Content url={currentDocUrl} context="title-bar" editable />
+            <Content url={currentDocUrl} context="list" editable />
           </div>
           <div className="CollaboratorsBar Inline">
             <Authors
@@ -108,7 +108,7 @@ export default function TitleBar({
             <div className="TitleBar-self">
               <Content
                 url={createDocumentLink("contact", workspaceDoc.selfId)}
-                context="title-bar"
+                context="badge"
                 isPresent
               />
             </div>

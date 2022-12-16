@@ -478,39 +478,6 @@ export default function PdfContent(props: ContentProps) {
   )
 }
 
-interface PdfSourceLinkProps extends ContentProps {
-  region: Region
-}
-
-export function PdfAsSourceLink(props: PdfSourceLinkProps) {
-  const [pdf] = useDocument<PdfDoc>(props.documentId)
-
-  if (!pdf || !pdf.title) {
-    return null
-  }
-
-  const subtitle = `on page ${props.region.page}`
-
-  return (
-    <ListItem>
-      <ContentDragHandle
-        url={createDocumentLink("pdf", props.documentId)}
-        filename={pdf.title}
-        extension="pdf"
-        binaryDataId={pdf.binaryDataId}
-      >
-        <Badge shape="square" icon="file-o" />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        title={pdf.title}
-        subtitle={subtitle}
-        documentId={props.documentId}
-        editable={false}
-      />
-    </ListItem>
-  )
-}
-
 function PdfRegionListItemView({
   region,
   number,
@@ -643,7 +610,6 @@ ContentTypes.register({
   contexts: {
     workspace: PdfContent,
     board: PdfContent,
-    "source-link": PdfAsSourceLink,
   },
   supportsMimeType,
 })

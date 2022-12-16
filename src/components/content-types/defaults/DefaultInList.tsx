@@ -28,8 +28,3 @@ ContentTypes.registerDefault({
   component: DefaultInList,
   context: "list",
 })
-
-ContentTypes.registerDefault({
-  component: DefaultInList,
-  context: "title-bar",
-})
