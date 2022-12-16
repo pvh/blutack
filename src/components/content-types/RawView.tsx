@@ -17,6 +17,8 @@ export default function RawView(props: ContentProps) {
 
   const onEdit = useCallback(
     ({ namespace, new_value, name }: InteractionProps) => {
+      console.log("onEdit", { namespace, new_value, name })
+
       changeDoc((doc) => {
         let current: any = doc
 
@@ -31,6 +33,17 @@ export default function RawView(props: ContentProps) {
   )
 
   const onAdd = useCallback(() => true, [])
+  const onDelete = useCallback(({ namespace, name }: InteractionProps) => {
+    changeDoc((doc) => {
+      let current: any = doc
+
+      for (const key of namespace) {
+        current = current[key as string]
+      }
+
+      delete current[name as string]
+    })
+  }, [])
 
   if (!doc) {
     return null
@@ -38,11 +51,7 @@ export default function RawView(props: ContentProps) {
 
   return (
     <div className="RawView">
-      <ReactJson
-        src={JSON.parse(JSON.stringify(doc))}
-        onEdit={onEdit}
-        onAdd={onAdd}
-      />
+      <ReactJson src={doc} onEdit={onEdit} onAdd={onAdd} onDelete={onDelete} />
     </div>
   )
 }
