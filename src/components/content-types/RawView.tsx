@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 
 import * as ContentTypes from "../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
@@ -10,10 +10,25 @@ import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { DocumentWithTitle } from "./workspace/Workspace"
 import { ContentProps, EditableContentProps } from "../Content"
 import "./RawView.css"
-import ReactJson from "react-json-view"
+import ReactJson, { InteractionProps } from "react-json-view"
 
 export default function RawView(props: ContentProps) {
-  const [doc] = useDocument(props.documentId)
+  const [doc, changeDoc] = useDocument(props.documentId)
+
+  const onEdit = useCallback(
+    ({ namespace, new_value, name }: InteractionProps) => {
+      changeDoc((doc) => {
+        let current: any = doc
+
+        for (const key of namespace) {
+          current = current[key as string]
+        }
+
+        current[name as string] = new_value
+      })
+    },
+    [changeDoc]
+  )
 
   if (!doc) {
     return null
@@ -21,7 +36,7 @@ export default function RawView(props: ContentProps) {
 
   return (
     <div className="RawView">
-      <ReactJson src={JSON.parse(JSON.stringify(doc))} />
+      <ReactJson src={JSON.parse(JSON.stringify(doc))} onEdit={onEdit} />
     </div>
   )
 }
