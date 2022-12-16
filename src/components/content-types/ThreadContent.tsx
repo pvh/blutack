@@ -42,13 +42,17 @@ export interface ThreadDoc {
   messages: Message[]
 }
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
+const dateFormatterTimeOnly = new Intl.DateTimeFormat("en-US", {
   localeMatcher: "best fit",
-  weekday: "short",
   hour: "numeric",
   minute: "2-digit",
-  month: "numeric",
+})
+
+const dateFormatterFullDate = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  weekday: "short",
   day: "numeric",
+  month: "numeric",
 })
 
 ThreadContent.minWidth = 9
@@ -152,13 +156,35 @@ export default function ThreadContent(props: ContentProps) {
     >
       <div className="messageWrapper">
         <div className="messages" onScroll={stopPropagation}>
-          {messageGroups.map((messageGroup, idx) => (
-            <MessageGroupView
-              key={idx}
-              messageGroup={messageGroup}
-              oldestUnseenMessageTimestamp={oldestUnseenMessageTimestamp}
-            />
-          ))}
+          {messageGroups.map((messageGroup, idx) => {
+            const prevMessageGroup = messageGroups[idx - 1]
+
+            const isFirstMessageGroupOfDay =
+              !prevMessageGroup ||
+              !isOnSameDay(
+                prevMessageGroup.messages[0].time,
+                messageGroup.messages[0].time
+              )
+
+            return (
+              <>
+                {isFirstMessageGroupOfDay && (
+                  <div className="Thread-dayLine">
+                    <div className="Thread-dayLineDate">
+                      {dateFormatterFullDate.format(
+                        messageGroup.messages[0].time
+                      )}
+                    </div>
+                  </div>
+                )}
+                <MessageGroupView
+                  key={idx}
+                  messageGroup={messageGroup}
+                  oldestUnseenMessageTimestamp={oldestUnseenMessageTimestamp}
+                />
+              </>
+            )
+          })}
         </div>
       </div>
       <div
@@ -316,14 +342,16 @@ function MessageView({
   return (
     <>
       {oldestUnseenMessageTimestamp === message.time && (
-        <div className="Thread-unreadLine"></div>
+        <div className="Thread-unreadLine">
+          <div className="Thread-unreadLineLabel">NEW</div>
+        </div>
       )}
 
       <div className="message">
-        <pre className="content">{result}</pre>
         {showTime ? (
-          <div className="time">{dateFormatter.format(date)}</div>
+          <div className="time">{dateFormatterTimeOnly.format(date)}</div>
         ) : null}
+        <pre className="content">{result}</pre>
       </div>
     </>
   )
@@ -373,10 +401,12 @@ function groupMessageByAuthor(messages: Message[]): MessageGroup[] {
     const previousMessage = messages[idx - 1]
 
     if (
-      !currentMessageGroup ||
+      !previousMessage ||
       currentMessageGroup.authorId !== message.authorId ||
       // more than 10 minutes gap to previous message
-      (previousMessage && message.time - previousMessage.time > 10 * 60 * 1000)
+      (previousMessage &&
+        message.time - previousMessage.time > 10 * 60 * 1000) ||
+      !isOnSameDay(message.time, previousMessage.time)
     ) {
       currentMessageGroup = {
         authorId: message.authorId,
@@ -389,6 +419,10 @@ function groupMessageByAuthor(messages: Message[]): MessageGroup[] {
   })
 
   return messageGroups
+}
+
+function isOnSameDay(timestampA: number, timestampB: number): boolean {
+  return new Date(timestampA).getDate() === new Date(timestampB).getDate()
 }
 
 function create(unusedAttrs: any, handle: DocHandle<any>) {

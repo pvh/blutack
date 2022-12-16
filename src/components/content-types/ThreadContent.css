@@ -10,7 +10,7 @@
 }
 
 .messageWrapper {
-  padding: 12px;
+  padding: var(--halfCellSize) 0;
   position: relative;
   display: flex;
   flex-direction: column-reverse;
@@ -23,7 +23,8 @@
 }
 
 .messageGroup {
-  padding-top: 12px;
+  padding: var(--halfCellSize);
+  padding-bottom: 0;
   display: flex;
   align-items: flex-start;
 }
@@ -46,7 +47,6 @@
 
 .message {
   color: black;
-  display: flex;
   line-height: 20px;
   padding: 2px 0;
 }
@@ -61,12 +61,9 @@
 }
 
 .time {
-  flex: none;
-  position: absolute;
-  right: 12px;
-  font-size: 12px;
   color: var(--colorSecondaryGrey);
-  margin-top: -22px;
+  display: block;
+  font-size: 12px;
 }
 
 .inputWrapper {
@@ -82,4 +79,41 @@
 
 .Thread-unreadLine {
   border-bottom: 1px solid var(--colorUnreadLine);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 0;
 }
+
+.Thread-unreadLineLabel {
+  right: 0;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: white;
+  background: var(--colorUnreadLine);
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.Thread-dayLine {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+}
+
+.Thread-dayLine::before {
+  content: "";
+  border-bottom: 1px solid rgb(221, 221, 221);
+  width: 100%;
+  position: absolute;
+}
+
+.Thread-dayLineDate {
+  color: var(--colorSecondaryGrey);
+  background: white;
+  z-index: 1;
+  padding: 0 var(--halfCellSize);
+}
+
