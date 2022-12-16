@@ -1,30 +1,17 @@
-import React, {
-  useContext,
-  useRef,
-  Ref,
-  ChangeEvent,
-  useState,
-  useMemo,
-  useCallback,
-} from "react"
+import React, { useState, useCallback } from "react"
 
 import { parseDocumentLink, PushpinUrl } from "../pushpin-code/Url"
 
 import Content, { ContentProps, EditableContentProps } from "../Content"
 import * as ContentTypes from "../pushpin-code/ContentTypes"
 
-import { DocHandle, DocumentId } from "automerge-repo"
+import { DocHandle } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
 import CenteredStack from "../ui/CenteredStack"
-import ListMenuItem from "../ui/ListMenuItem"
 import ListMenu from "../ui/ListMenu"
 import "./ContentList.css"
-import DefaultInList from "./defaults/DefaultInList"
-import ListMenuHeader from "../ui/ListMenuHeader"
-import TitleEditor from "../TitleEditor"
 import ListItem from "../ui/ListItem"
-import ListMenuSection from "../ui/ListMenuSection"
 import classNames from "classnames"
 import ActionListItem from "./workspace/omnibox/ActionListItem"
 import CenteredStackRowItem from "../ui/CenteredStackRowItem"
@@ -33,7 +20,6 @@ import Badge from "../ui/Badge"
 import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
-import Heading from "../ui/Heading"
 import { useViewState } from "../pushpin-code/ViewState"
 import NewDocumentButton from "../NewDocumentButton"
 import { openDoc } from "../pushpin-code/Url"
@@ -172,8 +158,8 @@ export default function ContentList({ documentId }: ContentProps) {
   // XXX: Would be better to not recreate this every render.
   const actions = [
     {
-      name: "view",
-      faIcon: "fa-compass",
+      name: "debug",
+      faIcon: "fa-",
       label: "View",
       shortcut: "⏎",
       keysForActionPressed: (e: KeyboardEvent) =>
