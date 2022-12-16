@@ -68,8 +68,6 @@ export default function ThreadContent(props: ContentProps) {
     })
   }
 
-  console.log({ contacts, contactTitles, contactLinks })
-
   useAutoAdvanceLastSeenHeads(createDocumentLink("thread", props.documentId))
 
   const onDrop = useCallback((e: React.DragEvent) => {
