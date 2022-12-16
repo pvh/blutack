@@ -1,5 +1,4 @@
 import Badge from "../../ui/Badge"
-import React from "react"
 import Content, { ContentProps, EditableContentProps } from "../../Content"
 import { Popover } from "../../ui/Popover"
 import { useDocumentIds } from "../../pushpin-code/Hooks"
@@ -9,6 +8,7 @@ import "./ChangedDocsList.css"
 import { LastSeenHeadsMap } from "../../pushpin-code/Changes"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import { Doc } from "@automerge/automerge"
+import ListItem from "../../ui/ListItem"
 interface ChangedDocsListProps {
   lastSeenHeads: LastSeenHeadsMap
 }
@@ -62,7 +62,10 @@ export function ChangedDocsList({ lastSeenHeads }: ChangedDocsListProps) {
       {documentUrlsWithUnseenChanges.map((url) => {
         return (
           <ListMenuItem key={url} onClick={() => openDoc(url as PushpinUrl)}>
-            <Content url={url} context="list" />
+            <ListItem>
+              <Content url={url} context="badge" />
+              <Content url={url} context="title" />
+            </ListItem>
           </ListMenuItem>
         )
       })}

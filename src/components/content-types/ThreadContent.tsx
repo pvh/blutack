@@ -174,7 +174,10 @@ function renderMessage({ content, time }: Message, idx: number) {
         openDoc(content)
       }}
     >
-      <Content url={content} context="list" />
+      <ListItem>
+        <Content url={content} context="badge" />
+        <Content url={content} context="title" />
+      </ListItem>
     </div>
   ) : (
     content

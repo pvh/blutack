@@ -21,6 +21,7 @@ import NewDocumentButton from "../../NewDocumentButton"
 import { openDoc } from "../../pushpin-code/Url"
 import { ChangedDocsList } from "./ChangedDocsList"
 import { getLastSeenHeadsMapOfWorkspace } from "../../pushpin-code/Changes"
+import ListItem from "../../ui/ListItem"
 
 export interface Props {
   workspaceDocId: DocumentId
@@ -98,7 +99,10 @@ export default function TitleBar({
       {currentDocUrl && (
         <>
           <div className="ContentHeader Group">
-            <Content url={currentDocUrl} context="list" editable />
+            <ListItem>
+              <Content url={currentDocUrl} context="badge" />
+              <Content url={currentDocUrl} context="title" editable />
+            </ListItem>
           </div>
           <div className="CollaboratorsBar Inline">
             <Authors

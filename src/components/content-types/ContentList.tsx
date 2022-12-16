@@ -19,6 +19,7 @@ import { useViewState } from "../pushpin-code/ViewState"
 import NewDocumentButton from "../NewDocumentButton"
 import { openDoc } from "../pushpin-code/Url"
 import { ContentType } from "../pushpin-code/ContentTypes"
+import ListItem from "../ui/ListItem"
 
 export interface ContentListDoc {
   title: string
@@ -202,7 +203,10 @@ export default function ContentList({ documentId }: ContentProps) {
                 actions={actions}
                 selected={url === currentContent}
               >
-                <Content context="list" url={url} editable={true} />
+                <ListItem>
+                  <Content url={url} context="badge" />
+                  <Content url={url} context="title" />
+                </ListItem>
               </ActionListItem>
             </div>
           ))}

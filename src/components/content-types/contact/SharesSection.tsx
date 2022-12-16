@@ -21,8 +21,13 @@ export default function SharesSection(props: Props) {
         Object.entries(invites).map(([contact, shares]) => (
           <ListMenuItem key={contact}>
             <Content
-              context="list"
               url={createDocumentLink("contact", contact as DocumentId)}
+              context="badge"
+            />
+            <Content
+              url={createDocumentLink("contact", contact as DocumentId)}
+              context="title"
+              editable
             />
             <SecondaryText>{shares.length} items shared</SecondaryText>
           </ListMenuItem>

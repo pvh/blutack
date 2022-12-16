@@ -41,8 +41,6 @@ ContentTypes.register(videoContentType)
 import { listContentType } from "./content-types/ContentList"
 ContentTypes.register(listContentType)
 
-import "./content-types/workspace/ChangedDocsList"
-import "./content-types/defaults/DefaultInList"
 import "./content-types/defaults/DefaultInTitle"
 import "./content-types/defaults/DefaultInBadge"
 

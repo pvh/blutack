@@ -17,7 +17,7 @@ export default function DefaultInBadge(props: ContentProps) {
   const { url, documentId } = props
   const [rawDoc] = useDocument<Doc>(documentId)
   const { type } = props
-  const contentType = ContentTypes.lookup({ type, context: "list" })
+  const contentType = ContentTypes.lookup({ type, context: "badge" })
   const lastSeenHeads = useLastSeenHeads(createDocumentLink(type, documentId))
 
   if (!rawDoc) {

@@ -16,7 +16,7 @@ const log = Debug("pushpin:content-types")
 // that allows for pass-through.
 type Component = ComponentType<any>
 
-export type Context = "root" | "expanded" | "list" | "title" | "badge" | "board"
+export type Context = "root" | "expanded" | "title" | "badge" | "board"
 
 type Contexts = {
   [K in Context]?: Component
