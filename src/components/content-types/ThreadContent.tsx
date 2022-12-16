@@ -1,8 +1,12 @@
-import React, { useCallback, useId, useRef, useState } from "react"
+import React, { useCallback, useRef } from "react"
 
 import * as ContentTypes from "../pushpin-code/ContentTypes"
 import Content, { ContentProps, EditableContentProps } from "../Content"
-import { createDocumentLink, isPushpinUrl } from "../pushpin-code/Url"
+import {
+  createDocumentLink,
+  isPushpinUrl,
+  PushpinUrl,
+} from "../pushpin-code/Url"
 import ListItem from "../ui/ListItem"
 import Badge from "../ui/Badge"
 import ContentDragHandle from "../ui/ContentDragHandle"
@@ -12,7 +16,6 @@ import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
 import { DocHandle } from "automerge-repo"
-import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
 import { openDoc } from "../pushpin-code/Url"
 import {
@@ -58,7 +61,10 @@ ThreadContent.maxHeight = 36
 export default function ThreadContent(props: ContentProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [doc, changeDoc] = useDocument<ThreadDoc>(props.documentId)
-  useAutoAdvanceLastSeenHeads(createDocumentLink("thread", props.documentId))
+
+  const initialLastSeenHeads = useAutoAdvanceLastSeenHeads(
+    createDocumentLink("thread", props.documentId)
+  )
 
   const onDrop = useCallback((e: React.DragEvent) => {
     ImportData.importDataTransfer(e.dataTransfer, (url) => {
@@ -130,8 +136,12 @@ export default function ThreadContent(props: ContentProps) {
     return null
   }
 
-  const { messages } = doc
-  const groupedMessages = groupBy(messages, "authorId")
+  const oldestUnseenMessageTimestamp = getOldestUnseenMessageTimestamp(
+    doc,
+    initialLastSeenHeads
+  )
+
+  const messageGroups = groupMessageByAuthor(doc.messages)
 
   return (
     <div
@@ -142,7 +152,13 @@ export default function ThreadContent(props: ContentProps) {
     >
       <div className="messageWrapper">
         <div className="messages" onScroll={stopPropagation}>
-          {groupedMessages.map(renderGroupedMessages)}
+          {messageGroups.map((messageGroup, idx) => (
+            <MessageGroupView
+              key={idx}
+              messageGroup={messageGroup}
+              oldestUnseenMessageTimestamp={oldestUnseenMessageTimestamp}
+            />
+          ))}
         </div>
       </div>
       <div
@@ -209,6 +225,31 @@ export function ThreadInList(props: EditableContentProps) {
   )
 }
 
+export function getOldestUnseenMessageTimestamp(
+  doc: Doc<ThreadDoc>,
+  lastSeenHeads?: LastSeenHeads
+): number | undefined {
+  let oldestTimestamp: number | undefined
+
+  getUnseenPatches(doc, lastSeenHeads).forEach((patch) => {
+    if (
+      patch.action === "put" &&
+      patch.path.length === 3 &&
+      patch.path[0] === "messages" &&
+      patch.path[2] === "time"
+    ) {
+      if (
+        oldestTimestamp === undefined ||
+        (patch.value && patch.value < oldestTimestamp)
+      ) {
+        oldestTimestamp = patch.value as number
+      }
+    }
+  })
+
+  return oldestTimestamp
+}
+
 export function hasUnseenChanges(
   doc: Doc<unknown>,
   lastSeenHeads?: LastSeenHeads
@@ -245,66 +286,109 @@ function stopPropagation(e: React.SyntheticEvent) {
   e.nativeEvent.stopImmediatePropagation()
 }
 
-function renderMessage({ content, time }: Message, idx: number) {
-  const date = new Date()
-  date.setTime(time)
+interface MessageProps {
+  message: Message
+  oldestUnseenMessageTimestamp?: number
+  showTime: boolean
+}
 
-  const result = isPushpinUrl(content) ? (
+function MessageView({
+  message,
+  oldestUnseenMessageTimestamp,
+  showTime,
+}: MessageProps) {
+  const date = new Date()
+  date.setTime(message.time)
+
+  const result = isPushpinUrl(message.content) ? (
     <div
       className="ThreadContent-clickable"
       onClick={() => {
-        openDoc(content)
+        openDoc(message.content as PushpinUrl)
       }}
     >
-      <Content url={content} context="list" />
+      <Content url={message.content} context="list" />
     </div>
   ) : (
-    content
+    message.content
   )
 
   return (
-    <div className="message" key={idx}>
-      <pre className="content">{result}</pre>
-      {idx === 0 ? (
-        <div className="time">{dateFormatter.format(date)}</div>
-      ) : null}
-    </div>
+    <>
+      {oldestUnseenMessageTimestamp === message.time && (
+        <div className="Thread-unreadLine"></div>
+      )}
+
+      <div className="message">
+        <pre className="content">{result}</pre>
+        {showTime ? (
+          <div className="time">{dateFormatter.format(date)}</div>
+        ) : null}
+      </div>
+    </>
   )
 }
 
-function renderGroupedMessages(groupOfMessages: Message[], idx: number) {
+interface MessageGroupProps {
+  messageGroup: MessageGroup
+  oldestUnseenMessageTimestamp?: number
+}
+
+function MessageGroupView({
+  messageGroup,
+  oldestUnseenMessageTimestamp,
+}: MessageGroupProps) {
   return (
-    <div className="messageGroup" key={idx}>
+    <div className="messageGroup">
       <div style={{ width: "40px" }}>
         <Content
           context="thread"
-          url={createDocumentLink("contact", groupOfMessages[0].authorId)}
+          url={createDocumentLink("contact", messageGroup.authorId)}
         />
       </div>
       <div className="groupedMessages">
-        {groupOfMessages.map(renderMessage)}
+        {messageGroup.messages.map((message, idx) => (
+          <MessageView
+            key={idx}
+            message={message}
+            showTime={idx === 0}
+            oldestUnseenMessageTimestamp={oldestUnseenMessageTimestamp}
+          />
+        ))}
       </div>
     </div>
   )
 }
 
-function groupBy<T, K extends keyof T>(items: T[], key: K): T[][] {
-  const grouped: T[][] = []
-  let currentGroup: T[]
+interface MessageGroup {
+  authorId: DocumentId
+  messages: Message[]
+}
 
-  items.forEach((item) => {
+function groupMessageByAuthor(messages: Message[]): MessageGroup[] {
+  const messageGroups: MessageGroup[] = []
+  let currentMessageGroup: MessageGroup
+
+  messages.forEach((message, idx) => {
+    const previousMessage = messages[idx - 1]
+
     if (
-      !currentGroup ||
-      (currentGroup.length > 0 && currentGroup[0][key] !== item[key])
+      !currentMessageGroup ||
+      currentMessageGroup.authorId !== message.authorId ||
+      // more than 10 minutes gap to previous message
+      (previousMessage && message.time - previousMessage.time > 10 * 60 * 1000)
     ) {
-      currentGroup = []
-      grouped.push(currentGroup)
+      currentMessageGroup = {
+        authorId: message.authorId,
+        messages: [message],
+      }
+      messageGroups.push(currentMessageGroup)
+    } else {
+      currentMessageGroup.messages.push(message)
     }
-
-    currentGroup.push(item)
   })
 
-  return grouped
+  return messageGroups
 }
 
 function create(unusedAttrs: any, handle: DocHandle<any>) {

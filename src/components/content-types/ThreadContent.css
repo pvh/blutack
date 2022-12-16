@@ -30,6 +30,7 @@
 
 .groupedMessages {
   padding-left: 32px;
+  flex: 1;
 }
 
 .messages {
@@ -37,6 +38,10 @@
   flex-direction: column;
   justify-content: flex-end;
   flex-grow: 1;
+}
+
+.message > .content {
+  white-space: pre-wrap;
 }
 
 .message {
@@ -73,4 +78,8 @@
 
 .messageInput {
   width: 100%;
+}
+
+.Thread-unreadLine {
+  border-bottom: 1px solid var(--colorUnreadLine);
 }

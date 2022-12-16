@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect } from "react"
+import { useCallback, useContext, useEffect, useRef } from "react"
 import {
   WorkspaceContext,
   WorkspaceDoc,
@@ -16,7 +16,7 @@ import {
   Patch,
 } from "@automerge/automerge"
 import memoize from "lodash.memoize"
-import { ThreadDoc } from "../content-types/ThreadContent"
+import { hasUnseenChanges } from "../content-types/ThreadContent"
 
 export function useAdvanceLastSeenHeads(docUrl: PushpinUrl) {
   const workspaceId = useContext(WorkspaceContext)
@@ -50,6 +50,9 @@ function isDocUrlCurrentlyViewed(url: PushpinUrl): boolean {
 export function useAutoAdvanceLastSeenHeads(docUrl: PushpinUrl) {
   const [doc] = useDocument(parseDocumentLink(docUrl).documentId)
   const advanceLastSeenHeads = useAdvanceLastSeenHeads(docUrl)
+  const lastSeenHeads = usePersistedLastSeenHeads(docUrl)
+  const hadInitialChanges = useRef<boolean>()
+  const initialLastSeenHeadsRef = useRef<Heads>()
 
   useEffect(() => {
     CURRENTLY_VIEWED_DOC_URLS[docUrl] = true
@@ -59,9 +62,19 @@ export function useAutoAdvanceLastSeenHeads(docUrl: PushpinUrl) {
     }
   }, [docUrl])
 
+  // advance the head whenever the doc changes
   useEffect(() => {
+    // before we advance the head initially
+    // store if the document had unseen changes initially and what the initial lastSeenHeads was
+    if (doc && lastSeenHeads && hadInitialChanges.current === undefined) {
+      hadInitialChanges.current = hasUnseenChanges(doc, lastSeenHeads)
+      initialLastSeenHeadsRef.current = lastSeenHeads
+    }
+
     advanceLastSeenHeads()
   }, [doc])
+
+  return hadInitialChanges.current ? initialLastSeenHeadsRef.current : undefined
 }
 
 export type LastSeenHeads = Heads | "latestHeads"
@@ -74,16 +87,10 @@ export interface PersistedLastSeenHeadsMap {
   [url: PushpinUrl]: Heads
 }
 
-export function useLastSeenHeads(
-  docUrl: PushpinUrl
-): LastSeenHeads | undefined {
+function usePersistedLastSeenHeads(docUrl: PushpinUrl): Heads | undefined {
   const workspaceId = useContext(WorkspaceContext)
   const [workspaceDoc, changeWorkspaceDoc] =
     useDocument<WorkspaceDoc>(workspaceId)
-
-  if (CURRENTLY_VIEWED_DOC_URLS[docUrl]) {
-    return "latestHeads"
-  }
 
   if (!workspaceDoc || !workspaceDoc.persistedLastSeenHeads) {
     return undefined
@@ -102,6 +109,18 @@ export function useLastSeenHeads(
 
       lastSeenHeadsByDocUrl[docUrl] = []
     })
+  }
+
+  return lastSeenHeads
+}
+
+export function useLastSeenHeads(
+  docUrl: PushpinUrl
+): LastSeenHeads | undefined {
+  const lastSeenHeads = usePersistedLastSeenHeads(docUrl)
+
+  if (CURRENTLY_VIEWED_DOC_URLS[docUrl]) {
+    return "latestHeads"
   }
 
   return lastSeenHeads

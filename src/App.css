@@ -139,6 +139,7 @@ table {
   --colorLink: #0645ad;
   --colorDestructive: #f87060;
   --colorChangeDot: #f87060;
+  --colorUnreadLine: #f87060;
 
   /* Sizing */
   --cellSize: 20px;
