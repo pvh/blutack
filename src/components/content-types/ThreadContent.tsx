@@ -198,12 +198,12 @@ function renderGroupedMessages(groupOfMessages: Message[], idx: number) {
           context="badge"
           url={createDocumentLink("contact", groupOfMessages[0].authorId)}
         />
+      </div>
+      <div className="groupedMessages">
         <Content
           context="title"
           url={createDocumentLink("contact", groupOfMessages[0].authorId)}
         />
-      </div>
-      <div className="groupedMessages">
         {groupOfMessages.map(renderMessage)}
       </div>
     </div>
