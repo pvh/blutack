@@ -18,6 +18,11 @@ import {
 } from "../pushpin-code/Changes"
 import { Doc, getHeads } from "@automerge/automerge"
 import memoize from "lodash.memoize"
+import { useDocumentIds, useDocuments } from "../pushpin-code/Hooks"
+import { ContactDoc } from "./contact"
+import { readWithSchema } from "../../lenses"
+import { HasTitle } from "../../lenses/HasTitle"
+import Heading from "../ui/Heading"
 
 interface Message {
   authorId: DocumentId
@@ -49,6 +54,21 @@ ThreadContent.maxHeight = 36
 export default function ThreadContent(props: ContentProps) {
   const [message, setMessage] = useState("")
   const [doc, changeDoc] = useDocument<ThreadDoc>(props.documentId)
+
+  const contactLinks = [...new Set(doc?.messages.map((m) => m.authorId))]
+  const contacts = useDocumentIds<ContactDoc>(contactLinks)
+
+  let contactTitles: { [key: string]: HasTitle } = {}
+  for (let [key, value] of Object.entries(contacts)) {
+    contactTitles[key] = readWithSchema({
+      doc: value,
+      type: "contact",
+      schema: "HasTitle",
+      lastSeenHeads: undefined,
+    })
+  }
+
+  console.log({ contacts, contactTitles, contactLinks })
 
   useAutoAdvanceLastSeenHeads(createDocumentLink("thread", props.documentId))
 
@@ -107,7 +127,9 @@ export default function ThreadContent(props: ContentProps) {
     >
       <div className="messageWrapper">
         <div className="messages" onScroll={stopPropagation}>
-          {groupedMessages.map(renderGroupedMessages)}
+          {groupedMessages.map((messages, index) =>
+            renderGroupedMessages(messages, index, contactTitles)
+          )}
         </div>
       </div>
       <div className="inputWrapper">
@@ -135,19 +157,13 @@ export const getUnreadMessageCountOfThread = memoize(
     // count any splice on the messages property of the thread document as a change
     return getUnseenPatches(doc, lastSeenHeads).filter(
       (patch) =>
-        patch.action === "splice" &&
-        patch.path.length === 2 &&
-        patch.path[0] === "messages"
+        patch.action === "splice" && patch.path.length === 2 && patch.path[0] === "messages"
     ).length
   },
-  (doc, lastSeenHeads) =>
-    `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
+  (doc, lastSeenHeads) => `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
 )
 
-export function hasUnseenChanges(
-  doc: Doc<unknown>,
-  lastSeenHeads: LastSeenHeads
-) {
+export function hasUnseenChanges(doc: Doc<unknown>, lastSeenHeads: LastSeenHeads) {
   // TODO: one of these days we should figure out the typing
   return getUnreadMessageCountOfThread(doc as ThreadDoc, lastSeenHeads) > 0
 }
@@ -180,27 +196,23 @@ function renderMessage({ content, time }: Message, idx: number) {
   return (
     <div className="message" key={idx}>
       <div className="content">{result}</div>
-      {idx === 0 ? (
-        <div className="time">{dateFormatter.format(date)}</div>
-      ) : null}
+      {idx === 0 ? <div className="time">{dateFormatter.format(date)}</div> : null}
     </div>
   )
 }
 
-function renderGroupedMessages(groupOfMessages: Message[], idx: number) {
+function renderGroupedMessages(
+  groupOfMessages: Message[],
+  idx: number,
+  contactTitles: { [key: string]: HasTitle }
+) {
   return (
     <div className="messageGroup" key={idx}>
       <div style={{ width: "40px" }}>
-        <Content
-          context="badge"
-          url={createDocumentLink("contact", groupOfMessages[0].authorId)}
-        />
+        <Content context="badge" url={createDocumentLink("contact", groupOfMessages[0].authorId)} />
       </div>
       <div className="groupedMessages">
-        <Content
-          context="title"
-          url={createDocumentLink("contact", groupOfMessages[0].authorId)}
-        />
+        <Heading>{contactTitles[groupOfMessages[0].authorId]?.title}</Heading>
         {groupOfMessages.map(renderMessage)}
       </div>
     </div>
@@ -212,10 +224,7 @@ function groupBy<T, K extends keyof T>(items: T[], key: K): T[][] {
   let currentGroup: T[]
 
   items.forEach((item) => {
-    if (
-      !currentGroup ||
-      (currentGroup.length > 0 && currentGroup[0][key] !== item[key])
-    ) {
+    if (!currentGroup || (currentGroup.length > 0 && currentGroup[0][key] !== item[key])) {
       currentGroup = []
       grouped.push(currentGroup)
     }
