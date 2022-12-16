@@ -167,7 +167,7 @@ export default function ThreadContent(props: ContentProps) {
               )
 
             return (
-              <>
+              <React.Fragment key={idx}>
                 {isFirstMessageGroupOfDay && (
                   <div className="Thread-dayLine">
                     <div className="Thread-dayLineDate">
@@ -178,11 +178,10 @@ export default function ThreadContent(props: ContentProps) {
                   </div>
                 )}
                 <MessageGroupView
-                  key={idx}
                   messageGroup={messageGroup}
                   oldestUnseenMessageTimestamp={oldestUnseenMessageTimestamp}
                 />
-              </>
+              </React.Fragment>
             )
           })}
         </div>
