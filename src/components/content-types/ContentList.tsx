@@ -1,6 +1,10 @@
 import React, { useState, useCallback } from "react"
 
-import { parseDocumentLink, PushpinUrl } from "../pushpin-code/Url"
+import {
+  createDocumentLink,
+  parseDocumentLink,
+  PushpinUrl,
+} from "../pushpin-code/Url"
 
 import Content, { ContentProps, EditableContentProps } from "../Content"
 import * as ContentTypes from "../pushpin-code/ContentTypes"
@@ -158,13 +162,23 @@ export default function ContentList({ documentId }: ContentProps) {
   // XXX: Would be better to not recreate this every render.
   const actions = [
     {
-      name: "debug",
-      faIcon: "fa-",
+      name: "view",
+      faIcon: "fa-compass",
       label: "View",
       shortcut: "⏎",
       keysForActionPressed: (e: KeyboardEvent) =>
         !e.shiftKey && e.key === "Enter",
-      callback: (url: PushpinUrl) => () => selectContent(url),
+      callback: (url: PushpinUrl) => () => setCurrentContent(url),
+    },
+    {
+      name: "debug",
+      faIcon: "fa-bug",
+      label: "Debug",
+      shortcut: "⌘+d",
+      keysForActionPressed: (e) =>
+        (e.metaKey || e.ctrlKey) && e.key === "Enter",
+      callback: (url: PushpinUrl) => () =>
+        openDoc(createDocumentLink("raw", parseDocumentLink(url).documentId)),
     },
     {
       name: "remove",

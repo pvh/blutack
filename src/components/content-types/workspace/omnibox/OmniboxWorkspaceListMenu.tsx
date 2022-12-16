@@ -155,6 +155,17 @@ export default function OmniboxWorkspaceListMenu(
     },
   }
 
+  const debug: MenuAction = {
+    name: "debug",
+    faIcon: "fa-bug",
+    label: "Debug",
+    shortcut: "⌘+d",
+    keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "Enter",
+    callback: (url) => () => {
+      navigate(createDocumentLink("raw", parseDocumentLink(url).documentId))
+    },
+  }
+
   /* end actions */
 
   const sectionDefinitions: Section[] = useMemo(() => {
@@ -166,7 +177,7 @@ export default function OmniboxWorkspaceListMenu(
       {
         name: "viewedDocUrls",
         label: "Documents",
-        actions: [view, place, archive],
+        actions: [debug, view, place, archive],
         items: (props) =>
           Object.entries(viewedDocs)
             .filter(
@@ -199,7 +210,7 @@ export default function OmniboxWorkspaceListMenu(
       {
         name: "archivedDocUrls",
         label: "Archived",
-        actions: [view, unarchive],
+        actions: [debug, view, unarchive],
         items: (props) =>
           props.search === "" || !workspace
             ? [] // don't show archived URLs unless there's a current search term
@@ -215,7 +226,7 @@ export default function OmniboxWorkspaceListMenu(
       },
       {
         name: "docUrls",
-        actions: [view],
+        actions: [debug, view],
         items: (props) => {
           // try parsing the "search" to see if it is a valid document URL
           try {
@@ -229,7 +240,7 @@ export default function OmniboxWorkspaceListMenu(
       {
         name: "contacts",
         label: "Contacts",
-        actions: [invite, place],
+        actions: [debug, invite, place],
         items: (props) =>
           Object.entries(contacts)
             .filter(([id, doc]) => doc.name)
