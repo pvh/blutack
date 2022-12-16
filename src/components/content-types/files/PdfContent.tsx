@@ -598,7 +598,7 @@ function PdfAnnotationOverlayView({
 const supportsMimeType = (mimeType: string) =>
   !!mimeType.match("application/pdf")
 
-export const pdfContentType: ContentType = {
+export const contentType: ContentType = {
   type: "pdf",
   name: "PDF",
   icon: "file-pdf-o",

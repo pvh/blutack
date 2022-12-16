@@ -107,7 +107,7 @@ export default function AudioContent({ documentId }: ContentProps) {
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match("audio/")
 
-export const audioContentType: ContentType = {
+export const contentType: ContentType = {
   type: "audio",
   name: "Audio",
   icon: "file-audio-o",

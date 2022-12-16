@@ -44,7 +44,7 @@ async function createFrom(
   })
 }
 
-export const fileContentType: ContentType = {
+export const contentType: ContentType = {
   type: "file",
   name: "File",
   icon: "file-o",

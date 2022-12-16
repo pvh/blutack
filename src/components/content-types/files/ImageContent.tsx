@@ -82,7 +82,7 @@ function ImageInList(props: Props) {
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match("image/")
 
-export const imageContentType: ContentType = {
+export const contentType: ContentType = {
   type: "image",
   name: "Image",
   icon: "file-image-o",
@@ -90,7 +90,6 @@ export const imageContentType: ContentType = {
   contexts: {
     expanded: ImageContent,
     board: ImageContent,
-    list: ImageInList,
   },
   supportsMimeType,
 }

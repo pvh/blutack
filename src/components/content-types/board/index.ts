@@ -55,7 +55,7 @@ function create(typeAttrs: Attrs, handle: DocHandle<unknown>) {
 
 export const icon = "sitemap"
 
-export const boardContentType: ContentType = {
+export const contentType: ContentType = {
   type: "board",
   contexts: {
     expanded: Board,

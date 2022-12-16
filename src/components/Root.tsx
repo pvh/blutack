@@ -10,36 +10,16 @@ import { useUrlParams } from "./pushpin-code/Url"
 import { workspaceContentType } from "./content-types/workspace/Workspace"
 ContentTypes.register(workspaceContentType)
 
-import { boardContentType } from "./content-types/board"
-ContentTypes.register(boardContentType)
-
-import { contactContentType } from "./content-types/contact"
-ContentTypes.register(contactContentType)
-
-// other single-context components
-import { textContentType } from "./content-types/TextContent"
-ContentTypes.register(textContentType)
-
-import { threadContentType } from "./content-types/ThreadContent"
-ContentTypes.register(threadContentType)
-
-import { fileContentType } from "./content-types/files/index"
-ContentTypes.register(fileContentType)
-
-import { imageContentType } from "./content-types/files/ImageContent"
-ContentTypes.register(imageContentType)
-
-import { pdfContentType } from "./content-types/files/PdfContent"
-ContentTypes.register(pdfContentType)
-
-import { audioContentType } from "./content-types/files/AudioContent"
-ContentTypes.register(audioContentType)
-
-import { videoContentType } from "./content-types/files/VideoContent"
-ContentTypes.register(videoContentType)
-
-import { listContentType } from "./content-types/ContentList"
-ContentTypes.register(listContentType)
+ContentTypes.register((await import("./content-types/board")).contentType)
+ContentTypes.register((await import("./content-types/contact")).contentType)
+ContentTypes.register((await import("./content-types/TextContent")).contentType)
+ContentTypes.register((await import("./content-types/ThreadContent")).contentType)
+ContentTypes.register((await import("./content-types/files/index")).contentType)
+ContentTypes.register((await import("./content-types/files/ImageContent")).contentType)
+ContentTypes.register((await import("./content-types/files/PdfContent")).contentType)
+ContentTypes.register((await import("./content-types/files/AudioContent")).contentType)
+ContentTypes.register((await import("./content-types/files/VideoContent")).contentType)
+ContentTypes.register((await import("./content-types/ContentList")).contentType)
 
 import "./content-types/defaults/DefaultInTitle"
 import "./content-types/defaults/DefaultInBadge"

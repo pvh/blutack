@@ -27,7 +27,7 @@ export default function VideoContent({ documentId }: ContentProps) {
 const supportsMimeType = (mimeType: string) =>
   !!(mimeType.match("video/") || mimeType.match("application/ogg"))
 
-export const videoContentType: ContentType = {
+export const contentType: ContentType = {
   type: "video",
   name: "Video",
   icon: "file-video-o",

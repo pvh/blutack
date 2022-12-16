@@ -253,7 +253,7 @@ function create(attrs: any, handle: DocHandle<any>) {
   })
 }
 
-export const listContentType: ContentType = {
+export const contentType: ContentType = {
   type: "contentlist",
   name: "List",
   icon,

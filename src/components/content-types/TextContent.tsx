@@ -301,7 +301,7 @@ export const hasUnseenChanges = memoize(
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match("text/")
 
-export const textContentType: ContentType = {
+export const contentType: ContentType = {
   type: "text",
   name: "Text",
   icon: "sticky-note",

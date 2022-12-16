@@ -30,19 +30,13 @@ function Device(props: Props) {
   const { icon = "desktop", name } = doc
 
   return (
-    <div
-      className={
-        isOnline ? "DeviceListItem DeviceListItem--online" : "DeviceListItem"
-      }
-    >
+    <div className={isOnline ? "DeviceListItem DeviceListItem--online" : "DeviceListItem"}>
       <div className="DeviceListItem-badge">
         <Badge
           icon={icon}
           shape="circle"
           size="large"
-          backgroundColor={`var(${
-            isOnline ? "--colorOnline" : "--colorOffline"
-          })`}
+          backgroundColor={`var(${isOnline ? "--colorOnline" : "--colorOffline"})`}
         />
       </div>
       <TitleWithSubtitle
@@ -75,7 +69,6 @@ export const contentType: ContentType = {
   name: "Device",
   icon: "desktop",
   contexts: {
-    list: Device,
     board: Device,
   },
   resizable: false,
@@ -83,6 +76,4 @@ export const contentType: ContentType = {
   create,
 }
 
-export const CurrentDeviceContext = React.createContext<DocumentId | undefined>(
-  undefined
-)
+export const CurrentDeviceContext = React.createContext<DocumentId | undefined>(undefined)

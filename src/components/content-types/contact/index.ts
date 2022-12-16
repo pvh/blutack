@@ -30,7 +30,7 @@ function create(_typeAttrs: any, handle: DocHandle<any>) {
   })
 }
 
-export const contactContentType: ContentType = {
+export const contentType: ContentType = {
   type: "contact",
   name: "Contact",
   icon: "sticky-note",

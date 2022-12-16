@@ -1,29 +1,23 @@
 import React, { useCallback, useState } from "react"
 
 import { ContentType } from "../pushpin-code/ContentTypes"
-import Content, { ContentProps, EditableContentProps } from "../Content"
+import Content, { ContentProps } from "../Content"
 import { createDocumentLink, isPushpinUrl } from "../pushpin-code/Url"
 import ListItem from "../ui/ListItem"
-import Badge from "../ui/Badge"
-import ContentDragHandle from "../ui/ContentDragHandle"
-import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import "./ThreadContent.css"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
 import { DocHandle } from "automerge-repo"
-import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
 import { openDoc } from "../pushpin-code/Url"
 import {
   getUnseenPatches,
   LastSeenHeads,
   useAutoAdvanceLastSeenHeads,
-  useLastSeenHeads,
 } from "../pushpin-code/Changes"
 import { Doc, getHeads } from "@automerge/automerge"
 import memoize from "lodash.memoize"
-import DefaultInList from "./defaults/DefaultInList"
 
 interface Message {
   authorId: DocumentId
@@ -240,7 +234,7 @@ function create(unusedAttrs: any, handle: DocHandle<any>) {
 
 const icon = "comments"
 
-export const threadContentType: ContentType = {
+export const contentType: ContentType = {
   type: "thread",
   name: "Thread",
   icon,

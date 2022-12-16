@@ -49,15 +49,10 @@ interface WorkspaceContentProps extends ContentProps {
   createWorkspace: () => void
 }
 
-export default function Workspace({
-  documentId,
-  currentDocUrl,
-}: WorkspaceContentProps) {
+export default function Workspace({ documentId, currentDocUrl }: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
-  const currentDocId =
-    currentDocUrl && parseDocumentLink(currentDocUrl).documentId
-  const [currentDoc, changeCurrentDoc] =
-    useDocument<DocumentWithTitle>(currentDocId)
+  const currentDocId = currentDocUrl && parseDocumentLink(currentDocUrl).documentId
+  const [currentDoc, changeCurrentDoc] = useDocument<DocumentWithTitle>(currentDocId)
 
   const currentDeviceId = useContext(CurrentDeviceContext)
   const [self, changeSelf] = useDocument<ContactDoc>(workspace?.selfId)
@@ -91,9 +86,7 @@ export default function Workspace({
       ws.viewedDocUrls.unshift(currentDocUrl)
 
       if (ws.archivedDocUrls) {
-        ws.archivedDocUrls = ws.archivedDocUrls.filter(
-          (url) => url !== currentDocUrl
-        )
+        ws.archivedDocUrls = ws.archivedDocUrls.filter((url) => url !== currentDocUrl)
       }
     })
   }, [currentDocUrl])
@@ -116,10 +109,7 @@ export default function Workspace({
       return
     }
 
-    if (
-      currentDeviceId &&
-      (!self.devices || !self.devices.includes(currentDeviceId))
-    ) {
+    if (currentDeviceId && (!self.devices || !self.devices.includes(currentDeviceId))) {
       changeSelf((doc: ContactDoc) => {
         if (!doc.devices) {
           doc.devices = []
@@ -205,27 +195,19 @@ export function create(_attrs: any, handle: DocHandle<any>) {
     // we should refactor not to require the DocumentId on the contact
     // but i don't want to pull that in scope right now
 
-    ContentTypes.create(
-      "contentlist",
-      { title: "Ink & Switch" },
-      (listUrl, listHandle) => {
-        ContentTypes.create(
-          "thread",
-          { title: "#default" },
-          (threadUrl, threadHandle) => {
-            listHandle.change((doc) => {
-              ;(doc as ContentListDoc).content.push(threadUrl)
-            })
-            handle.change((workspace) => {
-              workspace.selfId = selfDocumentId
-              workspace.contactIds = []
-              workspace.currentDocUrl = listUrl
-              workspace.viewedDocUrls = [listUrl]
-            })
-          }
-        )
-      }
-    )
+    ContentTypes.create("contentlist", { title: "Ink & Switch" }, (listUrl, listHandle) => {
+      ContentTypes.create("thread", { title: "#default" }, (threadUrl, threadHandle) => {
+        listHandle.change((doc) => {
+          ;(doc as ContentListDoc).content.push(threadUrl)
+        })
+        handle.change((workspace) => {
+          workspace.selfId = selfDocumentId
+          workspace.contactIds = []
+          workspace.currentDocUrl = listUrl
+          workspace.viewedDocUrls = [listUrl]
+        })
+      })
+    })
   })
 }
 
@@ -235,7 +217,6 @@ export const workspaceContentType: ContentType = {
   icon: "briefcase",
   contexts: {
     root: Workspace,
-    list: WorkspaceInList,
     board: WorkspaceInList,
   },
   resizable: false,
