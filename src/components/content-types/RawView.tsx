@@ -30,13 +30,19 @@ export default function RawView(props: ContentProps) {
     [changeDoc]
   )
 
+  const onAdd = useCallback(() => true, [])
+
   if (!doc) {
     return null
   }
 
   return (
     <div className="RawView">
-      <ReactJson src={JSON.parse(JSON.stringify(doc))} onEdit={onEdit} />
+      <ReactJson
+        src={JSON.parse(JSON.stringify(doc))}
+        onEdit={onEdit}
+        onAdd={onAdd}
+      />
     </div>
   )
 }
