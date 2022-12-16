@@ -211,7 +211,7 @@ export function create(_attrs: any, handle: DocHandle<any>) {
   })
 }
 
-export const workspaceContentType: ContentType = {
+export const contentType: ContentType = {
   type: "workspace",
   name: "Workspace",
   icon: "briefcase",

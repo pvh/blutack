@@ -7,20 +7,31 @@ import { createDocumentLink } from "./pushpin-code/Url"
 import { useUrlParams } from "./pushpin-code/Url"
 
 // Import various content types and register them.
-import { workspaceContentType } from "./content-types/workspace/Workspace"
-ContentTypes.register(workspaceContentType)
 
-ContentTypes.register((await import("./content-types/board")).contentType)
-ContentTypes.register((await import("./content-types/contact")).contentType)
-ContentTypes.register((await import("./content-types/TextContent")).contentType)
-ContentTypes.register((await import("./content-types/ThreadContent")).contentType)
-ContentTypes.register((await import("./content-types/files/index")).contentType)
-ContentTypes.register((await import("./content-types/files/ImageContent")).contentType)
-ContentTypes.register((await import("./content-types/files/PdfContent")).contentType)
-ContentTypes.register((await import("./content-types/files/AudioContent")).contentType)
-ContentTypes.register((await import("./content-types/files/VideoContent")).contentType)
-ContentTypes.register((await import("./content-types/ContentList")).contentType)
-ContentTypes.register((await import("./content-types/workspace/Device")).contentType)
+import * as W from "./content-types/workspace/Workspace"
+ContentTypes.register(W.contentType)
+import * as B from "./content-types/board"
+ContentTypes.register(B.contentType)
+import * as Contact from "./content-types/contact"
+ContentTypes.register(Contact.contentType)
+import * as Text from "./content-types/TextContent"
+ContentTypes.register(Text.contentType)
+import * as Thread from "./content-types/ThreadContent"
+ContentTypes.register(Thread.contentType)
+import * as File from "./content-types/files/index"
+ContentTypes.register(File.contentType)
+import * as Image from "./content-types/files/ImageContent"
+ContentTypes.register(Image.contentType)
+import * as Pdf from "./content-types/files/PdfContent"
+ContentTypes.register(Pdf.contentType)
+import * as Audio from "./content-types/files/AudioContent"
+ContentTypes.register(Audio.contentType)
+import * as Video from "./content-types/files/VideoContent"
+ContentTypes.register(Video.contentType)
+import * as List from "./content-types/ContentList"
+ContentTypes.register(List.contentType)
+import * as Device from "./content-types/workspace/Device"
+ContentTypes.register(Device.contentType)
 
 import "./content-types/defaults/DefaultInTitle"
 import "./content-types/defaults/DefaultInBadge"
