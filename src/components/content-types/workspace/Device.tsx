@@ -25,24 +25,38 @@ function Device(props: Props) {
   if (!doc) return null
   const { icon = "desktop", name } = doc
 
-  return (
-    <div className={isOnline ? "DeviceListItem DeviceListItem--online" : "DeviceListItem"}>
-      <div className="DeviceListItem-badge">
+  switch (props.context) {
+    case "board":
+      return (
+        <div className={isOnline ? "DeviceListItem DeviceListItem--online" : "DeviceListItem"}>
+          <div className="DeviceListItem-badge">
+            <Badge
+              icon={icon}
+              shape="circle"
+              size="large"
+              backgroundColor={`var(${isOnline ? "--colorOnline" : "--colorOffline"})`}
+            />
+          </div>
+          <TitleWithSubtitle
+            title={name}
+            titleEditorField="name"
+            editable={props.editable}
+            documentId={props.documentId}
+          />
+        </div>
+      )
+    case "badge":
+      return (
         <Badge
           icon={icon}
           shape="circle"
           size="large"
           backgroundColor={`var(${isOnline ? "--colorOnline" : "--colorOffline"})`}
         />
-      </div>
-      <TitleWithSubtitle
-        title={name}
-        titleEditorField="name"
-        editable={props.editable}
-        documentId={props.documentId}
-      />
-    </div>
-  )
+      )
+    default:
+      return null
+  }
 }
 
 export function create(deviceAttrs: any, handle: DocHandle<any>) {
@@ -66,6 +80,7 @@ export const contentType: ContentType = {
   icon: "desktop",
   contexts: {
     board: Device,
+    badge: Device,
   },
   resizable: false,
   unlisted: true,

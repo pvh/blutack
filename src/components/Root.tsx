@@ -20,6 +20,7 @@ ContentTypes.register((await import("./content-types/files/PdfContent")).content
 ContentTypes.register((await import("./content-types/files/AudioContent")).contentType)
 ContentTypes.register((await import("./content-types/files/VideoContent")).contentType)
 ContentTypes.register((await import("./content-types/ContentList")).contentType)
+ContentTypes.register((await import("./content-types/workspace/Device")).contentType)
 
 import "./content-types/defaults/DefaultInTitle"
 import "./content-types/defaults/DefaultInBadge"

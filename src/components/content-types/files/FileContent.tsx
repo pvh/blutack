@@ -34,12 +34,7 @@ VVV permanent and unchanging (and required to render) VVV
 fileId: { "mimetype": "binary/pdf", length: 8000, "extension": "PDF"}
 */
 
-export default function FileContent({
-  documentId,
-  context,
-  editable,
-  url,
-}: Props) {
+export default function FileContent({ documentId, context, editable, url }: Props) {
   const [doc] = useDocument<FileDoc>(documentId)
   const badgeRef = useRef<HTMLDivElement>(null)
 
@@ -48,7 +43,16 @@ export default function FileContent({
   const header = useBinaryDataHeader(binaryDataId)
 
   if (!binaryDataId || !header) {
-    return null
+    return (
+      <ContentDragHandle
+        url={url}
+        filename={title}
+        extension={extension}
+        binaryDataId={binaryDataId}
+      >
+        <Badge shape="square" icon="file-o" />
+      </ContentDragHandle>
+    )
   }
   const { size, mimeType } = header
 

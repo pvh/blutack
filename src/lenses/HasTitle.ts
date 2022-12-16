@@ -21,8 +21,7 @@ export const readAsHasTitle = (doc: any, type: string): HasTitle => {
       titleEditorField: "title",
     }
   } else if (type === "contentlist") {
-    const title =
-      doc.title != null && doc.title !== "" ? doc.title : "Untitled List"
+    const title = doc.title != null && doc.title !== "" ? doc.title : "Untitled List"
     const items = doc.content.length
     const subtitle = `${items} item${items !== 1 ? "s" : ""}`
 
@@ -32,8 +31,7 @@ export const readAsHasTitle = (doc: any, type: string): HasTitle => {
       subtitle,
     }
   } else if (type === "board") {
-    const title =
-      doc.title != null && doc.title !== "" ? doc.title : "Untitled Board"
+    const title = doc.title != null && doc.title !== "" ? doc.title : "Untitled Board"
     const cardLength = Object.keys(doc.cards).length
     const subtitle = `${cardLength} item${cardLength !== 1 ? "s" : ""}`
 
@@ -53,6 +51,12 @@ export const readAsHasTitle = (doc: any, type: string): HasTitle => {
     return {
       title,
       titleEditorField: "title",
+    }
+  } else if (Object.keys(doc).includes("name")) {
+    const title = doc.name != null && doc.name !== "" ? doc.name : "Untitled"
+    return {
+      title,
+      titleEditorField: "name",
     }
   } else {
     return {
