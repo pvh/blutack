@@ -25,6 +25,7 @@ import { ContentListDoc } from "../ContentList"
 import { storeCurrentUrlOfUser } from "../../pushpin-code/Url"
 import { ViewStateContext } from "../../pushpin-code/ViewState"
 import { PersistedLastSeenHeadsMap } from "../../pushpin-code/Changes"
+import { ContentType } from "../../pushpin-code/ContentTypes"
 
 const log = Debug("pushpin:workspace")
 
@@ -175,7 +176,7 @@ export default function Workspace({
     const { type } = parseDocumentLink(currentDocUrl)
     return (
       <div className={`Workspace__container Workspace__container--${type}`}>
-        <Content ref={contentRef} context="workspace" url={currentDocUrl} />
+        <Content ref={contentRef} context="expanded" url={currentDocUrl} />
       </div>
     )
   }
@@ -228,7 +229,7 @@ export function create(_attrs: any, handle: DocHandle<any>) {
   })
 }
 
-ContentTypes.register({
+export const workspaceContentType: ContentType = {
   type: "workspace",
   name: "Workspace",
   icon: "briefcase",
@@ -240,4 +241,4 @@ ContentTypes.register({
   resizable: false,
   unlisted: true,
   create,
-})
+}

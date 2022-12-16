@@ -1,5 +1,3 @@
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
-
 import ContactWorkspace from "./ContactWorkspace"
 import ContactInVarious from "./ContactInVarious"
 import { USER_COLORS } from "./Constants"
@@ -8,6 +6,7 @@ import "./Avatar.css"
 import { DocumentId } from "automerge-repo"
 import { DocHandle } from "automerge-repo"
 import { PushpinUrl } from "../../pushpin-code/Url"
+import { ContentType } from "../../pushpin-code/ContentTypes"
 
 export type ContactDocInvites = {
   [url: string]: PushpinUrl[] /* Crypto.Box[] */
@@ -31,7 +30,7 @@ function create(_typeAttrs: any, handle: DocHandle<any>) {
   })
 }
 
-ContentTypes.register({
+export const contactContentType: ContentType = {
   type: "contact",
   name: "Contact",
   icon: "sticky-note",
@@ -39,8 +38,8 @@ ContentTypes.register({
   unlisted: true,
   create,
   contexts: {
-    workspace: ContactWorkspace,
+    expanded: ContactWorkspace,
     board: ContactInVarious,
     badge: ContactInVarious,
   },
-})
+}

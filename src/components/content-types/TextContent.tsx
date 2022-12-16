@@ -7,17 +7,13 @@ import Quill, {
   SelectionChangeHandler,
 } from "quill"
 import Delta from "quill-delta"
-import * as ContentTypes from "../pushpin-code/ContentTypes"
+import { ContentType } from "../pushpin-code/ContentTypes"
 import { ContentProps, EditableContentProps } from "../Content"
 import { useDocument } from "automerge-repo-react-hooks"
 import { useDocumentIds, useStaticCallback } from "../pushpin-code/Hooks"
 import "./TextContent.css"
-import Badge from "../ui/Badge"
 import * as ContentData from "../pushpin-code/ContentData"
 import * as WebStreamLogic from "../pushpin-code/WebStreamLogic"
-import ListItem from "../ui/ListItem"
-import ContentDragHandle from "../ui/ContentDragHandle"
-import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { DocHandle, DocumentId } from "automerge-repo"
 import QuillCursors from "quill-cursors"
 import { usePresence } from "../pushpin-code/PresenceHooks"
@@ -28,12 +24,10 @@ import {
   getUnseenPatches,
   LastSeenHeads,
   useAutoAdvanceLastSeenHeads,
-  useLastSeenHeads,
 } from "../pushpin-code/Changes"
 import { createDocumentLink } from "../pushpin-code/Url"
 import memoize from "lodash.memoize"
 import { Doc, getHeads } from "@automerge/automerge"
-import DefaultInList from "./defaults/DefaultInList"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -307,16 +301,16 @@ export const hasUnseenChanges = memoize(
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match("text/")
 
-ContentTypes.register({
+export const textContentType: ContentType = {
   type: "text",
   name: "Text",
   icon: "sticky-note",
   contexts: {
     board: TextContent,
-    workspace: TextContent,
+    expanded: TextContent,
   },
   create,
   createFrom,
   supportsMimeType,
   hasUnseenChanges,
-})
+}

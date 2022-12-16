@@ -16,20 +16,13 @@ const log = Debug("pushpin:content-types")
 // that allows for pass-through.
 type Component = ComponentType<any>
 
-export type Context =
-  | "root"
-  | "workspace"
-  | "list"
-  | "title"
-  | "badge"
-  | "board"
-  | "thread"
+export type Context = "root" | "expanded" | "list" | "title" | "badge" | "board"
 
 type Contexts = {
   [K in Context]?: Component
 }
 
-interface ContentType {
+export interface ContentType {
   type: string
   name: string
   icon: string

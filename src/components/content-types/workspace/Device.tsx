@@ -12,6 +12,7 @@ import "./Device.css"
 import { useDeviceOnlineStatus } from "../../pushpin-code/PresenceHooks"
 import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import { DocHandle } from "automerge-repo"
+import { ContentType } from "../../pushpin-code/ContentTypes"
 
 export interface DeviceDoc {
   icon: string // fa-icon name
@@ -69,7 +70,7 @@ export function create(deviceAttrs: any, handle: DocHandle<any>) {
   })
 }
 
-ContentTypes.register({
+export const contentType: ContentType = {
   type: "device",
   name: "Device",
   icon: "desktop",
@@ -80,7 +81,7 @@ ContentTypes.register({
   resizable: false,
   unlisted: true,
   create,
-})
+}
 
 export const CurrentDeviceContext = React.createContext<DocumentId | undefined>(
   undefined

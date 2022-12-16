@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react"
 
-import * as ContentTypes from "../pushpin-code/ContentTypes"
+import { ContentType } from "../pushpin-code/ContentTypes"
 import Content, { ContentProps, EditableContentProps } from "../Content"
 import { createDocumentLink, isPushpinUrl } from "../pushpin-code/Url"
 import ListItem from "../ui/ListItem"
@@ -237,12 +237,12 @@ function create(unusedAttrs: any, handle: DocHandle<any>) {
 
 const icon = "comments"
 
-ContentTypes.register({
+export const threadContentType: ContentType = {
   type: "thread",
   name: "Thread",
   icon,
   contexts: {
-    workspace: ThreadContent,
+    expanded: ThreadContent,
     board: ThreadContent,
   },
   create,
@@ -251,4 +251,4 @@ ContentTypes.register({
   // can it live outside the content type on a lens or something?
   // Would need to return not just a boolean but also the count
   hasUnseenChanges,
-})
+}

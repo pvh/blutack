@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import { useRef } from "react"
 import Content, { ContentProps } from "../../Content"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
@@ -7,14 +7,11 @@ import { FileDoc } from "."
 
 import "./FileContent.css"
 import Badge from "../../ui/Badge"
-import ListItem from "../../ui/ListItem"
 import ContentDragHandle from "../../ui/ContentDragHandle"
-import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import CenteredStack from "../../ui/CenteredStack"
 import SecondaryText from "../../ui/SecondaryText"
 import Heading from "../../ui/Heading"
 import { useBinaryDataHeader } from "../../../blobstore/Blob"
-import { PdfDoc } from "./PdfContent"
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0

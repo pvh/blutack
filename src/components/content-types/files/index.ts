@@ -1,4 +1,3 @@
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import FileContent from "./FileContent"
 
 import * as ContentData from "../../pushpin-code/ContentData"
@@ -6,6 +5,7 @@ import { DocumentId, DocHandle } from "automerge-repo"
 import { BinaryDataId } from "../../../blobstore/Blob"
 
 import path from "path"
+import { ContentType } from "../../pushpin-code/ContentTypes"
 
 export interface FileDoc {
   title: string // names are editable and not an intrinsic part of the file
@@ -44,16 +44,16 @@ async function createFrom(
   })
 }
 
-ContentTypes.register({
+export const fileContentType: ContentType = {
   type: "file",
   name: "File",
   icon: "file-o",
   unlisted: true,
   contexts: {
-    workspace: FileContent,
+    expanded: FileContent,
     board: FileContent,
     badge: FileContent,
   },
   create,
   createFrom,
-})
+}

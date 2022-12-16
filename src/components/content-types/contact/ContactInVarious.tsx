@@ -51,7 +51,7 @@ export default function ContactInVarious(props: ContactProps) {
 
   const avatarImage = avatarDocId ? (
     <Content
-      context="workspace"
+      context="expanded"
       url={createDocumentLink("image", avatarDocId)}
     />
   ) : (

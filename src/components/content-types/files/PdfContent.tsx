@@ -1,11 +1,8 @@
 import React, {
   useState,
   useCallback,
-  useEffect,
-  useRef,
   PointerEventHandler,
   useMemo,
-  useContext,
 } from "react"
 import { getStroke, StrokePoint } from "perfect-freehand"
 
@@ -37,8 +34,7 @@ import ListMenu from "../../ui/ListMenu"
 import ListMenuItem from "../../ui/ListMenuItem"
 import * as buffer from "buffer"
 import ListMenuSection from "../../ui/ListMenuSection"
-import { contentType } from "mime-types"
-import { LookupResult } from "../../pushpin-code/ContentTypes"
+import { ContentType, LookupResult } from "../../pushpin-code/ContentTypes"
 import ListItem from "../../ui/ListItem"
 import ContentDragHandle from "../../ui/ContentDragHandle"
 import Badge from "../../ui/Badge"
@@ -602,17 +598,17 @@ function PdfAnnotationOverlayView({
 const supportsMimeType = (mimeType: string) =>
   !!mimeType.match("application/pdf")
 
-ContentTypes.register({
+export const pdfContentType: ContentType = {
   type: "pdf",
   name: "PDF",
   icon: "file-pdf-o",
   unlisted: true,
   contexts: {
-    workspace: PdfContent,
+    expanded: PdfContent,
     board: PdfContent,
   },
   supportsMimeType,
-})
+}
 
 //TODO: any types
 const getPageText = async (pdf: any, pageNo: number): Promise<string> => {

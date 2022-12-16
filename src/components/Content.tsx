@@ -54,7 +54,7 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
 
   const { type, documentId } = parseDocumentLink(url)
 
-  useHeartbeat(["workspace"].includes(context) ? documentId : undefined)
+  useHeartbeat(["expanded"].includes(context) ? documentId : undefined)
 
   useEffect(() => {
     setCrashed(false)

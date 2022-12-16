@@ -6,6 +6,7 @@ import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import "./VideoContent.css"
 import { createBinaryDataUrl } from "../../../blobstore/Blob"
+import { ContentType } from "../../pushpin-code/ContentTypes"
 
 export default function VideoContent({ documentId }: ContentProps) {
   const [doc] = useDocument<FileDoc>(documentId)
@@ -26,14 +27,14 @@ export default function VideoContent({ documentId }: ContentProps) {
 const supportsMimeType = (mimeType: string) =>
   !!(mimeType.match("video/") || mimeType.match("application/ogg"))
 
-ContentTypes.register({
+export const videoContentType: ContentType = {
   type: "video",
   name: "Video",
   icon: "file-video-o",
   unlisted: true,
   contexts: {
-    workspace: VideoContent,
+    expanded: VideoContent,
     board: VideoContent,
   },
   supportsMimeType,
-})
+}

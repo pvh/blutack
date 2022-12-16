@@ -15,6 +15,7 @@ import {
   createBinaryDataUrl,
   useBinaryDataHeader,
 } from "../../../blobstore/Blob"
+import { ContentType } from "../../pushpin-code/ContentTypes"
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
@@ -81,15 +82,15 @@ function ImageInList(props: Props) {
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match("image/")
 
-ContentTypes.register({
+export const imageContentType: ContentType = {
   type: "image",
   name: "Image",
   icon: "file-image-o",
   unlisted: true,
   contexts: {
-    workspace: ImageContent,
+    expanded: ImageContent,
     board: ImageContent,
     list: ImageInList,
   },
   supportsMimeType,
-})
+}
