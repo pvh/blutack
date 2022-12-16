@@ -43,7 +43,11 @@ export default function TitleBar({
   }, [currentDocUrl])
 
   useEvent(document, "keydown", (e) => {
-    if (e.key === "/" && document.activeElement === document.body) {
+    if (
+      (e.key === "k" || e.key === "p") &&
+      (e.metaKey || e.ctrlKey) &&
+      document.activeElement === document.body
+    ) {
       if (!activeOmnibox) {
         showOmnibox()
         e.preventDefault()
