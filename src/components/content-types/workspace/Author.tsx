@@ -18,7 +18,7 @@ export default function Author(props: Props) {
   return (
     <div className="Author" data-name={contact.name}>
       <Content
-        context="title-bar"
+        context="badge"
         url={createDocumentLink("contact", props.contactId)}
         isPresent={props.isPresent}
       />

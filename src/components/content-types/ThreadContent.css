@@ -29,7 +29,7 @@
 }
 
 .groupedMessages {
-  padding-left: 32px;
+  padding-left: 16px;
 }
 
 .messages {
@@ -77,4 +77,8 @@
 
 .messageInput {
   width: 100%;
+}
+
+.groupedMessages .Heading {
+  margin-bottom: 4px;
 }

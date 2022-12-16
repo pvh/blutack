@@ -1,12 +1,10 @@
 import { DocumentId, DocHandle } from "automerge-repo"
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import { ContentType } from "../../pushpin-code/ContentTypes"
 import { PushpinUrl } from "../../pushpin-code/Url"
 
 // board in various contexts
 import Board, { BOARD_COLORS } from "./Board"
 import BoardInBoard from "./BoardInBoard"
-import BoardInList from "./BoardInList"
-import BoardInTitleBar from "./BoardInTitleBar"
 
 export type CardId = string & { cardId: true }
 
@@ -57,15 +55,13 @@ function create(typeAttrs: Attrs, handle: DocHandle<unknown>) {
 
 export const icon = "sitemap"
 
-ContentTypes.register({
+export const contentType: ContentType = {
   type: "board",
   contexts: {
-    workspace: Board,
+    expanded: Board,
     board: BoardInBoard,
-    list: BoardInList,
-    "title-bar": BoardInTitleBar,
   },
   name: "Board",
   icon,
   create,
-})
+}

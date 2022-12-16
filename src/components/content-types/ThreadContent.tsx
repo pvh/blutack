@@ -1,28 +1,28 @@
 import React, { useCallback, useState } from "react"
 
-import * as ContentTypes from "../pushpin-code/ContentTypes"
-import Content, { ContentProps, EditableContentProps } from "../Content"
+import { ContentType } from "../pushpin-code/ContentTypes"
+import Content, { ContentProps } from "../Content"
 import { createDocumentLink, isPushpinUrl } from "../pushpin-code/Url"
 import ListItem from "../ui/ListItem"
-import Badge from "../ui/Badge"
-import ContentDragHandle from "../ui/ContentDragHandle"
-import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import "./ThreadContent.css"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
 import { DocHandle } from "automerge-repo"
-import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
 import { openDoc } from "../pushpin-code/Url"
 import {
   getUnseenPatches,
   LastSeenHeads,
   useAutoAdvanceLastSeenHeads,
-  useLastSeenHeads,
 } from "../pushpin-code/Changes"
 import { Doc, getHeads } from "@automerge/automerge"
 import memoize from "lodash.memoize"
+import { useDocumentIds, useDocuments } from "../pushpin-code/Hooks"
+import { ContactDoc } from "./contact"
+import { readWithSchema } from "../../lenses"
+import { HasTitle } from "../../lenses/HasTitle"
+import Heading from "../ui/Heading"
 
 interface Message {
   authorId: DocumentId
@@ -54,6 +54,21 @@ ThreadContent.maxHeight = 36
 export default function ThreadContent(props: ContentProps) {
   const [message, setMessage] = useState("")
   const [doc, changeDoc] = useDocument<ThreadDoc>(props.documentId)
+
+  const contactLinks = [...new Set(doc?.messages.map((m) => m.authorId))]
+  const contacts = useDocumentIds<ContactDoc>(contactLinks)
+
+  let contactTitles: { [key: string]: HasTitle } = {}
+  for (let [key, value] of Object.entries(contacts)) {
+    contactTitles[key] = readWithSchema({
+      doc: value,
+      type: "contact",
+      schema: "HasTitle",
+      lastSeenHeads: undefined,
+    })
+  }
+
+  console.log({ contacts, contactTitles, contactLinks })
 
   useAutoAdvanceLastSeenHeads(createDocumentLink("thread", props.documentId))
 
@@ -112,7 +127,9 @@ export default function ThreadContent(props: ContentProps) {
     >
       <div className="messageWrapper">
         <div className="messages" onScroll={stopPropagation}>
-          {groupedMessages.map(renderGroupedMessages)}
+          {groupedMessages.map((messages, index) =>
+            renderGroupedMessages(messages, index, contactTitles)
+          )}
         </div>
       </div>
       <div className="inputWrapper">
@@ -135,68 +152,18 @@ function preventDefault(e: React.SyntheticEvent) {
   e.preventDefault()
 }
 
-export function ThreadInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
-  const [doc] = useDocument<ThreadDoc>(documentId)
-  const lastSeenHeads = useLastSeenHeads(
-    createDocumentLink("thread", documentId)
-  )
-
-  const unreadMessageCount = doc
-    ? getUnreadMessageCountOfThread(doc, lastSeenHeads)
-    : 0
-
-  if (!doc || !doc.messages) return null
-
-  const title =
-    doc.title != null && doc.title !== "" ? doc.title : "Untitled conversation"
-  const subtitle = (doc.messages[doc.messages.length - 1] || { content: "" })
-    .content
-
-  return (
-    <ListItem>
-      <ContentDragHandle url={url}>
-        <Badge
-          size="medium"
-          icon={icon}
-          dot={
-            unreadMessageCount > 0
-              ? {
-                  color: "var(--colorChangeDot)",
-                  number: unreadMessageCount,
-                }
-              : undefined
-          }
-        />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        titleEditorField="title"
-        title={title}
-        documentId={documentId}
-        editable={editable}
-      />
-    </ListItem>
-  )
-}
-
-const getUnreadMessageCountOfThread = memoize(
+export const getUnreadMessageCountOfThread = memoize(
   (doc: ThreadDoc, lastSeenHeads?: LastSeenHeads) => {
     // count any splice on the messages property of the thread document as a change
     return getUnseenPatches(doc, lastSeenHeads).filter(
       (patch) =>
-        patch.action === "splice" &&
-        patch.path.length === 2 &&
-        patch.path[0] === "messages"
+        patch.action === "splice" && patch.path.length === 2 && patch.path[0] === "messages"
     ).length
   },
-  (doc, lastSeenHeads) =>
-    `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
+  (doc, lastSeenHeads) => `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
 )
 
-export function hasUnseenChanges(
-  doc: Doc<unknown>,
-  lastSeenHeads: LastSeenHeads
-) {
+export function hasUnseenChanges(doc: Doc<unknown>, lastSeenHeads: LastSeenHeads) {
   // TODO: one of these days we should figure out the typing
   return getUnreadMessageCountOfThread(doc as ThreadDoc, lastSeenHeads) > 0
 }
@@ -217,7 +184,10 @@ function renderMessage({ content, time }: Message, idx: number) {
         openDoc(content)
       }}
     >
-      <Content url={content} context="list" />
+      <ListItem>
+        <Content url={content} context="badge" />
+        <Content url={content} context="title" />
+      </ListItem>
     </div>
   ) : (
     content
@@ -226,23 +196,23 @@ function renderMessage({ content, time }: Message, idx: number) {
   return (
     <div className="message" key={idx}>
       <div className="content">{result}</div>
-      {idx === 0 ? (
-        <div className="time">{dateFormatter.format(date)}</div>
-      ) : null}
+      {idx === 0 ? <div className="time">{dateFormatter.format(date)}</div> : null}
     </div>
   )
 }
 
-function renderGroupedMessages(groupOfMessages: Message[], idx: number) {
+function renderGroupedMessages(
+  groupOfMessages: Message[],
+  idx: number,
+  contactTitles: { [key: string]: HasTitle }
+) {
   return (
     <div className="messageGroup" key={idx}>
       <div style={{ width: "40px" }}>
-        <Content
-          context="thread"
-          url={createDocumentLink("contact", groupOfMessages[0].authorId)}
-        />
+        <Content context="badge" url={createDocumentLink("contact", groupOfMessages[0].authorId)} />
       </div>
       <div className="groupedMessages">
+        <Heading>{contactTitles[groupOfMessages[0].authorId]?.title}</Heading>
         {groupOfMessages.map(renderMessage)}
       </div>
     </div>
@@ -254,10 +224,7 @@ function groupBy<T, K extends keyof T>(items: T[], key: K): T[][] {
   let currentGroup: T[]
 
   items.forEach((item) => {
-    if (
-      !currentGroup ||
-      (currentGroup.length > 0 && currentGroup[0][key] !== item[key])
-    ) {
+    if (!currentGroup || (currentGroup.length > 0 && currentGroup[0][key] !== item[key])) {
       currentGroup = []
       grouped.push(currentGroup)
     }
@@ -276,16 +243,18 @@ function create(unusedAttrs: any, handle: DocHandle<any>) {
 
 const icon = "comments"
 
-ContentTypes.register({
+export const contentType: ContentType = {
   type: "thread",
   name: "Thread",
   icon,
   contexts: {
-    workspace: ThreadContent,
+    expanded: ThreadContent,
     board: ThreadContent,
-    list: ThreadInList,
-    "title-bar": ThreadInList,
   },
   create,
+
+  // TODO: figure out where this function should live;
+  // can it live outside the content type on a lens or something?
+  // Would need to return not just a boolean but also the count
   hasUnseenChanges,
-})
+}

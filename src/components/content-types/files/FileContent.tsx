@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import { useRef } from "react"
 import Content, { ContentProps } from "../../Content"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
@@ -7,14 +7,11 @@ import { FileDoc } from "."
 
 import "./FileContent.css"
 import Badge from "../../ui/Badge"
-import ListItem from "../../ui/ListItem"
 import ContentDragHandle from "../../ui/ContentDragHandle"
-import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import CenteredStack from "../../ui/CenteredStack"
 import SecondaryText from "../../ui/SecondaryText"
 import Heading from "../../ui/Heading"
 import { useBinaryDataHeader } from "../../../blobstore/Blob"
-import { PdfDoc } from "./PdfContent"
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0
@@ -37,12 +34,7 @@ VVV permanent and unchanging (and required to render) VVV
 fileId: { "mimetype": "binary/pdf", length: 8000, "extension": "PDF"}
 */
 
-export default function FileContent({
-  documentId,
-  context,
-  editable,
-  url,
-}: Props) {
+export default function FileContent({ documentId, context, editable, url }: Props) {
   const [doc] = useDocument<FileDoc>(documentId)
   const badgeRef = useRef<HTMLDivElement>(null)
 
@@ -51,7 +43,16 @@ export default function FileContent({
   const header = useBinaryDataHeader(binaryDataId)
 
   if (!binaryDataId || !header) {
-    return null
+    return (
+      <ContentDragHandle
+        url={url}
+        filename={title}
+        extension={extension}
+        binaryDataId={binaryDataId}
+      >
+        <Badge shape="square" icon="file-o" />
+      </ContentDragHandle>
+    )
   }
   const { size, mimeType } = header
 
@@ -59,25 +60,16 @@ export default function FileContent({
 
   function renderUnidentifiedFile() {
     switch (context) {
-      case "list":
-      case "title-bar":
+      case "badge":
         return (
-          <ListItem>
-            <ContentDragHandle
-              url={url}
-              filename={title}
-              extension={extension}
-              binaryDataId={binaryDataId}
-            >
-              <Badge shape="square" icon="file-o" />
-            </ContentDragHandle>
-            <TitleWithSubtitle
-              title={title}
-              subtitle={subtitle}
-              documentId={documentId}
-              editable={editable}
-            />
-          </ListItem>
+          <ContentDragHandle
+            url={url}
+            filename={title}
+            extension={extension}
+            binaryDataId={binaryDataId}
+          >
+            <Badge shape="square" icon="file-o" />
+          </ContentDragHandle>
         )
       default:
         return (
