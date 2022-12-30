@@ -757,10 +757,10 @@ automerge-repo-network-websocket@0.0.31:
     eventemitter3 "^4.0.7"
     isomorphic-ws "^5.0.0"
 
-automerge-repo-react-hooks@0.0.40:
-  version "0.0.40"
-  resolved "https://registry.yarnpkg.com/automerge-repo-react-hooks/-/automerge-repo-react-hooks-0.0.40.tgz#5d173e18e7c6b024f612ac584346e537dc0b9a78"
-  integrity sha512-8PSfBwa0GpkQ/LeUyWFSZDsu3EzaiOWFX0rldkYHEyH3w+XLo9AimQlUxiJuoZDVLhTLOdUZW2QzOnN+/HnEkQ==
+automerge-repo-react-hooks@0.0.42:
+  version "0.0.42"
+  resolved "https://registry.yarnpkg.com/automerge-repo-react-hooks/-/automerge-repo-react-hooks-0.0.42.tgz#e6e8df9db8600e5f2b43754f67233e639a80db74"
+  integrity sha512-J5yKPHxSSn2RH3PXGrxIcUUSu+6RJgxUOtlaKrcMbU8KbVh48iqEwPimtxZZwdW73syN7oX9kKBRAQYg3szv/g==
   dependencies:
     automerge-repo "*"
 
