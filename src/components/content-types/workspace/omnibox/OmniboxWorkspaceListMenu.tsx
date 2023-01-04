@@ -155,7 +155,7 @@ export default function OmniboxWorkspaceListMenu(props: Props): ReactElement | n
     faIcon: "fa-bug",
     label: "Debug",
     shortcut: "⌘+d",
-    keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "Enter",
+    keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "d",
     callback: (url) => () => {
       navigate(createDocumentLink("raw", parseDocumentLink(url).documentId))
     },
