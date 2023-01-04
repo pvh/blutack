@@ -1,14 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react"
 
-import * as ContentTypes from "../pushpin-code/ContentTypes"
+import { ContentType } from "../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import "./TextContent.css"
-import Badge from "../ui/Badge"
-import ListItem from "../ui/ListItem"
-import ContentDragHandle from "../ui/ContentDragHandle"
-import TitleWithSubtitle from "../ui/TitleWithSubtitle"
-import { DocumentWithTitle } from "./workspace/Workspace"
-import { ContentProps, EditableContentProps } from "../Content"
+import { ContentProps } from "../Content"
 import "./RawView.css"
 import ReactJson, { InteractionProps, OnSelectProps } from "react-json-view"
 import {
@@ -19,7 +14,6 @@ import {
   PushpinUrl,
 } from "../pushpin-code/Url"
 import { DocumentId } from "automerge-repo"
-import { ContentType } from "../pushpin-code/ContentTypes"
 
 export default function RawView(props: ContentProps) {
   const [doc, changeDoc] = useDocument(props.documentId)
@@ -27,8 +21,6 @@ export default function RawView(props: ContentProps) {
 
   const onEdit = useCallback(
     ({ namespace, new_value, name }: InteractionProps) => {
-      console.log("onEdit", { namespace, new_value, name })
-
       changeDoc((doc) => {
         let current: any = doc
 
@@ -111,25 +103,7 @@ function isDocumentId(value: any) {
   )
 }
 
-function JsonInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
-  const [doc] = useDocument<DocumentWithTitle>(documentId)
-  if (!doc) return null
-
-  const title = doc.title || documentId
-
-  return (
-    <ListItem>
-      <ContentDragHandle url={url}>
-        <Badge icon="file-code" size="medium" />
-      </ContentDragHandle>
-      <TitleWithSubtitle title={title} documentId={documentId} editable={editable} />
-    </ListItem>
-  )
-}
-
 export const contentType: ContentType = {
-  unlisted: true,
   type: "raw",
   name: "Raw",
   icon: "file-code",
@@ -138,4 +112,6 @@ export const contentType: ContentType = {
     board: RawView,
     expanded: RawView,
   },
+  unlisted: true,
+  dontAddToViewedDocUrls: true,
 }

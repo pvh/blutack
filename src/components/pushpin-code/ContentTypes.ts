@@ -27,13 +27,11 @@ export interface ContentType {
   name: string
   icon: string
   unlisted?: boolean
+  dontAddToViewedDocUrls?: boolean
   resizable?: boolean
   contexts: Contexts
   create?: (typeAttrs: any, handle: DocHandle<unknown>) => Promise<void> | void
-  createFrom?: (
-    contentData: ContentData,
-    handle: DocHandle<any>
-  ) => Promise<void> | void
+  createFrom?: (contentData: ContentData, handle: DocHandle<any>) => Promise<void> | void
   supportsMimeType?: (type: string) => boolean
   // TODO: i don't love this, but we'll put it here for now
   hasUnseenChanges?: (doc: Doc<unknown>, lastHeads: LastSeenHeads) => boolean
@@ -72,10 +70,7 @@ export function register(contentType: ContentType) {
   registry[type] = entry
 }
 
-export function registerDefault(contentType: {
-  component: Component
-  context: Context
-}) {
+export function registerDefault(contentType: { component: Component; context: Context }) {
   const { component, context } = contentType
   defaultRegistry[context] = component
 }
@@ -97,19 +92,13 @@ export interface LookupResult {
 // TODO: this could be simplified to not include a context
 export function lookup({ type, context }: LookupQuery): LookupResult | null {
   const entry = registry[type]
-  const component =
-    (entry && entry.contexts[context]) || defaultRegistry[context]
+  const component = (entry && entry.contexts[context]) || defaultRegistry[context]
 
   if (!component) {
     return null
   }
 
-  const {
-    name = "Unknown",
-    icon = "question",
-    unlisted = false,
-    resizable = true,
-  } = entry || {}
+  const { name = "Unknown", icon = "question", unlisted = false, resizable = true } = entry || {}
 
   return { type, name, icon, component, unlisted, resizable }
 }
@@ -134,15 +123,9 @@ export function mimeTypeToContentType(mimeType?: string): ContentType {
   return supportingType
 }
 
-export type CreateCallback = (
-  url: PushpinUrl,
-  handle: DocHandle<unknown>
-) => void
+export type CreateCallback = (url: PushpinUrl, handle: DocHandle<unknown>) => void
 
-export function createFrom(
-  contentData: ContentData,
-  callback: CreateCallback
-): void {
+export function createFrom(contentData: ContentData, callback: CreateCallback): void {
   // importFromText
   // TODO: the different content types should include mime type tests.
   let contentType: string
@@ -167,11 +150,7 @@ export function createFrom(
     .catch(log)
 }
 
-export function create(
-  type: string,
-  attrs = {},
-  callback: CreateCallback
-): void {
+export function create(type: string, attrs = {}, callback: CreateCallback): void {
   const entry = registry[type]
   if (!entry) {
     console.error(`Cannot create unknown type ${type}`)
@@ -199,10 +178,7 @@ export interface ListQuery {
   withUnlisted?: boolean
 }
 
-export function list({
-  context,
-  withUnlisted = false,
-}: ListQuery): LookupResult[] {
+export function list({ context, withUnlisted = false }: ListQuery): LookupResult[] {
   const allTypes = Object.keys(registry)
     .map((type) => lookup({ type, context }))
     .filter((ct) => ct) as LookupResult[]
