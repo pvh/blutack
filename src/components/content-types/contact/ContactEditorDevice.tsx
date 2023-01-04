@@ -7,6 +7,7 @@ import ActionListItem from "../workspace/omnibox/ActionListItem"
 import { DeviceDoc } from "../workspace/Device"
 
 import "./ContactEditor.css"
+import ListItem from "../../ui/ListItem"
 
 export interface Props {
   selfId: DocumentId
@@ -43,17 +44,17 @@ export default function ContactEditorDevice(props: Props) {
     },
   ]
 
+  const url = createDocumentLink("device", deviceId)
   return (
     <ActionListItem
-      contentUrl={createDocumentLink("device", deviceId)}
+      contentUrl={url}
       actions={isCurrentDevice ? [] : deviceActions}
       selected={false}
     >
-      <Content
-        context="list"
-        url={createDocumentLink("device", deviceId)}
-        editable
-      />
+      <ListItem>
+        <Content url={url} context="badge" />
+        <Content url={url} context="title" editable />
+      </ListItem>
     </ActionListItem>
   )
 }

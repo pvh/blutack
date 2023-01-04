@@ -15,6 +15,8 @@ interface Props extends ContentProps {
 
 type KeyedCard = [CardId, BoardDocCard]
 
+// TODO: maybe i should move this into the title-bar itself?
+
 export default function BoardInTitleBar(props: Props) {
   const { documentId } = props
   const [doc] = useDocument<BoardDoc>(documentId)
@@ -91,7 +93,10 @@ const ActiveBoardItem = (
         <Badge icon={icon} backgroundColor={backgroundColor} />
       </ContentDragHandle>
       <div className="ActiveCard">
-        <Content url={card.url} context="list" editable />
+        <ListItem>
+          <Content url={url} context="badge" />
+          <Content url={url} context="title" editable />
+        </ListItem>
       </div>
     </ListItem>
   )

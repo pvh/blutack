@@ -28,6 +28,7 @@ import Content from "../../../Content"
 import useInvitations, { Invitation } from "./InvitationsHook"
 import "./OmniboxWorkspaceListMenu.css"
 import { getCurrentDocUrl, openDoc } from "../../../pushpin-code/Url"
+import ListItem from "../../../ui/ListItem"
 
 const log = Debug("pushpin:omnibox")
 
@@ -87,12 +88,8 @@ interface TitledDoc {
   title: string
 }
 
-export default function OmniboxWorkspaceListMenu(
-  props: Props
-): ReactElement | null {
-  const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(
-    props.workspaceDocId
-  )
+export default function OmniboxWorkspaceListMenu(props: Props): ReactElement | null {
+  const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(props.workspaceDocId)
   const repo = useRepo()
 
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -129,8 +126,7 @@ export default function OmniboxWorkspaceListMenu(
     faIcon: "fa-trash",
     label: "Archive",
     shortcut: "⌘+⌫",
-    keysForActionPressed: (e) =>
-      (e.metaKey || e.ctrlKey) && e.key === "Backspace",
+    keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "Backspace",
     callback: (url) => () => archiveDocument(url),
   }
 
@@ -139,8 +135,7 @@ export default function OmniboxWorkspaceListMenu(
     faIcon: "fa-trash-restore",
     label: "Unarchive",
     shortcut: "⌘+⌫",
-    keysForActionPressed: (e) =>
-      (e.metaKey || e.ctrlKey) && e.key === "Backspace",
+    keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "Backspace",
     callback: (url) => () => unarchiveDocument(url),
   }
 
@@ -177,7 +172,7 @@ export default function OmniboxWorkspaceListMenu(
       {
         name: "viewedDocUrls",
         label: "Documents",
-        actions: [debug, view, place, archive],
+        actions: [view, place, debug, archive],
         items: (props) =>
           Object.entries(viewedDocs)
             .filter(
@@ -188,10 +183,8 @@ export default function OmniboxWorkspaceListMenu(
             .filter(
               ([_url, doc]) =>
                 doc &&
-                ((doc.title &&
-                  doc.title.match(new RegExp(props.search, "i"))) ||
-                  (doc.text &&
-                    doc.text.join("").match(new RegExp(props.search, "i"))))
+                ((doc.title && doc.title.match(new RegExp(props.search, "i"))) ||
+                  (doc.text && doc.text.join("").match(new RegExp(props.search, "i"))))
             )
             .reduce(
               (prev, current) => {
@@ -218,9 +211,7 @@ export default function OmniboxWorkspaceListMenu(
                 .map((url): [PushpinUrl, Doc<any>] => [url, viewedDocs[url]])
                 .filter(
                   ([_url, doc]) =>
-                    doc &&
-                    doc.title &&
-                    doc.title.match(new RegExp(props.search, "i"))
+                    doc && doc.title && doc.title.match(new RegExp(props.search, "i"))
                 )
                 .map(([url, doc]) => ({ url })),
       },
@@ -244,9 +235,7 @@ export default function OmniboxWorkspaceListMenu(
         items: (props) =>
           Object.entries(contacts)
             .filter(([id, doc]) => doc.name)
-            .filter(([id, doc]) =>
-              doc.name.match(new RegExp(props.search, "i"))
-            )
+            .filter(([id, doc]) => doc.name.match(new RegExp(props.search, "i")))
             .map(([id, doc]) => ({
               url: createDocumentLink("contact", id as DocumentId),
             })),
@@ -433,8 +422,7 @@ export default function OmniboxWorkspaceListMenu(
     }
 
     // XXX out of scope RN but consider if we should change the key for consistency?
-    const { type, documentId: recipientId } =
-      parseDocumentLink(recipientPushpinUrl)
+    const { type, documentId: recipientId } = parseDocumentLink(recipientPushpinUrl)
 
     if (!workspace || !workspace.selfId) {
       return
@@ -496,10 +484,7 @@ export default function OmniboxWorkspaceListMenu(
       return (
         <ListMenuSection title="Oops..." key="nothingFound">
           <ListMenuItem>
-            <Badge
-              icon="question-circle"
-              backgroundColor="var(--colorPaleGrey)"
-            />
+            <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
             <Heading>Nothing Found</Heading>
           </ListMenuItem>
         </ListMenuSection>
@@ -525,11 +510,7 @@ export default function OmniboxWorkspaceListMenu(
           actions={actions}
           selected={item.selected}
         >
-          <InvitationListItem
-            invitation={invitation}
-            url={url}
-            documentId={documentId}
-          />
+          <InvitationListItem invitation={invitation} url={url} documentId={documentId} />
         </ActionListItem>
       )
     })
@@ -572,7 +553,10 @@ export default function OmniboxWorkspaceListMenu(
                   actions={actions}
                   selected={selected}
                 >
-                  <Content context="list" url={url} />
+                  <ListItem>
+                    <Content context="badge" url={url} />
+                    <Content context="title" url={url} />
+                  </ListItem>
                 </ActionListItem>
               )
           )}

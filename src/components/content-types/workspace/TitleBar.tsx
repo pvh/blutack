@@ -21,6 +21,7 @@ import NewDocumentButton from "../../NewDocumentButton"
 import { openDoc } from "../../pushpin-code/Url"
 import { ChangedDocsList } from "./ChangedDocsList"
 import { getLastSeenHeadsMapOfWorkspace } from "../../pushpin-code/Changes"
+import ListItem from "../../ui/ListItem"
 
 export interface Props {
   workspaceDocId: DocumentId
@@ -43,7 +44,11 @@ export default function TitleBar({
   }, [currentDocUrl])
 
   useEvent(document, "keydown", (e) => {
-    if (e.key === "/" && document.activeElement === document.body) {
+    if (
+      (e.key === "k" || e.key === "p") &&
+      (e.metaKey || e.ctrlKey) &&
+      document.activeElement === document.body
+    ) {
       if (!activeOmnibox) {
         showOmnibox()
         e.preventDefault()
@@ -98,7 +103,10 @@ export default function TitleBar({
       {currentDocUrl && (
         <>
           <div className="ContentHeader Group">
-            <Content url={currentDocUrl} context="title-bar" editable />
+            <ListItem>
+              <Content url={currentDocUrl} context="badge" />
+              <Content url={currentDocUrl} context="title" editable />
+            </ListItem>
           </div>
           <div className="CollaboratorsBar Inline">
             <Authors
@@ -108,7 +116,7 @@ export default function TitleBar({
             <div className="TitleBar-self">
               <Content
                 url={createDocumentLink("contact", workspaceDoc.selfId)}
-                context="title-bar"
+                context="badge"
                 isPresent
               />
             </div>

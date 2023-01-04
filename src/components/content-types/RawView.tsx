@@ -19,6 +19,7 @@ import {
   PushpinUrl,
 } from "../pushpin-code/Url"
 import { DocumentId } from "automerge-repo"
+import { ContentType } from "../pushpin-code/ContentTypes"
 
 export default function RawView(props: ContentProps) {
   const [doc, changeDoc] = useDocument(props.documentId)
@@ -66,10 +67,7 @@ export default function RawView(props: ContentProps) {
       if (isPushpinUrl(value)) {
         openDoc(
           isMetaPressed
-            ? createDocumentLink(
-                "raw",
-                parseDocumentLink(value as PushpinUrl).documentId
-              )
+            ? createDocumentLink("raw", parseDocumentLink(value as PushpinUrl).documentId)
             : (value as PushpinUrl)
         )
       } else if (isDocumentId(value)) {
@@ -102,13 +100,7 @@ export default function RawView(props: ContentProps) {
 
   return (
     <div className="RawView">
-      <ReactJson
-        src={doc}
-        onEdit={onEdit}
-        onAdd={onAdd}
-        onDelete={onDelete}
-        onSelect={onSelect}
-      />
+      <ReactJson src={doc} onEdit={onEdit} onAdd={onAdd} onDelete={onDelete} onSelect={onSelect} />
     </div>
   )
 }
@@ -131,24 +123,19 @@ function JsonInList(props: EditableContentProps) {
       <ContentDragHandle url={url}>
         <Badge icon="file-code" size="medium" />
       </ContentDragHandle>
-      <TitleWithSubtitle
-        title={title}
-        documentId={documentId}
-        editable={editable}
-      />
+      <TitleWithSubtitle title={title} documentId={documentId} editable={editable} />
     </ListItem>
   )
 }
 
-ContentTypes.register({
+export const contentType: ContentType = {
   unlisted: true,
   type: "raw",
   name: "Raw",
   icon: "file-code",
   contexts: {
-    workspace: RawView,
+    root: RawView,
     board: RawView,
-    list: JsonInList,
-    "title-bar": JsonInList,
+    expanded: RawView,
   },
-})
+}

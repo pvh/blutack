@@ -32,7 +32,7 @@ export default function WorkspaceListItem(props: ContentProps) {
         <div className="WorkspaceLink-ContactOverlay">
           <Content
             url={createDocumentLink("contact", selfId)}
-            context="title-bar"
+            context="badge"
           />
         </div>
       </ContentDragHandle>

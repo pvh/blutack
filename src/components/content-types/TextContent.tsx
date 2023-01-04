@@ -7,17 +7,13 @@ import Quill, {
   SelectionChangeHandler,
 } from "quill"
 import Delta from "quill-delta"
-import * as ContentTypes from "../pushpin-code/ContentTypes"
+import { ContentType } from "../pushpin-code/ContentTypes"
 import { ContentProps, EditableContentProps } from "../Content"
 import { useDocument } from "automerge-repo-react-hooks"
 import { useDocumentIds, useStaticCallback } from "../pushpin-code/Hooks"
 import "./TextContent.css"
-import Badge from "../ui/Badge"
 import * as ContentData from "../pushpin-code/ContentData"
 import * as WebStreamLogic from "../pushpin-code/WebStreamLogic"
-import ListItem from "../ui/ListItem"
-import ContentDragHandle from "../ui/ContentDragHandle"
-import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { DocHandle, DocumentId } from "automerge-repo"
 import QuillCursors from "quill-cursors"
 import { usePresence } from "../pushpin-code/PresenceHooks"
@@ -28,7 +24,6 @@ import {
   getUnseenPatches,
   LastSeenHeads,
   useAutoAdvanceLastSeenHeads,
-  useLastSeenHeads,
 } from "../pushpin-code/Changes"
 import { createDocumentLink } from "../pushpin-code/Url"
 import memoize from "lodash.memoize"
@@ -291,48 +286,6 @@ function create({ text }: any, handle: DocHandle<any>) {
   })
 }
 
-function TextInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
-  const [doc] = useDocument<TextDoc>(documentId)
-  const lastSeenHeads = useLastSeenHeads(createDocumentLink("text", documentId))
-
-  if (!doc || !doc.text) return null
-
-  const lines = doc.text
-    //  @ts-ignore-next-line
-    .join("")
-    .split("\n")
-    .filter((l: string) => l.length > 0)
-
-  const title = doc.title || lines.shift() || "[empty text note]"
-  const subtitle = lines.slice(0, 2).join("\n")
-
-  const unseenChanges = doc && hasUnseenChanges(doc, lastSeenHeads)
-
-  return (
-    <ListItem>
-      <ContentDragHandle url={url}>
-        <Badge
-          icon="sticky-note"
-          size="medium"
-          dot={
-            unseenChanges
-              ? {
-                  color: "var(--colorChangeDot)",
-                }
-              : undefined
-          }
-        />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        title={title}
-        documentId={documentId}
-        editable={editable}
-      />
-    </ListItem>
-  )
-}
-
 export const hasUnseenChanges = memoize(
   (doc: Doc<unknown>, lastSeenHeads?: LastSeenHeads) => {
     return getUnseenPatches(doc, lastSeenHeads).some(
@@ -348,18 +301,16 @@ export const hasUnseenChanges = memoize(
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match("text/")
 
-ContentTypes.register({
+export const contentType: ContentType = {
   type: "text",
   name: "Text",
   icon: "sticky-note",
   contexts: {
     board: TextContent,
-    workspace: TextContent,
-    list: TextInList,
-    "title-bar": TextInList,
+    expanded: TextContent,
   },
   create,
   createFrom,
   supportsMimeType,
   hasUnseenChanges,
-})
+}

@@ -51,7 +51,7 @@ export default function ContactInVarious(props: ContactProps) {
 
   const avatarImage = avatarDocId ? (
     <Content
-      context="workspace"
+      context="expanded"
       url={createDocumentLink("image", avatarDocId)}
     />
   ) : (
@@ -108,28 +108,8 @@ export default function ContactInVarious(props: ContactProps) {
   )
 
   switch (context) {
-    case "list":
-      return (
-        <ListItem>
-          <ContentDragHandle url={url}>{avatar}</ContentDragHandle>
-          <TitleWithSubtitle
-            title={name || "Unknown Contact"}
-            documentId={documentId}
-          />
-        </ListItem>
-      )
-
-    case "thread":
-      return (
-        <div className="Contact-user">
-          {avatar}
-          <div className="username Contact-username">{name}</div>
-        </div>
-      )
-
-    case "title-bar":
+    case "badge":
       return <ContentDragHandle url={url}>{avatar}</ContentDragHandle>
-
     case "board":
       return (
         <CenteredStack>
@@ -137,7 +117,6 @@ export default function ContactInVarious(props: ContactProps) {
           <Heading wrap>{name || ""}</Heading>
         </CenteredStack>
       )
-
     default:
       log("contact render called in an unexpected context")
       return null

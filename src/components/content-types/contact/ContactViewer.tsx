@@ -23,6 +23,7 @@ import { Swatch } from "react-color/lib/components/common/Swatch"
 
 import "./ContactEditor.css"
 import ListMenu from "../../ui/ListMenu"
+import ListItem from "../../ui/ListItem"
 
 export default function ContactViewer(props: ContentProps) {
   const { documentId: contactId } = props
@@ -90,7 +91,10 @@ const renderDevices = (
     .map((deviceUrl: DocumentId) => createDocumentLink("device", deviceUrl))
     .map((deviceId: PushpinUrl) => (
       <ListMenuItem key={deviceId}>
-        <Content context="list" url={deviceId} editable />
+        <ListItem>
+          <Content context="badge" url={deviceId} />
+          <Content context="title" url={deviceId} editable />
+        </ListItem>
       </ListMenuItem>
     ))
 
