@@ -95,34 +95,25 @@ export default function NotificationSetting({ currentDocumentUrl }: Notification
   )
 }
 
-export function shouldNotifyAboutDocChanges(
-  type: string,
-  doc: Doc<unknown>,
-  lastSeenHeads: LastSeenHeads | undefined,
-  contactId: DocumentId,
-  name: string
-) {
-  const contentType = ContentTypes.typeNameToContentType(type)
-
-  if (!contentType) {
-    return false
-  }
-
-  switch (getNotificationModeOfDocForUser(doc as DocWithNotificationSettings, contactId)) {
-    case "all":
-      return contentType.hasUnseenChanges ? contentType.hasUnseenChanges(doc, lastSeenHeads) : false
-    case "never":
-      return false
-    case "mentions":
-      return contentType.hasUnseenMentions
-        ? contentType.hasUnseenMentions(doc, lastSeenHeads, name)
-        : false
-  }
-}
-
 function getNotificationModeOfDocForUser(
   doc: DocWithNotificationSettings,
   userId: DocumentId
 ): NotificationMode {
   return doc.__notificationModeByUser?.[userId] ?? "mentions"
+}
+
+export function shouldNotifyUserAboutDoc(
+  doc: any,
+  contactId: DocumentId,
+  hasUnseenChanges: boolean,
+  hasUnseenMentions: boolean
+) {
+  switch (getNotificationModeOfDocForUser(doc as DocWithNotificationSettings, contactId)) {
+    case "all":
+      return hasUnseenChanges
+    case "never":
+      return false
+    case "mentions":
+      return hasUnseenMentions
+  }
 }

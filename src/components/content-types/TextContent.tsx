@@ -14,7 +14,7 @@ import { DocHandle, DocumentId } from "automerge-repo"
 import QuillCursors from "quill-cursors"
 import { usePresence } from "../pushpin-code/PresenceHooks"
 import IQuillRange from "quill-cursors/dist/quill-cursors/i-range"
-import { useSelf, useSelfId } from "../pushpin-code/SelfHooks"
+import { useSelfId } from "../pushpin-code/SelfHooks"
 import { ContactDoc } from "./contact"
 import {
   getUnseenPatches,
@@ -25,7 +25,6 @@ import { createDocumentLink } from "../pushpin-code/Url"
 import { Doc, getHeads, Heads, view } from "@automerge/automerge"
 import { evalAllSearches, evalSearchFor, Match, MENTION } from "../pushpin-code/Searches"
 import "./Autocompletion.js"
-import { shouldNotifyAboutDocChanges } from "./workspace/NotificationSetting"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -310,11 +309,15 @@ export function hasUnseenChanges(doc: Doc<unknown>, lastSeenHeads?: LastSeenHead
 
 // TODO: this is not really checking if the user has been mentioned since the doc was last seen
 // as long as the user is mentioned in the doc once we consider any new changes to be unseen mentions
-function hasUnseenMentions(
+export function hasUnseenMentions(
   doc: Doc<unknown>,
   lastSeenHeads: LastSeenHeads | undefined,
   name: string
 ) {
+  if (!name) {
+    debugger
+  }
+
   const isUserMentionedInText = evalSearchFor(MENTION, (doc as TextDoc).text.toString()).some(
     (match) => match.data.name.toLowerCase() === name.toLowerCase()
   )

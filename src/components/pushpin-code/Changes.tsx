@@ -16,6 +16,7 @@ import {
 import { readAsHasBadge } from "../../lenses/HasBadge"
 
 import memoize from "lodash.memoize"
+import { useSelf, useSelfId } from "./SelfHooks"
 
 export function useAdvanceLastSeenHeads(docUrl: PushpinUrl) {
   const workspaceId = useContext(WorkspaceContext)
@@ -49,6 +50,8 @@ function isDocUrlCurrentlyViewed(url: PushpinUrl): boolean {
 export function useAutoAdvanceLastSeenHeads(docUrl: PushpinUrl) {
   const { documentId, type } = parseDocumentLink(docUrl)
   const [doc] = useDocument(documentId)
+  const [self] = useSelf()
+  const selfId = useSelfId()
   const advanceLastSeenHeads = useAdvanceLastSeenHeads(docUrl)
   const lastSeenHeads = usePersistedLastSeenHeads(docUrl)
   const hadInitialChanges = useRef<boolean>()
@@ -64,16 +67,20 @@ export function useAutoAdvanceLastSeenHeads(docUrl: PushpinUrl) {
 
   // advance the head whenever the doc changes
   useEffect(() => {
+    if (!self) {
+      return
+    }
+
     // before we advance the head initially
     // store if the document had unseen changes initially and what the initial lastSeenHeads was
     if (doc && lastSeenHeads && hadInitialChanges.current === undefined) {
-      const hasBadge = readAsHasBadge(doc, type, lastSeenHeads)
+      const hasBadge = readAsHasBadge(doc, type, lastSeenHeads, selfId, self.name)
       hadInitialChanges.current = hasBadge?.unseenChanges.changes
       initialLastSeenHeadsRef.current = lastSeenHeads
     }
 
     advanceLastSeenHeads()
-  }, [doc])
+  }, [doc, self])
 
   return hadInitialChanges.current ? initialLastSeenHeadsRef.current : undefined
 }

@@ -18,8 +18,6 @@ import {
 } from "../pushpin-code/Changes"
 import { Doc, Text } from "@automerge/automerge"
 import { evalSearchFor, MENTION } from "../pushpin-code/Searches"
-import { useSelf } from "../pushpin-code/SelfHooks"
-import { shouldNotifyAboutDocChanges } from "./workspace/NotificationSetting"
 import { useQuill } from "./TextContent"
 import { useStaticCallback } from "../pushpin-code/Hooks"
 import { useDocumentIds, useDocuments } from "../pushpin-code/Hooks"
@@ -72,7 +70,7 @@ export default function ThreadContent(props: ContentProps) {
       doc: value,
       type: "contact",
       schema: "HasTitle",
-      lastSeenHeads: undefined,
+      props: {},
     })
   }
 

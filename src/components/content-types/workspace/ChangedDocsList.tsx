@@ -5,12 +5,8 @@ import { useDocumentIds } from "../../pushpin-code/Hooks"
 import { openDoc, parseDocumentLink, PushpinUrl } from "../../pushpin-code/Url"
 import ListMenuItem from "../../ui/ListMenuItem"
 import "./ChangedDocsList.css"
-import {
-  areHeadsEqual,
-  getLastSeenHeadsMapOfWorkspace,
-} from "../../pushpin-code/Changes"
+import { areHeadsEqual, getLastSeenHeadsMapOfWorkspace } from "../../pushpin-code/Changes"
 import { useSelf, useSelfId } from "../../pushpin-code/SelfHooks"
-import { shouldNotifyAboutDocChanges } from "./NotificationSetting"
 import ListMenuSection from "../../ui/ListMenuSection"
 import Button from "../../ui/Button"
 import { DocumentId } from "automerge-repo"
@@ -18,25 +14,23 @@ import { useDocument } from "automerge-repo-react-hooks"
 import { WorkspaceDoc } from "./Workspace"
 import { getHeads } from "@automerge/automerge"
 import ListItem from "../../ui/ListItem"
+import { HasBadge } from "../../../lenses/HasBadge"
+import { readWithSchema } from "../../../lenses"
+
 interface ChangedDocsListProps {
   workspaceDocId: DocumentId
 }
 
 export function ChangedDocsList({ workspaceDocId }: ChangedDocsListProps) {
-  const [workspaceDoc, changeWorkspaceDoc] =
-    useDocument<WorkspaceDoc>(workspaceDocId)
+  const [workspaceDoc, changeWorkspaceDoc] = useDocument<WorkspaceDoc>(workspaceDocId)
 
-  const lastSeenHeadsMap = workspaceDoc
-    ? getLastSeenHeadsMapOfWorkspace(workspaceDoc)
-    : {}
+  const lastSeenHeadsMap = workspaceDoc ? getLastSeenHeadsMapOfWorkspace(workspaceDoc) : {}
 
   const selfId = useSelfId()
   const [self] = useSelf()
 
   const trackedDocuments = useDocumentIds(
-    Object.keys(lastSeenHeadsMap).map(
-      (url) => parseDocumentLink(url).documentId
-    )
+    Object.keys(lastSeenHeadsMap).map((url) => parseDocumentLink(url).documentId)
   )
 
   if (!self) {
@@ -65,21 +59,26 @@ export function ChangedDocsList({ workspaceDocId }: ChangedDocsListProps) {
 
   const documentsToNotifyAbout = Object.entries(lastSeenHeadsMap)
     .filter(([documentUrl, lastSeenHeads]) => {
-      const doc = trackedDocuments[parseDocumentLink(documentUrl).documentId]
+      const rawDoc = trackedDocuments[parseDocumentLink(documentUrl).documentId]
 
-      if (!doc) {
+      if (!rawDoc) {
         return false
       }
 
       const type = parseDocumentLink(documentUrl).type
 
-      return shouldNotifyAboutDocChanges(
+      const doc = readWithSchema({
+        doc: rawDoc,
         type,
-        doc,
-        lastSeenHeads,
-        selfId,
-        self.name
-      )
+        schema: "HasBadge",
+        props: {
+          lastSeenHeads,
+          selfId: selfId,
+          selfName: self.name,
+        },
+      }) as HasBadge
+
+      return doc.notify
     })
     .map(([url]) => url)
 
@@ -108,14 +107,11 @@ export function ChangedDocsList({ workspaceDocId }: ChangedDocsListProps) {
         <div className="ChangedDocsList--content">
           {documentsToNotifyAbout.map((url) => {
             return (
-              <ListMenuItem
-                key={url}
-                onClick={() => openDoc(url as PushpinUrl)}
-              >
+              <ListMenuItem key={url} onClick={() => openDoc(url as PushpinUrl)}>
                 <ListItem>
-              <Content url={url} context="badge" />
-              <Content url={url} context="title" />
-            </ListItem>
+                  <Content url={url} context="badge" />
+                  <Content url={url} context="title" />
+                </ListItem>
               </ListMenuItem>
             )
           })}
