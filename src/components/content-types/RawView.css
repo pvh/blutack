@@ -1,0 +1,6 @@
+.RawView {
+  overflow: auto;
+  padding: var(--cellSize);
+  height: 100%;
+  box-sizing: border-box;
+}

@@ -1,11 +1,12 @@
-import { useEffect, useContext, useRef, createContext } from "react"
+import { createContext, useContext, useEffect, useRef } from "react"
 import Debug from "debug"
 import { useDocument } from "automerge-repo-react-hooks"
-import { DocumentId, DocHandle } from "automerge-repo"
+import { DocHandle, DocumentId } from "automerge-repo"
 
-import { parseDocumentLink, PushpinUrl } from "../../pushpin-code/Url"
-import Content, { ContentProps, ContentHandle } from "../../Content"
+import { parseDocumentLink, PushpinUrl, storeCurrentUrlOfUser } from "../../pushpin-code/Url"
+import Content, { ContentHandle, ContentProps } from "../../Content"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import { ContentType } from "../../pushpin-code/ContentTypes"
 import SelfContext from "../../pushpin-code/SelfHooks"
 import TitleBar from "./TitleBar"
 import { ContactDoc } from "../contact"
@@ -13,19 +14,17 @@ import { ContactDoc } from "../contact"
 import "./Workspace.css"
 import {
   useAllHeartbeats,
-  useHeartbeat,
   useContactOnlineStatus,
   useDeviceOnlineStatus,
+  useHeartbeat,
 } from "../../pushpin-code/PresenceHooks"
 
 import { CurrentDeviceContext } from "./Device"
 
 import WorkspaceInList from "./WorkspaceInList"
 import { ContentListDoc } from "../ContentList"
-import { storeCurrentUrlOfUser } from "../../pushpin-code/Url"
 import { ViewStateContext } from "../../pushpin-code/ViewState"
 import { PersistedLastSeenHeadsMap } from "../../pushpin-code/Changes"
-import { ContentType } from "../../pushpin-code/ContentTypes"
 
 const log = Debug("pushpin:workspace")
 
@@ -78,6 +77,11 @@ export default function Workspace({ documentId, currentDocUrl }: WorkspaceConten
   // store currentDocUrl in viewedDocUrls
   useEffect(() => {
     if (!currentDocUrl) {
+      return
+    }
+
+    const contentType = ContentTypes.typeNameToContentType(parseDocumentLink(currentDocUrl).type)
+    if (contentType?.dontAddToViewedDocUrls) {
       return
     }
 

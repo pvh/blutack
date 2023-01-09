@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react"
 
-import { parseDocumentLink, PushpinUrl } from "../pushpin-code/Url"
+import { createDocumentLink, parseDocumentLink, PushpinUrl } from "../pushpin-code/Url"
 
 import Content, { ContentProps } from "../Content"
 
@@ -10,6 +10,7 @@ import { useDocument } from "automerge-repo-react-hooks"
 import CenteredStack from "../ui/CenteredStack"
 import ListMenu from "../ui/ListMenu"
 import "./ContentList.css"
+import ListItem from "../ui/ListItem"
 import classNames from "classnames"
 import ActionListItem from "./workspace/omnibox/ActionListItem"
 import CenteredStackRowItem from "../ui/CenteredStackRowItem"
@@ -19,7 +20,6 @@ import { useViewState } from "../pushpin-code/ViewState"
 import NewDocumentButton from "../NewDocumentButton"
 import { openDoc } from "../pushpin-code/Url"
 import { ContentType } from "../pushpin-code/ContentTypes"
-import ListItem from "../ui/ListItem"
 
 export interface ContentListDoc {
   title: string
@@ -32,9 +32,7 @@ ContentList.defaultWidth = 24
 ContentList.maxWidth = 80
 ContentList.maxHeight = 36
 
-function getListMenuItemElement(
-  element: HTMLElement | null
-): HTMLElement | null {
+function getListMenuItemElement(element: HTMLElement | null): HTMLElement | null {
   if (!element) {
     return null
   }
@@ -49,9 +47,10 @@ function getListMenuItemElement(
 export default function ContentList({ documentId }: ContentProps) {
   const [doc, changeDoc] = useDocument<ContentListDoc>(documentId)
 
-  const [currentContent, setCurrentContent] = useViewState<
-    PushpinUrl | undefined
-  >(documentId, "currentContent")
+  const [currentContent, setCurrentContent] = useViewState<PushpinUrl | undefined>(
+    documentId,
+    "currentContent"
+  )
 
   const [draggedOverIndex, setDraggedOverIndex] = useState<number | undefined>()
 
@@ -62,8 +61,7 @@ export default function ContentList({ documentId }: ContentProps) {
       return
     }
 
-    const percentage =
-      (e.clientY - element.getBoundingClientRect().top) / element.clientHeight
+    const percentage = (e.clientY - element.getBoundingClientRect().top) / element.clientHeight
 
     setDraggedOverIndex(percentage > 0.5 ? index + 1 : index)
 
@@ -88,10 +86,7 @@ export default function ContentList({ documentId }: ContentProps) {
       e.preventDefault()
       e.stopPropagation()
 
-      const deleteIndex = parseInt(
-        e.dataTransfer.getData(MIMETYPE_CONTENT_LIST_INDEX),
-        10
-      )
+      const deleteIndex = parseInt(e.dataTransfer.getData(MIMETYPE_CONTENT_LIST_INDEX), 10)
       const insertIndex = Math.max(
         0,
         !isNaN(deleteIndex) && deleteIndex < draggedOverIndex
@@ -159,9 +154,17 @@ export default function ContentList({ documentId }: ContentProps) {
       faIcon: "fa-compass",
       label: "View",
       shortcut: "⏎",
-      keysForActionPressed: (e: KeyboardEvent) =>
-        !e.shiftKey && e.key === "Enter",
-      callback: (url: PushpinUrl) => () => selectContent(url),
+      keysForActionPressed: (e: KeyboardEvent) => !e.shiftKey && e.key === "Enter",
+      callback: (url: PushpinUrl) => () => setCurrentContent(url),
+    },
+    {
+      name: "debug",
+      faIcon: "fa-bug",
+      label: "Debug",
+      shortcut: "⌘+d",
+      keysForActionPressed: (e: KeyboardEvent) => (e.metaKey || e.ctrlKey) && e.key === "d",
+      callback: (url: PushpinUrl) => () =>
+        openDoc(createDocumentLink("raw", parseDocumentLink(url).documentId)),
     },
     {
       name: "remove",
@@ -170,8 +173,7 @@ export default function ContentList({ documentId }: ContentProps) {
       faIcon: "fa-trash",
       label: "Remove",
       shortcut: "⌘+⌫",
-      keysForActionPressed: (e: KeyboardEvent) =>
-        (e.metaKey || e.ctrlKey) && e.key === "Backspace",
+      keysForActionPressed: (e: KeyboardEvent) => (e.metaKey || e.ctrlKey) && e.key === "Backspace",
     },
   ]
 
@@ -227,10 +229,7 @@ export default function ContentList({ documentId }: ContentProps) {
           />
         </ListMenu>
       </CenteredStackRowItem>
-      <CenteredStackRowItem
-        size={{ mode: "auto" }}
-        className="ContentList--main"
-      >
+      <CenteredStackRowItem size={{ mode: "auto" }} className="ContentList--main">
         {currentContent ? (
           <Content context="expanded" url={currentContent} />
         ) : (

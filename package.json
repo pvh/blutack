@@ -32,6 +32,7 @@
     "react-contextmenu": "^2.14.0",
     "react-dom": "^18.2.0",
     "react-dropdown-select": "^4.9.0",
+    "react-json-view": "^1.21.3",
     "react-pdf": "^5.7.2",
     "react-tag-autocomplete": "^6.3.0",
     "uuid": "^9.0.0"

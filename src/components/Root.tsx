@@ -33,6 +33,9 @@ ContentTypes.register(List.contentType)
 import * as Device from "./content-types/workspace/Device"
 ContentTypes.register(Device.contentType)
 
+import * as RawView from "./content-types/RawView"
+ContentTypes.register(RawView.contentType)
+
 import "./content-types/defaults/DefaultInTitle"
 import "./content-types/defaults/DefaultInBadge"
 

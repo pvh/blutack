@@ -88,12 +88,8 @@ interface TitledDoc {
   title: string
 }
 
-export default function OmniboxWorkspaceListMenu(
-  props: Props
-): ReactElement | null {
-  const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(
-    props.workspaceDocId
-  )
+export default function OmniboxWorkspaceListMenu(props: Props): ReactElement | null {
+  const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(props.workspaceDocId)
   const repo = useRepo()
 
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -130,8 +126,7 @@ export default function OmniboxWorkspaceListMenu(
     faIcon: "fa-trash",
     label: "Archive",
     shortcut: "⌘+⌫",
-    keysForActionPressed: (e) =>
-      (e.metaKey || e.ctrlKey) && e.key === "Backspace",
+    keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "Backspace",
     callback: (url) => () => archiveDocument(url),
   }
 
@@ -140,8 +135,7 @@ export default function OmniboxWorkspaceListMenu(
     faIcon: "fa-trash-restore",
     label: "Unarchive",
     shortcut: "⌘+⌫",
-    keysForActionPressed: (e) =>
-      (e.metaKey || e.ctrlKey) && e.key === "Backspace",
+    keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "Backspace",
     callback: (url) => () => unarchiveDocument(url),
   }
 
@@ -156,6 +150,17 @@ export default function OmniboxWorkspaceListMenu(
     },
   }
 
+  const debug: MenuAction = {
+    name: "debug",
+    faIcon: "fa-bug",
+    label: "Debug",
+    shortcut: "⌘+d",
+    keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "d",
+    callback: (url) => () => {
+      navigate(createDocumentLink("raw", parseDocumentLink(url).documentId))
+    },
+  }
+
   /* end actions */
 
   const sectionDefinitions: Section[] = useMemo(() => {
@@ -167,7 +172,7 @@ export default function OmniboxWorkspaceListMenu(
       {
         name: "viewedDocUrls",
         label: "Documents",
-        actions: [view, place, archive],
+        actions: [view, place, debug, archive],
         items: (props) =>
           Object.entries(viewedDocs)
             .filter(
@@ -178,10 +183,8 @@ export default function OmniboxWorkspaceListMenu(
             .filter(
               ([_url, doc]) =>
                 doc &&
-                ((doc.title &&
-                  doc.title.match(new RegExp(props.search, "i"))) ||
-                  (doc.text &&
-                    doc.text.join("").match(new RegExp(props.search, "i"))))
+                ((doc.title && doc.title.match(new RegExp(props.search, "i"))) ||
+                  (doc.text && doc.text.join("").match(new RegExp(props.search, "i"))))
             )
             .reduce(
               (prev, current) => {
@@ -200,7 +203,7 @@ export default function OmniboxWorkspaceListMenu(
       {
         name: "archivedDocUrls",
         label: "Archived",
-        actions: [view, unarchive],
+        actions: [debug, view, unarchive],
         items: (props) =>
           props.search === "" || !workspace
             ? [] // don't show archived URLs unless there's a current search term
@@ -208,15 +211,13 @@ export default function OmniboxWorkspaceListMenu(
                 .map((url): [PushpinUrl, Doc<any>] => [url, viewedDocs[url]])
                 .filter(
                   ([_url, doc]) =>
-                    doc &&
-                    doc.title &&
-                    doc.title.match(new RegExp(props.search, "i"))
+                    doc && doc.title && doc.title.match(new RegExp(props.search, "i"))
                 )
                 .map(([url, doc]) => ({ url })),
       },
       {
         name: "docUrls",
-        actions: [view],
+        actions: [debug, view],
         items: (props) => {
           // try parsing the "search" to see if it is a valid document URL
           try {
@@ -230,13 +231,11 @@ export default function OmniboxWorkspaceListMenu(
       {
         name: "contacts",
         label: "Contacts",
-        actions: [invite, place],
+        actions: [debug, invite, place],
         items: (props) =>
           Object.entries(contacts)
             .filter(([id, doc]) => doc.name)
-            .filter(([id, doc]) =>
-              doc.name.match(new RegExp(props.search, "i"))
-            )
+            .filter(([id, doc]) => doc.name.match(new RegExp(props.search, "i")))
             .map(([id, doc]) => ({
               url: createDocumentLink("contact", id as DocumentId),
             })),
@@ -423,8 +422,7 @@ export default function OmniboxWorkspaceListMenu(
     }
 
     // XXX out of scope RN but consider if we should change the key for consistency?
-    const { type, documentId: recipientId } =
-      parseDocumentLink(recipientPushpinUrl)
+    const { type, documentId: recipientId } = parseDocumentLink(recipientPushpinUrl)
 
     if (!workspace || !workspace.selfId) {
       return
@@ -486,10 +484,7 @@ export default function OmniboxWorkspaceListMenu(
       return (
         <ListMenuSection title="Oops..." key="nothingFound">
           <ListMenuItem>
-            <Badge
-              icon="question-circle"
-              backgroundColor="var(--colorPaleGrey)"
-            />
+            <Badge icon="question-circle" backgroundColor="var(--colorPaleGrey)" />
             <Heading>Nothing Found</Heading>
           </ListMenuItem>
         </ListMenuSection>
@@ -515,11 +510,7 @@ export default function OmniboxWorkspaceListMenu(
           actions={actions}
           selected={item.selected}
         >
-          <InvitationListItem
-            invitation={invitation}
-            url={url}
-            documentId={documentId}
-          />
+          <InvitationListItem invitation={invitation} url={url} documentId={documentId} />
         </ActionListItem>
       )
     })
