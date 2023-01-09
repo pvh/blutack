@@ -20,7 +20,7 @@ import { Doc, Text } from "@automerge/automerge"
 import { evalSearchFor, MENTION } from "../pushpin-code/Searches"
 import { useQuill } from "./TextContent"
 import { useStaticCallback } from "../pushpin-code/Hooks"
-import { useDocumentIds, useDocuments } from "../pushpin-code/Hooks"
+import { useDocumentIds } from "../pushpin-code/Hooks"
 import { ContactDoc } from "./contact"
 import { readWithSchema } from "../../lenses"
 import { HasTitle } from "../../lenses/HasTitle"
@@ -73,6 +73,8 @@ export default function ThreadContent(props: ContentProps) {
       props: {},
     })
   }
+
+  useAutoAdvanceLastSeenHeads(createDocumentLink("thread", props.documentId))
 
   const initialLastSeenHeads = useAutoAdvanceLastSeenHeads(
     createDocumentLink("thread", props.documentId)
@@ -390,6 +392,5 @@ export const contentType: ContentType = {
   // TODO: figure out where this function should live;
   // can it live outside the content type on a lens or something?
   // Would need to return not just a boolean but also the count
-
   hasUnseenMentions,
 }

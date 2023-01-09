@@ -117,3 +117,6 @@
   padding: 0 var(--halfCellSize);
 }
 
+.groupedMessages .Heading {
+  margin-bottom: 4px;
+}
