@@ -7,31 +7,47 @@ import { useLastSeenHeads } from "../../pushpin-code/Changes"
 import { createDocumentLink } from "../../pushpin-code/Url"
 import { readWithSchema } from "../../../lenses"
 import { HasTitle } from "../../../lenses/HasTitle"
+import { HasBadge } from "../../../lenses/HasBadge"
+import { useSelf, useSelfId } from "../../pushpin-code/SelfHooks"
 
 export default function DefaultInTitle(props: ContentProps) {
   const { documentId } = props
   const [rawDoc] = useDocument<any>(documentId)
   const { type } = props
   const lastSeenHeads = useLastSeenHeads(createDocumentLink(type, documentId))
+  const selfId = useSelfId()
+  const [self] = useSelf()
 
-  if (!rawDoc) {
+  if (!rawDoc || !self) {
     return null
   }
 
-  const doc = readWithSchema({
+  const docWithTitle = readWithSchema({
     doc: rawDoc,
     type,
-    lastSeenHeads,
     schema: "HasTitle",
+    props: {},
   }) as HasTitle
+
+  const docWithBadge = readWithSchema({
+    doc: rawDoc,
+    type,
+    schema: "HasBadge",
+    props: {
+      lastSeenHeads,
+      selfId,
+      selfName: self.name,
+    },
+  }) as HasBadge
 
   return (
     <TitleWithSubtitle
-      title={doc.title}
-      titleEditorField={doc.titleEditorField ?? ""}
-      subtitle={doc.subtitle}
+      bold={docWithBadge.unseenChanges.changes}
+      title={docWithTitle.title}
+      titleEditorField={docWithTitle.titleEditorField ?? ""}
+      subtitle={docWithTitle.subtitle}
       documentId={documentId}
-      editable={doc.titleEditorField !== null}
+      editable={docWithTitle.titleEditorField !== null}
     />
   )
 }

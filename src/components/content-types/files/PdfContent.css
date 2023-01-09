@@ -61,7 +61,6 @@
   justify-content: center;
   padding: 8px;
   top: 40px;
-  z-index: 10;
   background-color: white;
   border-bottom: 1px solid var(--colorPaleGrey);
 }

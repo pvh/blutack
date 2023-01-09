@@ -8,6 +8,7 @@ import { useLastSeenHeads } from "../../pushpin-code/Changes"
 import { createDocumentLink } from "../../pushpin-code/Url"
 import { HasBadge } from "../../../lenses/HasBadge"
 import { readWithSchema } from "../../../lenses"
+import { useSelf, useSelfId } from "../../pushpin-code/SelfHooks"
 
 interface Doc {
   title?: string
@@ -19,19 +20,24 @@ export default function DefaultInBadge(props: ContentProps) {
   const { type } = props
   const contentType = ContentTypes.lookup({ type, context: "badge" })
   const lastSeenHeads = useLastSeenHeads(createDocumentLink(type, documentId))
+  const selfId = useSelfId()
+  const [self] = useSelf()
 
-  if (!rawDoc) {
+  if (!rawDoc || !self) {
     return null
   }
 
-  const { icon = "question", name = `Unidentified type: ${type}` } =
-    contentType || {}
+  const { icon = "question", name = `Unidentified type: ${type}` } = contentType || {}
 
-  const { unseenChanges, badgeColor } = readWithSchema({
+  const { unseenChanges, badgeColor, notify } = readWithSchema({
     doc: rawDoc,
     type,
-    lastSeenHeads,
     schema: "HasBadge",
+    props: {
+      lastSeenHeads,
+      selfId: selfId,
+      selfName: self.name,
+    },
   }) as HasBadge
 
   return (
@@ -40,7 +46,7 @@ export default function DefaultInBadge(props: ContentProps) {
         icon={icon}
         backgroundColor={badgeColor}
         dot={
-          unseenChanges.changes
+          notify && unseenChanges.changes
             ? {
                 color: "var(--colorChangeDot)",
                 number: unseenChanges.count,

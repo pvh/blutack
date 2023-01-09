@@ -1,20 +1,20 @@
 .threadWrapper {
   position: relative;
   display: flex;
+  flex-direction: column;
   background-color: white;
   width: 100%;
   overflow: auto;
   height: 100%;
-  padding: 1px 1px 0px 1px;
+  padding: 1px 1px 0 1px;
 }
 
 .messageWrapper {
-  padding: 12px;
+  padding: var(--halfCellSize) 0;
   position: relative;
   display: flex;
   flex-direction: column-reverse;
   overflow-y: scroll;
-  margin-bottom: 49px;
   flex-grow: 1;
 }
 
@@ -23,13 +23,15 @@
 }
 
 .messageGroup {
-  padding-top: 12px;
+  padding: var(--halfCellSize);
+  padding-bottom: 0;
   display: flex;
   align-items: flex-start;
 }
 
 .groupedMessages {
   padding-left: 16px;
+  flex: 1;
 }
 
 .messages {
@@ -39,9 +41,12 @@
   flex-grow: 1;
 }
 
+.message > .content {
+  white-space: pre-wrap;
+}
+
 .message {
   color: black;
-  display: flex;
   line-height: 20px;
   padding: 2px 0;
 }
@@ -56,27 +61,60 @@
 }
 
 .time {
-  flex: none;
-  position: absolute;
-  right: 12px;
-  font-size: 12px;
   color: var(--colorSecondaryGrey);
-  margin-top: -22px;
+  padding-left: var(--halfCellSize);
+  font-size: 12px;
 }
 
 .inputWrapper {
   box-sizing: border-box;
   width: calc(100% - 2px);
   border-top: 1px solid var(--colorInputGrey);
-  position: absolute;
-  bottom: 1px;
   background-color: white;
-  padding: 8px;
-  min-height: 3rem;
 }
 
 .messageInput {
   width: 100%;
+}
+
+.Thread-unreadLine {
+  border-bottom: 1px solid var(--colorUnreadLine);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 0;
+}
+
+.Thread-unreadLineLabel {
+  right: 0;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: white;
+  background: var(--colorUnreadLine);
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.Thread-dayLine {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+}
+
+.Thread-dayLine::before {
+  content: "";
+  border-bottom: 1px solid rgb(221, 221, 221);
+  width: 100%;
+  position: absolute;
+}
+
+.Thread-dayLineDate {
+  color: var(--colorSecondaryGrey);
+  background: white;
+  z-index: 1;
+  padding: 0 var(--halfCellSize);
 }
 
 .groupedMessages .Heading {

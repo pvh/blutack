@@ -11,7 +11,7 @@ import { Position, Dimension } from "./BoardGrid"
 import { useDocument } from "automerge-repo-react-hooks"
 import { useSelf } from "../../pushpin-code/SelfHooks"
 import { usePresence } from "../../pushpin-code/PresenceHooks"
-import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from "../..//constants"
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from "../../constants"
 import { boundDimension, boundSizeByType } from "./BoardBoundary"
 import * as UriList from "../../pushpin-code/UriList"
 import { DocumentId } from "automerge-repo"
@@ -38,11 +38,7 @@ interface CardDragEnd {
   distance: Position
 }
 
-export type BoardCardAction =
-  | CardClicked
-  | CardDoubleClicked
-  | CardResized
-  | CardDragEnd
+export type BoardCardAction = CardClicked | CardDoubleClicked | CardResized | CardDragEnd
 
 interface BoardCardProps extends BoardDocCard {
   id: CardId
@@ -159,19 +155,14 @@ function BoardCard(props: BoardCardProps) {
     }
 
     // don't make CSS changes if we haven't moved position
-    if (
-      previousDistance.current.x === distance.x &&
-      previousDistance.current.y === distance.y
-    ) {
+    if (previousDistance.current.x === distance.x && previousDistance.current.y === distance.y) {
       return
     }
 
     previousDistance.current = distance
 
     // we want to skip expensive React recalculations, so we'll just update the style directly here
-    selectedCardsRef.current = document.querySelectorAll(
-      ".BoardCard--mySelected"
-    )
+    selectedCardsRef.current = document.querySelectorAll(".BoardCard--mySelected")
     if (selectedCardsRef.current) {
       selectedCardsRef.current.forEach((element) => {
         element.style.setProperty("--drag-x", `${distance.x}px`)

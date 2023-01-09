@@ -1,8 +1,8 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useRef } from "react"
 
 import { ContentType } from "../pushpin-code/ContentTypes"
 import Content, { ContentProps } from "../Content"
-import { createDocumentLink, isPushpinUrl } from "../pushpin-code/Url"
+import { createDocumentLink, isPushpinUrl, PushpinUrl } from "../pushpin-code/Url"
 import ListItem from "../ui/ListItem"
 import "./ThreadContent.css"
 import { DocumentId } from "automerge-repo"
@@ -16,9 +16,11 @@ import {
   LastSeenHeads,
   useAutoAdvanceLastSeenHeads,
 } from "../pushpin-code/Changes"
-import { Doc, getHeads } from "@automerge/automerge"
-import memoize from "lodash.memoize"
-import { useDocumentIds, useDocuments } from "../pushpin-code/Hooks"
+import { Doc, Text } from "@automerge/automerge"
+import { evalSearchFor, MENTION } from "../pushpin-code/Searches"
+import { useQuill } from "./TextContent"
+import { useStaticCallback } from "../pushpin-code/Hooks"
+import { useDocumentIds } from "../pushpin-code/Hooks"
 import { ContactDoc } from "./contact"
 import { readWithSchema } from "../../lenses"
 import { HasTitle } from "../../lenses/HasTitle"
@@ -35,13 +37,17 @@ export interface ThreadDoc {
   messages: Message[]
 }
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
+const dateFormatterTimeOnly = new Intl.DateTimeFormat("en-US", {
   localeMatcher: "best fit",
-  weekday: "short",
   hour: "numeric",
   minute: "2-digit",
-  month: "numeric",
+})
+
+const dateFormatterFullDate = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  weekday: "short",
   day: "numeric",
+  month: "numeric",
 })
 
 ThreadContent.minWidth = 9
@@ -52,7 +58,7 @@ ThreadContent.maxWidth = 24
 ThreadContent.maxHeight = 36
 
 export default function ThreadContent(props: ContentProps) {
-  const [message, setMessage] = useState("")
+  const containerRef = useRef<HTMLDivElement>(null)
   const [doc, changeDoc] = useDocument<ThreadDoc>(props.documentId)
 
   const contactLinks = [...new Set(doc?.messages.map((m) => m.authorId))]
@@ -64,12 +70,15 @@ export default function ThreadContent(props: ContentProps) {
       doc: value,
       type: "contact",
       schema: "HasTitle",
-      lastSeenHeads: undefined,
+      props: {},
     })
   }
 
   useAutoAdvanceLastSeenHeads(createDocumentLink("thread", props.documentId))
 
+  const initialLastSeenHeads = useAutoAdvanceLastSeenHeads(
+    createDocumentLink("thread", props.documentId)
+  )
   const onDrop = useCallback((e: React.DragEvent) => {
     ImportData.importDataTransfer(e.dataTransfer, (url) => {
       if (url == props.url) {
@@ -87,34 +96,62 @@ export default function ThreadContent(props: ContentProps) {
     })
   }, [])
 
+  const onEnterKey = useStaticCallback(() => {
+    if (!quill.current) {
+      return
+    }
+
+    const content = quill.current.getText().toString()
+
+    changeDoc((threadDoc: ThreadDoc) => {
+      threadDoc.messages.push({
+        authorId: props.selfId,
+        content,
+        time: new Date().getTime(),
+      })
+    })
+
+    quill.current.deleteText(0, quill.current.getText().length)
+  })
+
+  const [ref, quill] = useQuill({
+    text: new Text(""),
+    config: {
+      formats: ["bold", "color", "italic"],
+      modules: {
+        mention: {},
+        cursors: {
+          hideDelayMs: 500,
+          transformOnTextChange: true,
+        },
+        toolbar: false,
+        history: {
+          maxStack: 500,
+          userOnly: true,
+        },
+        clipboard: {
+          disableFormattingOnPaste: true,
+        },
+        keyboard: {
+          bindings: {
+            enter: {
+              key: 13,
+              shiftKey: false,
+              handler: onEnterKey,
+            },
+          },
+        },
+      },
+    },
+  })
+
   if (!doc || !doc.messages) {
     return null
   }
 
-  const { messages } = doc
-  const groupedMessages = groupBy(messages, "authorId")
+  const oldestUnseenMessageTimestamp = getOldestUnseenMessageTimestamp(doc, initialLastSeenHeads)
 
-  function onInput(e: React.ChangeEvent<HTMLInputElement>) {
-    setMessage(e.target.value)
-  }
-
-  function onKeyDown(e: React.KeyboardEvent) {
-    e.stopPropagation()
-
-    if (e.key === "Enter" && !e.shiftKey && message) {
-      e.preventDefault()
-
-      changeDoc((threadDoc: ThreadDoc) => {
-        threadDoc.messages.push({
-          authorId: props.selfId,
-          content: message,
-          time: new Date().getTime(),
-        })
-      })
-
-      setMessage("")
-    }
-  }
+  const messageGroups = groupMessageByAuthor(doc.messages)
 
   return (
     <div
@@ -125,21 +162,40 @@ export default function ThreadContent(props: ContentProps) {
     >
       <div className="messageWrapper">
         <div className="messages" onScroll={stopPropagation}>
-          {groupedMessages.map((messages, index) =>
-            renderGroupedMessages(messages, index, contactTitles)
-          )}
+          {messageGroups.map((messageGroup, idx) => {
+            const prevMessageGroup = messageGroups[idx - 1]
+
+            const isFirstMessageGroupOfDay =
+              !prevMessageGroup ||
+              !isOnSameDay(prevMessageGroup.messages[0].time, messageGroup.messages[0].time)
+
+            return (
+              <React.Fragment key={idx}>
+                {isFirstMessageGroupOfDay && (
+                  <div className="Thread-dayLine">
+                    <div className="Thread-dayLineDate">
+                      {dateFormatterFullDate.format(messageGroup.messages[0].time)}
+                    </div>
+                  </div>
+                )}
+                <MessageGroupView
+                  contactTitles={contactTitles}
+                  messageGroup={messageGroup}
+                  oldestUnseenMessageTimestamp={oldestUnseenMessageTimestamp}
+                />
+              </React.Fragment>
+            )
+          })}
         </div>
       </div>
-      <div className="inputWrapper">
-        <input
-          className="messageInput"
-          value={message}
-          onKeyDown={onKeyDown}
-          onChange={onInput}
-          onPaste={stopPropagation}
-          onCut={stopPropagation}
+      <div className="inputWrapper" onClick={() => quill.current?.focus()} ref={containerRef}>
+        <div
+          ref={ref}
+          onClick={stopPropagation}
           onCopy={stopPropagation}
-          placeholder="Enter your message..."
+          onCut={stopPropagation}
+          onPaste={stopPropagation}
+          onDoubleClick={stopPropagation}
         />
       </div>
     </div>
@@ -150,20 +206,53 @@ function preventDefault(e: React.SyntheticEvent) {
   e.preventDefault()
 }
 
-export const getUnreadMessageCountOfThread = memoize(
-  (doc: ThreadDoc, lastSeenHeads?: LastSeenHeads) => {
-    // count any splice on the messages property of the thread document as a change
-    return getUnseenPatches(doc, lastSeenHeads).filter(
-      (patch) =>
-        patch.action === "splice" && patch.path.length === 2 && patch.path[0] === "messages"
-    ).length
-  },
-  (doc, lastSeenHeads) => `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
-)
+export function getOldestUnseenMessageTimestamp(
+  doc: Doc<ThreadDoc>,
+  lastSeenHeads?: LastSeenHeads
+): number | undefined {
+  let oldestTimestamp: number | undefined
 
-export function hasUnseenChanges(doc: Doc<unknown>, lastSeenHeads: LastSeenHeads) {
+  getUnseenPatches(doc, lastSeenHeads).forEach((patch) => {
+    if (
+      patch.action === "put" &&
+      patch.path.length === 3 &&
+      patch.path[0] === "messages" &&
+      patch.path[2] === "time"
+    ) {
+      if (oldestTimestamp === undefined || (patch.value && patch.value < oldestTimestamp)) {
+        oldestTimestamp = patch.value as number
+      }
+    }
+  })
+
+  return oldestTimestamp
+}
+
+export function getUnreadMessageCountOfThread(
+  doc: ThreadDoc,
+  lastSeenHeads?: LastSeenHeads
+): number {
+  return getUnseenPatches(doc as ThreadDoc, lastSeenHeads).filter(
+    (patch) => patch.action === "splice" && patch.path.length === 2 && patch.path[0] === "messages"
+  ).length
+}
+
+export function hasUnseenMentions(
+  doc: Doc<unknown>,
+  lastSeenHeads: LastSeenHeads | undefined,
+  name: string
+) {
   // TODO: one of these days we should figure out the typing
-  return getUnreadMessageCountOfThread(doc as ThreadDoc, lastSeenHeads) > 0
+  return getUnseenPatches(doc as ThreadDoc, lastSeenHeads).some(
+    (patch) =>
+      patch.action === "put" &&
+      patch.path.length === 3 &&
+      patch.path[0] === "messages" &&
+      typeof patch.value === "string" &&
+      evalSearchFor(MENTION, patch.value).some(
+        (match) => match.data.name.toLowerCase() === name.toLowerCase()
+      )
+  )
 }
 
 function stopPropagation(e: React.SyntheticEvent) {
@@ -171,66 +260,115 @@ function stopPropagation(e: React.SyntheticEvent) {
   e.nativeEvent.stopImmediatePropagation()
 }
 
-function renderMessage({ content, time }: Message, idx: number) {
-  const date = new Date()
-  date.setTime(time)
+interface MessageProps {
+  message: Message
+  oldestUnseenMessageTimestamp?: number
+}
 
-  const result = isPushpinUrl(content) ? (
+function MessageView({ message, oldestUnseenMessageTimestamp }: MessageProps) {
+  const result = isPushpinUrl(message.content) ? (
     <div
       className="ThreadContent-clickable"
       onClick={() => {
-        openDoc(content)
+        openDoc(message.content as PushpinUrl)
       }}
     >
       <ListItem>
-        <Content url={content} context="badge" />
-        <Content url={content} context="title" />
+        <Content url={message.content} context="badge" />
+        <Content url={message.content} context="title" />
       </ListItem>
     </div>
   ) : (
-    content
+    message.content
   )
 
   return (
-    <div className="message" key={idx}>
-      <div className="content">{result}</div>
-      {idx === 0 ? <div className="time">{dateFormatter.format(date)}</div> : null}
-    </div>
+    <>
+      {oldestUnseenMessageTimestamp === message.time && (
+        <div className="Thread-unreadLine">
+          <div className="Thread-unreadLineLabel">NEW</div>
+        </div>
+      )}
+
+      <div className="message">
+        <pre className="content">{result}</pre>
+      </div>
+    </>
   )
 }
 
-function renderGroupedMessages(
-  groupOfMessages: Message[],
-  idx: number,
+interface MessageGroupProps {
+  messageGroup: MessageGroup
+  oldestUnseenMessageTimestamp?: number
   contactTitles: { [key: string]: HasTitle }
-) {
+}
+
+function MessageGroupView({
+  messageGroup,
+  oldestUnseenMessageTimestamp,
+  contactTitles,
+}: MessageGroupProps) {
+  const date = new Date()
+  date.setTime(messageGroup.messages[0].time)
+
   return (
-    <div className="messageGroup" key={idx}>
+    <div className="messageGroup">
       <div style={{ width: "40px" }}>
-        <Content context="badge" url={createDocumentLink("contact", groupOfMessages[0].authorId)} />
+        <Content context="badge" url={createDocumentLink("contact", messageGroup.authorId)} />
       </div>
       <div className="groupedMessages">
-        <Heading>{contactTitles[groupOfMessages[0].authorId]?.title}</Heading>
-        {groupOfMessages.map(renderMessage)}
+        <Heading wrap={false}>
+          <>
+            {contactTitles[messageGroup.authorId]?.title}
+            <span className="time">{dateFormatterTimeOnly.format(date)}</span>
+          </>
+        </Heading>
+        {messageGroup.messages.map((message, idx) => (
+          <MessageView
+            key={idx}
+            message={message}
+            oldestUnseenMessageTimestamp={oldestUnseenMessageTimestamp}
+          />
+        ))}
       </div>
     </div>
   )
 }
 
-function groupBy<T, K extends keyof T>(items: T[], key: K): T[][] {
-  const grouped: T[][] = []
-  let currentGroup: T[]
+interface MessageGroup {
+  authorId: DocumentId
+  messages: Message[]
+}
 
-  items.forEach((item) => {
-    if (!currentGroup || (currentGroup.length > 0 && currentGroup[0][key] !== item[key])) {
-      currentGroup = []
-      grouped.push(currentGroup)
+function groupMessageByAuthor(messages: Message[]): MessageGroup[] {
+  const messageGroups: MessageGroup[] = []
+  let currentMessageGroup: MessageGroup
+
+  messages.forEach((message, idx) => {
+    const previousMessage = messages[idx - 1]
+
+    if (
+      !previousMessage ||
+      currentMessageGroup.authorId !== message.authorId ||
+      // more than 10 minutes gap to previous message
+      (previousMessage && message.time - previousMessage.time > 10 * 60 * 1000) ||
+      !isOnSameDay(message.time, previousMessage.time)
+    ) {
+      currentMessageGroup = {
+        authorId: message.authorId,
+        messages: [message],
+      }
+      messageGroups.push(currentMessageGroup)
+    } else {
+      currentMessageGroup.messages.push(message)
     }
-
-    currentGroup.push(item)
   })
 
-  return grouped
+  return messageGroups
+}
+
+function isOnSameDay(timestampA: number, timestampB: number): boolean {
+  return new Date(timestampA).getDate() === new Date(timestampB).getDate()
 }
 
 function create(unusedAttrs: any, handle: DocHandle<any>) {
@@ -254,5 +392,5 @@ export const contentType: ContentType = {
   // TODO: figure out where this function should live;
   // can it live outside the content type on a lens or something?
   // Would need to return not just a boolean but also the count
-  hasUnseenChanges,
+  hasUnseenMentions,
 }

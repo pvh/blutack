@@ -25,6 +25,7 @@ import { ContentListDoc } from "../ContentList"
 import { storeCurrentUrlOfUser } from "../../pushpin-code/Url"
 import { ViewStateContext } from "../../pushpin-code/ViewState"
 import { PersistedLastSeenHeadsMap } from "../../pushpin-code/Changes"
+import { useMentionAutocompletion } from "../../pushpin-code/Searches"
 import { ContentType } from "../../pushpin-code/ContentTypes"
 
 const log = Debug("pushpin:workspace")
@@ -67,6 +68,8 @@ export default function Workspace({ documentId, currentDocUrl }: WorkspaceConten
 
   useDeviceOnlineStatus(currentDeviceId)
   useContactOnlineStatus(selfId)
+
+  useMentionAutocompletion(documentId)
 
   const currentDocTitle = currentDoc && currentDoc.title
 

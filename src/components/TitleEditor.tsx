@@ -4,6 +4,7 @@ import { useDocument } from "automerge-repo-react-hooks"
 import React, { useRef } from "react"
 
 import "./TitleEditor.css"
+import classNames from "classnames"
 
 interface AnyDoc {
   [field: string]: string
@@ -14,6 +15,7 @@ interface Props {
   field?: string
   placeholder?: string
   preventDrag?: boolean
+  bold?: boolean
 }
 
 // `preventDrag` is a little kludgey, but is required to enable text selection if the
@@ -56,7 +58,7 @@ export default function TitleEditor(props: Props) {
         draggable={preventDrag}
         onDragStart={onDragStart}
         type="text"
-        className="TitleEditor"
+        className={classNames("TitleEditor", { bold: props.bold })}
         defaultValue={doc[field]}
         placeholder={placeholder}
         onKeyDown={onKeyDown}
