@@ -23,9 +23,7 @@ interface NotificationSettingProps {
   currentDocumentUrl: PushpinUrl
 }
 
-export default function NotificationSetting({
-  currentDocumentUrl,
-}: NotificationSettingProps) {
+export default function NotificationSetting({ currentDocumentUrl }: NotificationSettingProps) {
   const docLink = parseDocumentLink(currentDocumentUrl)
 
   // todo: this is bad
@@ -39,9 +37,7 @@ export default function NotificationSetting({
   let docId: DocumentId | undefined
 
   if (docLink.type === "contentlist") {
-    docId = currentContent
-      ? parseDocumentLink(currentContent).documentId
-      : undefined
+    docId = currentContent ? parseDocumentLink(currentContent).documentId : undefined
   } else {
     docId = docLink.documentId
   }
@@ -74,33 +70,23 @@ export default function NotificationSetting({
         <Badge
           size="medium"
           icon={icon}
-          backgroundColor={
-            notificationMode === "all" ? "var(--colorWarning)" : undefined
-          }
+          backgroundColor={notificationMode === "all" ? "var(--colorWarning)" : undefined}
         />
       }
       alignment="right"
     >
       <ListMenuSection title="Notify me about this document">
         <ListMenu>
-          <ListMenuItem
-            selected={notificationMode === "all"}
-            onClick={() => changeMode("all")}
-          >
-            {notificationMode === "all" && <span className="check" />} on every
-            change
+          <ListMenuItem selected={notificationMode === "all"} onClick={() => changeMode("all")}>
+            {notificationMode === "all" && <span className="check" />} on every change
           </ListMenuItem>
           <ListMenuItem
             selected={notificationMode === "mentions"}
             onClick={() => changeMode("mentions")}
           >
-            {notificationMode === "mentions" && <span className="check" />} when
-            mentioned
+            {notificationMode === "mentions" && <span className="check" />} when mentioned
           </ListMenuItem>
-          <ListMenuItem
-            selected={notificationMode === "never"}
-            onClick={() => changeMode("never")}
-          >
+          <ListMenuItem selected={notificationMode === "never"} onClick={() => changeMode("never")}>
             {notificationMode === "never" && <span className="check" />} never
           </ListMenuItem>
         </ListMenu>
@@ -122,16 +108,9 @@ export function shouldNotifyAboutDocChanges(
     return false
   }
 
-  switch (
-    getNotificationModeOfDocForUser(
-      doc as DocWithNotificationSettings,
-      contactId
-    )
-  ) {
+  switch (getNotificationModeOfDocForUser(doc as DocWithNotificationSettings, contactId)) {
     case "all":
-      return contentType.hasUnseenChanges
-        ? contentType.hasUnseenChanges(doc, lastSeenHeads)
-        : false
+      return contentType.hasUnseenChanges ? contentType.hasUnseenChanges(doc, lastSeenHeads) : false
     case "never":
       return false
     case "mentions":

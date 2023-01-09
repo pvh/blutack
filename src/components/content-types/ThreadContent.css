@@ -30,7 +30,7 @@
 }
 
 .groupedMessages {
-  padding-left: 32px;
+  padding-left: 16px;
   flex: 1;
 }
 
@@ -62,7 +62,7 @@
 
 .time {
   color: var(--colorSecondaryGrey);
-  display: block;
+  padding-left: var(--halfCellSize);
   font-size: 12px;
 }
 

@@ -20,13 +20,13 @@
   object-fit: cover;
 }
 
-.Avatar--title-bar {
+.TitleBar .Avatar--badge {
   width: 28px;
   height: 28px;
   padding: 1px;
 }
 
-.Avatar--title-bar:hover::after {
+.TitleBar .Avatar--badge:hover::after {
   display: block;
   position: absolute;
   /* border: 2px solid var(--highlight-color, var(--colorOnline)); */

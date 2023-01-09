@@ -1,42 +1,25 @@
-import React, {
-  useContext,
-  useRef,
-  Ref,
-  ChangeEvent,
-  useState,
-  useMemo,
-  useCallback,
-} from "react"
+import React, { useState, useCallback } from "react"
 
 import { parseDocumentLink, PushpinUrl } from "../pushpin-code/Url"
 
-import Content, { ContentProps, EditableContentProps } from "../Content"
-import * as ContentTypes from "../pushpin-code/ContentTypes"
+import Content, { ContentProps } from "../Content"
 
-import { DocHandle, DocumentId } from "automerge-repo"
+import { DocHandle } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
 import CenteredStack from "../ui/CenteredStack"
-import ListMenuItem from "../ui/ListMenuItem"
 import ListMenu from "../ui/ListMenu"
 import "./ContentList.css"
-import DefaultInList from "./defaults/DefaultInList"
-import ListMenuHeader from "../ui/ListMenuHeader"
-import TitleEditor from "../TitleEditor"
-import ListItem from "../ui/ListItem"
-import ListMenuSection from "../ui/ListMenuSection"
 import classNames from "classnames"
 import ActionListItem from "./workspace/omnibox/ActionListItem"
 import CenteredStackRowItem from "../ui/CenteredStackRowItem"
-import ContentDragHandle from "../ui/ContentDragHandle"
-import Badge from "../ui/Badge"
-import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
 import * as ImportData from "../pushpin-code/ImportData"
-import Heading from "../ui/Heading"
 import { useViewState } from "../pushpin-code/ViewState"
 import NewDocumentButton from "../NewDocumentButton"
 import { openDoc } from "../pushpin-code/Url"
+import { ContentType } from "../pushpin-code/ContentTypes"
+import ListItem from "../ui/ListItem"
 
 export interface ContentListDoc {
   title: string
@@ -220,7 +203,10 @@ export default function ContentList({ documentId }: ContentProps) {
                 actions={actions}
                 selected={url === currentContent}
               >
-                <Content context="list" url={url} editable={true} />
+                <ListItem>
+                  <Content url={url} context="badge" />
+                  <Content url={url} context="title" />
+                </ListItem>
               </ActionListItem>
             </div>
           ))}
@@ -246,7 +232,7 @@ export default function ContentList({ documentId }: ContentProps) {
         className="ContentList--main"
       >
         {currentContent ? (
-          <Content context="workspace" url={currentContent} />
+          <Content context="expanded" url={currentContent} />
         ) : (
           <div style={{ padding: "10px" }}>Select something from the side</div>
         )}
@@ -256,32 +242,6 @@ export default function ContentList({ documentId }: ContentProps) {
 }
 
 const icon = "list"
-
-export function ContentListInList(props: EditableContentProps) {
-  const { documentId, url, editable } = props
-  const [doc] = useDocument<ContentListDoc>(documentId)
-  if (!doc || !doc.content) return null
-
-  const title =
-    doc.title != null && doc.title !== "" ? doc.title : "Untitled List"
-  const items = doc.content.length
-  const subtitle = `${items} item${items !== 1 ? "s" : ""}`
-
-  return (
-    <ListItem>
-      <ContentDragHandle url={url}>
-        <Badge size="medium" icon={icon} />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        titleEditorField="title"
-        title={title}
-        subtitle={subtitle}
-        documentId={documentId}
-        editable={editable}
-      />
-    </ListItem>
-  )
-}
 
 function create(attrs: any, handle: DocHandle<any>) {
   handle.change((doc: ContentListDoc) => {
@@ -293,16 +253,14 @@ function create(attrs: any, handle: DocHandle<any>) {
   })
 }
 
-ContentTypes.register({
+export const contentType: ContentType = {
   type: "contentlist",
   name: "List",
   icon,
   contexts: {
     root: ContentList,
     board: ContentList,
-    workspace: ContentList,
-    list: ContentListInList,
-    "title-bar": ContentListInList,
+    expanded: ContentList,
   },
   create,
-})
+}

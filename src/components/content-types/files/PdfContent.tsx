@@ -1,11 +1,8 @@
 import React, {
   useState,
   useCallback,
-  useEffect,
-  useRef,
   PointerEventHandler,
   useMemo,
-  useContext,
 } from "react"
 import { getStroke, StrokePoint } from "perfect-freehand"
 
@@ -28,7 +25,6 @@ import {
   parseDocumentLink,
   PushpinUrl,
 } from "../../pushpin-code/Url"
-import ContentList, { ContentListDoc, ContentListInList } from "../ContentList"
 import { DocHandle, DocumentId } from "automerge-repo"
 import { ContactDoc } from "../contact"
 import classNames from "classnames"
@@ -38,8 +34,7 @@ import ListMenu from "../../ui/ListMenu"
 import ListMenuItem from "../../ui/ListMenuItem"
 import * as buffer from "buffer"
 import ListMenuSection from "../../ui/ListMenuSection"
-import { contentType } from "mime-types"
-import { LookupResult } from "../../pushpin-code/ContentTypes"
+import { ContentType, LookupResult } from "../../pushpin-code/ContentTypes"
 import ListItem from "../../ui/ListItem"
 import ContentDragHandle from "../../ui/ContentDragHandle"
 import Badge from "../../ui/Badge"
@@ -479,39 +474,6 @@ export default function PdfContent(props: ContentProps) {
   )
 }
 
-interface PdfSourceLinkProps extends ContentProps {
-  region: Region
-}
-
-export function PdfAsSourceLink(props: PdfSourceLinkProps) {
-  const [pdf] = useDocument<PdfDoc>(props.documentId)
-
-  if (!pdf || !pdf.title) {
-    return null
-  }
-
-  const subtitle = `on page ${props.region.page}`
-
-  return (
-    <ListItem>
-      <ContentDragHandle
-        url={createDocumentLink("pdf", props.documentId)}
-        filename={pdf.title}
-        extension="pdf"
-        binaryDataId={pdf.binaryDataId}
-      >
-        <Badge shape="square" icon="file-o" />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        title={pdf.title}
-        subtitle={subtitle}
-        documentId={props.documentId}
-        editable={false}
-      />
-    </ListItem>
-  )
-}
-
 function PdfRegionListItemView({
   region,
   number,
@@ -636,18 +598,17 @@ function PdfAnnotationOverlayView({
 const supportsMimeType = (mimeType: string) =>
   !!mimeType.match("application/pdf")
 
-ContentTypes.register({
+export const contentType: ContentType = {
   type: "pdf",
   name: "PDF",
   icon: "file-pdf-o",
   unlisted: true,
   contexts: {
-    workspace: PdfContent,
+    expanded: PdfContent,
     board: PdfContent,
-    "source-link": PdfAsSourceLink,
   },
   supportsMimeType,
-})
+}
 
 //TODO: any types
 const getPageText = async (pdf: any, pageNo: number): Promise<string> => {

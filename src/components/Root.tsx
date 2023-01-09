@@ -1,29 +1,40 @@
 import Content from "./Content"
+import * as ContentTypes from "./pushpin-code/ContentTypes"
 import { DocumentId } from "automerge-repo"
 import { CurrentDeviceContext } from "./content-types/workspace/Device"
 import { ViewStateContext } from "./pushpin-code/ViewState"
 import { createDocumentLink } from "./pushpin-code/Url"
 import { useUrlParams } from "./pushpin-code/Url"
 
-// board in various contexts
-import "./content-types/board"
-import "./content-types/contact"
+// Import various content types and register them.
 
-// other single-context components
-import "./content-types/TextContent"
-import "./content-types/ThreadContent"
+import * as W from "./content-types/workspace/Workspace"
+ContentTypes.register(W.contentType)
+import * as B from "./content-types/board"
+ContentTypes.register(B.contentType)
+import * as Contact from "./content-types/contact"
+ContentTypes.register(Contact.contentType)
+import * as Text from "./content-types/TextContent"
+ContentTypes.register(Text.contentType)
+import * as Thread from "./content-types/ThreadContent"
+ContentTypes.register(Thread.contentType)
+import * as File from "./content-types/files/index"
+ContentTypes.register(File.contentType)
+import * as Image from "./content-types/files/ImageContent"
+ContentTypes.register(Image.contentType)
+import * as Pdf from "./content-types/files/PdfContent"
+ContentTypes.register(Pdf.contentType)
+import * as Audio from "./content-types/files/AudioContent"
+ContentTypes.register(Audio.contentType)
+import * as Video from "./content-types/files/VideoContent"
+ContentTypes.register(Video.contentType)
+import * as List from "./content-types/ContentList"
+ContentTypes.register(List.contentType)
+import * as Device from "./content-types/workspace/Device"
+ContentTypes.register(Device.contentType)
 
-import "./content-types/files/index"
-import "./content-types/files/FileContent"
-import "./content-types/files/ImageContent"
-import "./content-types/files/PdfContent"
-import "./content-types/files/AudioContent"
-import "./content-types/files/VideoContent"
-
-import "./content-types/TopicList"
-import "./content-types/TodoList"
-import "./content-types/ContentList"
-import "./content-types/workspace/ChangedDocsList"
+import "./content-types/defaults/DefaultInTitle"
+import "./content-types/defaults/DefaultInBadge"
 
 interface RootArgs {
   workspaceDocId: DocumentId

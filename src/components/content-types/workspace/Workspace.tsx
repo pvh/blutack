@@ -26,6 +26,7 @@ import { storeCurrentUrlOfUser } from "../../pushpin-code/Url"
 import { ViewStateContext } from "../../pushpin-code/ViewState"
 import { PersistedLastSeenHeadsMap } from "../../pushpin-code/Changes"
 import { useMentionAutocompletion } from "../../pushpin-code/Searches"
+import { ContentType } from "../../pushpin-code/ContentTypes"
 
 const log = Debug("pushpin:workspace")
 
@@ -49,15 +50,10 @@ interface WorkspaceContentProps extends ContentProps {
   createWorkspace: () => void
 }
 
-export default function Workspace({
-  documentId,
-  currentDocUrl,
-}: WorkspaceContentProps) {
+export default function Workspace({ documentId, currentDocUrl }: WorkspaceContentProps) {
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(documentId)
-  const currentDocId =
-    currentDocUrl && parseDocumentLink(currentDocUrl).documentId
-  const [currentDoc, changeCurrentDoc] =
-    useDocument<DocumentWithTitle>(currentDocId)
+  const currentDocId = currentDocUrl && parseDocumentLink(currentDocUrl).documentId
+  const [currentDoc, changeCurrentDoc] = useDocument<DocumentWithTitle>(currentDocId)
 
   const currentDeviceId = useContext(CurrentDeviceContext)
   const [self, changeSelf] = useDocument<ContactDoc>(workspace?.selfId)
@@ -93,9 +89,7 @@ export default function Workspace({
       ws.viewedDocUrls.unshift(currentDocUrl)
 
       if (ws.archivedDocUrls) {
-        ws.archivedDocUrls = ws.archivedDocUrls.filter(
-          (url) => url !== currentDocUrl
-        )
+        ws.archivedDocUrls = ws.archivedDocUrls.filter((url) => url !== currentDocUrl)
       }
     })
   }, [currentDocUrl])
@@ -118,10 +112,7 @@ export default function Workspace({
       return
     }
 
-    if (
-      currentDeviceId &&
-      (!self.devices || !self.devices.includes(currentDeviceId))
-    ) {
+    if (currentDeviceId && (!self.devices || !self.devices.includes(currentDeviceId))) {
       changeSelf((doc: ContactDoc) => {
         if (!doc.devices) {
           doc.devices = []
@@ -178,7 +169,7 @@ export default function Workspace({
     const { type } = parseDocumentLink(currentDocUrl)
     return (
       <div className={`Workspace__container Workspace__container--${type}`}>
-        <Content ref={contentRef} context="workspace" url={currentDocUrl} />
+        <Content ref={contentRef} context="expanded" url={currentDocUrl} />
       </div>
     )
   }
@@ -207,41 +198,31 @@ export function create(_attrs: any, handle: DocHandle<any>) {
     // we should refactor not to require the DocumentId on the contact
     // but i don't want to pull that in scope right now
 
-    ContentTypes.create(
-      "contentlist",
-      { title: "Ink & Switch" },
-      (listUrl, listHandle) => {
-        ContentTypes.create(
-          "thread",
-          { title: "#default" },
-          (threadUrl, threadHandle) => {
-            listHandle.change((doc) => {
-              ;(doc as ContentListDoc).content.push(threadUrl)
-            })
-            handle.change((workspace) => {
-              workspace.selfId = selfDocumentId
-              workspace.contactIds = []
-              workspace.currentDocUrl = listUrl
-              workspace.viewedDocUrls = [listUrl]
-            })
-          }
-        )
-      }
-    )
+    ContentTypes.create("contentlist", { title: "Ink & Switch" }, (listUrl, listHandle) => {
+      ContentTypes.create("thread", { title: "#default" }, (threadUrl, threadHandle) => {
+        listHandle.change((doc) => {
+          ;(doc as ContentListDoc).content.push(threadUrl)
+        })
+        handle.change((workspace) => {
+          workspace.selfId = selfDocumentId
+          workspace.contactIds = []
+          workspace.currentDocUrl = listUrl
+          workspace.viewedDocUrls = [listUrl]
+        })
+      })
+    })
   })
 }
 
-ContentTypes.register({
+export const contentType: ContentType = {
   type: "workspace",
   name: "Workspace",
   icon: "briefcase",
   contexts: {
     root: Workspace,
-    list: WorkspaceInList,
     board: WorkspaceInList,
-    "title-bar": WorkspaceInList,
   },
   resizable: false,
   unlisted: true,
   create,
-})
+}

@@ -1,8 +1,4 @@
 import React, { useState, useEffect } from "react"
-// import Fs from 'fs'
-// import Os from 'os'
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import { PushpinUrl } from "../../pushpin-code/Url"
 import { ContentProps } from "../../Content"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
@@ -12,6 +8,7 @@ import "./Device.css"
 import { useDeviceOnlineStatus } from "../../pushpin-code/PresenceHooks"
 import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
 import { DocHandle } from "automerge-repo"
+import { ContentType } from "../../pushpin-code/ContentTypes"
 
 export interface DeviceDoc {
   icon: string // fa-icon name
@@ -29,39 +26,15 @@ function Device(props: Props) {
   const { icon = "desktop", name } = doc
 
   switch (props.context) {
-    case "title-bar":
+    case "board":
       return (
-        <div
-          className={
-            isOnline ? "Device Device--online" : "Device Device--offline"
-          }
-        >
-          <Badge
-            icon={doc.icon || "desktop"}
-            shape="circle"
-            size="large"
-            backgroundColor={`var(${
-              isOnline ? "--colorOnline" : "--colorOffline"
-            })`}
-          />
-        </div>
-      )
-    default:
-      return (
-        <div
-          className={
-            isOnline
-              ? "DeviceListItem DeviceListItem--online"
-              : "DeviceListItem"
-          }
-        >
+        <div className={isOnline ? "DeviceListItem DeviceListItem--online" : "DeviceListItem"}>
           <div className="DeviceListItem-badge">
             <Badge
               icon={icon}
               shape="circle"
-              backgroundColor={`var(${
-                isOnline ? "--colorOnline" : "--colorOffline"
-              })`}
+              size="large"
+              backgroundColor={`var(${isOnline ? "--colorOnline" : "--colorOffline"})`}
             />
           </div>
           <TitleWithSubtitle
@@ -72,6 +45,17 @@ function Device(props: Props) {
           />
         </div>
       )
+    case "badge":
+      return (
+        <Badge
+          icon={icon}
+          shape="circle"
+          size="large"
+          backgroundColor={`var(${isOnline ? "--colorOnline" : "--colorOffline"})`}
+        />
+      )
+    default:
+      return null
   }
 }
 
@@ -80,6 +64,8 @@ export function create(deviceAttrs: any, handle: DocHandle<any>) {
     doc.name = "computer"
     doc.icon = "desktop"
   })
+  // TODO: this stuff relied on electron magic to pick an icon and set a useful hostname
+  //       really we should look at the user agent or something instead
   const isLaptop = true
   const icon = isLaptop ? "laptop" : "desktop"
   handle.change((doc: DeviceDoc) => {
@@ -88,21 +74,17 @@ export function create(deviceAttrs: any, handle: DocHandle<any>) {
   })
 }
 
-ContentTypes.register({
+export const contentType: ContentType = {
   type: "device",
   name: "Device",
   icon: "desktop",
   contexts: {
-    list: Device,
-    "title-bar": Device,
-    contact: Device,
     board: Device,
+    badge: Device,
   },
   resizable: false,
   unlisted: true,
   create,
-})
+}
 
-export const CurrentDeviceContext = React.createContext<DocumentId | undefined>(
-  undefined
-)
+export const CurrentDeviceContext = React.createContext<DocumentId | undefined>(undefined)

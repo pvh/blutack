@@ -2,11 +2,11 @@ import React, { useRef, useState } from "react"
 import { FileDoc } from "."
 
 import { ContentProps } from "../../Content"
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import "./AudioContent.css"
 import { createBinaryDataUrl } from "../../../blobstore/Blob"
 import { usePresence } from "../../pushpin-code/PresenceHooks"
+import { ContentType } from "../../pushpin-code/ContentTypes"
 
 interface AudioState {
   paused: boolean
@@ -107,14 +107,14 @@ export default function AudioContent({ documentId }: ContentProps) {
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match("audio/")
 
-ContentTypes.register({
+export const contentType: ContentType = {
   type: "audio",
   name: "Audio",
   icon: "file-audio-o",
   unlisted: true,
   contexts: {
-    workspace: AudioContent,
+    expanded: AudioContent,
     board: AudioContent,
   },
   supportsMimeType,
-})
+}

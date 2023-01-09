@@ -1,5 +1,4 @@
 import Badge from "../../ui/Badge"
-import React from "react"
 import Content from "../../Content"
 import { Popover } from "../../ui/Popover"
 import { useDocumentIds } from "../../pushpin-code/Hooks"
@@ -18,6 +17,7 @@ import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 import { WorkspaceDoc } from "./Workspace"
 import { getHeads } from "@automerge/automerge"
+import ListItem from "../../ui/ListItem"
 interface ChangedDocsListProps {
   workspaceDocId: DocumentId
 }
@@ -112,7 +112,10 @@ export function ChangedDocsList({ workspaceDocId }: ChangedDocsListProps) {
                 key={url}
                 onClick={() => openDoc(url as PushpinUrl)}
               >
-                <Content url={url} context="list" />
+                <ListItem>
+              <Content url={url} context="badge" />
+              <Content url={url} context="title" />
+            </ListItem>
               </ListMenuItem>
             )
           })}

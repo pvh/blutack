@@ -22,7 +22,9 @@ import NewDocumentButton from "../../NewDocumentButton"
 import { openDoc } from "../../pushpin-code/Url"
 import { ChangedDocsList } from "./ChangedDocsList"
 import { getLastSeenHeadsMapOfWorkspace } from "../../pushpin-code/Changes"
+import ListItem from "../../ui/ListItem"
 import NotificationSetting from "./NotificationSetting"
+import classNames from "classnames"
 
 export interface Props {
   workspaceDocId: DocumentId
@@ -30,11 +32,7 @@ export interface Props {
   onContent: (url: PushpinUrl) => boolean
 }
 
-export default function TitleBar({
-  workspaceDocId,
-  currentDocUrl,
-  onContent,
-}: Props) {
+export default function TitleBar({ workspaceDocId, currentDocUrl, onContent }: Props) {
   const [activeOmnibox, setActive] = useState(false)
   const [workspaceDoc] = useDocument<WorkspaceDoc>(workspaceDocId)
 
@@ -45,7 +43,11 @@ export default function TitleBar({
   }, [currentDocUrl])
 
   useEvent(document, "keydown", (e) => {
-    if (e.key === "/" && document.activeElement === document.body) {
+    if (
+      (e.key === "k" || e.key === "p") &&
+      (e.metaKey || e.ctrlKey) &&
+      document.activeElement === document.body
+    ) {
       if (!activeOmnibox) {
         showOmnibox()
         e.preventDefault()
@@ -79,15 +81,13 @@ export default function TitleBar({
       <div className="TitleBar-section">
         <Content
           url={createDocumentLink("contact", workspaceDoc.selfId)}
-          context="title-bar"
+          context="badge"
           isPresent
         />
         <ChangedDocsList workspaceDocId={workspaceDocId}></ChangedDocsList>
         <NewDocumentButton
           onCreateDocument={onCreateDocument}
-          trigger={
-            <Badge icon="plus" size="medium" backgroundColor="transparent" />
-          }
+          trigger={<Badge icon="plus" size="medium" backgroundColor="transparent" />}
         />
         <div
           onClick={(e) => {
@@ -102,19 +102,20 @@ export default function TitleBar({
       <div className="TitleBar-section stretch withDividers">
         {currentDocUrl && (
           <>
-            <Content url={currentDocUrl} context="title-bar" editable />
-            <Authors
-              currentDocUrl={currentDocUrl}
-              workspaceDocId={workspaceDocId}
-            />
+            <div className="ContentHeader Group">
+              <ListItem>
+                <Content url={currentDocUrl} context="badge" />
+                <Content url={currentDocUrl} context="title" editable />
+              </ListItem>
+            </div>
+            <div className="CollaboratorsBar Inline">
+              <Authors currentDocUrl={currentDocUrl} workspaceDocId={workspaceDocId} />
+            </div>
           </>
         )}
       </div>
-
       <div className="TitleBar-section">
-        {currentDocUrl && (
-          <NotificationSetting currentDocumentUrl={currentDocUrl} />
-        )}
+        {currentDocUrl && <NotificationSetting currentDocumentUrl={currentDocUrl} />}
       </div>
 
       <Omnibox

@@ -28,6 +28,7 @@ import Content from "../../../Content"
 import useInvitations, { Invitation } from "./InvitationsHook"
 import "./OmniboxWorkspaceListMenu.css"
 import { getCurrentDocUrl, openDoc } from "../../../pushpin-code/Url"
+import ListItem from "../../../ui/ListItem"
 
 const log = Debug("pushpin:omnibox")
 
@@ -561,7 +562,10 @@ export default function OmniboxWorkspaceListMenu(
                   actions={actions}
                   selected={selected}
                 >
-                  <Content context="list" url={url} />
+                  <ListItem>
+                    <Content context="badge" url={url} />
+                    <Content context="title" url={url} />
+                  </ListItem>
                 </ActionListItem>
               )
           )}

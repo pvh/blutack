@@ -64,6 +64,7 @@ export function useAuthors(
     const { authorIds = [] } = doc
 
     // Add any never-before seen authors to our contacts.
+    // TODO: this is why we can't really delete authors from our contacts too
     changeWorkspace(({ contactIds }) => {
       const newContactIds = authorIds.filter(
         (a) => selfId !== a && !contactIds.includes(a)
@@ -83,6 +84,7 @@ export function useAuthors(
     log("adding self to authors")
 
     // Add ourselves to the authors if we haven't yet.
+    // TODO: we should really block on doing this until first edit!
     changeDoc((doc) => {
       if (!doc.authorIds) {
         doc.authorIds = []

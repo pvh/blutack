@@ -1,23 +1,15 @@
 import React, { useEffect, useRef, useMemo, useState, useId } from "react"
 
 import * as Automerge from "@automerge/automerge"
-import Quill, {
-  TextChangeHandler,
-  QuillOptionsStatic,
-  SelectionChangeHandler,
-} from "quill"
+import Quill, { TextChangeHandler, QuillOptionsStatic, SelectionChangeHandler } from "quill"
 import Delta from "quill-delta"
-import * as ContentTypes from "../pushpin-code/ContentTypes"
+import { ContentType } from "../pushpin-code/ContentTypes"
 import { ContentProps, EditableContentProps } from "../Content"
 import { useDocument } from "automerge-repo-react-hooks"
 import { useDocumentIds, useStaticCallback } from "../pushpin-code/Hooks"
 import "./TextContent.css"
-import Badge from "../ui/Badge"
 import * as ContentData from "../pushpin-code/ContentData"
 import * as WebStreamLogic from "../pushpin-code/WebStreamLogic"
-import ListItem from "../ui/ListItem"
-import ContentDragHandle from "../ui/ContentDragHandle"
-import TitleWithSubtitle from "../ui/TitleWithSubtitle"
 import { DocHandle, DocumentId } from "automerge-repo"
 import QuillCursors from "quill-cursors"
 import { usePresence } from "../pushpin-code/PresenceHooks"
@@ -28,16 +20,10 @@ import {
   getUnseenPatches,
   LastSeenHeads,
   useAutoAdvanceLastSeenHeads,
-  useLastSeenHeads,
 } from "../pushpin-code/Changes"
 import { createDocumentLink } from "../pushpin-code/Url"
 import { Doc, getHeads, Heads, view } from "@automerge/automerge"
-import {
-  evalAllSearches,
-  evalSearchFor,
-  Match,
-  MENTION,
-} from "../pushpin-code/Searches"
+import { evalAllSearches, evalSearchFor, Match, MENTION } from "../pushpin-code/Searches"
 import "./Autocompletion.js"
 import { shouldNotifyAboutDocChanges } from "./workspace/NotificationSetting"
 
@@ -66,11 +52,7 @@ export default function TextContent(props: Props) {
 
   useAutoAdvanceLastSeenHeads(createDocumentLink("text", props.documentId))
 
-  const presence = usePresence<IQuillRange | undefined>(
-    props.documentId,
-    cursorPos,
-    "cursorPos"
-  )
+  const presence = usePresence<IQuillRange | undefined>(props.documentId, cursorPos, "cursorPos")
 
   const cursors: Cursor[] = useMemo(
     () =>
@@ -162,10 +144,7 @@ export function useQuill({
   const makeChange = useStaticCallback(change ?? (() => {}))
   const onSelectionChange = useStaticCallback(selectionChange ?? (() => {}))
 
-  const contactIds = useMemo(
-    () => cursors.map(({ contactId }) => contactId),
-    [cursors]
-  )
+  const contactIds = useMemo(() => cursors.map(({ contactId }) => contactId), [cursors])
   const contactsById = useDocumentIds<ContactDoc>(contactIds)
 
   useEffect(() => {
@@ -300,10 +279,7 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
   })
 }
 
-async function createFrom(
-  contentData: ContentData.ContentData,
-  handle: DocHandle<TextDoc>
-) {
+async function createFrom(contentData: ContentData.ContentData, handle: DocHandle<TextDoc>) {
   const text = await WebStreamLogic.toString(contentData.data)
   handle.change((doc) => {
     doc.text = new Automerge.Text()
@@ -326,62 +302,9 @@ function create({ text }: any, handle: DocHandle<any>) {
   })
 }
 
-function TextInList(props: EditableContentProps) {
-  const { documentId, url, editable, selfId } = props
-  const [doc] = useDocument<TextDoc>(documentId)
-  const [self] = useSelf()
-  const lastSeenHeads = useLastSeenHeads(createDocumentLink("text", documentId))
-
-  if (!doc || !doc.text || !self) return null
-
-  const lines = doc.text
-    //  @ts-ignore-next-line
-    .join("")
-    .split("\n")
-    .filter((l: string) => l.length > 0)
-
-  const title = doc.title || lines.shift() || "[empty text note]"
-
-  const showChangedDot = shouldNotifyAboutDocChanges(
-    "text",
-    doc,
-    lastSeenHeads,
-    selfId,
-    self.name
-  )
-  const unseenChanges = hasUnseenChanges(doc, lastSeenHeads)
-
-  return (
-    <ListItem>
-      <ContentDragHandle url={url}>
-        <Badge
-          icon="sticky-note"
-          size="medium"
-          dot={
-            showChangedDot
-              ? {
-                  color: "var(--colorChangeDot)",
-                }
-              : undefined
-          }
-        />
-      </ContentDragHandle>
-      <TitleWithSubtitle
-        bold={unseenChanges}
-        title={title}
-        documentId={documentId}
-        editable={editable}
-      />
-    </ListItem>
-  )
-}
-
-function hasUnseenChanges(doc: Doc<unknown>, lastSeenHeads?: LastSeenHeads) {
+export function hasUnseenChanges(doc: Doc<unknown>, lastSeenHeads?: LastSeenHeads) {
   return getUnseenPatches(doc, lastSeenHeads).some(
-    (patch) =>
-      patch.action === "splice" &&
-      patch.path.length === 2 &&
-      patch.path[0] === "text"
+    (patch) => patch.action === "splice" && patch.path.length === 2 && patch.path[0] === "text"
   )
 }
 
@@ -392,29 +315,26 @@ function hasUnseenMentions(
   lastSeenHeads: LastSeenHeads | undefined,
   name: string
 ) {
-  const isUserMentionedInText = evalSearchFor(
-    MENTION,
-    (doc as TextDoc).text.toString()
-  ).some((match) => match.data.name.toLowerCase() === name.toLowerCase())
+  const isUserMentionedInText = evalSearchFor(MENTION, (doc as TextDoc).text.toString()).some(
+    (match) => match.data.name.toLowerCase() === name.toLowerCase()
+  )
 
   return isUserMentionedInText && hasUnseenChanges(doc, lastSeenHeads)
 }
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match("text/")
 
-ContentTypes.register({
+export const contentType: ContentType = {
   type: "text",
   name: "Text",
   icon: "sticky-note",
   contexts: {
     board: TextContent,
-    workspace: TextContent,
-    list: TextInList,
-    "title-bar": TextInList,
+    expanded: TextContent,
   },
   create,
   createFrom,
   supportsMimeType,
   hasUnseenChanges,
   hasUnseenMentions,
-})
+}
