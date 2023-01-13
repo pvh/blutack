@@ -11,6 +11,8 @@
   z-index: 3;
   user-select: none;
   background-color: white;
+  gap: var(--halfCellSize);
+  padding: 0 var(--halfCellSize);
 }
 
 .TitleBar .ContentHeader {
@@ -28,7 +30,20 @@ button[disabled].TitleBar-menuItem .fa {
   color: #ccc;
 }
 
-.TitleBar-content {
+
+.TitleBar-section {
+  display: flex;
+  gap: var(--halfCellSize);
+}
+
+.TitleBar-section.withDividers {
+  border-left: 1px solid var(--colorPaleGrey);
+  border-right: 1px solid var(--colorPaleGrey);
+  padding-left: var(--halfCellSize);
+  padding-right: var(--halfCellSize);
+}
+
+.TitleBar-section.stretch {
   flex: 1;
 }
 

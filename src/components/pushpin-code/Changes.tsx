@@ -1,8 +1,5 @@
-import { useCallback, useContext, useEffect } from "react"
-import {
-  WorkspaceContext,
-  WorkspaceDoc,
-} from "../content-types/workspace/Workspace"
+import { useCallback, useContext, useEffect, useRef } from "react"
+import { WorkspaceContext, WorkspaceDoc } from "../content-types/workspace/Workspace"
 import { useDocument } from "automerge-repo-react-hooks"
 import { parseDocumentLink, PushpinUrl } from "./Url"
 import {
@@ -15,6 +12,11 @@ import {
   clone,
   Patch,
 } from "@automerge/automerge"
+
+import { readAsHasBadge } from "../../lenses/HasBadge"
+
+import memoize from "lodash.memoize"
+import { useSelf, useSelfId } from "./SelfHooks"
 
 export function useAdvanceLastSeenHeads(docUrl: PushpinUrl) {
   const workspaceId = useContext(WorkspaceContext)
@@ -46,8 +48,14 @@ function isDocUrlCurrentlyViewed(url: PushpinUrl): boolean {
 }
 
 export function useAutoAdvanceLastSeenHeads(docUrl: PushpinUrl) {
-  const [doc] = useDocument(parseDocumentLink(docUrl).documentId)
+  const { documentId, type } = parseDocumentLink(docUrl)
+  const [doc] = useDocument(documentId)
+  const [self] = useSelf()
+  const selfId = useSelfId()
   const advanceLastSeenHeads = useAdvanceLastSeenHeads(docUrl)
+  const lastSeenHeads = usePersistedLastSeenHeads(docUrl)
+  const hadInitialChanges = useRef<boolean>()
+  const initialLastSeenHeadsRef = useRef<Heads>()
 
   useEffect(() => {
     CURRENTLY_VIEWED_DOC_URLS[docUrl] = true
@@ -57,9 +65,24 @@ export function useAutoAdvanceLastSeenHeads(docUrl: PushpinUrl) {
     }
   }, [docUrl])
 
+  // advance the head whenever the doc changes
   useEffect(() => {
+    if (!self) {
+      return
+    }
+
+    // before we advance the head initially
+    // store if the document had unseen changes initially and what the initial lastSeenHeads was
+    if (doc && lastSeenHeads && hadInitialChanges.current === undefined) {
+      const hasBadge = readAsHasBadge(doc, type, lastSeenHeads, selfId, self.name)
+      hadInitialChanges.current = hasBadge?.unseenChanges.changes
+      initialLastSeenHeadsRef.current = lastSeenHeads
+    }
+
     advanceLastSeenHeads()
-  }, [doc])
+  }, [doc, self])
+
+  return hadInitialChanges.current ? initialLastSeenHeadsRef.current : undefined
 }
 
 export type LastSeenHeads = Heads | "latestHeads"
@@ -72,16 +95,9 @@ export interface PersistedLastSeenHeadsMap {
   [url: PushpinUrl]: Heads
 }
 
-export function useLastSeenHeads(
-  docUrl: PushpinUrl
-): LastSeenHeads | undefined {
+function usePersistedLastSeenHeads(docUrl: PushpinUrl): Heads | undefined {
   const workspaceId = useContext(WorkspaceContext)
-  const [workspaceDoc, changeWorkspaceDoc] =
-    useDocument<WorkspaceDoc>(workspaceId)
-
-  if (CURRENTLY_VIEWED_DOC_URLS[docUrl]) {
-    return "latestHeads"
-  }
+  const [workspaceDoc, changeWorkspaceDoc] = useDocument<WorkspaceDoc>(workspaceId)
 
   if (!workspaceDoc || !workspaceDoc.persistedLastSeenHeads) {
     return undefined
@@ -105,36 +121,43 @@ export function useLastSeenHeads(
   return lastSeenHeads
 }
 
-export function getUnseenPatches(
-  doc: Doc<any>,
-  lastSeenHeads?: LastSeenHeads
-): Patch[] {
-  const patches: Patch[] = []
+export function useLastSeenHeads(docUrl: PushpinUrl): LastSeenHeads | undefined {
+  const lastSeenHeads = usePersistedLastSeenHeads(docUrl)
 
-  if (!hasDocUnseenChanges(doc, lastSeenHeads)) {
-    return []
+  if (CURRENTLY_VIEWED_DOC_URLS[docUrl]) {
+    return "latestHeads"
   }
 
-  try {
-    const oldDoc = clone(view(doc, lastSeenHeads as Heads))
-
-    applyChanges(oldDoc, getChanges(oldDoc, doc), {
-      patchCallback: (patch: Patch) => {
-        patches.push(patch)
-      },
-    })
-
-    return patches
-  } catch (err) {
-    console.error(err)
-    return []
-  }
+  return lastSeenHeads
 }
 
-export function hasDocUnseenChanges(
-  doc: Doc<any>,
-  lastSeenHeads?: LastSeenHeads
-): boolean {
+export const getUnseenPatches = memoize(
+  (doc: Doc<any>, lastSeenHeads?: LastSeenHeads): Patch[] => {
+    const patches: Patch[] = []
+
+    if (!hasDocUnseenChanges(doc, lastSeenHeads)) {
+      return []
+    }
+
+    try {
+      const oldDoc = clone(view(doc, lastSeenHeads as Heads))
+
+      applyChanges(oldDoc, getChanges(oldDoc, doc), {
+        patchCallback: (patch: Patch) => {
+          patches.push(patch)
+        },
+      })
+
+      return patches
+    } catch (err) {
+      console.error(err)
+      return []
+    }
+  },
+  (doc, lastSeenHeads) => `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
+)
+
+export function hasDocUnseenChanges(doc: Doc<any>, lastSeenHeads?: LastSeenHeads): boolean {
   if (!lastSeenHeads || lastSeenHeads === "latestHeads") {
     return false
   }
@@ -145,9 +168,7 @@ export function hasDocUnseenChanges(
     return true
   }
 
-  return !lastSeenHeads.every((head, index) => {
-    return docHeads[index] === head
-  })
+  return !areHeadsEqual(lastSeenHeads, docHeads)
 }
 
 export function getLastSeenHeadsMapOfWorkspace(workspace: WorkspaceDoc) {
@@ -158,15 +179,17 @@ export function getLastSeenHeadsMapOfWorkspace(workspace: WorkspaceDoc) {
   const lastSeenHeadsByDocUrl: LastSeenHeadsMap = {}
 
   // replace persisted head with special value "latestHeads" if view is currently being viewed
-  Object.entries(workspace.persistedLastSeenHeads).forEach(
-    ([docUrl, lastSeenHeads]) => {
-      lastSeenHeadsByDocUrl[docUrl as PushpinUrl] = isDocUrlCurrentlyViewed(
-        docUrl as PushpinUrl
-      )
-        ? "latestHeads"
-        : lastSeenHeads
-    }
-  )
+  Object.entries(workspace.persistedLastSeenHeads).forEach(([docUrl, lastSeenHeads]) => {
+    lastSeenHeadsByDocUrl[docUrl as PushpinUrl] = isDocUrlCurrentlyViewed(docUrl as PushpinUrl)
+      ? "latestHeads"
+      : lastSeenHeads
+  })
 
   return lastSeenHeadsByDocUrl
+}
+
+export function areHeadsEqual(a: Heads, b: Heads): boolean {
+  return a.every((head, index) => {
+    return b[index] === head
+  })
 }

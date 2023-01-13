@@ -9,6 +9,7 @@ import {
   PushpinUrl,
   createDocumentLink,
   createWebLink,
+  parseDocumentLink,
 } from "../../pushpin-code/Url"
 import { useEvent } from "../../pushpin-code/Hooks"
 
@@ -22,6 +23,8 @@ import { openDoc } from "../../pushpin-code/Url"
 import { ChangedDocsList } from "./ChangedDocsList"
 import { getLastSeenHeadsMapOfWorkspace } from "../../pushpin-code/Changes"
 import ListItem from "../../ui/ListItem"
+import NotificationSetting from "./NotificationSetting"
+import classNames from "classnames"
 
 export interface Props {
   workspaceDocId: DocumentId
@@ -29,11 +32,7 @@ export interface Props {
   onContent: (url: PushpinUrl) => boolean
 }
 
-export default function TitleBar({
-  workspaceDocId,
-  currentDocUrl,
-  onContent,
-}: Props) {
+export default function TitleBar({ workspaceDocId, currentDocUrl, onContent }: Props) {
   const [activeOmnibox, setActive] = useState(false)
   const [workspaceDoc] = useDocument<WorkspaceDoc>(workspaceDocId)
 
@@ -79,54 +78,44 @@ export default function TitleBar({
 
   return (
     <div className="TitleBar">
-      <div className="NavigationBar Inline">
+      <div className="TitleBar-section">
+        <Content
+          url={createDocumentLink("contact", workspaceDoc.selfId)}
+          context="badge"
+          isPresent
+        />
+        <ChangedDocsList workspaceDocId={workspaceDocId}></ChangedDocsList>
         <NewDocumentButton
           onCreateDocument={onCreateDocument}
-          trigger={
-            <button type="button" className="TitleBar-menuItem">
-              <i className="fa fa-plus" />
-            </button>
-          }
+          trigger={<Badge icon="plus" size="medium" backgroundColor="transparent" />}
         />
-        <button
-          type="button"
+        <div
           onClick={(e) => {
             showOmnibox()
             e.stopPropagation()
           }}
-          className="TitleBar-menuItem"
         >
-          <Badge icon="search" backgroundColor="#00000000" />
-        </button>
+          <Badge icon="search" size="medium" backgroundColor="transparent" />
+        </div>
       </div>
 
-      {currentDocUrl && (
-        <>
-          <div className="ContentHeader Group">
-            <ListItem>
-              <Content url={currentDocUrl} context="badge" />
-              <Content url={currentDocUrl} context="title" editable />
-            </ListItem>
-          </div>
-          <div className="CollaboratorsBar Inline">
-            <Authors
-              currentDocUrl={currentDocUrl}
-              workspaceDocId={workspaceDocId}
-            />
-            <div className="TitleBar-self">
-              <Content
-                url={createDocumentLink("contact", workspaceDoc.selfId)}
-                context="badge"
-                isPresent
-              />
+      <div className="TitleBar-section stretch withDividers">
+        {currentDocUrl && (
+          <>
+            <div className="ContentHeader Group">
+              <ListItem>
+                <Content url={currentDocUrl} context="badge" />
+                <Content url={currentDocUrl} context="title" editable />
+              </ListItem>
             </div>
-          </div>
-        </>
-      )}
-      <div className="TitleBar-unseenChanges">
-        <ChangedDocsList
-          lastSeenHeads={getLastSeenHeadsMapOfWorkspace(workspaceDoc)}
-        ></ChangedDocsList>
+            <div className="CollaboratorsBar Inline">
+              <Authors currentDocUrl={currentDocUrl} workspaceDocId={workspaceDocId} />
+            </div>
+          </>
+        )}
+      </div>
+      <div className="TitleBar-section">
+        {currentDocUrl && <NotificationSetting currentDocumentUrl={currentDocUrl} />}
       </div>
 
       <Omnibox

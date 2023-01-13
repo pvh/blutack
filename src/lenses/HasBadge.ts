@@ -2,25 +2,49 @@
 // It's meant to be a crude approximation of a set of cambria lenses that would
 // bidirectionally (ie, read/writeable) map any doc to a list item
 
-import { hasUnseenChanges as textHasUnseenChanges } from "../components/content-types/TextContent"
-import { getUnreadMessageCountOfThread } from "../components/content-types/ThreadContent"
+import {
+  hasUnseenChanges,
+  hasUnseenChanges as textHasUnseenChanges,
+  hasUnseenMentions as textHasUnseenMentions,
+} from "../components/content-types/TextContent"
+import {
+  getUnreadMessageCountOfThread,
+  hasUnseenMentions as threadHasUnseenMentions,
+} from "../components/content-types/ThreadContent"
 import { LastSeenHeads } from "../components/pushpin-code/Changes"
+import { DocumentId } from "automerge-repo"
+import { shouldNotifyUserAboutDoc } from "../components/content-types/workspace/NotificationSetting"
 
 export type HasBadge = {
-  unseenChanges: { changes: true; count?: number } | { changes: false }
+  unseenChanges: { changes: true; count?: number; mentions: boolean } | { changes: false }
+  notify: boolean
   badgeColor?: string
 }
 
 export const readAsHasBadge = (
   doc: any,
   type: string,
-  lastSeenHeads: LastSeenHeads | undefined
+  lastSeenHeads: LastSeenHeads | undefined,
+  selfId: DocumentId,
+  selfName: string
 ): HasBadge => {
   const unseenChanges = getUnseenChanges(doc, type, lastSeenHeads)
   const badgeColor = getBadgeColor(doc, type)
 
+  if (!unseenChanges.changes) {
+    return {
+      unseenChanges: { changes: false },
+      notify: false,
+      badgeColor,
+    }
+  }
+
+  const mentions = hasUnseenMentions(doc, type, lastSeenHeads, selfName)
+  const notify = shouldNotifyUserAboutDoc(doc, selfId, unseenChanges.changes, mentions)
+
   return {
-    unseenChanges,
+    unseenChanges: { ...unseenChanges, mentions },
+    notify,
     badgeColor,
   }
 }
@@ -45,6 +69,24 @@ const getUnseenChanges = (
     default: {
       return { changes: false }
     }
+  }
+}
+
+const hasUnseenMentions = (
+  doc: any,
+  type: string,
+  lastSeenHeads: LastSeenHeads | undefined,
+  name: string
+): boolean => {
+  switch (type) {
+    case "thread":
+      return threadHasUnseenMentions(doc, lastSeenHeads, name)
+
+    case "text":
+      return textHasUnseenMentions(doc, lastSeenHeads, name)
+
+    default:
+      return false
   }
 }
 

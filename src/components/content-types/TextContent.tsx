@@ -1,11 +1,7 @@
 import React, { useEffect, useRef, useMemo, useState, useId } from "react"
 
 import * as Automerge from "@automerge/automerge"
-import Quill, {
-  TextChangeHandler,
-  QuillOptionsStatic,
-  SelectionChangeHandler,
-} from "quill"
+import Quill, { TextChangeHandler, QuillOptionsStatic, SelectionChangeHandler } from "quill"
 import Delta from "quill-delta"
 import { ContentType } from "../pushpin-code/ContentTypes"
 import { ContentProps, EditableContentProps } from "../Content"
@@ -26,8 +22,9 @@ import {
   useAutoAdvanceLastSeenHeads,
 } from "../pushpin-code/Changes"
 import { createDocumentLink } from "../pushpin-code/Url"
-import memoize from "lodash.memoize"
-import { Doc, getHeads } from "@automerge/automerge"
+import { Doc, getHeads, Heads, view } from "@automerge/automerge"
+import { evalAllSearches, evalSearchFor, Match, MENTION } from "../pushpin-code/Searches"
+import "./Autocompletion.js"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -54,11 +51,7 @@ export default function TextContent(props: Props) {
 
   useAutoAdvanceLastSeenHeads(createDocumentLink("text", props.documentId))
 
-  const presence = usePresence<IQuillRange | undefined>(
-    props.documentId,
-    cursorPos,
-    "cursorPos"
-  )
+  const presence = usePresence<IQuillRange | undefined>(props.documentId, cursorPos, "cursorPos")
 
   const cursors: Cursor[] = useMemo(
     () =>
@@ -82,8 +75,9 @@ export default function TextContent(props: Props) {
     cursors,
     selected: props.uniquelySelected,
     config: {
-      formats: [],
+      formats: ["bold", "color", "italic"],
       modules: {
+        mention: {},
         cursors: {
           hideDelayMs: 500,
           transformOnTextChange: true,
@@ -92,6 +86,9 @@ export default function TextContent(props: Props) {
         history: {
           maxStack: 500,
           userOnly: true,
+        },
+        clipboard: {
+          disableFormattingOnPaste: true,
         },
       },
       scrollingContainer: `#${scrollingContainerId}`,
@@ -102,7 +99,7 @@ export default function TextContent(props: Props) {
     <div
       className="TextContent"
       id={scrollingContainerId}
-      onClick={() => quill?.focus()}
+      onClick={() => quill.current?.focus()}
       ref={containerRef}
     >
       <div
@@ -124,32 +121,29 @@ interface Cursor {
 
 interface QuillOpts {
   text: Automerge.Text | null
-  change: (cb: (text: Automerge.Text) => void) => void
-  selectionChange: SelectionChangeHandler
+  change?: (cb: (text: Automerge.Text) => void) => void
+  selectionChange?: SelectionChangeHandler
   selected?: boolean
-  cursors: Cursor[]
+  cursors?: Cursor[]
   config?: QuillOptionsStatic
 }
 
-function useQuill({
+export function useQuill({
   text,
   change,
   selectionChange,
-  cursors,
+  cursors = [],
   selected,
   config,
-}: QuillOpts): [React.Ref<HTMLDivElement>, Quill | null] {
+}: QuillOpts): [React.Ref<HTMLDivElement>, React.RefObject<Quill | null>] {
   const ref = useRef<HTMLDivElement>(null)
   const quill = useRef<Quill | null>(null)
   // @ts-ignore-next-line
   const textString = useMemo(() => text && text.join(""), [text])
-  const makeChange = useStaticCallback(change)
-  const onSelectionChange = useStaticCallback(selectionChange)
+  const makeChange = useStaticCallback(change ?? (() => {}))
+  const onSelectionChange = useStaticCallback(selectionChange ?? (() => {}))
 
-  const contactIds = useMemo(
-    () => cursors.map(({ contactId }) => contactId),
-    [cursors]
-  )
+  const contactIds = useMemo(() => cursors.map(({ contactId }) => contactId), [cursors])
   const contactsById = useDocumentIds<ContactDoc>(contactIds)
 
   useEffect(() => {
@@ -198,12 +192,36 @@ function useQuill({
   }, [ref.current]) // eslint-disable-line
 
   useEffect(() => {
-    if (!textString || !quill.current) return
+    const q = quill.current
+
+    if (!textString || !q) return
 
     const delta = new Delta().insert(textString)
-    const diff = quill.current.getContents().diff(delta as any)
+    const diff = q.getContents().diff(delta as any)
 
-    quill.current.updateContents(diff)
+    q.updateContents(diff)
+
+    const matches = evalAllSearches(textString)
+
+    q.removeFormat(0, textString.length, "api")
+
+    matches.forEach((formatting: Match) => {
+      const index = formatting.from
+      const length = formatting.to - index
+      const { color, isBold, isItalic } = formatting.style
+
+      if (color) {
+        q.formatText(index, length, "color", formatting.style.color, "api")
+      }
+
+      if (isBold) {
+        q.formatText(index, length, "bold", true, "api")
+      }
+
+      if (isItalic) {
+        q.formatText(index, length, "italic", true, "api")
+      }
+    })
   }, [textString])
 
   useEffect(() => {
@@ -235,7 +253,7 @@ function useQuill({
     }
   }, [cursors])
 
-  return [ref, quill.current]
+  return [ref, quill]
 }
 
 function stopPropagation(e: React.SyntheticEvent) {
@@ -260,10 +278,7 @@ function applyDeltaToText(text: Automerge.Text, delta: Delta): void {
   })
 }
 
-async function createFrom(
-  contentData: ContentData.ContentData,
-  handle: DocHandle<TextDoc>
-) {
+async function createFrom(contentData: ContentData.ContentData, handle: DocHandle<TextDoc>) {
   const text = await WebStreamLogic.toString(contentData.data)
   handle.change((doc) => {
     doc.text = new Automerge.Text()
@@ -286,18 +301,29 @@ function create({ text }: any, handle: DocHandle<any>) {
   })
 }
 
-export const hasUnseenChanges = memoize(
-  (doc: Doc<unknown>, lastSeenHeads?: LastSeenHeads) => {
-    return getUnseenPatches(doc, lastSeenHeads).some(
-      (patch) =>
-        patch.action === "splice" &&
-        patch.path.length === 2 &&
-        patch.path[0] === "text"
-    )
-  },
-  (doc, lastSeenHeads) =>
-    `${getHeads(doc).join(",")}:${JSON.stringify(lastSeenHeads)}`
-)
+export function hasUnseenChanges(doc: Doc<unknown>, lastSeenHeads?: LastSeenHeads) {
+  return getUnseenPatches(doc, lastSeenHeads).some(
+    (patch) => patch.action === "splice" && patch.path.length === 2 && patch.path[0] === "text"
+  )
+}
+
+// TODO: this is not really checking if the user has been mentioned since the doc was last seen
+// as long as the user is mentioned in the doc once we consider any new changes to be unseen mentions
+export function hasUnseenMentions(
+  doc: Doc<unknown>,
+  lastSeenHeads: LastSeenHeads | undefined,
+  name: string
+) {
+  if (!name) {
+    debugger
+  }
+
+  const isUserMentionedInText = evalSearchFor(MENTION, (doc as TextDoc).text.toString()).some(
+    (match) => match.data.name.toLowerCase() === name.toLowerCase()
+  )
+
+  return isUserMentionedInText && hasUnseenChanges(doc, lastSeenHeads)
+}
 
 const supportsMimeType = (mimeType: string) => !!mimeType.match("text/")
 
@@ -313,4 +339,5 @@ export const contentType: ContentType = {
   createFrom,
   supportsMimeType,
   hasUnseenChanges,
+  hasUnseenMentions,
 }

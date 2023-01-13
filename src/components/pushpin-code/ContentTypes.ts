@@ -34,7 +34,12 @@ export interface ContentType {
   createFrom?: (contentData: ContentData, handle: DocHandle<any>) => Promise<void> | void
   supportsMimeType?: (type: string) => boolean
   // TODO: i don't love this, but we'll put it here for now
-  hasUnseenChanges?: (doc: Doc<unknown>, lastHeads: LastSeenHeads) => boolean
+  hasUnseenChanges?: (doc: Doc<unknown>, lastHeads?: LastSeenHeads) => boolean
+  hasUnseenMentions?: (
+    doc: Doc<unknown>,
+    lastHeads: LastSeenHeads | undefined,
+    name: string
+  ) => boolean
 }
 
 const registry: { [type: string]: ContentType } = {}

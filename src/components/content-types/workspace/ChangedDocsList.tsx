@@ -1,44 +1,88 @@
 import Badge from "../../ui/Badge"
-import Content, { ContentProps, EditableContentProps } from "../../Content"
+import Content from "../../Content"
 import { Popover } from "../../ui/Popover"
 import { useDocumentIds } from "../../pushpin-code/Hooks"
 import { openDoc, parseDocumentLink, PushpinUrl } from "../../pushpin-code/Url"
 import ListMenuItem from "../../ui/ListMenuItem"
 import "./ChangedDocsList.css"
-import { LastSeenHeadsMap } from "../../pushpin-code/Changes"
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import { Doc } from "@automerge/automerge"
+import { areHeadsEqual, getLastSeenHeadsMapOfWorkspace } from "../../pushpin-code/Changes"
+import { useSelf, useSelfId } from "../../pushpin-code/SelfHooks"
+import ListMenuSection from "../../ui/ListMenuSection"
+import Button from "../../ui/Button"
+import { DocumentId } from "automerge-repo"
+import { useDocument } from "automerge-repo-react-hooks"
+import { WorkspaceDoc } from "./Workspace"
+import { getHeads } from "@automerge/automerge"
 import ListItem from "../../ui/ListItem"
+import { HasBadge } from "../../../lenses/HasBadge"
+import { readWithSchema } from "../../../lenses"
+
 interface ChangedDocsListProps {
-  lastSeenHeads: LastSeenHeadsMap
+  workspaceDocId: DocumentId
 }
 
-export function ChangedDocsList({ lastSeenHeads }: ChangedDocsListProps) {
+export function ChangedDocsList({ workspaceDocId }: ChangedDocsListProps) {
+  const [workspaceDoc, changeWorkspaceDoc] = useDocument<WorkspaceDoc>(workspaceDocId)
+
+  const lastSeenHeadsMap = workspaceDoc ? getLastSeenHeadsMapOfWorkspace(workspaceDoc) : {}
+
+  const selfId = useSelfId()
+  const [self] = useSelf()
+
   const trackedDocuments = useDocumentIds(
-    Object.keys(lastSeenHeads).map((url) => parseDocumentLink(url).documentId)
+    Object.keys(lastSeenHeadsMap).map((url) => parseDocumentLink(url).documentId)
   )
 
-  const documentUrlsWithUnseenChanges = Object.entries(lastSeenHeads)
-    .filter(([documentUrl, lastSeenHead]) => {
-      const doc = trackedDocuments[parseDocumentLink(documentUrl).documentId]
+  if (!self) {
+    return null
+  }
 
-      if (!doc) {
+  const markAllDocumentAsRead = () => {
+    changeWorkspaceDoc((workspaceDoc) => {
+      workspaceDoc.persistedLastSeenHeads
+
+      for (const [url, lastSeenHead] of Object.entries(lastSeenHeadsMap)) {
+        const doc = trackedDocuments[parseDocumentLink(url).documentId]
+
+        if (!doc) {
+          continue
+        }
+
+        const latestHeads = getHeads(doc)
+
+        if (!areHeadsEqual(latestHeads, lastSeenHead)) {
+          workspaceDoc.persistedLastSeenHeads[url as PushpinUrl] = latestHeads
+        }
+      }
+    })
+  }
+
+  const documentsToNotifyAbout = Object.entries(lastSeenHeadsMap)
+    .filter(([documentUrl, lastSeenHeads]) => {
+      const rawDoc = trackedDocuments[parseDocumentLink(documentUrl).documentId]
+
+      if (!rawDoc) {
         return false
       }
 
-      const contentType = ContentTypes.typeNameToContentType(
-        parseDocumentLink(documentUrl).type
-      )
+      const type = parseDocumentLink(documentUrl).type
 
-      if (!contentType || !contentType.hasUnseenChanges) {
-        return false
-      }
-      return contentType.hasUnseenChanges(doc as Doc<unknown>, lastSeenHead)
+      const doc = readWithSchema({
+        doc: rawDoc,
+        type,
+        schema: "HasBadge",
+        props: {
+          lastSeenHeads,
+          selfId: selfId,
+          selfName: self.name,
+        },
+      }) as HasBadge
+
+      return doc.notify
     })
     .map(([url]) => url)
 
-  const hasDocumentsWithUnseenChanges =
-    documentUrlsWithUnseenChanges.length !== 0
+  const hasDocumentsToNotifyAbout = documentsToNotifyAbout.length !== 0
 
   return (
     <Popover
@@ -46,31 +90,40 @@ export function ChangedDocsList({ lastSeenHeads }: ChangedDocsListProps) {
       trigger={
         <Badge
           size="medium"
-          icon="bell"
+          icon="inbox"
           dot={
-            hasDocumentsWithUnseenChanges
+            hasDocumentsToNotifyAbout
               ? {
                   color: "var(--colorChangeDot)",
-                  number: documentUrlsWithUnseenChanges.length,
+                  number: documentsToNotifyAbout.length,
                 }
               : undefined
           }
         />
       }
-      alignment="right"
+      alignment="left"
     >
-      {documentUrlsWithUnseenChanges.map((url) => {
-        return (
-          <ListMenuItem key={url} onClick={() => openDoc(url as PushpinUrl)}>
-            <ListItem>
-              <Content url={url} context="badge" />
-              <Content url={url} context="title" />
-            </ListItem>
-          </ListMenuItem>
-        )
-      })}
-      {!hasDocumentsWithUnseenChanges && (
-        <div className="UnseenChangesDoc-emptyState">no new changes</div>
+      <ListMenuSection title="Inbox">
+        <div className="ChangedDocsList--content">
+          {documentsToNotifyAbout.map((url) => {
+            return (
+              <ListMenuItem key={url} onClick={() => openDoc(url as PushpinUrl)}>
+                <ListItem>
+                  <Content url={url} context="badge" />
+                  <Content url={url} context="title" />
+                </ListItem>
+              </ListMenuItem>
+            )
+          })}
+          {!hasDocumentsToNotifyAbout && (
+            <div className="ChangedDocsList--emptyState">no new changes</div>
+          )}
+        </div>
+      </ListMenuSection>
+      {hasDocumentsToNotifyAbout && (
+        <div className="ChangedDocsList--footer">
+          <Button onClick={markAllDocumentAsRead}>Mark all as read</Button>
+        </div>
       )}
     </Popover>
   )
