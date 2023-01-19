@@ -14,6 +14,7 @@ import {
   PushpinUrl,
 } from "../pushpin-code/Url"
 import { DocumentId } from "automerge-repo"
+import * as Automerge from "@automerge/automerge"
 
 export default function RawView(props: ContentProps) {
   const [doc, changeDoc] = useDocument(props.documentId)
@@ -90,9 +91,14 @@ export default function RawView(props: ContentProps) {
     return null
   }
 
+  var blobUrl = URL.createObjectURL(new Blob([Automerge.save(doc)]))
+
   return (
     <div className="RawView">
       <ReactJson src={doc} onEdit={onEdit} onAdd={onAdd} onDelete={onDelete} onSelect={onSelect} />
+      <a href={blobUrl} download={props.documentId + ".amrg"}>
+        Download this document...
+      </a>
     </div>
   )
 }
