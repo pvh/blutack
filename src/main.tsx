@@ -1,5 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
+import { SharedWorkerPolyfill as SharedWorker } from "@okikio/sharedworker"
 import Root from "./components/Root"
 import "./App.css"
 import "./ibm-plex.css"
