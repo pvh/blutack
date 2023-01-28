@@ -50,6 +50,10 @@ const repo = new Repo({
 self.addEventListener("connect", (e: MessageEvent) => {
   console.log("client connected to shared-worker")
   var mainPort = e.ports[0]
+  start(mainPort)
+})
+
+const start = (mainPort: MessagePort) => {
   mainPort.postMessage("READY")
   mainPort.onmessage = function (e: MessageEvent<SharedWorkerMessage>) {
     const data = e.data
@@ -61,7 +65,7 @@ self.addEventListener("connect", (e: MessageEvent) => {
       configureRepoNetworkPort(data.repoNetworkPort)
     }
   }
-})
+}
 
 function configureServiceWorkerPort(port: MessagePort) {
   port.onmessage = (e) => {
@@ -105,5 +109,10 @@ async function configureRepoNetworkPort(port: MessagePort) {
   )
 }, 100)
 */
+
+
+// This is the fallback for WebWorkers, in case the browser doesn't support SharedWorkers natively
+if (!("SharedWorkerGlobalScope" in self)) 
+    start(self as unknown as MessagePort)
 
 console.log("ran shared-worker to end")

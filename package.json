@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@automerge/automerge": "^2.0.1-alpha.1",
+    "@okikio/sharedworker": "^1.0.4",
     "@types/lodash.memoize": "^4.1.7",
     "automerge-repo": "0.0.40",
     "automerge-repo-network-messagechannel": "^0.0.40",
