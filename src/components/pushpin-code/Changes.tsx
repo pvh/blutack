@@ -143,8 +143,8 @@ export const getUnseenPatches = memoize(
       const oldDoc = clone(view(doc, lastSeenHeads as Heads))
 
       applyChanges(oldDoc, getChanges(oldDoc, doc), {
-        patchCallback: (patch: Patch) => {
-          patches.push(patch)
+        patchCallback: (patches: Patch[]) => {
+          patches.push(...patches)
         },
       })
 

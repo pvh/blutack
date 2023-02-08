@@ -10,18 +10,18 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@automerge/automerge-wasm@0.1.18":
-  version "0.1.18"
-  resolved "https://registry.yarnpkg.com/@automerge/automerge-wasm/-/automerge-wasm-0.1.18.tgz#83b09a7f6517856bd54e827389519754470c2f4a"
-  integrity sha512-0tlCLINoO3+lVP4vQmu2sMYoTjQIyKcXcPJB7wq679d6oz+2Y0Rg+X1G7cj7PFAPEhssKLhsoy6Vwy5her7LCA==
+"@automerge/automerge-wasm@0.1.24":
+  version "0.1.24"
+  resolved "https://registry.yarnpkg.com/@automerge/automerge-wasm/-/automerge-wasm-0.1.24.tgz#9d231d3017ce5a15ec97fe7ec6f3251b075059a2"
+  integrity sha512-ZNROb7tFocgFy1vrfjZWqu9nh7YScVJNNjPxYTzQCUTvLA4W6nlzxyXIUyFR+g0GxFc/YROUrIw3TNW5bYXwOQ==
 
-"@automerge/automerge@^2.0.1-alpha.1":
-  version "2.0.1-alpha.1"
-  resolved "https://registry.yarnpkg.com/@automerge/automerge/-/automerge-2.0.1-alpha.1.tgz#cf52250585b94b16b76931ffb44b310be9f56fe1"
-  integrity sha512-Gm5Rp7x0j08+ls68u5DxvR6W2xEKQTjR/vQUtVH5wdxCgRe8k3Uztk4FL9/eKlxX/Jb62iMHZvEhK6sE0RIdbg==
+"@automerge/automerge@2.0.2-alpha.1":
+  version "2.0.2-alpha.1"
+  resolved "https://registry.yarnpkg.com/@automerge/automerge/-/automerge-2.0.2-alpha.1.tgz#698f9c7346a5571a219016568fb54c4ed00a6820"
+  integrity sha512-W/GWpJj3KBg3suzy6d+fWVwXuexkgh1ikBsOOFN3QD7Tnd6QMv/BNqzDU+atrE1C88l+H+mRrXN6gRu0hbUKng==
   dependencies:
-    "@automerge/automerge-wasm" "0.1.18"
-    uuid "^8.3"
+    "@automerge/automerge-wasm" "0.1.24"
+    uuid "^9.0.0"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.18.6":
   version "7.18.6"
@@ -2027,7 +2027,7 @@ use-latest@^1.2.1:
   dependencies:
     use-isomorphic-layout-effect "^1.1.1"
 
-uuid@^8.3, uuid@^8.3.2:
+uuid@^8.3.2:
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
