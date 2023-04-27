@@ -39,10 +39,10 @@ let sharedWorker = await createSharedWorker()
 function createSharedWorker(): Promise<SharedWorker> {
   return new Promise((resolve) => {
     let interval = setInterval(() => {
-      let worker = new SharedWorker(
-        new URL("./shared-worker.ts", import.meta.url),
-        { type: "module", name: "automerge-repo-shared-worker" }
-      )
+      let worker = new SharedWorker(new URL("./shared-worker.ts", import.meta.url), {
+        type: "module",
+        name: "automerge-repo-shared-worker",
+      })
       worker.port.onmessage = (e) => {
         if (e.data === "READY") {
           clearInterval(interval)
@@ -64,9 +64,7 @@ async function introduceWorkers(sharedWorker: SharedWorker) {
   const channel = new MessageChannel()
 
   reg.active.postMessage({ sharedWorkerPort: channel.port1 }, [channel.port1])
-  sharedWorker.port.postMessage({ serviceWorkerPort: channel.port2 }, [
-    channel.port2,
-  ])
+  sharedWorker.port.postMessage({ serviceWorkerPort: channel.port2 }, [channel.port2])
   console.log("posted to both workers")
 }
 introduceWorkers(sharedWorker)
@@ -79,7 +77,7 @@ function setupSharedWorkerAndRepo() {
 
   const repo = new Repo({
     network: [new MessageChannelNetworkAdapter(repoNetworkChannel.port1)],
-    sharePolicy: (peerId) => peerId.includes("shared-worker"),
+    sharePolicy: async (peerId) => peerId.includes("shared-worker"),
   })
 
   ContentTypes.setRepo(repo)

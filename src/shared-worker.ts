@@ -5,11 +5,7 @@ import { DocumentId, PeerId, Repo } from "automerge-repo"
 import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechannel"
 import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
 import { BrowserWebSocketClientAdapter } from "automerge-repo-network-websocket"
-import {
-  BinaryDataId,
-  BinaryObjectDoc,
-  parseBinaryDataId,
-} from "./blobstore/Blob"
+import { BinaryDataId, BinaryObjectDoc, parseBinaryDataId } from "./blobstore/Blob"
 
 console.log("shared-worker starting up")
 import debug from "debug"
@@ -44,7 +40,7 @@ const repo = new Repo({
   storage: new LocalForageStorageAdapter(),
   network: [new BrowserWebSocketClientAdapter(url)],
   peerId: ("shared-worker-" + Math.round(Math.random() * 10000)) as PeerId,
-  sharePolicy: (peerId) => peerId.includes("storage-server"),
+  sharePolicy: async (peerId) => peerId.includes("storage-server"),
 })
 
 self.addEventListener("connect", (e: MessageEvent) => {
@@ -81,9 +77,7 @@ function configureServiceWorkerPort(port: MessagePort) {
       const { mimeType, binary } = doc
       var outboundBinary = new ArrayBuffer(binary.byteLength)
       new Uint8Array(outboundBinary).set(new Uint8Array(binary))
-      port.postMessage({ binaryDataId, mimeType, binary: outboundBinary }, [
-        outboundBinary,
-      ])
+      port.postMessage({ binaryDataId, mimeType, binary: outboundBinary }, [outboundBinary])
     })
     // and what if it doesn't work?
   }
