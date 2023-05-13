@@ -88,6 +88,9 @@ export default function Workspace({ documentId, currentDocUrl }: WorkspaceConten
       return
     }
 
+    if (!workspace) { console.log('tried to set the currentDocUrl too early'); return }
+    
+    if (workspace.viewedDocUrls[0] === currentDocUrl) { return }
     changeWorkspace((ws: WorkspaceDoc) => {
       ws.viewedDocUrls = ws.viewedDocUrls.filter((url) => url !== currentDocUrl)
       ws.viewedDocUrls.unshift(currentDocUrl)
@@ -125,32 +128,6 @@ export default function Workspace({ documentId, currentDocUrl }: WorkspaceConten
       })
     }
   }, [changeSelf, currentDeviceId, self])
-
-  /*  function importClip(payload: ClipperPayload) {
-    const creationCallback = (importedUrl) => {
-      changeWorkspace((d) => {
-        d.viewedDocUrls.unshift(importedUrl)
-      })
-    }
-
-    const { dataUrl, src, capturedAt } = payload
-
-    const dataUrlInfo = DataUrl.parse(dataUrl)
-    if (!dataUrlInfo) return
-    const { mimeType, data, isBase64 } = dataUrlInfo
-    const contentData = {
-      mimeType,
-      data: isBase64 ? WebStreamLogic.fromBase64(data) : WebStreamLogic.fromString(data),
-      src,
-      capturedAt,
-    }
-
-    if (mimeType.includes('text/plain')) {
-      importPlainText(data, creationCallback)
-    } else {
-      ContentTypes.createFrom(contentData, creationCallback)
-    }
-  }*/
 
   const contentRef = useRef<ContentHandle>(null)
 
