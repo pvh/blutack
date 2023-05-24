@@ -88,9 +88,15 @@ export default function Workspace({ documentId, currentDocUrl }: WorkspaceConten
       return
     }
 
-    if (!workspace) { console.log('tried to set the currentDocUrl too early'); return }
-    
-    if (workspace.viewedDocUrls[0] === currentDocUrl) { return }
+    if (!workspace) {
+      console.log("tried to set the currentDocUrl too early")
+      return
+    }
+
+    if (workspace.viewedDocUrls[0] === currentDocUrl) {
+      return
+    }
+
     changeWorkspace((ws: WorkspaceDoc) => {
       ws.viewedDocUrls = ws.viewedDocUrls.filter((url) => url !== currentDocUrl)
       ws.viewedDocUrls.unshift(currentDocUrl)
@@ -104,6 +110,10 @@ export default function Workspace({ documentId, currentDocUrl }: WorkspaceConten
   // store currentUrl of user in document
   useEffect(() => {
     if (!selfId) {
+      return
+    }
+
+    if (!currentDoc) {
       return
     }
 
