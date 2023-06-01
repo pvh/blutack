@@ -5,6 +5,7 @@ import { PushpinUrl } from "../../pushpin-code/Url"
 // board in various contexts
 import Board, { BOARD_COLORS } from "./Board"
 import BoardInBoard from "./BoardInBoard"
+import { List } from "@automerge/automerge"
 
 export type CardId = string & { cardId: true }
 
@@ -32,9 +33,7 @@ interface Attrs {
 const BOARD_COLOR_VALUES = Object.values(BOARD_COLORS)
 
 function randomColor(): string {
-  return BOARD_COLOR_VALUES[
-    Math.floor(Math.random() * BOARD_COLOR_VALUES.length)
-  ]
+  return BOARD_COLOR_VALUES[Math.floor(Math.random() * BOARD_COLOR_VALUES.length)]
 }
 
 function initializeBoard(
@@ -45,7 +44,7 @@ function initializeBoard(
     board.title = title
     board.backgroundColor = backgroundColor
     board.cards = {}
-    board.authorIds = []
+    board.authorIds = [] as unknown as List<DocumentId>
   })
 }
 

@@ -11,6 +11,7 @@ import { useDocument } from "automerge-repo-react-hooks"
 
 import { useSelfId } from "../../pushpin-code/SelfHooks"
 import { usePresence } from "../../pushpin-code/PresenceHooks"
+import { List } from "@automerge/automerge"
 
 const log = Debug("pushpin:authors")
 
@@ -35,20 +36,13 @@ export default function Authors({ workspaceDocId, currentDocUrl }: Props) {
     .filter((authorId) => authorId !== selfId)
     .filter((id, i, a) => a.indexOf(id) === i)
     .map((id) => (
-      <Author
-        key={id}
-        contactId={id}
-        isPresent={presence.some((p) => p.contact === id)}
-      />
+      <Author key={id} contactId={id} isPresent={presence.some((p) => p.contact === id)} />
     ))
 
   return <div className="Authors">{authors}</div>
 }
 
-export function useAuthors(
-  currentDocUrl: PushpinUrl,
-  workspaceDocId: DocumentId
-): DocumentId[] {
+export function useAuthors(currentDocUrl: PushpinUrl, workspaceDocId: DocumentId): DocumentId[] {
   const { type, documentId } = parseDocumentLink(currentDocUrl)
   const [workspace, changeWorkspace] = useDocument<WorkspaceDoc>(workspaceDocId)
   const [doc, changeDoc] = useDocument<DocWithAuthors>(documentId)
@@ -66,9 +60,7 @@ export function useAuthors(
     // Add any never-before seen authors to our contacts.
     // TODO: this is why we can't really delete authors from our contacts too
     changeWorkspace(({ contactIds }) => {
-      const newContactIds = authorIds.filter(
-        (a) => selfId !== a && !contactIds.includes(a)
-      )
+      const newContactIds = authorIds.filter((a) => selfId !== a && !contactIds.includes(a))
 
       if (newContactIds.length) {
         contactIds.push(...newContactIds)
@@ -87,7 +79,7 @@ export function useAuthors(
     // TODO: we should really block on doing this until first edit!
     changeDoc((doc) => {
       if (!doc.authorIds) {
-        doc.authorIds = []
+        doc.authorIds = [] as unknown as List<DocumentId>
       }
 
       if (selfId && !doc.authorIds.includes(selfId)) {

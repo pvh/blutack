@@ -14,10 +14,7 @@ export interface FileDoc {
   capturedAt: string
 }
 
-function create(
-  { title, extension, binaryDataId }: any,
-  handle: DocHandle<any>
-) {
+function create({ title, extension, binaryDataId }: any, handle: DocHandle<any>) {
   handle.change((doc) => {
     doc.title = title
     doc.extension = extension
@@ -25,15 +22,12 @@ function create(
   })
 }
 
-async function createFrom(
-  contentData: ContentData.ContentData,
-  handle: DocHandle<FileDoc>
-) {
+async function createFrom(contentData: ContentData.ContentData, handle: DocHandle<FileDoc>) {
   const name = contentData.name || contentData.src || "Nameless File"
   const binaryDataId = await ContentData.storeContentData(contentData)
   const { capturedAt } = contentData
 
-  handle.change((doc: FileDoc) => {
+  handle.change((doc) => {
     const parsed = path.parse(name)
     doc.binaryDataId = binaryDataId
     doc.title = parsed.name

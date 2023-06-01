@@ -21,7 +21,7 @@ import "./OmniboxWorkspaceListMenu.css"
 import ActionListItem from "./ActionListItem"
 import Heading from "../../../ui/Heading"
 import { DocumentId } from "automerge-repo"
-import { Doc } from "@automerge/automerge"
+import { Doc, List } from "@automerge/automerge"
 import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import { useDocumentIds, useDocuments } from "../../../pushpin-code/Hooks"
 import Content from "../../../Content"
@@ -435,7 +435,7 @@ export default function OmniboxWorkspaceListMenu(props: Props): ReactElement | n
     }
 
     const handle = repo.find<ContactDoc>(workspace.selfId)
-    handle.change((s: ContactDoc) => {
+    handle.change((s) => {
       if (!s.invites) {
         s.invites = {}
       }
@@ -444,7 +444,7 @@ export default function OmniboxWorkspaceListMenu(props: Props): ReactElement | n
       //     every single person who knows you
       // TODO: encrypt identity
       if (!s.invites[recipientId]) {
-        s.invites[recipientId] = []
+        s.invites[recipientId] = [] as unknown as List<PushpinUrl>
       }
 
       // TODO: prevent duplicate shares.
@@ -456,7 +456,7 @@ export default function OmniboxWorkspaceListMenu(props: Props): ReactElement | n
   const archiveDocument = (url: PushpinUrl) => {
     changeWorkspace((doc) => {
       if (!doc.archivedDocUrls) {
-        doc.archivedDocUrls = []
+        doc.archivedDocUrls = [] as unknown as List<PushpinUrl>
       }
 
       if (!doc.archivedDocUrls.includes(url)) {

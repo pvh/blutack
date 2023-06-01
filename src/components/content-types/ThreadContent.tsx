@@ -86,7 +86,7 @@ export default function ThreadContent(props: ContentProps) {
       }
 
       e.preventDefault()
-      changeDoc((threadDoc: ThreadDoc) => {
+      changeDoc((threadDoc) => {
         threadDoc.messages.push({
           authorId: props.selfId,
           content: url,
@@ -103,7 +103,7 @@ export default function ThreadContent(props: ContentProps) {
 
     const content = quill.current.getText().toString()
 
-    changeDoc((threadDoc: ThreadDoc) => {
+    changeDoc((threadDoc) => {
       threadDoc.messages.push({
         authorId: props.selfId,
         content,
@@ -219,8 +219,9 @@ export function getOldestUnseenMessageTimestamp(
       patch.path[0] === "messages" &&
       patch.path[2] === "time"
     ) {
-      if (oldestTimestamp === undefined || (patch.value && patch.value < oldestTimestamp)) {
-        oldestTimestamp = patch.value as number
+      const newTimestamp = patch.value as number
+      if (oldestTimestamp === undefined || (newTimestamp && newTimestamp < oldestTimestamp)) {
+        oldestTimestamp = newTimestamp
       }
     }
   })

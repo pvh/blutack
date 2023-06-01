@@ -1,10 +1,6 @@
 import React, { useContext, useRef, Ref, ChangeEvent } from "react"
 
-import {
-  createDocumentLink,
-  createWebLink,
-  parseDocumentLink,
-} from "../../pushpin-code/Url"
+import { createDocumentLink, createWebLink, parseDocumentLink } from "../../pushpin-code/Url"
 
 import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
 import { ContentProps } from "../../Content"
@@ -95,12 +91,7 @@ export default function ContactEditor(props: ContentProps) {
           <Heading>Edit Profile...</Heading>
         </div>
         {renderNameEditor(props.documentId)}
-        {renderAvatarEditor(
-          avatarBinaryId,
-          onFilesChanged,
-          hiddenFileInput,
-          onImportClick
-        )}
+        {renderAvatarEditor(avatarBinaryId, onFilesChanged, hiddenFileInput, onImportClick)}
         {renderPresenceColorSelector(color, setColor)}
         {renderDevices(devices, status, selfUrl, removeDevice, currentDeviceId)}
         <SharesSection invites={invites} />
@@ -114,36 +105,26 @@ const MergeProfileSection = () => {
   const repo = useRepo()
 
   async function mergeWithOtherProfile() {
-    const newProfileDocId = prompt(
-      "Please enter the id of the profile that you want to merge"
-    )
+    const newProfileDocId = prompt("Please enter the id of the profile that you want to merge")
 
     if (!newProfileDocId) {
       return
     }
 
-    const currentProfileDocId = (await localforage.getItem(
-      "workspaceDocId"
-    )) as DocumentId
+    const currentProfileDocId = (await localforage.getItem("workspaceDocId")) as DocumentId
 
     if (newProfileDocId === currentProfileDocId) {
       alert("You entered your current profile id")
       return
     }
 
-    const currentProfileDoc = (await repo
-      .find(currentProfileDocId)
-      .value()) as WorkspaceDoc
+    const currentProfileDoc = (await repo.find(currentProfileDocId).value()) as WorkspaceDoc
 
-    const newProfileDocHandle = repo.find<WorkspaceDoc>(
-      newProfileDocId as DocumentId
-    )
+    const newProfileDocHandle = repo.find<WorkspaceDoc>(newProfileDocId as DocumentId)
     const newProfileDoc = (await newProfileDocHandle.value()) as WorkspaceDoc
 
     // copy over contacts and viewed docs
-    newProfileDocHandle.change((doc) => {
-      const newProfileDoc = doc as WorkspaceDoc
-
+    newProfileDocHandle.change((newProfileDoc) => {
       if (!newProfileDoc.viewedDocUrls) {
         alert("The entered id is not a valid profile doc id")
         return
@@ -166,10 +147,7 @@ const MergeProfileSection = () => {
     newProfileDocHandle.addListener("change", async () => {
       await localforage.setItem("workspaceDocId", newProfileDocId)
 
-      location.href = createWebLink(
-        location,
-        createDocumentLink("contact", newProfileDoc.selfId)
-      )
+      location.href = createWebLink(location, createDocumentLink("contact", newProfileDoc.selfId))
     })
   }
 
@@ -189,9 +167,7 @@ const MergeProfileSection = () => {
           }}
         >
           <Button onClick={copyProfileId}>Copy profile id</Button>
-          <Button onClick={mergeWithOtherProfile}>
-            Abandon and merge profile
-          </Button>
+          <Button onClick={mergeWithOtherProfile}>Abandon and merge profile</Button>
         </CenteredStack>
       </ListMenuItem>
     </ListMenuSection>
@@ -222,13 +198,7 @@ const renderAvatarEditor = (
             marginTop: "var(--halfCellSize)",
           }}
         >
-          <Badge
-            img={
-              avatarBinaryId
-                ? createBinaryDataUrl(avatarBinaryId)
-                : DEFAULT_AVATAR_PATH
-            }
-          />
+          <Badge img={avatarBinaryId ? createBinaryDataUrl(avatarBinaryId) : DEFAULT_AVATAR_PATH} />
           <input
             style={{ display: "none" }}
             type="file"
@@ -244,10 +214,7 @@ const renderAvatarEditor = (
   )
 }
 
-const renderPresenceColorSelector = (
-  color: string,
-  setColor: (color: { hex: string }) => void
-) => (
+const renderPresenceColorSelector = (color: string, setColor: (color: { hex: string }) => void) => (
   <ListMenuSection title="Presence Color">
     <ListMenuItem>
       <ColorPicker
@@ -259,8 +226,8 @@ const renderPresenceColorSelector = (
     </ListMenuItem>
     <ListMenuItem>
       <SecondaryText>
-        Your presence colour will be used by other authors to identify you when
-        you are present within a document.
+        Your presence colour will be used by other authors to identify you when you are present
+        within a document.
       </SecondaryText>
     </ListMenuItem>
   </ListMenuSection>
@@ -274,11 +241,7 @@ const renderDevices = (
   currentDeviceId: DocumentId | undefined
 ) => {
   if (!devices) {
-    return (
-      <SecondaryText>
-        Something is wrong, you should always have a device!
-      </SecondaryText>
-    )
+    return <SecondaryText>Something is wrong, you should always have a device!</SecondaryText>
   }
   const renderedDevices = devices.map((deviceId: DocumentId) => (
     <ContactEditorDevice
@@ -305,8 +268,7 @@ const renderDevices = (
           <ListItem>
             <Badge backgroundColor="#00000000" size="medium" icon="cloud" />
             <SecondaryText>
-              You aren't currently synchronizing to any other devices identified
-              by this user ID.
+              You aren't currently synchronizing to any other devices identified by this user ID.
             </SecondaryText>
           </ListItem>
         </ListMenuItem>

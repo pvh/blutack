@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 import { createDocumentLink } from "../../pushpin-code/Url"
 import { DocumentId } from "automerge-repo"
-import { useDocument, Change } from "automerge-repo-react-hooks"
+import { useDocument } from "automerge-repo-react-hooks"
 import Content from "../../Content"
 import ActionListItem from "../workspace/omnibox/ActionListItem"
 import { DeviceDoc } from "../workspace/Device"
@@ -39,8 +39,7 @@ export default function ContactEditorDevice(props: Props) {
       faIcon: "fa-trash",
       label: "Remove",
       shortcut: "⌘+⌫",
-      keysForActionPressed: (e: KeyboardEvent) =>
-        (e.metaKey || e.ctrlKey) && e.key === "Backspace",
+      keysForActionPressed: (e: KeyboardEvent) => (e.metaKey || e.ctrlKey) && e.key === "Backspace",
     },
   ]
 

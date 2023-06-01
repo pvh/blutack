@@ -1,14 +1,7 @@
-import { Doc } from "@automerge/automerge"
+import { Doc, Extend } from "@automerge/automerge"
 import { DocumentId, DocCollection, DocHandle, ChannelId } from "automerge-repo"
 import { useDocument, useHandle, useRepo } from "automerge-repo-react-hooks"
-import {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  createContext,
-  useContext,
-} from "react"
+import { useEffect, useState, useRef, useCallback, createContext, useContext } from "react"
 import { parseDocumentLink, PushpinUrl } from "./Url"
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
@@ -132,14 +125,14 @@ export function useDocuments<T>(urls?: PushpinUrl[]): DocMap<T> {
 
 export function useDocumentReducer<D, A>(
   documentId: DocumentId | undefined,
-  reducer: (doc: D, action: A) => void,
+  reducer: (doc: Extend<D>, action: A) => void,
   deps?: any[]
 ): [Doc<D> | undefined, (action: A) => void] {
   const [doc, changeDoc] = useDocument<D>(documentId)
 
   const dispatch = useCallback(
     (action: A) => {
-      changeDoc((doc: D) => {
+      changeDoc((doc) => {
         reducer(doc, action)
       })
     },
@@ -297,9 +290,7 @@ export function useTimeouts<K>(
   return [bump, timedOut]
 }
 
-type InputEvent =
-  | React.ChangeEvent<HTMLInputElement>
-  | React.KeyboardEvent<HTMLInputElement>
+type InputEvent = React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>
 
 /**
  * Manages the state and events for an input element for which the input's value
@@ -395,9 +386,7 @@ export function useEvent<K extends string>(
  * always calls the latest callback. This is generally a good thing, but it's worth noting that it
  * could result in a race condition.
  */
-export function useStaticCallback<T extends (...args: any[]) => any>(
-  callback: T
-): T {
+export function useStaticCallback<T extends (...args: any[]) => any>(callback: T): T {
   const cb = useRef<T>(callback)
   cb.current = callback
 
@@ -410,10 +399,7 @@ type Setter<T> = ((state: T) => T) | T
  * handle object used as key to which shared state is associated with
  * there for thing wishing to share the state will need to share the handle.
  */
-export function useSharedState<T>(
-  id: string,
-  defaultValue: T
-): [T, (v: Setter<T>) => void] {
+export function useSharedState<T>(id: string, defaultValue: T): [T, (v: Setter<T>) => void] {
   const atom = Atom.new(id, defaultValue)
   const [state, setState] = useState(atom.value)
   useEffect((): (() => void) => {

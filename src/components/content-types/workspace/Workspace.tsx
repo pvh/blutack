@@ -26,6 +26,7 @@ import { ContentListDoc } from "../ContentList"
 import { ViewStateContext } from "../../pushpin-code/ViewState"
 import { PersistedLastSeenHeadsMap } from "../../pushpin-code/Changes"
 import { useMentionAutocompletion } from "../../pushpin-code/Searches"
+import { List } from "@automerge/automerge"
 
 const log = Debug("pushpin:workspace")
 
@@ -97,12 +98,23 @@ export default function Workspace({ documentId, currentDocUrl }: WorkspaceConten
       return
     }
 
-    changeWorkspace((ws: WorkspaceDoc) => {
-      ws.viewedDocUrls = ws.viewedDocUrls.filter((url) => url !== currentDocUrl)
+    changeWorkspace((ws) => {
+      // Unfortunately, assigning the result of a filter will replace the whole array.
+      // As a result, we do an iteration over the array, splicing one at a time if required.
+      for (var i = 0; i < ws.viewedDocUrls.length; i++) {
+        if (ws.viewedDocUrls[i] === currentDocUrl) {
+          ws.viewedDocUrls.splice(i, 1)
+          i-- // decrement index if item is removed
+        }
+      }
       ws.viewedDocUrls.unshift(currentDocUrl)
 
-      if (ws.archivedDocUrls) {
-        ws.archivedDocUrls = ws.archivedDocUrls.filter((url) => url !== currentDocUrl)
+      // Unarchive a document implicitly if we open it.
+      for (var i = 0; i < ws.archivedDocUrls.length; i++) {
+        if (ws.archivedDocUrls[i] === currentDocUrl) {
+          ws.archivedDocUrls.splice(i, 1)
+          i-- // decrement index if item is removed
+        }
       }
     })
   }, [currentDocUrl])
@@ -130,9 +142,9 @@ export default function Workspace({ documentId, currentDocUrl }: WorkspaceConten
     }
 
     if (currentDeviceId && (!self.devices || !self.devices.includes(currentDeviceId))) {
-      changeSelf((doc: ContactDoc) => {
+      changeSelf((doc) => {
         if (!doc.devices) {
-          doc.devices = []
+          doc.devices = [] as unknown as List<DocumentId>
         }
         doc.devices.push(currentDeviceId)
       })

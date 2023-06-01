@@ -12,7 +12,7 @@ import Button from "../../ui/Button"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 import { WorkspaceDoc } from "./Workspace"
-import { getHeads } from "@automerge/automerge"
+import { getHeads, List } from "@automerge/automerge"
 import ListItem from "../../ui/ListItem"
 import { HasBadge } from "../../../lenses/HasBadge"
 import { readWithSchema } from "../../../lenses"
@@ -51,7 +51,7 @@ export function ChangedDocsList({ workspaceDocId }: ChangedDocsListProps) {
         const latestHeads = getHeads(doc)
 
         if (!areHeadsEqual(latestHeads, lastSeenHead)) {
-          workspaceDoc.persistedLastSeenHeads[url as PushpinUrl] = latestHeads
+          workspaceDoc.persistedLastSeenHeads[url as PushpinUrl] = latestHeads as List<string>
         }
       }
     })

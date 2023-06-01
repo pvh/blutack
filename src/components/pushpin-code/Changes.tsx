@@ -11,6 +11,7 @@ import {
   applyChanges,
   clone,
   Patch,
+  List,
 } from "@automerge/automerge"
 
 import { readAsHasBadge } from "../../lenses/HasBadge"
@@ -36,7 +37,7 @@ export function useAdvanceLastSeenHeads(docUrl: PushpinUrl) {
         lastSeenHeadsByDocUrl = workspaceDoc.persistedLastSeenHeads
       }
 
-      lastSeenHeadsByDocUrl[docUrl] = getHeads(doc)
+      lastSeenHeadsByDocUrl[docUrl] = getHeads(doc) as List<string>
     })
   }, [doc, changeWorkspaceDoc])
 }
@@ -114,7 +115,7 @@ function usePersistedLastSeenHeads(docUrl: PushpinUrl): Heads | undefined {
         lastSeenHeadsByDocUrl = workspaceDoc.persistedLastSeenHeads
       }
 
-      lastSeenHeadsByDocUrl[docUrl] = []
+      lastSeenHeadsByDocUrl[docUrl] = [] as unknown as List<string>
     })
   }
 

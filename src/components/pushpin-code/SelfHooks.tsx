@@ -1,4 +1,4 @@
-import { Doc } from "@automerge/automerge"
+import { Doc, Extend } from "@automerge/automerge"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
@@ -17,7 +17,7 @@ export function useSelfId(): DocumentId {
 
 export function useSelf(): [
   doc: Doc<ContactDoc> | undefined,
-  changeFn: (cf: (d: ContactDoc) => void) => void
+  changeFn: (cf: (d: Extend<ContactDoc>) => void) => void
 ] {
   const selfId = useSelfId()
   return useDocument<ContactDoc>(selfId)

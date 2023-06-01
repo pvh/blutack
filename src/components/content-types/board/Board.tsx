@@ -35,10 +35,7 @@ import {
   BoardDocManipulationAction,
 } from "./BoardDocManipulation"
 
-import {
-  MIMETYPE_BOARD_CARD_DRAG_ORIGIN,
-  MIMETYPE_BOARD_CARD_DATA,
-} from "../../constants"
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN, MIMETYPE_BOARD_CARD_DATA } from "../../constants"
 import { useDocumentReducer } from "../../pushpin-code/Hooks"
 import { openDoc } from "../../pushpin-code/Url"
 
@@ -79,12 +76,11 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
   }))
 
   const boardRef = useRef<HTMLDivElement>(null)
-  const { selection, selectOnly, selectToggle, selectNone } =
-    useSelection<CardId>(props.documentId)
+  const { selection, selectOnly, selectToggle, selectNone } = useSelection<CardId>(props.documentId)
 
   const [doc, dispatch] = useDocumentReducer<BoardDoc, BoardAction>(
     props.documentId,
-    (doc: BoardDoc, action: BoardAction) => {
+    (doc: /* BoardDoc */ any, action: BoardAction) => {
       switch (action.type) {
         // board actions
         case "AddCardForContent":
@@ -136,11 +132,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
 
   // xxx: this one is tricky because it feels like it should be in boardDocManipulation
   // but there isn't really a good way to get the cardId back from the dispatch
-  function addAndSelectCard(
-    doc: BoardDoc,
-    card: BoardDocCard,
-    shouldSelect?: boolean
-  ) {
+  function addAndSelectCard(doc: BoardDoc, card: BoardDocCard, shouldSelect?: boolean) {
     const cardId = addCardForContent(doc, card)
     if (shouldSelect) {
       selectOnly(cardId)
@@ -157,11 +149,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
     e.stopPropagation()
   }
 
-  const onCardDoubleClicked = (
-    doc: BoardDoc,
-    id: CardId,
-    e: React.MouseEvent
-  ) => {
+  const onCardDoubleClicked = (doc: BoardDoc, id: CardId, e: React.MouseEvent) => {
     const card = doc.cards[id]
     if (card && card.url) {
       openDoc(card.url)
@@ -227,9 +215,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
       e.stopPropagation()
 
       // If we have an origin board, and it's us, this is a move operation.
-      const originBoard = e.dataTransfer.getData(
-        MIMETYPE_BOARD_CARD_DRAG_ORIGIN
-      )
+      const originBoard = e.dataTransfer.getData(MIMETYPE_BOARD_CARD_DRAG_ORIGIN)
       if (originBoard === props.documentId) {
         onDropInternal(e)
       } else {
@@ -263,9 +249,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
             x: c.x + offset.x,
             y: c.y + offset.y,
           }))
-          .forEach((card: BoardDocCard) =>
-            dispatch({ type: "AddCardForContent", card })
-          )
+          .forEach((card: BoardDocCard) => dispatch({ type: "AddCardForContent", card }))
         return
       }
 
@@ -304,10 +288,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
       const boardCards = selection
         .map((c) => cards[c])
         .map((c) => ({ ...c, x: c.x - offset.x, y: c.y - offset.y }))
-      e.clipboardData.setData(
-        MIMETYPE_BOARD_CARD_DATA,
-        JSON.stringify(boardCards)
-      )
+      e.clipboardData.setData(MIMETYPE_BOARD_CARD_DATA, JSON.stringify(boardCards))
     },
     [cards, selection]
   )
@@ -354,10 +335,7 @@ const Board: FunctionComponent<ContentProps> = (props: ContentProps) => {
   )
 
   const docTitle = doc && doc.title ? doc.title : ""
-  const contentTypes = useMemo(
-    () => ContentTypes.list({ context: "board" }),
-    []
-  )
+  const contentTypes = useMemo(() => ContentTypes.list({ context: "board" }), [])
   const { backgroundColor = "#fff" } = doc || {}
 
   const style = useMemo(
