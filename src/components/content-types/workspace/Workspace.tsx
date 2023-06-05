@@ -110,6 +110,9 @@ export default function Workspace({ documentId, currentDocUrl }: WorkspaceConten
       ws.viewedDocUrls.unshift(currentDocUrl)
 
       // Unarchive a document implicitly if we open it.
+      if (!ws.archivedDocUrls) {
+        ws.archivedDocUrls = [] as unknown as List<PushpinUrl>
+      }
       for (var i = 0; i < ws.archivedDocUrls.length; i++) {
         if (ws.archivedDocUrls[i] === currentDocUrl) {
           ws.archivedDocUrls.splice(i, 1)
