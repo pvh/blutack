@@ -18,8 +18,8 @@
   cursor: text;
   padding: var(--halfCellSize);
 }
-.Workspace__container--text .ql-editor,
-.ContentList--main > .TextContent .ql-editor {
+.Workspace__container--text .ProseMirror,
+.ContentList--main > .TextContent .ProseMirror {
   padding: var(--doubleCellSize);
   max-width: 720px;
 }
@@ -87,4 +87,10 @@
   left: -5px;
   background: var(--colorSecondaryGrey);
   padding: 0 5px;
+}
+
+/* Prosemirror overrides */
+
+.ProseMirror-focused {
+  outline: 0 !important;
 }

@@ -10,17 +10,17 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@automerge/automerge-wasm@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@automerge/automerge-wasm/-/automerge-wasm-0.2.0.tgz#69c1155cbccc1c90b4df1795a4692e64f3752acc"
-  integrity sha512-Qr7XIlBI+b1xm8fz0JHclgfxAPv8iL3xrjX4t0XEdExN2IfMLtiOYXGwzn5QUPM00vfgIQmjNhr/2SXAm9aN/A==
+"@automerge/automerge-wasm@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@automerge/automerge-wasm/-/automerge-wasm-0.2.1.tgz#5c73d224b4507fc619b502e145428f9f56406579"
+  integrity sha512-Q8EX5g15EgA3pCurHPb5F0UyRW9DvJa3bHK/5yup3PufNGssEF0jgYiONrfTRwZgbvOsRWmtgjNbe4g7dRTp5A==
 
-"@automerge/automerge@2.1.0-alpha.1":
-  version "2.1.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/@automerge/automerge/-/automerge-2.1.0-alpha.1.tgz#94ca560e133f3c6895b7c2bc823547c9718c4cf7"
-  integrity sha512-GSvcPN6gDRS+p1j2CkIqjzoREWnQOvV13uFeCuihD7GEzdWDt5jNIu5EoHgtc9LfN1NrS6w+2WISXfTm+d7MdQ==
+"@automerge/automerge@^2.1.0-alpha.2":
+  version "2.1.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/@automerge/automerge/-/automerge-2.1.0-alpha.2.tgz#39c04810f2fbfb06ddca143fb2106b45476311bc"
+  integrity sha512-MbdUGckRqxN8jx7b0ccrM04gYYUwtuYkwEHrOHFbnOP2pTZW+oY5uC++E080p5l/wR9YHAfjeR8OgvSh3Bfrvw==
   dependencies:
-    "@automerge/automerge-wasm" "^0.2.0"
+    "@automerge/automerge-wasm" "^0.2.1"
     uuid "^9.0.0"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.18.6":
@@ -752,42 +752,49 @@ asap@~2.0.3:
   resolved "https://registry.yarnpkg.com/asap/-/asap-2.0.6.tgz#e50347611d7e690943208bbdafebcbc2fb866d46"
   integrity sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==
 
-automerge-repo-network-messagechannel@^0.0.40:
-  version "0.0.40"
-  resolved "https://registry.yarnpkg.com/automerge-repo-network-messagechannel/-/automerge-repo-network-messagechannel-0.0.40.tgz#2563efdf7ce7d73224da832827a243a8e39ce356"
-  integrity sha512-qInyqs8ParnEoteXymzzL+V0sPU/kLRoCe2OONK4uLy5CYloiwWcu8CtwSje9/sq6xVk2+wY2Lpm64gqXJunrA==
+automerge-repo-network-broadcastchannel@^0.0.53:
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/automerge-repo-network-broadcastchannel/-/automerge-repo-network-broadcastchannel-0.0.53.tgz#dfbac38783802e3db528270928aa2dfe5db93b5c"
+  integrity sha512-9+bJFAcjm32fCJeDT+rSyJ0uM4gZzcHPMWNIzebOf8jWzd1KTovqm28Dehy5U5Apv7v4ygK9bwHA1JEWkLg4FA==
   dependencies:
-    automerge-repo "*"
+    automerge-repo "^0.0.53"
 
-automerge-repo-network-websocket@0.0.31:
-  version "0.0.31"
-  resolved "https://registry.yarnpkg.com/automerge-repo-network-websocket/-/automerge-repo-network-websocket-0.0.31.tgz#f46008c6c147215eb07de2e4952819b579b613c0"
-  integrity sha512-Qx26EGDSheq66Iise82J9I6mt/9cFS4qiWx4EPvGW8hyWAiSjwygKrYOuQiTlhyZLOJrr3DX+coz+NdaTT/Pqg==
+automerge-repo-network-messagechannel@^0.0.53:
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/automerge-repo-network-messagechannel/-/automerge-repo-network-messagechannel-0.0.53.tgz#91de080b983cbca51ff7b1c281be64f9677f3e8a"
+  integrity sha512-qDzMoK/VJ2fDBSs3tZA0y/JezBC+MVSlaq8Th7cdV+Oji4pailFrWIRazZxWQOYhCwA+wM0jR+wJ5rZh60jQNg==
   dependencies:
-    automerge-repo "*"
+    automerge-repo "^0.0.53"
+
+automerge-repo-network-websocket@^0.0.53:
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/automerge-repo-network-websocket/-/automerge-repo-network-websocket-0.0.53.tgz#c4c28a99896f0e40c235a3f144b0c8ae0260bc7f"
+  integrity sha512-c8xAtWA2yC0MuJZTTE+eWgGNy3t0PZmlAMbPvVr5nQ0ebD0HMkHj7UeLl72W0KNAQuA3kK3MLGqMuB5iyEgtFg==
+  dependencies:
+    automerge-repo "^0.0.53"
     cbor-x "^1.3.0"
     eventemitter3 "^4.0.7"
     isomorphic-ws "^5.0.0"
 
-automerge-repo-react-hooks@0.0.42:
-  version "0.0.42"
-  resolved "https://registry.yarnpkg.com/automerge-repo-react-hooks/-/automerge-repo-react-hooks-0.0.42.tgz#e6e8df9db8600e5f2b43754f67233e639a80db74"
-  integrity sha512-J5yKPHxSSn2RH3PXGrxIcUUSu+6RJgxUOtlaKrcMbU8KbVh48iqEwPimtxZZwdW73syN7oX9kKBRAQYg3szv/g==
+automerge-repo-react-hooks@^0.0.53:
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/automerge-repo-react-hooks/-/automerge-repo-react-hooks-0.0.53.tgz#07fcebec3b158110fa106c87975a30efc78219cd"
+  integrity sha512-MAkc79ADgcy+jYYyRMxQJQQTGPMMPRAgTuVl3NLsKc2hqs0JBMtJ1IgucZswdRIcoZopFTXt/6RGrwslnSnZiQ==
   dependencies:
-    automerge-repo "*"
+    automerge-repo "^0.0.53"
 
-automerge-repo-storage-localforage@^0.0.11:
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/automerge-repo-storage-localforage/-/automerge-repo-storage-localforage-0.0.11.tgz#967fe4a623794954e3480bafd93e09c13a6a99ff"
-  integrity sha512-NUpDMTHgE1KkAZvk97TuppV3G8PnPtitnb+7InNeqnQYzih3Jq17M5KrP/onaWisTkpTyE11vKwwsHB7HIp4WA==
+automerge-repo-storage-localforage@^0.0.53:
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/automerge-repo-storage-localforage/-/automerge-repo-storage-localforage-0.0.53.tgz#5bf7cae48835cc444ce5c3abe74a86f47a2632fa"
+  integrity sha512-fVnpblX6hG5FA8i+6JbbtQBWifrUn59IFw9XlbIs8IYEojAnBoFkp/gTfr9N30F3mba7fiZbAsg0Udo6nOFzSw==
   dependencies:
-    automerge-repo "*"
+    automerge-repo "^0.0.53"
     localforage "^1.10.0"
 
-automerge-repo@*, automerge-repo@0.0.40:
-  version "0.0.40"
-  resolved "https://registry.yarnpkg.com/automerge-repo/-/automerge-repo-0.0.40.tgz#fd5f054b368ded855992193c4fe48d3129b2afb9"
-  integrity sha512-QTFCstMOPFNO9x+H9A599LnX/eKQMwZJbVdSVv/41c+MGgdvn0E6STLigBMvHaa1cBwx2TzFP/YC7pNiHa9mBQ==
+automerge-repo@^0.0.53:
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/automerge-repo/-/automerge-repo-0.0.53.tgz#e44924552c801bd72ec819a42ead27a73554c386"
+  integrity sha512-9jn/tBtNORd+SgCFX5eXjSOQEz1jDSYyiipQNxwcP4ZhLfJk0i1wWfFydEGb7hLq3Ds87l09n9JHkCywhUtPlQ==
   dependencies:
     cbor-x "^1.3.0"
     debug "^4.3.4"
@@ -795,6 +802,20 @@ automerge-repo@*, automerge-repo@0.0.40:
     tiny-typed-emitter "^2.1.0"
     ts-node "^10.9.1"
     uuid "^8.3.2"
+    xstate "^4.37.0"
+
+automerge-repo@^0.0.54:
+  version "0.0.54"
+  resolved "https://registry.yarnpkg.com/automerge-repo/-/automerge-repo-0.0.54.tgz#a0c04c43f62736628d3cbf6e9f2752eb98cf97c1"
+  integrity sha512-VXNZo61gz/Id3xZEtTn6QUxcn2uWdyeEF0SNq/USp5waM+H+nqQAoEPMg7GPoAAI5Yxfl77OIDOPPogZzvZqnw==
+  dependencies:
+    cbor-x "^1.3.0"
+    debug "^4.3.4"
+    eventemitter3 "^4.0.7"
+    tiny-typed-emitter "^2.1.0"
+    ts-node "^10.9.1"
+    uuid "^8.3.2"
+    xstate "^4.37.0"
 
 babel-plugin-macros@^3.1.0:
   version "3.1.0"
@@ -1552,6 +1573,11 @@ object-keys@^1.1.1:
   resolved "https://registry.yarnpkg.com/object-keys/-/object-keys-1.1.1.tgz#1c47f272df277f3b1daf061677d9c82e2322c60e"
   integrity sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==
 
+orderedmap@^2.0.0:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/orderedmap/-/orderedmap-2.1.1.tgz#61481269c44031c449915497bf5a4ad273c512d2"
+  integrity sha512-TvAWxi0nDe1j/rtMcWcIj94+Ffe6n7zhow33h40SKxmsmozs6dz/e+EajymfoFcHd7sxNn8yHM8839uixMOV6g==
+
 parchment@^1.1.2, parchment@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/parchment/-/parchment-1.1.4.tgz#aeded7ab938fe921d4c34bc339ce1168bc2ffde5"
@@ -1662,6 +1688,72 @@ prop-types@^15.5.10, prop-types@^15.6.2:
     loose-envify "^1.4.0"
     object-assign "^4.1.1"
     react-is "^16.13.1"
+
+prosemirror-commands@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/prosemirror-commands/-/prosemirror-commands-1.5.2.tgz#e94aeea52286f658cd984270de9b4c3fff580852"
+  integrity sha512-hgLcPaakxH8tu6YvVAaILV2tXYsW3rAdDR8WNkeKGcgeMVQg3/TMhPdVoh7iAmfgVjZGtcOSjKiQaoeKjzd2mQ==
+  dependencies:
+    prosemirror-model "^1.0.0"
+    prosemirror-state "^1.0.0"
+    prosemirror-transform "^1.0.0"
+
+prosemirror-history@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/prosemirror-history/-/prosemirror-history-1.3.2.tgz#ce6ad7ab9db83e761aee716f3040d74738311b15"
+  integrity sha512-/zm0XoU/N/+u7i5zepjmZAEnpvjDtzoPWW6VmKptcAnPadN/SStsBjMImdCEbb3seiNTpveziPTIrXQbHLtU1g==
+  dependencies:
+    prosemirror-state "^1.2.2"
+    prosemirror-transform "^1.0.0"
+    prosemirror-view "^1.31.0"
+    rope-sequence "^1.3.0"
+
+prosemirror-keymap@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/prosemirror-keymap/-/prosemirror-keymap-1.2.2.tgz#14a54763a29c7b2704f561088ccf3384d14eb77e"
+  integrity sha512-EAlXoksqC6Vbocqc0GtzCruZEzYgrn+iiGnNjsJsH4mrnIGex4qbLdWWNza3AW5W36ZRrlBID0eM6bdKH4OStQ==
+  dependencies:
+    prosemirror-state "^1.0.0"
+    w3c-keyname "^2.2.0"
+
+prosemirror-model@^1.0.0, prosemirror-model@^1.16.0, prosemirror-model@^1.19.0, prosemirror-model@^1.19.2:
+  version "1.19.2"
+  resolved "https://registry.yarnpkg.com/prosemirror-model/-/prosemirror-model-1.19.2.tgz#297c9ecfb103154e605f0dbaf3cc72ee32ca0ad5"
+  integrity sha512-RXl0Waiss4YtJAUY3NzKH0xkJmsZupCIccqcIFoLTIKFlKNbIvFDRl27/kQy1FP8iUAxrjRRfIVvOebnnXJgqQ==
+  dependencies:
+    orderedmap "^2.0.0"
+
+prosemirror-schema-basic@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/prosemirror-schema-basic/-/prosemirror-schema-basic-1.2.2.tgz#6695f5175e4628aab179bf62e5568628b9cfe6c7"
+  integrity sha512-/dT4JFEGyO7QnNTe9UaKUhjDXbTNkiWTq/N4VpKaF79bBjSExVV2NXmJpcM7z/gD7mbqNjxbmWW5nf1iNSSGnw==
+  dependencies:
+    prosemirror-model "^1.19.0"
+
+prosemirror-state@^1.0.0, prosemirror-state@^1.2.2, prosemirror-state@^1.4.3:
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/prosemirror-state/-/prosemirror-state-1.4.3.tgz#94aecf3ffd54ec37e87aa7179d13508da181a080"
+  integrity sha512-goFKORVbvPuAQaXhpbemJFRKJ2aixr+AZMGiquiqKxaucC6hlpHNZHWgz5R7dS4roHiwq9vDctE//CZ++o0W1Q==
+  dependencies:
+    prosemirror-model "^1.0.0"
+    prosemirror-transform "^1.0.0"
+    prosemirror-view "^1.27.0"
+
+prosemirror-transform@^1.0.0, prosemirror-transform@^1.1.0:
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/prosemirror-transform/-/prosemirror-transform-1.7.3.tgz#cc2225cd1bf88a3c62404b9eb051ff73e9c716a6"
+  integrity sha512-qDapyx5lqYfxVeUWEw0xTGgeP2S8346QtE7DxkalsXlX89lpzkY6GZfulgfHyk1n4tf74sZ7CcXgcaCcGjsUtA==
+  dependencies:
+    prosemirror-model "^1.0.0"
+
+prosemirror-view@^1.27.0, prosemirror-view@^1.31.0, prosemirror-view@^1.31.3:
+  version "1.31.4"
+  resolved "https://registry.yarnpkg.com/prosemirror-view/-/prosemirror-view-1.31.4.tgz#d9a40363bf517605f77a5cfe6c0106958a7dbe5e"
+  integrity sha512-nJzH2LpYbonSTYFqQ1BUdEhbd1WPN/rp/K9T9qxBEYpgg3jK3BvEUCR45Ymc9IHpO0m3nBJwPm19RBxZdoBVuw==
+  dependencies:
+    prosemirror-model "^1.16.0"
+    prosemirror-state "^1.0.0"
+    prosemirror-transform "^1.1.0"
 
 punycode@^2.1.0:
   version "2.1.1"
@@ -1873,6 +1965,11 @@ rollup@^2.79.1:
   optionalDependencies:
     fsevents "~2.3.2"
 
+rope-sequence@^1.3.0:
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/rope-sequence/-/rope-sequence-1.3.4.tgz#df85711aaecd32f1e756f76e43a415171235d425"
+  integrity sha512-UT5EDe2cu2E/6O4igUr5PSFs23nvvukicWHx6GnOPlHAiiYbzNuCRQCuiUdHJQcqKalLKlrYJnjY0ySGsXNQXQ==
+
 scheduler@^0.23.0:
   version "0.23.0"
   resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.23.0.tgz#ba8041afc3d30eb206a487b6b384002e4e61fdfe"
@@ -2068,6 +2165,11 @@ vite@^3, vite@^3.1.0:
   optionalDependencies:
     fsevents "~2.3.2"
 
+w3c-keyname@^2.2.0:
+  version "2.2.7"
+  resolved "https://registry.yarnpkg.com/w3c-keyname/-/w3c-keyname-2.2.7.tgz#e29549e9ac97ac5cb2993c8222994e97922ef377"
+  integrity sha512-XB8aa62d4rrVfoZYQaYNy3fy+z4nrfy2ooea3/0BnBzXW0tSdZ+lRgjzBZhk0La0H6h8fVyYCxx/qkQcAIuvfg==
+
 web-streams-polyfill@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.2.1.tgz#71c2718c52b45fd49dbeee88634b3a60ceab42a6"
@@ -2085,6 +2187,11 @@ whatwg-url@^5.0.0:
   dependencies:
     tr46 "~0.0.3"
     webidl-conversions "^3.0.0"
+
+xstate@^4.37.0:
+  version "4.37.2"
+  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.37.2.tgz#c5f4c1d8062784238b91e2dfddca05f821cb4eac"
+  integrity sha512-Qm337O49CRTZ3PRyRuK6b+kvI+D3JGxXIZCTul+xEsyFCVkTFDt5jixaL1nBWcUBcaTQ9um/5CRGVItPi7fveg==
 
 yaml@^1.10.0:
   version "1.10.2"

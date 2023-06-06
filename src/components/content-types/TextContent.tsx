@@ -1,30 +1,36 @@
-import React, { useEffect, useRef, useMemo, useState, useId } from "react"
+import React, { useEffect, useMemo, useRef } from "react"
 
 import * as Automerge from "@automerge/automerge"
-import Quill, { TextChangeHandler, QuillOptionsStatic, SelectionChangeHandler } from "quill"
-import Delta from "quill-delta"
+import { Doc, getHeads } from "@automerge/automerge"
+import { init as initPm, PatchSemaphore, plugin as amgPlugin } from "@automerge/prosemirror"
+import { Command, EditorState, Transaction } from "prosemirror-state"
+import { keymap } from "prosemirror-keymap"
+import { baseKeymap, toggleMark } from "prosemirror-commands"
+import { history, redo, undo } from "prosemirror-history"
+import { schema } from "prosemirror-schema-basic"
+import { EditorView } from "prosemirror-view"
+import Quill, { QuillOptionsStatic, SelectionChangeHandler, TextChangeHandler } from "quill"
 import { ContentType } from "../pushpin-code/ContentTypes"
-import { ContentProps, EditableContentProps } from "../Content"
-import { useDocument } from "automerge-repo-react-hooks"
-import { useDocumentIds, useStaticCallback } from "../pushpin-code/Hooks"
+import { ContentProps } from "../Content"
+import { useHandle } from "automerge-repo-react-hooks"
 import "./TextContent.css"
 import * as ContentData from "../pushpin-code/ContentData"
 import * as WebStreamLogic from "../pushpin-code/WebStreamLogic"
-import { DocHandle, DocumentId } from "automerge-repo"
+import { DocHandle, DocHandlePatchPayload, DocumentId } from "automerge-repo"
 import QuillCursors from "quill-cursors"
-import { usePresence } from "../pushpin-code/PresenceHooks"
 import IQuillRange from "quill-cursors/dist/quill-cursors/i-range"
-import { useSelfId } from "../pushpin-code/SelfHooks"
-import { ContactDoc } from "./contact"
 import {
   getUnseenPatches,
   LastSeenHeads,
   useAutoAdvanceLastSeenHeads,
 } from "../pushpin-code/Changes"
 import { createDocumentLink } from "../pushpin-code/Url"
-import { Doc, getHeads, Heads, view } from "@automerge/automerge"
 import { evalAllSearches, evalSearchFor, Match, MENTION } from "../pushpin-code/Searches"
 import "./Autocompletion.js"
+import { MarkType } from "prosemirror-model"
+import { useDocumentIds, useStaticCallback } from "../pushpin-code/Hooks"
+import { ContactDoc } from "./contact"
+import Delta from "quill-delta"
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -41,17 +47,73 @@ TextContent.minWidth = 6
 TextContent.minHeight = 2
 TextContent.defaultWidth = 15
 
+const toggleBold = toggleMarkCommand(schema.marks.strong)
+const toggleItalic = toggleMarkCommand(schema.marks.em)
+
+function toggleMarkCommand(mark: MarkType): Command {
+  return (state: EditorState, dispatch: ((tr: Transaction) => void) | undefined) => {
+    return toggleMark(mark)(state, dispatch)
+  }
+}
+
 export default function TextContent(props: Props) {
-  const [doc, changeDoc] = useDocument<TextDoc>(props.documentId)
-  const [cursorPos, setCursorPos] = useState<IQuillRange | undefined>(undefined)
-  const selfId = useSelfId()
-  // need to remove first and last char because id starts and ends with ":" which is not allowed in a html id
-  const scrollingContainerId = `scroll-container-${useId().slice(1, -1)}`
-  const containerRef = useRef<HTMLDivElement>(null)
+  const handle = useHandle(props.documentId)
+  const editorRootRef = useRef<HTMLDivElement | null>(null!)
+  const editorViewRef = useRef<EditorView | null>(null)
 
   useAutoAdvanceLastSeenHeads(createDocumentLink("text", props.documentId))
 
-  const presence = usePresence<IQuillRange | undefined>(props.documentId, cursorPos, "cursorPos")
+  const isDocReady = handle.isReady()
+
+  useEffect(() => {
+    if (!isDocReady) {
+      return
+    }
+
+    let editorConfig = {
+      schema,
+      history,
+      plugins: [
+        keymap({
+          ...baseKeymap,
+          "Mod-b": toggleBold,
+          "Mod-i": toggleItalic,
+          "Mod-z": undo,
+          "Mod-y": redo,
+          "Mod-Shift-z": redo,
+        }),
+        amgPlugin(handle.doc, ["text"]),
+      ],
+      doc: initPm(handle.doc, ["text"]),
+    }
+
+    const semaphore = new PatchSemaphore()
+    let state = EditorState.create(editorConfig)
+    const doChange = (fn: (d: Doc<any>) => void): Doc<any> => {
+      handle.change(fn)
+      return handle.doc
+    }
+    const view = (editorViewRef.current = new EditorView(editorRootRef.current, {
+      state,
+      dispatchTransaction: (tx: Transaction) => {
+        let newState = semaphore.intercept(getHeads(handle.doc), doChange, tx, view.state)
+        view.updateState(newState)
+      },
+    }))
+    const onPatch = (p: DocHandlePatchPayload<any>) => {
+      let newState = semaphore.reconcilePatch(p.patches, getHeads(p.after), view.state)
+      view.updateState(newState)
+    }
+    handle.on("patch", onPatch)
+    return () => {
+      view.destroy()
+      handle.off("patch", onPatch)
+    }
+  }, [isDocReady])
+
+  // todo: add back cursor presence
+  /* const [cursorPos, setCursorPos] = useState<IQuillRange | undefined>(undefined)
+   const presence = usePresence<IQuillRange | undefined>(props.documentId, cursorPos, "cursorPos")
 
   const cursors: Cursor[] = useMemo(
     () =>
@@ -64,46 +126,12 @@ export default function TextContent(props: Props) {
     [presence]
   )
 
-  const [ref, quill] = useQuill({
-    text: doc ? doc.text : null,
-    change(fn) {
-      changeDoc((doc: TextDoc) => fn(doc.text))
-    },
-    selectionChange(range) {
-      setCursorPos(range)
-    },
-    cursors,
-    selected: props.uniquelySelected,
-    config: {
-      formats: ["bold", "color", "italic"],
-      modules: {
-        mention: {},
-        cursors: {
-          hideDelayMs: 500,
-          transformOnTextChange: true,
-        },
-        toolbar: false,
-        history: {
-          maxStack: 500,
-          userOnly: true,
-        },
-        clipboard: {
-          disableFormattingOnPaste: true,
-        },
-      },
-      scrollingContainer: `#${scrollingContainerId}`,
-    },
-  })
+   */
 
   return (
-    <div
-      className="TextContent"
-      id={scrollingContainerId}
-      onClick={() => quill.current?.focus()}
-      ref={containerRef}
-    >
+    <div className="TextContent" onClick={() => editorViewRef.current?.focus()}>
       <div
-        ref={ref}
+        ref={editorRootRef}
         onClick={stopPropagation}
         onCopy={stopPropagation}
         onCut={stopPropagation}
