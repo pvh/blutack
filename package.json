@@ -9,7 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@automerge/automerge": "2.1.0-alpha.1",
+    "@automerge/automerge": "2.1.0-alpha.2",
+    "@automerge/prosemirror": "https://github.com/alexjg/amg-prosemirror",
     "@types/lodash.memoize": "^4.1.7",
     "automerge-repo": "0.0.55",
     "automerge-repo-network-messagechannel": "^0.0.55",
