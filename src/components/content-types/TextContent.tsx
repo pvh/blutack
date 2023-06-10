@@ -10,8 +10,6 @@ import { useHandle } from "automerge-repo-react-hooks"
 import "./TextContent.css"
 import * as ContentData from "../pushpin-code/ContentData"
 import * as WebStreamLogic from "../pushpin-code/WebStreamLogic"
-import QuillCursors from "quill-cursors"
-import IQuillRange from "quill-cursors/dist/quill-cursors/i-range"
 import {
   getUnseenPatches,
   LastSeenHeads,
@@ -75,14 +73,6 @@ const toggleLink: Command = (state, dispatch) => {
   return toggleMark(schema.marks.link, attrs)(state, dispatch)
 }
 
-export default function TextContent(props: Props) {
-  const handle = useHandle<TextDoc>(props.documentId)
-  const [cursorPos, setCursorPos] = useState<IQuillRange | undefined>(undefined)
-
-  useAutoAdvanceLastSeenHeads(createDocumentLink("text", props.documentId))
-  return Editor({ handle, path: ["text"] })
-}
-
 const markMap: MarkMap<TextDoc> = {
   createMark(doc: TextDoc, markName: string, value: any): MarkValue {
     if (markName === "link") {
@@ -109,11 +99,40 @@ const markMap: MarkMap<TextDoc> = {
   },
 }
 
-function Editor({ handle, path }: EditorProps) {
+export default function TextContent(props: Props) {
+  const handle = useHandle<TextDoc>(props.documentId)
+  const ready = handle.isReady()
+  const path = ["text"]
   const editorRoot = useRef<HTMLDivElement>(null!)
+  useAutoAdvanceLastSeenHeads(createDocumentLink("text", props.documentId))
 
   useEffect(() => {
+    if (!ready) {
+      return
+    }
+
+    const semaphore = new PatchSemaphore()
+
+    const doChange = (fn: (d: automerge.Doc<any>) => void): automerge.Doc<any> => {
+      handle.change(fn)
+      return handle.doc
+    }
+
+    const view = new EditorView(editorRoot.current, {
+      state: EditorState.create({ schema }),
+      dispatchTransaction: (tx: Transaction) => {
+        let newState = semaphore.intercept(automerge.getHeads(handle.doc), doChange, tx, view.state)
+        view.updateState(newState)
+      },
+    })
+
+    let onPatch: (payload: DocHandlePatchPayload<any>) => void
+
     handle.value().then((doc) => {
+      if (view.isDestroyed) {
+        console.log("it's gone")
+        return
+      }
       let editorConfig = {
         schema,
         plugins: [
@@ -128,25 +147,10 @@ function Editor({ handle, path }: EditorProps) {
         doc: initPm(handle.doc, path, { markMap }),
       }
 
-      const semaphore = new PatchSemaphore()
       let state = EditorState.create(editorConfig)
-      const doChange = (fn: (d: automerge.Doc<any>) => void): automerge.Doc<any> => {
-        handle.change(fn)
-        return handle.doc
-      }
-      const view = new EditorView(editorRoot.current, {
-        state,
-        dispatchTransaction: (tx: Transaction) => {
-          let newState = semaphore.intercept(
-            automerge.getHeads(handle.doc),
-            doChange,
-            tx,
-            view.state
-          )
-          view.updateState(newState)
-        },
-      })
-      const onPatch = (p: DocHandlePatchPayload<any>) => {
+      view.updateState(state)
+
+      onPatch = (p: DocHandlePatchPayload<any>) => {
         let newState = semaphore.reconcilePatch(
           p.after,
           p.patches,
@@ -157,12 +161,16 @@ function Editor({ handle, path }: EditorProps) {
       }
       handle.on("patch", onPatch)
     })
+
     return () => {
-      // TODO: we can't run this function as written until the document has loaded but we weren't waiting for that
-      // view.destroy()
-      // handle.off("patch", onPatch)
+      if (view) {
+        view.destroy()
+      }
+      if (onPatch) {
+        handle.off("patch", onPatch)
+      }
     }
-  }, [])
+  }, [handle, ready]) // we depend on the handle here so that we don't re-execute this over and over
 
   return <div ref={editorRoot}></div>
 }
