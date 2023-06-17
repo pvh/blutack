@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { ContentType } from "../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
-import { ContentProps } from "../Content"
+import Content, { ContentProps } from "../Content"
 import { DocHandle } from "automerge-repo"
-import { html } from "htm/react"
 import { EditorView, keymap } from "@codemirror/view"
 import { basicSetup } from "codemirror"
 import { javascript } from "@codemirror/lang-javascript"
@@ -11,6 +10,7 @@ import { indentWithTab } from "@codemirror/commands"
 import { ErrorBoundary } from "react-error-boundary"
 import "./Widget.css"
 import { transform } from "@babel/standalone"
+import { useHandle } from "automerge-repo-react-hooks"
 
 export interface WidgetDoc {
   title: string
@@ -38,6 +38,8 @@ export default function Widget(props: ContentProps) {
 
       return new Function("context", `with (context) { return ${transformedSource.code} }`)({
         React,
+        useHandle,
+        Content,
       })
     } catch (err) {
       return undefined
