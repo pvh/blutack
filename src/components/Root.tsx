@@ -32,6 +32,8 @@ import * as List from "./content-types/ContentList"
 ContentTypes.register(List.contentType)
 import * as Device from "./content-types/workspace/Device"
 ContentTypes.register(Device.contentType)
+import * as Widget from "./content-types/Widget"
+ContentTypes.register(Widget.contentType)
 
 import * as RawView from "./content-types/RawView"
 ContentTypes.register(RawView.contentType)
