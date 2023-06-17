@@ -52,6 +52,12 @@ export const readAsHasTitle = (doc: any, type: string): HasTitle => {
       title,
       titleEditorField: "title",
     }
+  } else if (type === "widget") {
+    const title = doc.title ? doc.title : "Untitled Widget"
+    return {
+      title,
+      titleEditorField: "title",
+    }
   } else if (Object.keys(doc).includes("title")) {
     const title = doc.title != null && doc.title !== "" ? doc.title : "Untitled"
     return {
