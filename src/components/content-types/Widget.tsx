@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { ContentType } from "../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import { ContentProps } from "../Content"
@@ -9,6 +9,7 @@ import { basicSetup } from "codemirror"
 import { javascript } from "@codemirror/lang-javascript"
 import { indentWithTab } from "@codemirror/commands"
 import { ErrorBoundary } from "react-error-boundary"
+import "./Widget.css"
 
 export interface WidgetDoc {
   title: string
@@ -16,6 +17,7 @@ export interface WidgetDoc {
 }
 
 export default function Widget(props: ContentProps) {
+  const [isEditorOpen, setIsEditorOpen] = useState(false)
   const [doc, changeDoc] = useDocument<WidgetDoc>(props.documentId)
   const errorBoundaryRef = useRef<ErrorBoundary | null>(null)
 
@@ -50,11 +52,19 @@ export default function Widget(props: ContentProps) {
   }
 
   return (
-    <div onDoubleClick={(evt) => evt.stopPropagation()}>
-      <CodeEditor source={doc.source} onChangeSource={onChangeSource} />
+    <div
+      className="Widget"
+      onDoubleClick={(evt) => evt.stopPropagation()}
+      onPaste={(evt) => evt.stopPropagation()}
+    >
       <ErrorBoundary fallback={<div>Something went wrong</div>} ref={errorBoundaryRef}>
-        {View && <View doc={doc} changeDoc={changeDoc} />}
+        <div>{View && <View doc={doc} changeDoc={changeDoc} />}</div>
       </ErrorBoundary>
+
+      {isEditorOpen && <CodeEditor source={doc.source} onChangeSource={onChangeSource} />}
+      <button className="Widget-editButton" onClick={() => setIsEditorOpen((isOpen) => !isOpen)}>
+        {!isEditorOpen ? "edit" : "close"}
+      </button>
     </div>
   )
 }
@@ -91,7 +101,9 @@ function CodeEditor({ source, onChangeSource }: CodeEditorProps) {
     }
   }, [])
 
-  return <div ref={editorRef} onKeyDown={(evt) => evt.stopPropagation()} />
+  return (
+    <div className="Widget-editor" ref={editorRef} onKeyDown={(evt) => evt.stopPropagation()} />
+  )
 }
 
 const EXAMPLE_SOURCE = `({doc, changeDoc}) => {

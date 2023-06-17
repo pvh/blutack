@@ -1,0 +1,28 @@
+.Widget {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  display: flex;
+}
+
+.Widget-editButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: none;
+  border-radius: 5px;
+  background: #d9d9d9;
+  border: 0;
+  color: white;
+  cursor: pointer;
+}
+
+.Widget:hover .Widget-editButton {
+  display: inherit;
+}
+
+.Widget-editor {
+  flex: 1;
+  height: 100%;
+}
