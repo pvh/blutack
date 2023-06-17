@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@automerge/automerge": "2.1.0-alpha.1",
+    "@babel/standalone": "^7.22.5",
     "@codemirror/commands": "^6.2.4",
     "@codemirror/lang-javascript": "^6.1.9",
     "@codemirror/state": "^6.2.1",
@@ -23,7 +24,6 @@
     "classnames": "^2.3.2",
     "codemirror": "^6.0.1",
     "debug": "^4.3.4",
-    "htm": "^3.1.1",
     "localforage": "^1.10.0",
     "lodash.memoize": "^4.1.2",
     "mime-types": "^2.1.35",
@@ -45,6 +45,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/babel__standalone": "^7.1.4",
     "@types/debug": "^4.1.7",
     "@types/mime-types": "^2.1.1",
     "@types/path-parse": "^1.0.19",

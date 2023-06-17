@@ -10,6 +10,7 @@ import { javascript } from "@codemirror/lang-javascript"
 import { indentWithTab } from "@codemirror/commands"
 import { ErrorBoundary } from "react-error-boundary"
 import "./Widget.css"
+import { transform } from "@babel/standalone"
 
 export interface WidgetDoc {
   title: string
@@ -33,8 +34,10 @@ export default function Widget(props: ContentProps) {
     }
 
     try {
-      return new Function("context", `with (context) { return ${doc.source} }`)({
-        html,
+      const transformedSource = transform(source, { presets: ["react"] })
+
+      return new Function("context", `with (context) { return ${transformedSource.code} }`)({
+        React,
       })
     } catch (err) {
       return undefined
@@ -57,14 +60,26 @@ export default function Widget(props: ContentProps) {
       onDoubleClick={(evt) => evt.stopPropagation()}
       onPaste={(evt) => evt.stopPropagation()}
     >
-      <ErrorBoundary fallback={<div>Something went wrong</div>} ref={errorBoundaryRef}>
-        <div>{View && <View doc={doc} changeDoc={changeDoc} />}</div>
-      </ErrorBoundary>
+      <div className="Widget-content">
+        <ErrorBoundary
+          fallback={<div className="Widget-error">Invalid syntax</div>}
+          ref={errorBoundaryRef}
+        >
+          {View && <View doc={doc} changeDoc={changeDoc} />}
+        </ErrorBoundary>
+      </div>
 
       {isEditorOpen && <CodeEditor source={doc.source} onChangeSource={onChangeSource} />}
-      <button className="Widget-editButton" onClick={() => setIsEditorOpen((isOpen) => !isOpen)}>
-        {!isEditorOpen ? "edit" : "close"}
-      </button>
+      {!isEditorOpen && (
+        <button className="Widget-editButton" onClick={() => setIsEditorOpen(true)}>
+          <span className="fa fa-edit"></span>
+        </button>
+      )}
+      {isEditorOpen && (
+        <button className="Widget-closeButton" onClick={() => setIsEditorOpen(false)}>
+          <span className="fa fa-close"></span>
+        </button>
+      )}
     </div>
   )
 }
@@ -84,7 +99,7 @@ function CodeEditor({ source, onChangeSource }: CodeEditorProps) {
 
     const view = new EditorView({
       doc: source,
-      extensions: [basicSetup, javascript(), keymap.of([indentWithTab])],
+      extensions: [basicSetup, javascript({ jsx: true }), keymap.of([indentWithTab])],
       dispatch(transaction) {
         view.update([transaction])
 
@@ -107,9 +122,20 @@ function CodeEditor({ source, onChangeSource }: CodeEditorProps) {
 }
 
 const EXAMPLE_SOURCE = `({doc, changeDoc}) => {
-  return html\`
-    <div>Hello world!</div>
-  \`
+  const counter = doc.counter ?? 0
+  
+  const onClickCounter = () => {
+    changeDoc((doc) => {
+      doc.counter = counter + 1
+    })
+  }
+
+  return (
+    <div>
+      <h1>My counter</h1>      
+      <button onClick={onClickCounter}>{counter}</button>     
+    </div>
+  )
 }`
 
 function create({ text }: any, handle: DocHandle<any>) {

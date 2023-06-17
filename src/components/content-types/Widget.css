@@ -6,23 +6,38 @@
   display: flex;
 }
 
-.Widget-editButton {
+.Widget-error {
+  color: var(--colorDestructive);
+}
+
+.Widget .cm-editor { height: 100%; }
+
+.Widget-editButton,
+.Widget-closeButton {
   position: absolute;
   top: 10px;
   right: 10px;
+  background: none;
+  border: none;
+}
+
+.Widget-editButton {
   display: none;
-  border-radius: 5px;
-  background: #d9d9d9;
-  border: 0;
-  color: white;
-  cursor: pointer;
 }
 
 .Widget:hover .Widget-editButton {
   display: inherit;
 }
 
-.Widget-editor {
+
+.Widget-content {
   flex: 1;
+  flex-shrink: 0;
+}
+
+.Widget-editor {
+  cursor: inherit !important;
+  flex-shrink: 1;
   height: 100%;
+  border-left: 1px solid #d9d9d9;
 }
