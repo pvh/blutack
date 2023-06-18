@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { ContentType } from "../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
-import Content, { ContentProps } from "../Content"
+import { ContentProps } from "../Content"
 import { DocHandle } from "automerge-repo"
 import { EditorView, keymap } from "@codemirror/view"
 import { basicSetup } from "codemirror"
@@ -10,21 +10,23 @@ import { indentWithTab } from "@codemirror/commands"
 import { ErrorBoundary } from "react-error-boundary"
 import "./Widget.css"
 import { transform } from "@babel/standalone"
-import { useHandle } from "automerge-repo-react-hooks"
 
 export interface WidgetDoc {
   title: string
   source: string
 }
 
+const AsyncFunction = async function () {}.constructor as any
+
 export default function Widget(props: ContentProps) {
   const [isEditorOpen, setIsEditorOpen] = useState(false)
   const [doc, changeDoc] = useDocument<WidgetDoc>(props.documentId)
   const errorBoundaryRef = useRef<ErrorBoundary | null>(null)
+  const [View, setView] = useState<Function | undefined>(undefined)
 
   const source = doc?.source
 
-  const View: Function | undefined = useMemo(() => {
+  useEffect(() => {
     if (!source) {
       return undefined
     }
@@ -33,17 +35,24 @@ export default function Widget(props: ContentProps) {
       errorBoundaryRef.current.resetErrorBoundary()
     }
 
-    try {
-      const transformedSource = transform(source, { presets: ["react"] })
+    ;(async () => {
+      try {
+        const transformedSource = transform(source, {
+          presets: ["react"],
+          parserOpts: { allowReturnOutsideFunction: true },
+        })
 
-      return new Function("context", `with (context) { return ${transformedSource.code} }`)({
-        React,
-        useHandle,
-        Content,
-      })
-    } catch (err) {
-      return undefined
-    }
+        const functionBody = `with (context) { ${transformedSource.code} }`
+
+        const view = await new AsyncFunction("context", functionBody)({
+          React,
+        })
+
+        setView(() => view)
+      } catch (err) {
+        return undefined
+      }
+    })()
   }, [source])
 
   if (!doc) {
@@ -123,7 +132,7 @@ function CodeEditor({ source, onChangeSource }: CodeEditorProps) {
   )
 }
 
-const EXAMPLE_SOURCE = `({doc, changeDoc}) => {
+const EXAMPLE_SOURCE = `return ({doc, changeDoc}) => {
   const counter = doc.counter ?? 0
   
   const onClickCounter = () => {
