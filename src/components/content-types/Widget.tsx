@@ -10,6 +10,7 @@ import { indentWithTab } from "@codemirror/commands"
 import { ErrorBoundary } from "react-error-boundary"
 import "./Widget.css"
 import { transform } from "@babel/standalone"
+import { createDocumentLink } from "../pushpin-code/Url"
 
 export interface WidgetDoc {
   title: string
@@ -72,15 +73,17 @@ export default function Widget(props: ContentProps) {
       onPaste={(evt) => evt.stopPropagation()}
     >
       <div className="Widget-content">
-        <ErrorBoundary
-          fallback={<div className="Widget-error">Invalid syntax</div>}
-          ref={errorBoundaryRef}
-        >
+        <ErrorBoundary fallbackRender={fallbackRender} ref={errorBoundaryRef}>
           {View && <View doc={doc} changeDoc={changeDoc} />}
         </ErrorBoundary>
       </div>
 
-      {isEditorOpen && <CodeEditor source={doc.source} onChangeSource={onChangeSource} />}
+      {isEditorOpen && (
+        <div>
+          {createDocumentLink("widget", props.documentId)}
+          <CodeEditor source={doc.source} onChangeSource={onChangeSource} />
+        </div>
+      )}
       {!isEditorOpen && (
         <button className="Widget-editButton" onClick={() => setIsEditorOpen(true)}>
           <span className="fa fa-edit"></span>
@@ -95,20 +98,30 @@ export default function Widget(props: ContentProps) {
   )
 }
 
+function fallbackRender({ error }: any) {
+  return (
+    <div>
+      <p>Something went wrong:</p>
+      <pre style={{ color: "red" }}>{error.stack}</pre>
+    </div>
+  )
+}
+
 interface CodeEditorProps {
   source: string
   onChangeSource: (source: string) => void
 }
 
 function CodeEditor({ source, onChangeSource }: CodeEditorProps) {
-  const editorRef = useRef(null)
+  const containerRef = useRef(null)
+  const editorViewRef = useRef<EditorView>()
 
   useEffect(() => {
-    if (!editorRef.current) {
+    if (!containerRef.current) {
       return
     }
 
-    const view = new EditorView({
+    const view = (editorViewRef.current = new EditorView({
       doc: source,
       extensions: [basicSetup, javascript({ jsx: true }), keymap.of([indentWithTab])],
       dispatch(transaction) {
@@ -119,8 +132,8 @@ function CodeEditor({ source, onChangeSource }: CodeEditorProps) {
           onChangeSource(newValue)
         }
       },
-      parent: editorRef.current,
-    })
+      parent: containerRef.current,
+    }))
 
     return () => {
       view.destroy()
@@ -128,7 +141,7 @@ function CodeEditor({ source, onChangeSource }: CodeEditorProps) {
   }, [])
 
   return (
-    <div className="Widget-editor" ref={editorRef} onKeyDown={(evt) => evt.stopPropagation()} />
+    <div className="Widget-editor" ref={containerRef} onKeyDown={(evt) => evt.stopPropagation()} />
   )
 }
 
