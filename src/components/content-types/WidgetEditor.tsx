@@ -4,7 +4,7 @@ import { ContentType } from "../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import "./TextContent.css"
 import { ContentProps } from "../Content"
-import "./RawView.css"
+import "./WidgetEditor.css"
 import { basicSetup } from "codemirror"
 import { javascript } from "@codemirror/lang-javascript"
 import { EditorView, keymap } from "@codemirror/view"
@@ -61,13 +61,7 @@ function CodeEditor({ source, onChangeSource }: CodeEditorProps) {
   }, [])
 
   return (
-    <div className="Widget-editor" ref={containerRef} onKeyDown={(evt) => evt.stopPropagation()} />
-  )
-}
-
-function isDocumentId(value: any) {
-  return /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/.test(
-    value
+    <div className="WidgetEditor" ref={containerRef} onKeyDown={(evt) => evt.stopPropagation()} />
   )
 }
 
