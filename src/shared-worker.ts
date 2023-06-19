@@ -81,7 +81,7 @@ function configureServiceWorkerPort(port: MessagePort) {
       if (!mimeType && !binary) {
         port.postMessage({
           binaryDataId,
-          mimeType: "text/plain",
+          mimeType: "text/javascript",
           binary: (doc as unknown as TextDoc).text.join(""),
         })
         return
