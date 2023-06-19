@@ -25,6 +25,7 @@ export type SharedWorkerMessage = ServiceWorkerConnection | FrontendConnection
 
 // TODO: this is just a debugging thing, take out the next few lines if you notice them here
 import * as Automerge from "@automerge/automerge"
+import { TextDoc } from "./components/content-types/TextContent"
 // @ts-ignore-next-line
 self.Automerge = Automerge
 
@@ -75,6 +76,17 @@ function configureServiceWorkerPort(port: MessagePort) {
       console.log(`[${id}]: shared-worker value`, doc)
 
       const { mimeType, binary } = doc
+
+      // hack for hackday
+      if (!mimeType && !binary) {
+        port.postMessage({
+          binaryDataId,
+          mimeType: "text/plain",
+          binary: (doc as unknown as TextDoc).text.join(""),
+        })
+        return
+      }
+
       var outboundBinary = new ArrayBuffer(binary.byteLength)
       new Uint8Array(outboundBinary).set(new Uint8Array(binary))
       port.postMessage({ binaryDataId, mimeType, binary: outboundBinary }, [outboundBinary])
