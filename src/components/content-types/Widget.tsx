@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { ContentType } from "../pushpin-code/ContentTypes"
-import { useDocument } from "automerge-repo-react-hooks"
-import { ContentProps } from "../Content"
+import { useDocument, useHandle } from "automerge-repo-react-hooks"
+import Content, { ContentProps } from "../Content"
 import { DocHandle } from "automerge-repo"
 import { ErrorBoundary } from "react-error-boundary"
 import "./Widget.css"
@@ -42,6 +42,8 @@ export default function Widget(props: ContentProps) {
 
         const view = await new AsyncFunction("context", functionBody)({
           React,
+          useHandle,
+          Content,
         })
 
         setView(() => view)

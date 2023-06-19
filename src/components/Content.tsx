@@ -35,6 +35,7 @@ export interface EditableContentProps extends ContentProps {
 interface Props {
   url: PushpinUrl
   context: ContentTypes.Context
+  typeOverride?: string
   [arbitraryProp: string]: any
 }
 
@@ -46,13 +47,15 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
   props: Props,
   ref: Ref<ContentHandle>
 ) => {
-  const { context, url } = props
+  const { context, url, typeOverride } = props
 
   const [isCrashed, setCrashed] = useState(false)
   const selfId = useSelfId()
   const onCatch = useCallback(() => setCrashed(true), [])
 
-  const { type, documentId } = parseDocumentLink(url)
+  const { type: linkType, documentId } = parseDocumentLink(url)
+
+  const type = typeOverride || linkType
 
   useHeartbeat(["expanded"].includes(context) ? documentId : undefined)
 
@@ -91,8 +94,7 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
 function renderError(type: string) {
   return (
     <div>
-      <i className="fa fa-exclamation-triangle" />A &quot;{type}&quot; threw an
-      error during render.
+      <i className="fa fa-exclamation-triangle" />A &quot;{type}&quot; threw an error during render.
     </div>
   )
 }
@@ -101,8 +103,7 @@ function renderMissingType(type: string, context: ContentTypes.Context) {
   return (
     <div>
       <i className="fa fa-exclamation-triangle" />
-      Component of type &quot;{type}&quot; in context &quot;{context}&quot; not
-      found.
+      Component of type &quot;{type}&quot; in context &quot;{context}&quot; not found.
     </div>
   )
 }
