@@ -20,6 +20,7 @@ import { useViewState } from "../pushpin-code/ViewState"
 import NewDocumentButton from "../NewDocumentButton"
 import { openDoc } from "../pushpin-code/Url"
 import { ContentType } from "../pushpin-code/ContentTypes"
+import { ActionItem } from "./workspace/omnibox/Actions"
 
 export interface ContentListDoc {
   title: string
@@ -187,31 +188,57 @@ export default function ContentList({ documentId }: ContentProps) {
         }}
       >
         <ListMenu>
-          {content.map((url, index) => (
-            <div
-              className={classNames("ContentListItem", {
-                "ContentListItem--insertTop": draggedOverIndex === index,
-              })}
-              onDragStart={(evt) => onDragStart(evt, index)}
-              onDragOver={(evt) => onDragOver(evt, index)}
-              onDragEnter={(evt) => onDragOver(evt, index)}
-              onDragLeave={(evt) => onDragLeave(evt, index)}
-              onDrop={(evt) => onDrop(evt)}
-              key={url}
-            >
-              <ActionListItem
-                contentUrl={url}
-                defaultAction={actions[0]}
-                actions={actions}
-                selected={url === currentContent}
+          {content.map((url, index) => {
+            // hack: shouldn't check types of other documents
+            const isWidget = parseDocumentLink(url).type === "widget"
+
+            return (
+              <div
+                className={classNames("ContentListItem", {
+                  "ContentListItem--insertTop": draggedOverIndex === index,
+                })}
+                onDragStart={(evt) => onDragStart(evt, index)}
+                onDragOver={(evt) => onDragOver(evt, index)}
+                onDragEnter={(evt) => onDragOver(evt, index)}
+                onDragLeave={(evt) => onDragLeave(evt, index)}
+                onDrop={(evt) => onDrop(evt)}
+                key={url}
               >
-                <ListItem>
-                  <Content url={url} context="badge" />
-                  <Content url={url} context="title" />
-                </ListItem>
-              </ActionListItem>
-            </div>
-          ))}
+                <ActionListItem
+                  contentUrl={url}
+                  defaultAction={actions[0]}
+                  actions={
+                    !isWidget
+                      ? actions
+                      : actions.concat([
+                          {
+                            name: "edit",
+                            faIcon: "fa-code",
+                            label: "Edit",
+                            shortcut: "⌘+e",
+                            keysForActionPressed: (e: KeyboardEvent) =>
+                              (e.metaKey || e.ctrlKey) && e.key === "e",
+                            callback: (url: PushpinUrl) => () => {
+                              openDoc(
+                                createDocumentLink(
+                                  "widgetEditor",
+                                  parseDocumentLink(url).documentId
+                                )
+                              )
+                            },
+                          },
+                        ])
+                  }
+                  selected={url === currentContent}
+                >
+                  <ListItem>
+                    <Content url={url} context="badge" />
+                    <Content url={url} context="title" />
+                  </ListItem>
+                </ActionListItem>
+              </div>
+            )
+          })}
           <div
             className={classNames("ContentListItem", {
               "ContentListItem--insertTop": draggedOverIndex === content.length,

@@ -34,6 +34,8 @@ import * as Device from "./content-types/workspace/Device"
 ContentTypes.register(Device.contentType)
 import * as Widget from "./content-types/Widget"
 ContentTypes.register(Widget.contentType)
+import * as WidgetEditor from "./content-types/WidgetEditor"
+ContentTypes.register(WidgetEditor.contentType)
 
 import * as RawView from "./content-types/RawView"
 ContentTypes.register(RawView.contentType)

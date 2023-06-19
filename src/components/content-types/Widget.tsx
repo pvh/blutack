@@ -3,24 +3,19 @@ import { ContentType } from "../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import { ContentProps } from "../Content"
 import { DocHandle } from "automerge-repo"
-import { EditorView, keymap } from "@codemirror/view"
-import { basicSetup } from "codemirror"
-import { javascript } from "@codemirror/lang-javascript"
-import { indentWithTab } from "@codemirror/commands"
 import { ErrorBoundary } from "react-error-boundary"
 import "./Widget.css"
 import { transform } from "@babel/standalone"
-import { createDocumentLink } from "../pushpin-code/Url"
 
 export interface WidgetDoc {
   title: string
   source: string
+  error: string | undefined
 }
 
 const AsyncFunction = async function () {}.constructor as any
 
 export default function Widget(props: ContentProps) {
-  const [isEditorOpen, setIsEditorOpen] = useState(false)
   const [doc, changeDoc] = useDocument<WidgetDoc>(props.documentId)
   const errorBoundaryRef = useRef<ErrorBoundary | null>(null)
   const [View, setView] = useState<Function | undefined>(undefined)
@@ -60,12 +55,6 @@ export default function Widget(props: ContentProps) {
     return null
   }
 
-  const onChangeSource = (source: string) => {
-    changeDoc((doc) => {
-      doc.source = source
-    })
-  }
-
   return (
     <div
       className="Widget"
@@ -77,23 +66,6 @@ export default function Widget(props: ContentProps) {
           {View && <View doc={doc} changeDoc={changeDoc} />}
         </ErrorBoundary>
       </div>
-
-      {isEditorOpen && (
-        <div>
-          {createDocumentLink("widget", props.documentId)}
-          <CodeEditor source={doc.source} onChangeSource={onChangeSource} />
-        </div>
-      )}
-      {!isEditorOpen && (
-        <button className="Widget-editButton" onClick={() => setIsEditorOpen(true)}>
-          <span className="fa fa-edit"></span>
-        </button>
-      )}
-      {isEditorOpen && (
-        <button className="Widget-closeButton" onClick={() => setIsEditorOpen(false)}>
-          <span className="fa fa-close"></span>
-        </button>
-      )}
     </div>
   )
 }
@@ -104,44 +76,6 @@ function fallbackRender({ error }: any) {
       <p>Something went wrong:</p>
       <pre style={{ color: "red" }}>{error.stack}</pre>
     </div>
-  )
-}
-
-interface CodeEditorProps {
-  source: string
-  onChangeSource: (source: string) => void
-}
-
-function CodeEditor({ source, onChangeSource }: CodeEditorProps) {
-  const containerRef = useRef(null)
-  const editorViewRef = useRef<EditorView>()
-
-  useEffect(() => {
-    if (!containerRef.current) {
-      return
-    }
-
-    const view = (editorViewRef.current = new EditorView({
-      doc: source,
-      extensions: [basicSetup, javascript({ jsx: true }), keymap.of([indentWithTab])],
-      dispatch(transaction) {
-        view.update([transaction])
-
-        if (transaction.docChanged) {
-          const newValue = view.state.doc.toString()
-          onChangeSource(newValue)
-        }
-      },
-      parent: containerRef.current,
-    }))
-
-    return () => {
-      view.destroy()
-    }
-  }, [])
-
-  return (
-    <div className="Widget-editor" ref={containerRef} onKeyDown={(evt) => evt.stopPropagation()} />
   )
 }
 
