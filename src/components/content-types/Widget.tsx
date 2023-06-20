@@ -46,8 +46,8 @@ export default function Widget(props: ContentProps) {
   }
 
   const context = {
-    changeDoc,
     React,
+    Content,
     useDocument,
     useHandle,
   }
