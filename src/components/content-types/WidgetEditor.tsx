@@ -10,6 +10,7 @@ import { javascript } from "@codemirror/lang-javascript"
 import { EditorView, keymap } from "@codemirror/view"
 import { indentWithTab } from "@codemirror/commands"
 import { WidgetDoc } from "./Widget"
+import { transform } from "@babel/standalone"
 
 export default function WidgetEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<WidgetDoc>(props.documentId)
@@ -21,6 +22,11 @@ export default function WidgetEditor(props: ContentProps) {
   const onChangeSource = (source: string) => {
     changeDoc((doc) => {
       doc.source = source
+      const dist = transform(source, {
+        presets: ["react"],
+        parserOpts: { allowReturnOutsideFunction: true },
+      })
+      doc.dist = dist.code
     })
   }
 
