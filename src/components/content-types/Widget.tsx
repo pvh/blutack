@@ -5,15 +5,14 @@ import Content, { ContentProps } from "../Content"
 import { DocHandle } from "automerge-repo"
 import { ErrorBoundary } from "react-error-boundary"
 import "./Widget.css"
-import { transform } from "@babel/standalone"
+import { BinaryDataId, createBinaryDataUrl } from "../../blobstore/Blob"
 
 export interface WidgetDoc {
   title: string
   source: string
+  dist?: string
   error: string | undefined
 }
-
-const AsyncFunction = async function () {}.constructor as any
 
 export default function Widget(props: ContentProps) {
   const [doc, changeDoc] = useDocument<WidgetDoc>(props.documentId)
@@ -32,30 +31,27 @@ export default function Widget(props: ContentProps) {
     }
 
     ;(async () => {
-      try {
-        const transformedSource = transform(source, {
-          presets: ["react"],
-          parserOpts: { allowReturnOutsideFunction: true },
-        })
-
-        const functionBody = `with (context) { ${transformedSource.code} }`
-
-        const view = await new AsyncFunction("context", functionBody)({
-          React,
-          useHandle,
-          Content,
-        })
-
-        setView(() => view)
-      } catch (err) {
-        return undefined
-      }
+      // fetch ourselves as an ES module
+      const module = await import(
+        createBinaryDataUrl(
+          `web+binarydata://${props.documentId}?rand=${Math.random()}` as unknown as BinaryDataId
+        )
+      )
+      setView(() => module.default)
     })()
   }, [source])
 
   if (!doc) {
     return null
   }
+
+  const context = {
+    changeDoc,
+    React,
+    useDocument,
+    useHandle,
+  }
+  console.log("view", View)
 
   return (
     <div
@@ -65,7 +61,7 @@ export default function Widget(props: ContentProps) {
     >
       <div className="Widget-content">
         <ErrorBoundary fallbackRender={fallbackRender} ref={errorBoundaryRef}>
-          {View && <View doc={doc} changeDoc={changeDoc} />}
+          {View && <View contentProps={props} context={context} />}
         </ErrorBoundary>
       </div>
     </div>
@@ -81,8 +77,11 @@ function fallbackRender({ error }: any) {
   )
 }
 
-const EXAMPLE_SOURCE = `return ({doc, changeDoc}) => {
-  const counter = doc.counter ?? 0
+const EXAMPLE_SOURCE = `export default ({contentProps, context}) => {
+  const { React, useDocument, useHandle } = context
+  const [doc, changeDoc] = useDocument(contentProps.documentId)
+
+  const counter = doc?.counter ?? 0
   
   const onClickCounter = () => {
     changeDoc((doc) => {
@@ -91,10 +90,10 @@ const EXAMPLE_SOURCE = `return ({doc, changeDoc}) => {
   }
 
   return (
-    <div>
-      <h1>My counter</h1>      
-      <button onClick={onClickCounter}>{counter}</button>     
-    </div>
+    React.createElement("div", {},
+      React.createElement("h1", {}, "My counter"),
+      React.createElement("button", {onClick: onClickCounter}, counter)
+    )
   )
 }`
 

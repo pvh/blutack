@@ -13,14 +13,18 @@ self.addEventListener("fetch", async function (event) {
           console.log(`[${binaryDataId}]: requesting from shared-worker`)
           entry = await loadBinaryData(binaryDataId)
           console.log(`[${binaryDataId}]: received from shared-worker`, entry)
-          CACHED_BINARY_OBJECTS[binaryDataId] = entry
+
+          // don't cache JS files
+          if (entry[0] != "text/javascript") {
+            CACHED_BINARY_OBJECTS[binaryDataId] = entry
+          }
         }
         // TODO: handle case where it's not in either
-        const [header, binary] = entry || [null, null]
+        const [mimeType, binary] = entry || [null, null]
 
-        console.log(`[${binaryDataId}]: answering`, entry)
+        console.log(`[${binaryDataId}]: answering`, mimeType, entry)
 
-        if (!header) {
+        if (!mimeType) {
           return new Response("Not found", {
             status: 404,
             headers: { "Content-Type": "text/plain" },
@@ -28,7 +32,7 @@ self.addEventListener("fetch", async function (event) {
         }
 
         return new Response(binary, {
-          headers: { "Content-Type": header.mimeType },
+          headers: { "Content-Type": mimeType },
         })
       })()
     )
@@ -37,10 +41,15 @@ self.addEventListener("fetch", async function (event) {
 
 const openRequests = {}
 
-let binaryDataRequestPort
+let portArrivedResolve
+let binaryDataRequestPortArrived = new Promise((resolve, reject) => {
+  portArrivedResolve = resolve
+})
+
 self.addEventListener("message", (e) => {
   console.log("ServiceWorker recieved a message", e)
   binaryDataRequestPort = e.data.sharedWorkerPort
+  portArrivedResolve()
   binaryDataRequestPort.onmessage = (e) => {
     console.log("binaryDataRequestPort inbound message: ", e)
     const { binaryDataId, mimeType, binary } = e.data
@@ -53,16 +62,16 @@ self.addEventListener("message", (e) => {
 })
 
 async function loadBinaryData(binaryDataId) {
-  if (!binaryDataRequestPort) {
-    throw new Error("gotta wait for that port")
-  }
   console.log("loadBinaryData", binaryDataId)
+  await binaryDataRequestPortArrived
+
   const promise = new Promise((resolve, reject) => {
     binaryDataRequestPort.postMessage({ binaryDataId })
     console.log("loadBinaryData posted", binaryDataId)
     openRequests[binaryDataId] = resolve
     // what about reject?
   })
+
   return promise
 }
 

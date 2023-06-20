@@ -79,10 +79,12 @@ function configureServiceWorkerPort(port: MessagePort) {
 
       // hack for hackday
       if (!mimeType && !binary) {
+        const text = (doc as any).dist || (doc as any).source || (doc as any).text
+        console.log("doc", doc)
         port.postMessage({
           binaryDataId,
           mimeType: "text/javascript",
-          binary: (doc as unknown as TextDoc).text.join(""),
+          binary: text,
         })
         return
       }
