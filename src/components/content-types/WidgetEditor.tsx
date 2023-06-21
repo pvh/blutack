@@ -38,17 +38,22 @@ export default function WidgetEditor(props: ContentProps) {
   const onChangeSource = (source: string) => {
     changeDoc((doc) => {
       doc.source = source
-      const dist = transform(source, {
-        presets: ["react"],
-        plugins: [importTransformPlugin],
-        parserOpts: { allowReturnOutsideFunction: true },
-      })
 
-      if (!dist.code) {
-        return
+      try {
+        const dist = transform(source, {
+          presets: ["react"],
+          plugins: [importTransformPlugin],
+          parserOpts: { allowReturnOutsideFunction: true },
+        })
+
+        if (!dist.code) {
+          return
+        }
+
+        doc.dist = dist.code
+      } catch (error) {
+        console.error(error)
       }
-
-      doc.dist = dist.code
     })
   }
 
