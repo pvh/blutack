@@ -71,9 +71,10 @@ export const readAsHasTitle = (doc: any, type: string): HasTitle => {
       titleEditorField: "name",
     }
   } else {
+    const name = doc.name != null && doc.name !== "" ? doc.name : `Unnamed ${type}`
     return {
-      title: "Unknown doc",
-      titleEditorField: null,
+      title: name,
+      titleEditorField: "name",
     }
   }
 }
