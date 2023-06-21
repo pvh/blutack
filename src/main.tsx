@@ -15,6 +15,9 @@ import { create as createWorkspace } from "./components/content-types/workspace/
 import { create as createDevice } from "./components/content-types/workspace/Device"
 import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
 
+// hack: create global React object so it's accessible in widgets
+window.React = React
+
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
     try {

@@ -11,34 +11,10 @@ import { indentWithTab } from "@codemirror/commands"
 import { WidgetDoc } from "./Widget"
 import { transform } from "@babel/standalone"
 import { PluginObj } from "@babel/core"
-import { identifier, importDeclaration, importDefaultSpecifier, stringLiteral } from "@babel/types"
 
-const importTransformPlugin: () => PluginObj = () => {
-  let containsJsx: boolean
-
-  return {
+const importTransformPlugin: PluginObj =  {
     name: "transform-imports-to-skypack",
     visitor: {
-      Program: {
-        enter(path) {
-          containsJsx = false
-        },
-
-        /* exit(path) {
-          if (containsJsx) {
-            // if jsx is used we need to make sure React is imported
-            // todo: checked first if react was already imported
-            path.unshiftContainer(
-              "body",
-              importDeclaration(
-                [importDefaultSpecifier(identifier("React"))],
-                stringLiteral("react")
-              )
-            )
-          }
-        }, */
-      },
-
       ImportDeclaration(path) {
         const value = path.node.source.value
 
@@ -48,12 +24,8 @@ const importTransformPlugin: () => PluginObj = () => {
         }
 
         path.node.source.value = `https://cdn.skypack.dev/${value}`
-      },
-      JSXElement(path) {
-        containsJsx = true
-      },
-    },
-  }
+      }
+    }
 }
 
 export default function WidgetEditor(props: ContentProps) {
