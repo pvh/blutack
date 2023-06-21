@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react"
-
 import { ContentType } from "../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import "./TextContent.css"
@@ -11,6 +10,51 @@ import { EditorView, keymap } from "@codemirror/view"
 import { indentWithTab } from "@codemirror/commands"
 import { WidgetDoc } from "./Widget"
 import { transform } from "@babel/standalone"
+import { PluginObj } from "@babel/core"
+import { identifier, importDeclaration, importDefaultSpecifier, stringLiteral } from "@babel/types"
+
+const importTransformPlugin: () => PluginObj = () => {
+  let containsJsx: boolean
+
+  return {
+    name: "transform-imports-to-skypack",
+    visitor: {
+      Program: {
+        enter(path) {
+          containsJsx = false
+        },
+
+        /* exit(path) {
+          if (containsJsx) {
+            // if jsx is used we need to make sure React is imported
+            // todo: checked first if react was already imported
+            path.unshiftContainer(
+              "body",
+              importDeclaration(
+                [importDefaultSpecifier(identifier("React"))],
+                stringLiteral("react")
+              )
+            )
+          }
+        }, */
+      },
+
+      ImportDeclaration(path) {
+        const value = path.node.source.value
+
+        // Don't replace relative or absolute URLs.
+        if (/^([./])/.test(value)) {
+          return
+        }
+
+        path.node.source.value = `https://cdn.skypack.dev/${value}`
+      },
+      JSXElement(path) {
+        containsJsx = true
+      },
+    },
+  }
+}
 
 export default function WidgetEditor(props: ContentProps) {
   const [doc, changeDoc] = useDocument<WidgetDoc>(props.documentId)
@@ -24,8 +68,14 @@ export default function WidgetEditor(props: ContentProps) {
       doc.source = source
       const dist = transform(source, {
         presets: ["react"],
+        plugins: [importTransformPlugin],
         parserOpts: { allowReturnOutsideFunction: true },
       })
+
+      if (!dist.code) {
+        return
+      }
+
       doc.dist = dist.code
     })
   }

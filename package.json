@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@automerge/automerge": "2.1.0-alpha.1",
+    "@babel/core": "^7.22.5",
     "@babel/standalone": "^7.22.5",
     "@codemirror/commands": "^6.2.4",
     "@codemirror/lang-javascript": "^6.1.9",
@@ -47,6 +48,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/babel__core": "^7.20.1",
     "@types/babel__standalone": "^7.1.4",
     "@types/debug": "^4.1.7",
     "@types/mime-types": "^2.1.1",
