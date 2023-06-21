@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react"
+import * as ContentTypes from "../pushpin-code/ContentTypes"
 import { ContentType } from "../pushpin-code/ContentTypes"
-import { useDocument, useHandle } from "automerge-repo-react-hooks"
-import Content, { ContentProps } from "../Content"
-import { DocHandle } from "automerge-repo"
+import { useDocument } from "automerge-repo-react-hooks"
+import { ContentProps } from "../Content"
+import { DocHandle, DocumentId } from "automerge-repo"
 import { ErrorBoundary } from "react-error-boundary"
 import "./Widget.css"
 import { BinaryDataId, createBinaryDataUrl } from "../../blobstore/Blob"
+import { useWorkspace } from "./workspace/Workspace"
 
 export interface WidgetDoc {
   title: string
@@ -14,10 +16,26 @@ export interface WidgetDoc {
   error: string | undefined
 }
 
+export async function loadWidgetModule(documentId: DocumentId) {
+  const module = await import(
+    createBinaryDataUrl(
+      `web+binarydata://${documentId}?rand=${Math.random()}` as unknown as BinaryDataId
+    )
+  )
+
+  if (module.contentType) {
+    ContentTypes.register(module.contentType)
+  }
+
+  return module
+}
+
 export default function Widget(props: ContentProps) {
-  const [doc, changeDoc] = useDocument<WidgetDoc>(props.documentId)
+  const { documentId } = props
+  const [doc, changeDoc] = useDocument<WidgetDoc>(documentId)
   const errorBoundaryRef = useRef<ErrorBoundary | null>(null)
   const [View, setView] = useState<Function | undefined>(undefined)
+  const [workspace, changeWorkspace] = useWorkspace()
 
   const source = doc?.source
 
@@ -32,11 +50,20 @@ export default function Widget(props: ContentProps) {
 
     ;(async () => {
       // fetch ourselves as an ES module
-      const module = await import(
-        createBinaryDataUrl(
-          `web+binarydata://${props.documentId}?rand=${Math.random()}` as unknown as BinaryDataId
-        )
-      )
+      const module = await loadWidgetModule(documentId)
+
+      // if widget exports content type add it to list of known content types
+      if (module.contentType) {
+        const contentTypeDocIds = workspace?.contentTypeIds ?? []
+        if (!contentTypeDocIds.includes(documentId)) {
+          changeWorkspace((workspace) => {
+            // todo: fix types
+            ;(workspace.contentTypeIds as any) = []
+            workspace.contentTypeIds.push(documentId)
+          })
+        }
+      }
+
       setView(() => module.default)
     })()
   }, [source])
@@ -44,14 +71,6 @@ export default function Widget(props: ContentProps) {
   if (!doc) {
     return null
   }
-
-  const context = {
-    React,
-    Content,
-    useDocument,
-    useHandle,
-  }
-  console.log("view", View)
 
   return (
     <div
@@ -61,7 +80,7 @@ export default function Widget(props: ContentProps) {
     >
       <div className="Widget-content">
         <ErrorBoundary fallbackRender={fallbackRender} ref={errorBoundaryRef}>
-          {View && <View contentProps={props} context={context} />}
+          {View && <View {...props} />}
         </ErrorBoundary>
       </div>
     </div>
@@ -77,11 +96,10 @@ function fallbackRender({ error }: any) {
   )
 }
 
-const EXAMPLE_SOURCE = `export default ({contentProps, context}) => {
-  const { React, useDocument, useHandle } = context
-  const [doc, changeDoc] = useDocument(contentProps.documentId)
+const EXAMPLE_SOURCE = `export default ({ documentId }) => {
+   const [doc, changeDoc] = useDocument(documentId)
 
-  const counter = doc?.counter ?? 0
+  const counter = doc ? doc.counter ?? 0 : 0
   
   const onClickCounter = () => {
     changeDoc((doc) => {

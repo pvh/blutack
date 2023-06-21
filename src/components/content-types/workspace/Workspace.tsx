@@ -26,17 +26,36 @@ import { ContentListDoc } from "../ContentList"
 import { ViewStateContext } from "../../pushpin-code/ViewState"
 import { PersistedLastSeenHeadsMap } from "../../pushpin-code/Changes"
 import { useMentionAutocompletion } from "../../pushpin-code/Searches"
-import { List } from "@automerge/automerge"
+import { Doc, Extend, List } from "@automerge/automerge"
 
 const log = Debug("pushpin:workspace")
 
 export const WorkspaceContext = createContext<DocumentId | undefined>(undefined)
+
+export function useWorkspaceId(): DocumentId {
+  const context = useContext(WorkspaceContext)
+  if (!context) {
+    throw new Error("Missing workspace context")
+  }
+
+  return context
+}
+
+export function useWorkspace(): [
+  doc: Doc<WorkspaceDoc> | undefined,
+  changeFn: (cf: (d: Extend<WorkspaceDoc>) => void) => void
+] {
+  const workspaceId = useWorkspaceId()
+  return useDocument<WorkspaceDoc>(workspaceId)
+}
+
 
 export interface WorkspaceDoc {
   selfId: DocumentId
   contactIds: DocumentId[]
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
+  contentTypeIds: DocumentId[]
   persistedLastSeenHeads: PersistedLastSeenHeadsMap
 }
 
