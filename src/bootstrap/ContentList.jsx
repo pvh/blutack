@@ -88,11 +88,7 @@ export default function ContentList({ documentId }) {
   )
 
   function selectContent(contentUrl) {
-    if (parseDocumentLink(contentUrl).type === "contentlist") {
-      openDoc(contentUrl)
-    } else {
-      setCurrentContent(contentUrl)
-    }
+    console.log("todo select")
   }
 
   const onCreateContent = React.useCallback(
@@ -211,8 +207,6 @@ function ContentListItem({ url, onDelete }) {
 }
 
 export function NewDocumentButton({ trigger, onCreateDocument }) {
-  const hiddenFileInput = useRef(null)
-
   const contentTypes = useMemo(
     () => ContentTypes.list({ context: "board" }),
     []
@@ -221,17 +215,6 @@ export function NewDocumentButton({ trigger, onCreateDocument }) {
   const createDoc = contentType => {
     ContentTypes.create(contentType.type, {}, contentUrl => {
       onCreateDocument(contentUrl)
-    })
-  }
-
-  const onImportClick = () => {
-    if (hiddenFileInput.current) {
-      hiddenFileInput.current.click()
-    }
-  }
-  const onFilesChanged = e => {
-    ImportData.importFileList(e.target.files, url => {
-      onCreateDocument(url)
     })
   }
 
@@ -251,23 +234,6 @@ export function NewDocumentButton({ trigger, onCreateDocument }) {
             <span className="ContextMenu__label">{contentType.name}</span>
           </ListMenuItem>
         ))}
-
-        <ListMenuItem key="import" onClick={onImportClick}>
-          <div>
-            <input
-              type="file"
-              id="hiddender"
-              multiple
-              onChange={onFilesChanged}
-              ref={hiddenFileInput}
-              style={{ display: "none" }}
-            />
-            <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-              <i className="fa fa-file-o" />
-            </div>
-          </div>
-          <span className="ContextMenu__label">File</span>
-        </ListMenuItem>
       </ListMenuSection>
     </Popover>
   )

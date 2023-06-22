@@ -271,35 +271,14 @@ function create({ text, title }, handle) {
     if (title) {
       doc.title = title
     }
+
+    console.log("create text")
+
     doc.text = new Automerge.Text(text)
     if (!text || !text.endsWith("\n")) {
       doc.text.insertAt(text ? text.length : 0, "\n") // Quill prefers an ending newline
     }
   })
-}
-
-export function hasUnseenChanges(doc, lastSeenHeads) {
-  return getUnseenPatches(doc, lastSeenHeads).some(
-    patch =>
-      patch.action === "splice" &&
-      patch.path.length === 2 &&
-      patch.path[0] === "text"
-  )
-}
-
-// TODO: this is not really checking if the user has been mentioned since the doc was last seen
-// as long as the user is mentioned in the doc once we consider any new changes to be unseen mentions
-export function hasUnseenMentions(doc, lastSeenHeads, name) {
-  if (!name) {
-    debugger
-  }
-
-  const isUserMentionedInText = evalSearchFor(
-    MENTION,
-    doc.text.toString()
-  ).some(match => match.data.name.toLowerCase() === name.toLowerCase())
-
-  return isUserMentionedInText && hasUnseenChanges(doc, lastSeenHeads)
 }
 
 const supportsMimeType = mimeType => !!mimeType.match("text/")
@@ -314,7 +293,5 @@ export const contentType = {
   },
   create,
   createFrom,
-  supportsMimeType,
-  hasUnseenChanges,
-  hasUnseenMentions
+  supportsMimeType
 }
