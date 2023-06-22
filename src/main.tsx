@@ -123,8 +123,7 @@ async function findOrMakeProfileDoc(): Promise<DocumentId> {
   const handle = repo.create()
   const newProfileDocId = handle.documentId
 
-  // todo: remember profile id
-  //  await localforage.setItem("profileDocId", newProfileDocId)
+  await localforage.setItem("profileDocId", newProfileDocId)
 
   createProfile({}, handle)
 
