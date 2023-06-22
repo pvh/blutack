@@ -11,11 +11,13 @@ import { DocumentId, Repo } from "automerge-repo"
 import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechannel"
 import { RepoContext, useDocument } from "automerge-repo-react-hooks"
 import * as ContentTypes from "./components/pushpin-code/ContentTypes"
-import { create as createWorkspace, WorkspaceDoc } from "./components/content-types/workspace/Workspace"
-import { create as createDevice } from "./components/content-types/workspace/Device"
 import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
 import Content from "./components/Content";
 import { loadWidgetModule } from "./components/content-types/Widget";
+
+// TODO: load dynamically
+import { create as createProfile } from "./bootstrap/Profile.jsx"
+import { create as createDevice } from "./bootstrap/Device.jsx"
 
 // hack: create globals so they are accessible in widgets
 (window as any).React = React;
@@ -112,7 +114,7 @@ async function findOrMakeDeviceDoc(): Promise<DocumentId> {
 
 async function findOrMakeProfileDoc(): Promise<DocumentId> {
   // profiles used to be called workspaces, for backwards compatibility keep the old name here
-  const profileDocId = await localforage.getItem("workspaceDocId")
+  const profileDocId = await localforage.getItem("profileDocId")
 
   if (profileDocId) {
     return profileDocId as DocumentId
@@ -121,29 +123,30 @@ async function findOrMakeProfileDoc(): Promise<DocumentId> {
   const handle = repo.create()
   const newProfileDocId = handle.documentId
 
-  await localforage.setItem("workspaceDocId", newProfileDocId)
+  // todo: remember profile id
+  //  await localforage.setItem("profileDocId", newProfileDocId)
 
-  createWorkspace({}, handle)
+  createProfile({}, handle)
 
   return newProfileDocId
 }
 
 // bootstrapping: first try the indexedDB, then make one
 const deviceDocId = await findOrMakeDeviceDoc()
-const workspaceDocId = await findOrMakeProfileDoc()
+const profileDocId = await findOrMakeProfileDoc()
 
 console.log("deviceDocId", deviceDocId)
-console.log("workspaceDocId", workspaceDocId)
+console.log("profileDocId", profileDocId)
 
-const workspace = await (repo.find<WorkspaceDoc>(workspaceDocId).value())
+const workspace = await (repo.find<any>(profileDocId).value())
 
 // load known content types
-await Promise.all(workspace.contentTypeIds.map((contentTypeDocId) => loadWidgetModule(contentTypeDocId)))
+// await Promise.all(workspace.contentTypeIds.map((contentTypeDocId : string) => loadWidgetModule(contentTypeDocId)))
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <RepoContext.Provider value={repo}>
-      <Root workspaceDocId={workspaceDocId} deviceDocId={deviceDocId} />
+      <Root profileDocId={profileDocId} deviceDocId={deviceDocId} />
     </RepoContext.Provider>
   </React.StrictMode>
 )

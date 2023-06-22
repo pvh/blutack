@@ -1,5 +1,7 @@
 import { createContext } from "react"
 import { useDocument } from "automerge-repo-react-hooks"
+import * as ContentTypes from "../components/pushpin-code/ContentTypes"
+import {createDocumentLink, parseDocumentLink} from "../components/pushpin-code/Url";
 
 export const ProfileContext = createContext(undefined)
 
@@ -8,6 +10,7 @@ export const ProfileContext = createContext(undefined)
 interface ProfileDoc {
   selfId: DocumentId
   contactIds: DocumentId[]
+  homeDocUrl: DocumentId,
   viewedDocUrls: PushpinUrl[]
   archivedDocUrls: PushpinUrl[]
   contentTypeIds: DocumentId[]
@@ -19,9 +22,18 @@ interface ProfileDoc {
 export default function Profile({ documentId }) {
   const [workspace, changeWorkspace] = useDocument(documentId)
 
+  if (!workspace) {
+    return null
+  }
+
   return (
     <ProfileContext.Provider value={documentId}>
-      <div>Hello world</div>
+      <div className="p-4">
+      <div className="flex flex-col max-w-[300px]">
+        <h1 className="text-xl">Blutak</h1>
+        <Content url={workspace.homeDocUrl} />
+      </div>
+      </div>
     </ProfileContext.Provider>
   )
 }
@@ -34,14 +46,21 @@ export function create(_attrs, profileHndle) {
     // but i don't want to pull that in scope right now
 
     ContentTypes.create("contentlist", { title: "Home" }, (listUrl, listHandle) => {
-      listHandle.change((doc) => {
-        doc.content.push(threadUrl)
-      })
-      profileHndle.change((workspace) => {
-        workspace.selfId = selfDocumentId
-        workspace.contactIds = []
-        workspace.currentDocUrl = listUrl
-        workspace.viewedDocUrls = [listUrl]
+      ContentTypes.create("text", {
+        title: "Home",
+        text: "Hello world!"}, (textUrl) => {
+        listHandle.change((doc) => {
+          doc.content.push(textUrl)
+        })
+        profileHndle.change((profile) => {
+          profile.selfId = selfDocumentId
+          profile.contactIds = []
+          profile.homeDocUrl = listUrl
+          profile.viewedDocUrls = [listUrl]
+          profile.archivedDocUrls = [listUrl]
+          profile.contentTypeIds = []
+          profile.persistedLastSeenHeads = {}
+        })
       })
     })
   })

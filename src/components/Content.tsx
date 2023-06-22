@@ -18,7 +18,7 @@ import { useDocument } from "../../../automerge-repo/packages/automerge-repo-rea
 
 // this is the interface imported by Content types
 export interface ContentProps {
-  context: ContentTypes.Context
+  context?: ContentTypes.Context
   type: string
   documentId: DocumentId
   selfId: DocumentId
@@ -32,8 +32,7 @@ export interface EditableContentProps extends ContentProps {
 
 // These are the props the generic Content wrapper receives
 interface Props {
-  documentId: DocumentId
-  type: string
+  url: PushpinUrl
   context: ContentTypes.Context
   [arbitraryProp: string]: any
 }
@@ -46,7 +45,8 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
   props: Props,
   ref: Ref<ContentHandle>
 ) => {
-  const { context, documentId, type } = props
+  const { context = "expanded", url } = props
+  const { documentId, type } = parseDocumentLink(url)
 
   const [isCrashed, setCrashed] = useState(false)
   const selfId = useSelfId()

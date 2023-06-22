@@ -3,10 +3,25 @@ import * as ContentTypes from "./pushpin-code/ContentTypes"
 import { DocumentId } from "automerge-repo"
 import { CurrentDeviceContext } from "./content-types/workspace/Device"
 
-// Import various content types and register them.
-import * as Profile from "./bootstrap/Profile"
+// Import css files
+// todo: find solution that allows to add styling from docs
+import "../bootstrap/ContentList.css"
+import "../bootstrap/TextContent.css"
 
+// todo: actually load files bootstrapped
+// Import various content types and register them.
+import * as Profile from "../bootstrap/Profile"
 ContentTypes.register(Profile.contentType)
+
+import * as ContentList from "../bootstrap/ContentList"
+ContentTypes.register(ContentList.contentType)
+
+import * as TextContent from "../bootstrap/TextContent"
+ContentTypes.register(TextContent.contentType)
+
+import * as Contact from "../bootstrap/Contact"
+import { createDocumentLink } from "./pushpin-code/Url";
+ContentTypes.register(Contact.contentType)
 
 /*import * as B from "./content-types/board"
 ContentTypes.register(B.contentType)
@@ -42,17 +57,16 @@ import "./content-types/defaults/DefaultInTitle"
 import "./content-types/defaults/DefaultInBadge" */
 
 interface RootArgs {
-  workspaceDocId: DocumentId
+  profileDocId: DocumentId
   deviceDocId: DocumentId
 }
 
-export default function Root({ workspaceDocId, deviceDocId }: RootArgs) {
+export default function Root({ profileDocId, deviceDocId }: RootArgs) {
   return (
       <CurrentDeviceContext.Provider value={deviceDocId}>
         <Content
           context="root"
-          type="profile"
-          documentId={workspaceDocId}
+          url={createDocumentLink("profile", profileDocId)}
         />
       </CurrentDeviceContext.Provider>
   )
