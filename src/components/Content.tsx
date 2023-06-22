@@ -19,7 +19,6 @@ import { useDocument } from "../../../automerge-repo/packages/automerge-repo-rea
 // this is the interface imported by Content types
 export interface ContentProps {
   context: ContentTypes.Context
-  url: PushpinUrl
   type: string
   documentId: DocumentId
   selfId: DocumentId
@@ -33,9 +32,9 @@ export interface EditableContentProps extends ContentProps {
 
 // These are the props the generic Content wrapper receives
 interface Props {
-  url: PushpinUrl
+  documentId: DocumentId
+  type: string
   context: ContentTypes.Context
-  typeOverride?: string
   [arbitraryProp: string]: any
 }
 
@@ -47,25 +46,18 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
   props: Props,
   ref: Ref<ContentHandle>
 ) => {
-  const { context, url, typeOverride } = props
+  const { context, documentId, type } = props
 
   const [isCrashed, setCrashed] = useState(false)
   const selfId = useSelfId()
   const onCatch = useCallback(() => setCrashed(true), [])
 
-  const { type: linkType, documentId } = parseDocumentLink(url)
-
-  const type = typeOverride || linkType
 
   useHeartbeat(["expanded"].includes(context) ? documentId : undefined)
 
   useEffect(() => {
     setCrashed(false)
-  }, [url])
-
-  if (!url) {
-    return null
-  }
+  }, [documentId, type])
 
   const contentType = ContentTypes.lookup({ type, context })
 
@@ -77,12 +69,14 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
     return renderError(type)
   }
 
+  const key = `${documentId}/${type}`
+
   return (
     <Crashable onCatch={onCatch}>
       <contentType.component
         {...props}
         contentRef={ref}
-        key={url}
+        key={key}
         type={type}
         documentId={documentId}
         selfId={selfId}

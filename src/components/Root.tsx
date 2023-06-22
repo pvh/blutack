@@ -2,15 +2,13 @@ import Content from "./Content"
 import * as ContentTypes from "./pushpin-code/ContentTypes"
 import { DocumentId } from "automerge-repo"
 import { CurrentDeviceContext } from "./content-types/workspace/Device"
-import { ViewStateContext } from "./pushpin-code/ViewState"
-import { createDocumentLink } from "./pushpin-code/Url"
-import { useUrlParams } from "./pushpin-code/Url"
 
 // Import various content types and register them.
+import * as Profile from "./bootstrap/Profile"
 
-import * as W from "./content-types/workspace/Workspace"
-ContentTypes.register(W.contentType)
-import * as B from "./content-types/board"
+ContentTypes.register(Profile.contentType)
+
+/*import * as B from "./content-types/board"
 ContentTypes.register(B.contentType)
 import * as Contact from "./content-types/contact"
 ContentTypes.register(Contact.contentType)
@@ -41,7 +39,7 @@ import * as RawView from "./content-types/RawView"
 ContentTypes.register(RawView.contentType)
 
 import "./content-types/defaults/DefaultInTitle"
-import "./content-types/defaults/DefaultInBadge"
+import "./content-types/defaults/DefaultInBadge" */
 
 interface RootArgs {
   workspaceDocId: DocumentId
@@ -49,17 +47,13 @@ interface RootArgs {
 }
 
 export default function Root({ workspaceDocId, deviceDocId }: RootArgs) {
-  const { currentDocUrl, viewState } = useUrlParams()
-
   return (
-    <ViewStateContext.Provider value={viewState}>
       <CurrentDeviceContext.Provider value={deviceDocId}>
         <Content
           context="root"
-          currentDocUrl={currentDocUrl}
-          url={createDocumentLink("workspace", workspaceDocId)}
+          type="profile"
+          documentId={workspaceDocId}
         />
       </CurrentDeviceContext.Provider>
-    </ViewStateContext.Provider>
   )
 }
