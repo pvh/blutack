@@ -1,4 +1,4 @@
-import { createDocumentLink, openDoc, parseDocumentLink } from "../components/pushpin-code/Url"
+import { createDocumentLink, openDocument, parseDocumentLink } from "../components/pushpin-code/Url"
 
 import CenteredStack from "../components/ui/CenteredStack"
 import ListMenu from "../components/ui/ListMenu"
@@ -8,11 +8,11 @@ import * as ImportData from "../components/pushpin-code/ImportData"
 import { useDocument } from "automerge-repo-react-hooks"
 import ActionListItem from "../components/content-types/workspace/omnibox/ActionListItem"
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle"
-import React, {useMemo, useRef} from "react"
-import * as ContentTypes from "../components/pushpin-code/ContentTypes";
-import {Popover} from "../components/ui/Popover";
-import ListMenuSection from "../components/ui/ListMenuSection";
-import ListMenuItem from "../components/ui/ListMenuItem";
+import React, { useMemo } from "react"
+import * as ContentTypes from "../components/pushpin-code/ContentTypes"
+import { Popover } from "../components/ui/Popover"
+import ListMenuSection from "../components/ui/ListMenuSection"
+import ListMenuItem from "../components/ui/ListMenuItem"
 
 function getListMenuItemElement(element) {
   if (!element) {
@@ -87,15 +87,11 @@ export default function ContentList({ documentId }) {
     [draggedOverIndex]
   )
 
-  function selectContent(contentUrl) {
-    console.log("todo select")
-  }
-
   const onCreateContent = React.useCallback(
     (contentUrl) => {
       changeDoc((doc) => {
         doc.content.push(contentUrl)
-        selectContent(contentUrl)
+        openDocument(contentUrl)
       })
     },
     [changeDoc]
@@ -164,7 +160,7 @@ function ContentListItem({ url, onDelete }) {
       shortcut: "⏎",
       keysForActionPressed: (e) => !e.shiftKey && e.key === "Enter",
       callback: (url) => () => {
-        console.log("not implemented")
+        openDocument(url)
       },
     },
     {
@@ -174,7 +170,7 @@ function ContentListItem({ url, onDelete }) {
       shortcut: "⌘+d",
       keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "d",
       callback: (url) => () =>
-        openDoc(createDocumentLink("raw", parseDocumentLink(url).documentId)),
+        openDocument(createDocumentLink("raw", parseDocumentLink(url).documentId)),
     },
     {
       name: "remove",

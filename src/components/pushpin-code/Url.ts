@@ -90,6 +90,16 @@ export function parts(str: string) {
   return { scheme, type, documentId }
 }
 
+export function openDocument(url: PushpinUrl) {
+  const {documentId, type} = parseDocumentLink(url)
+  changeUrl(`//${window.location.host}/blutack/${documentId}/${type}`)
+}
+
+export function openEmptyState () {
+  changeUrl(`//${window.location.host}/blutack/`)
+}
+
+
 // always use changeUrl instead of using the history api directly
 // because otherwise we won't be notified of the changes
 export function changeUrl(url: string) {
@@ -202,4 +212,46 @@ export function loadUrlOfUser(document: DocWithUrlState, userId: DocumentId) {
   if (url) {
     changeUrl(url)
   }
+}
+
+const DOC_URL_REGEX = /^\/blutack\/(([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\/(.+))?$/
+
+interface ActiveRoute {
+  documentId: DocumentId
+  type: string
+}
+
+export function useActiveRoute () : ActiveRoute | undefined  {
+  const [ activeRoute, setActiveRoute ] = useState<ActiveRoute | undefined>(undefined)
+
+  useEffect(() => {
+    const onChangeUrl = () => {
+      const match = location.pathname.match(DOC_URL_REGEX)
+
+      if (!match) {
+        openEmptyState()
+        setActiveRoute(undefined)
+        return
+      }
+
+      if (!match) {
+        return
+      }
+
+      const documentId = match[2] as DocumentId
+      const type = match[3]
+
+      setActiveRoute(documentId && type  ? { documentId, type } : undefined)
+    }
+
+    onChangeUrl()
+
+    window.addEventListener("popstate", onChangeUrl)
+
+    return () => {
+      window.removeEventListener("popstate", onChangeUrl)
+    }
+  }, [])
+
+  return activeRoute
 }

@@ -1,7 +1,12 @@
 import { createContext } from "react"
 import { useDocument } from "automerge-repo-react-hooks"
 import * as ContentTypes from "../components/pushpin-code/ContentTypes"
-import {createDocumentLink, parseDocumentLink} from "../components/pushpin-code/Url";
+import {
+  createDocumentLink,
+  parseDocumentLink,
+  useActiveRoute,
+} from "../components/pushpin-code/Url"
+import Content from "../components/Content"
 
 export const ProfileContext = createContext(undefined)
 
@@ -20,7 +25,8 @@ interface ProfileDoc {
 */
 
 export default function Profile({ documentId }) {
-  const [workspace, changeWorkspace] = useDocument(documentId)
+  const [workspace] = useDocument(documentId)
+  const activeRoute = useActiveRoute()
 
   if (!workspace) {
     return null
@@ -28,11 +34,14 @@ export default function Profile({ documentId }) {
 
   return (
     <ProfileContext.Provider value={documentId}>
-      <div className="p-4">
-      <div className="flex flex-col max-w-[300px]">
-        <h1 className="text-xl">Blutak</h1>
-        <Content url={workspace.homeDocUrl} />
-      </div>
+      <div className="p-4 flex">
+        <div className="flex flex-col max-w-[300px]">
+          <h1 className="text-xl">Blutack</h1>
+          <Content url={workspace.homeDocUrl} />
+        </div>
+        {activeRoute && (
+          <Content url={createDocumentLink(activeRoute.type, activeRoute.documentId)} />
+        )}
       </div>
     </ProfileContext.Provider>
   )
@@ -46,22 +55,27 @@ export function create(_attrs, profileHndle) {
     // but i don't want to pull that in scope right now
 
     ContentTypes.create("contentlist", { title: "Home" }, (listUrl, listHandle) => {
-      ContentTypes.create("text", {
-        title: "Home",
-        text: "Hello world!"}, (textUrl) => {
-        listHandle.change((doc) => {
-          doc.content.push(textUrl)
-        })
-        profileHndle.change((profile) => {
-          profile.selfId = selfDocumentId
-          profile.contactIds = []
-          profile.homeDocUrl = listUrl
-          profile.viewedDocUrls = [listUrl]
-          profile.archivedDocUrls = [listUrl]
-          profile.contentTypeIds = []
-          profile.persistedLastSeenHeads = {}
-        })
-      })
+      ContentTypes.create(
+        "text",
+        {
+          title: "Home",
+          text: "Hello world!",
+        },
+        (textUrl) => {
+          listHandle.change((doc) => {
+            doc.content.push(textUrl)
+          })
+          profileHndle.change((profile) => {
+            profile.selfId = selfDocumentId
+            profile.contactIds = []
+            profile.homeDocUrl = listUrl
+            profile.viewedDocUrls = [listUrl]
+            profile.archivedDocUrls = [listUrl]
+            profile.contentTypeIds = []
+            profile.persistedLastSeenHeads = {}
+          })
+        }
+      )
     })
   })
 }
@@ -76,4 +90,4 @@ export const contentType = {
   resizable: false,
   unlisted: true,
   create,
-};
+}
