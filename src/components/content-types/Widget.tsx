@@ -48,6 +48,7 @@ export default function Widget(props: ContentProps) {
       errorBoundaryRef.current.resetErrorBoundary()
     }
 
+    console.log("source change effect")
     ;(async () => {
       // fetch ourselves as an ES module
       const module = await loadWidgetModule(documentId)
@@ -71,6 +72,8 @@ export default function Widget(props: ContentProps) {
   if (!doc) {
     return null
   }
+
+  console.log({ View })
 
   return (
     <div
@@ -100,7 +103,7 @@ const EXAMPLE_SOURCE = `export default ({ documentId }) => {
    const [doc, changeDoc] = useDocument(documentId)
 
   const counter = doc ? doc.counter ?? 0 : 0
-  
+
   const onClickCounter = () => {
     changeDoc((doc) => {
       doc.counter = counter + 1

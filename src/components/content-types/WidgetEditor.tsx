@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react"
 import { ContentType } from "../pushpin-code/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import "./TextContent.css"
-import { ContentProps } from "../Content"
+import Content, { ContentProps } from "../Content"
 import "./WidgetEditor.css"
 import { basicSetup } from "codemirror"
 import { javascript } from "@codemirror/lang-javascript"
@@ -12,20 +12,20 @@ import { WidgetDoc } from "./Widget"
 import { transform } from "@babel/standalone"
 import { PluginObj } from "@babel/core"
 
-const importTransformPlugin: PluginObj =  {
-    name: "transform-imports-to-skypack",
-    visitor: {
-      ImportDeclaration(path) {
-        const value = path.node.source.value
+const importTransformPlugin: PluginObj = {
+  name: "transform-imports-to-skypack",
+  visitor: {
+    ImportDeclaration(path) {
+      const value = path.node.source.value
 
-        // Don't replace relative or absolute URLs.
-        if (/^([./])/.test(value)) {
-          return
-        }
-
-        path.node.source.value = `https://cdn.skypack.dev/${value}`
+      // Don't replace relative or absolute URLs.
+      if (/^([./])/.test(value)) {
+        return
       }
-    }
+
+      path.node.source.value = `https://cdn.skypack.dev/${value}`
+    },
+  },
 }
 
 export default function WidgetEditor(props: ContentProps) {
@@ -36,6 +36,7 @@ export default function WidgetEditor(props: ContentProps) {
   }
 
   const onChangeSource = (source: string) => {
+    console.log("changesource")
     changeDoc((doc) => {
       doc.source = source
 
@@ -57,7 +58,16 @@ export default function WidgetEditor(props: ContentProps) {
     })
   }
 
-  return <CodeEditor source={doc.source} onChangeSource={onChangeSource} />
+  const newUrl = props.url.replaceAll("widgetEditor", "widget")
+
+  return (
+    <div>
+      <div>
+        <Content context="root" url={newUrl} />
+      </div>
+      <CodeEditor source={doc.source} onChangeSource={onChangeSource} />
+    </div>
+  )
 }
 
 interface CodeEditorProps {
