@@ -13,6 +13,9 @@ import * as ContentTypes from "../components/pushpin-code/ContentTypes"
 import { Popover } from "../components/ui/Popover"
 import ListMenuSection from "../components/ui/ListMenuSection"
 import ListMenuItem from "../components/ui/ListMenuItem"
+import Badge from "../components/ui/Badge"
+import ListItem from "../components/ui/ListItem";
+import {typeNameToContentType} from "../components/pushpin-code/ContentTypes";
 
 function getListMenuItemElement(element) {
   if (!element) {
@@ -186,30 +189,32 @@ function ContentListItem({ url, onDelete }) {
   const { type, documentId } = parseDocumentLink(url)
   const [doc] = useDocument(documentId)
 
+  const contentType = ContentTypes.typeNameToContentType(type)
+
   if (!doc) {
     return null
   }
 
   return (
     <ActionListItem contentUrl={url} defaultAction={actions[0]} actions={actions}>
-      <TitleWithSubtitle
-        title={doc.title ?? `Untitled ${type}`}
-        titleEditorField={"title"}
-        documentId={documentId}
-        editable={true}
-      />
+      <ListItem>
+        <Badge icon={contentType ? contentType.icon : "question"} />
+        <TitleWithSubtitle
+          title={doc.title ?? `Untitled ${type}`}
+          titleEditorField={"title"}
+          documentId={documentId}
+          editable={true}
+        />
+      </ListItem>
     </ActionListItem>
   )
 }
 
 export function NewDocumentButton({ trigger, onCreateDocument }) {
-  const contentTypes = useMemo(
-    () => ContentTypes.list({ context: "board" }),
-    []
-  )
+  const contentTypes = useMemo(() => ContentTypes.list({ context: "board" }), [])
 
-  const createDoc = contentType => {
-    ContentTypes.create(contentType.type, {}, contentUrl => {
+  const createDoc = (contentType) => {
+    ContentTypes.create(contentType.type, {}, (contentUrl) => {
       onCreateDocument(contentUrl)
     })
   }
@@ -217,16 +222,14 @@ export function NewDocumentButton({ trigger, onCreateDocument }) {
   return (
     <Popover closeOnClick={true} trigger={trigger}>
       <ListMenuSection>
-        {contentTypes.map(contentType => (
+        {contentTypes.map((contentType) => (
           <ListMenuItem
             onClick={() => {
               createDoc(contentType)
             }}
             key={contentType.type}
           >
-            <div className="ContextMenu__iconBounding ContextMenu__iconBounding--note">
-              <i className={classNames("fa", `fa-${contentType.icon}`)} />
-            </div>
+            <Badge icon={contentType ? contentType.icon : "question"} />
             <span className="ContextMenu__label">{contentType.name}</span>
           </ListMenuItem>
         ))}
@@ -234,7 +237,6 @@ export function NewDocumentButton({ trigger, onCreateDocument }) {
     </Popover>
   )
 }
-
 
 function create(attrs, handle) {
   handle.change((doc) => {
