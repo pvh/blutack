@@ -1,6 +1,6 @@
 import { DocumentId, DocHandle } from "automerge-repo"
-import { ContentType } from "../../../bootstrap/lib/blutack/ContentTypes"
-import { PushpinUrl } from "../../../bootstrap/lib/blutack/Url"
+import { ContentType } from "../../../lib/blutack/ContentTypes"
+import { PushpinUrl } from "../../../lib/blutack/Url"
 
 // board in various contexts
 import Board, { BOARD_COLORS } from "./Board"

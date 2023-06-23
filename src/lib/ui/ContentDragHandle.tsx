@@ -5,7 +5,7 @@ import * as UriList from "../blutack/UriList"
 import "./ContentDragHandle.css"
 import { PushpinUrl } from "../blutack/Url"
 import { DocumentId } from "automerge-repo"
-import { BinaryDataId, useBinaryDataHeader } from "../../../blobstore/Blob"
+import { BinaryDataId, useBinaryDataHeader } from "../../blobstore/Blob"
 
 interface SimpleProps {
   url: PushpinUrl

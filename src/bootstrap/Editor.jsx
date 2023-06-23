@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react"
-import { useDocument } from "automerge-repo-react-hooks"
-import "./TextContent.css"
+import { useDocument, Modules, Context } from "../lib/blutack"
+// const { useDocument, Modules, Context } = Blutack
 import { basicSetup } from "codemirror"
 import { javascript } from "@codemirror/lang-javascript"
 import { EditorView, keymap } from "@codemirror/view"
@@ -19,44 +19,66 @@ const importTransformPlugin = {
       }
 
       path.node.source.value = `https://cdn.skypack.dev/${value}`
-    }
-  }
+    },
+  },
 }
 
 export default function Editor(props) {
   const [doc, changeDoc] = useDocument(props.documentId)
+  const [profile, changeProfile] = Context.useProfile()
 
   if (!doc) {
     return null
   }
 
   if (doc.source === undefined) {
-    return <div>Source of document is not editable</div>
+    return <div>Document has no editable source</div>
   }
 
-  const onChangeSource = source => {
-    changeDoc(doc => {
+  const onChangeSource = async (source) => {
+    changeDoc((doc) => {
       doc.source = source
 
       try {
         const transformedCode = transform(source, {
           presets: ["react"],
           plugins: [importTransformPlugin],
-          parserOpts: { allowReturnOutsideFunction: true }
+          parserOpts: { allowReturnOutsideFunction: true },
         })
 
         if (!transformedCode.code) {
           return
         }
 
-        doc.compiledSource = transformedCode.code
+        doc.dist = transformedCode.code
       } catch (error) {
         console.error(error)
       }
     })
+
+    const module = await Modules.load(props.documentId)
+
+    // update registration in profile depending on weather the module defines a content type
+    changeProfile((profile) => {
+      if (!profile.contentTypeIds) {
+        profile.contentTypeIds = []
+      }
+
+      const indexOfModule = profile.contentTypeIds.indexOf(props.documentId)
+
+      if (module.contentType && indexOfModule === -1) {
+        profile.contentTypeIds.push(props.documentId)
+      } else if (!module.contentType && indexOfModule !== -1) {
+        profile.contentTypeIds.splice(indexOfModule, 1)
+      }
+    })
   }
 
-  return <div className="w-full h-full"><CodeEditor source={doc.source} onChangeSource={onChangeSource} /></div>
+  return (
+    <div className="w-full h-full">
+      <CodeEditor source={doc.source} onChangeSource={onChangeSource} />
+    </div>
+  )
 }
 
 function CodeEditor({ source, onChangeSource }) {
@@ -70,11 +92,7 @@ function CodeEditor({ source, onChangeSource }) {
 
     const view = (editorViewRef.current = new EditorView({
       doc: source,
-      extensions: [
-        basicSetup,
-        javascript({ jsx: true }),
-        keymap.of([indentWithTab])
-      ],
+      extensions: [basicSetup, javascript({ jsx: true }), keymap.of([indentWithTab])],
       dispatch(transaction) {
         view.update([transaction])
 
@@ -83,7 +101,7 @@ function CodeEditor({ source, onChangeSource }) {
           onChangeSource(newValue)
         }
       },
-      parent: containerRef.current
+      parent: containerRef.current,
     }))
 
     return () => {
@@ -92,11 +110,7 @@ function CodeEditor({ source, onChangeSource }) {
   }, [])
 
   return (
-    <div
-      className="WidgetEditor"
-      ref={containerRef}
-      onKeyDown={evt => evt.stopPropagation()}
-    />
+    <div className="WidgetEditor" ref={containerRef} onKeyDown={(evt) => evt.stopPropagation()} />
   )
 }
 
@@ -107,8 +121,8 @@ export const contentType = {
   contexts: {
     root: Editor,
     board: Editor,
-    expanded: Editor
+    expanded: Editor,
   },
   unlisted: true,
-  dontAddToViewedDocUrls: true
+  dontAddToViewedDocUrls: true,
 }

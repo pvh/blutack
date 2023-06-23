@@ -1,4 +1,4 @@
-import { LastSeenHeads } from "../bootstrap/lib/blutack/Changes"
+import { LastSeenHeads } from "../lib/blutack/Changes"
 import { HasBadge, readAsHasBadge } from "./HasBadge"
 import { HasTitle, readAsHasTitle } from "./HasTitle"
 

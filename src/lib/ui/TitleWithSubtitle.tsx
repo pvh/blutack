@@ -2,7 +2,7 @@ import React from "react"
 import "./Heading.css"
 import Heading from "./Heading"
 import SecondaryText from "./SecondaryText"
-import TitleEditor from "../../../components/TitleEditor"
+import TitleEditor from "../../components/TitleEditor"
 import "./TitleWithSubtitle.css"
 import { DocumentId } from "automerge-repo"
 

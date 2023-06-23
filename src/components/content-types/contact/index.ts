@@ -5,8 +5,8 @@ import { USER_COLORS } from "./Constants"
 import "./Avatar.css"
 import { DocumentId } from "automerge-repo"
 import { DocHandle } from "automerge-repo"
-import { PushpinUrl } from "../../../bootstrap/lib/blutack/Url"
-import { ContentType } from "../../../bootstrap/lib/blutack/ContentTypes"
+import { PushpinUrl } from "../../../lib/blutack/Url"
+import { ContentType } from "../../../lib/blutack/ContentTypes"
 
 export type ContactDocInvites = {
   [url: string]: PushpinUrl[] /* Crypto.Box[] */

@@ -1,13 +1,13 @@
 import { useCallback } from "react"
-import { createDocumentLink } from "../../../bootstrap/lib/blutack/Url"
+import { createDocumentLink } from "../../../lib/blutack/Url"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
-import Content from "../../../bootstrap/lib/blutack/Content"
+import Content from "../../../lib/blutack/Content"
 import ActionListItem from "../workspace/omnibox/ActionListItem"
 import { DeviceDoc } from "../workspace/Device"
 
 import "./ContactEditor.css"
-import ListItem from "../../../bootstrap/lib/ui/ListItem"
+import ListItem from "../../../lib/ui/ListItem"
 
 export interface Props {
   selfId: DocumentId

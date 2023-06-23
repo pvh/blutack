@@ -1,6 +1,6 @@
 import { BoardDoc, CardId, BoardDocCard } from "."
-import { parseDocumentLink } from "../../../bootstrap/lib/blutack/Url"
-import * as ContentTypes from "../../../bootstrap/lib/blutack/ContentTypes"
+import { parseDocumentLink } from "../../../lib/blutack/Url"
+import * as ContentTypes from "../../../lib/blutack/ContentTypes"
 import {
   gridCellsToPixels,
   snapPositionToGrid,

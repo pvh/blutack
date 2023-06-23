@@ -2,7 +2,7 @@
 
 import Quill from "quill"
 import "./Autocompletion.css"
-import { evalAutocompletion } from "../../bootstrap/lib/blutack/Searches"
+import { evalAutocompletion } from "../../lib/blutack/Searches"
 
 function attachDataValues(element, data, dataAttributes) {
   const mention = element

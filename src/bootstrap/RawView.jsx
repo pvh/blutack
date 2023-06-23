@@ -1,35 +1,31 @@
 import React, { useCallback, useEffect, useState } from "react"
 
-import { ContentType } from "../../lib/blutack/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import "./TextContent.css"
-import { ContentProps } from "../../lib/blutack/Content"
-import "./RawView.css"
-import ReactJson, { InteractionProps, OnSelectProps } from "react-json-view"
-import {
-  createDocumentLink,
-  isPushpinUrl,
-  openDoc,
-  parseDocumentLink,
-  PushpinUrl,
-} from "../../lib/blutack/Url"
-import { DocumentId } from "automerge-repo"
-import * as Automerge from "@automerge/automerge"
+import ReactJson from "react-json-view"
+import { Url, Automerge } from "../lib/blutack"
+/*
+const {
+  Url
+} = Blutack
+ */
+const { createDocumentLink, isPushpinUrl, openDoc, parseDocumentLink } = Url
 
-export default function RawView(props: ContentProps) {
+
+export default function RawView(props) {
   const [doc, changeDoc] = useDocument(props.documentId)
-  const [isMetaPressed, setIsAltPressed] = useState<boolean>(false)
+  const [isMetaPressed, setIsAltPressed] = useState(false)
 
   const onEdit = useCallback(
-    ({ namespace, new_value, name }: InteractionProps) => {
+    ({ namespace, new_value, name }) => {
       changeDoc((doc) => {
-        let current: any = doc
+        let current = doc
 
         for (const key of namespace) {
-          current = current[key as string]
+          current = current[key]
         }
 
-        current[name as string] = new_value
+        current[name] = new_value
       })
     },
     [changeDoc]
@@ -37,44 +33,42 @@ export default function RawView(props: ContentProps) {
 
   const onAdd = useCallback(() => true, [])
   const onDelete = useCallback(
-    ({ namespace, name }: InteractionProps) => {
+    ({ namespace, name }) => {
       changeDoc((doc) => {
-        let current: any = doc
+        let current = doc
 
         for (const key of namespace) {
-          current = current[key as string]
+          current = current[key]
         }
 
-        delete current[name as string]
+        delete current[name]
       })
     },
     [changeDoc]
   )
 
   const onSelect = useCallback(
-    ({ value }: OnSelectProps) => {
+    ({ value }) => {
       if (!(typeof value === "string")) {
         return
       }
 
       if (isPushpinUrl(value)) {
         openDoc(
-          isMetaPressed
-            ? createDocumentLink("raw", parseDocumentLink(value as PushpinUrl).documentId)
-            : (value as PushpinUrl)
+          isMetaPressed ? createDocumentLink("raw", parseDocumentLink(value).documentId) : value
         )
       } else if (isDocumentId(value)) {
-        openDoc(createDocumentLink("raw", value as DocumentId))
+        openDoc(createDocumentLink("raw", value))
       }
     },
     [changeDoc]
   )
 
   useEffect(() => {
-    const onKeyDown = (evt: KeyboardEvent) => {
+    const onKeyDown = (evt) => {
       setIsAltPressed(evt.altKey)
     }
-    const onKeyUp = (evt: KeyboardEvent) => {
+    const onKeyUp = (evt) => {
       setIsAltPressed(evt.altKey)
     }
 
@@ -103,13 +97,13 @@ export default function RawView(props: ContentProps) {
   )
 }
 
-function isDocumentId(value: any) {
+function isDocumentId(value) {
   return /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/.test(
     value
   )
 }
 
-export const contentType: ContentType = {
+export const contentType = {
   type: "raw",
   name: "Raw",
   icon: "file-code",

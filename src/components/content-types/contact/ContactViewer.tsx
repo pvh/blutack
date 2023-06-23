@@ -1,29 +1,29 @@
-import { createDocumentLink, PushpinUrl } from "../../../bootstrap/lib/blutack/Url"
+import { createDocumentLink, PushpinUrl } from "../../../lib/blutack/Url"
 
 import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
-import Content, { ContentProps } from "../../../bootstrap/lib/blutack/Content"
+import Content, { ContentProps } from "../../../lib/blutack/Content"
 import { ContactDoc } from "."
 import { FileDoc } from "../files"
 
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
-import Heading from "../../../bootstrap/lib/ui/Heading"
-import SecondaryText from "../../../bootstrap/lib/ui/SecondaryText"
+import Heading from "../../../lib/ui/Heading"
+import SecondaryText from "../../../lib/ui/SecondaryText"
 
 import ConnectionStatusBadge from "./ConnectionStatusBadge"
-import Badge from "../../../bootstrap/lib/ui/Badge"
-import CenteredStack from "../../../bootstrap/lib/ui/CenteredStack"
-import ListMenuSection from "../../../bootstrap/lib/ui/ListMenuSection"
-import ListMenuItem from "../../../bootstrap/lib/ui/ListMenuItem"
+import Badge from "../../../lib/ui/Badge"
+import CenteredStack from "../../../lib/ui/CenteredStack"
+import ListMenuSection from "../../../lib/ui/ListMenuSection"
+import ListMenuItem from "../../../lib/ui/ListMenuItem"
 import SharesSection from "./SharesSection"
 
 // @ts-ignore-next-line
 import { Swatch } from "react-color/lib/components/common/Swatch"
 
 import "./ContactEditor.css"
-import ListMenu from "../../../bootstrap/lib/ui/ListMenu"
-import ListItem from "../../../bootstrap/lib/ui/ListItem"
+import ListMenu from "../../../lib/ui/ListMenu"
+import ListItem from "../../../lib/ui/ListItem"
 
 export default function ContactViewer(props: ContentProps) {
   const { documentId: contactId } = props

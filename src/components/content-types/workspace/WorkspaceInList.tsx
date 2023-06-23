@@ -1,14 +1,14 @@
 import React from "react"
-import Content, { ContentProps } from "../../../bootstrap/lib/blutack/Content"
+import Content, { ContentProps } from "../../../lib/blutack/Content"
 import { useDocument } from "automerge-repo-react-hooks"
-import Badge from "../../../bootstrap/lib/ui/Badge"
+import Badge from "../../../lib/ui/Badge"
 import { WorkspaceDoc } from "./Workspace"
-import { createDocumentLink } from "../../../bootstrap/lib/blutack/Url"
+import { createDocumentLink } from "../../../lib/blutack/Url"
 import { ContactDoc } from "../contact"
 import "./WorkspaceInList.css"
-import ListItem from "../../../bootstrap/lib/ui/ListItem"
-import ContentDragHandle from "../../../bootstrap/lib/ui/ContentDragHandle"
-import TitleWithSubtitle from "../../../bootstrap/lib/ui/TitleWithSubtitle"
+import ListItem from "../../../lib/ui/ListItem"
+import ContentDragHandle from "../../../lib/ui/ContentDragHandle"
+import TitleWithSubtitle from "../../../lib/ui/TitleWithSubtitle"
 
 export default function WorkspaceListItem(props: ContentProps) {
   const { url, documentId } = props

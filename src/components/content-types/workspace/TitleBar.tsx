@@ -3,26 +3,26 @@ import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
 import Omnibox from "./omnibox/Omnibox"
-import Content from "../../../bootstrap/lib/blutack/Content"
+import Content from "../../../lib/blutack/Content"
 import Authors from "./Authors"
 import {
   PushpinUrl,
   createDocumentLink,
   createWebLink,
   parseDocumentLink,
-} from "../../../bootstrap/lib/blutack/Url"
-import { useEvent } from "../../../bootstrap/lib/blutack/Hooks"
+} from "../../../lib/blutack/Url"
+import { useEvent } from "../../../lib/blutack/Hooks"
 
 import "./TitleBar.css"
 import { WorkspaceDoc as WorkspaceDoc } from "./Workspace"
-import Badge from "../../../bootstrap/lib/ui/Badge"
+import Badge from "../../../lib/ui/Badge"
 
 import "./TitleBar.css"
 import NewDocumentButton from "../../NewDocumentButton"
-import { openDoc } from "../../../bootstrap/lib/blutack/Url"
+import { openDoc } from "../../../lib/blutack/Url"
 import { ChangedDocsList } from "./ChangedDocsList"
-import { getLastSeenHeadsMapOfWorkspace } from "../../../bootstrap/lib/blutack/Changes"
-import ListItem from "../../../bootstrap/lib/ui/ListItem"
+import { getLastSeenHeadsMapOfWorkspace } from "../../../lib/blutack/Changes"
+import ListItem from "../../../lib/ui/ListItem"
 import NotificationSetting from "./NotificationSetting"
 import classNames from "classnames"
 

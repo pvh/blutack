@@ -11,7 +11,7 @@ import {
   getUnreadMessageCountOfThread,
   hasUnseenMentions as threadHasUnseenMentions,
 } from "../components/content-types/ThreadContent"
-import { LastSeenHeads } from "../bootstrap/lib/blutack/Changes"
+import { LastSeenHeads } from "../lib/blutack/Changes"
 import { DocumentId } from "automerge-repo"
 import { shouldNotifyUserAboutDoc } from "../components/content-types/workspace/NotificationSetting"
 

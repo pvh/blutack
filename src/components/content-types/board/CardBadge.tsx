@@ -1,9 +1,9 @@
 import React from "react"
-import { parseDocumentLink, PushpinUrl } from "../../../bootstrap/lib/blutack/Url"
-import * as ContentTypes from "../../../bootstrap/lib/blutack/ContentTypes"
-import Badge from "../../../bootstrap/lib/ui/Badge"
+import { parseDocumentLink, PushpinUrl } from "../../../lib/blutack/Url"
+import * as ContentTypes from "../../../lib/blutack/ContentTypes"
+import Badge from "../../../lib/ui/Badge"
 import { useDocument } from "automerge-repo-react-hooks"
-import ContentDragHandle from "../../../bootstrap/lib/ui/ContentDragHandle"
+import ContentDragHandle from "../../../lib/ui/ContentDragHandle"
 
 interface Props {
   url: PushpinUrl

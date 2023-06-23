@@ -4,18 +4,18 @@ import { FileDoc } from "."
 
 import "./ImageContent.css"
 
-import { ContentProps } from "../../../bootstrap/lib/blutack/Content"
-import * as ContentTypes from "../../../bootstrap/lib/blutack/ContentTypes"
-import Badge from "../../../bootstrap/lib/ui/Badge"
-import ListItem from "../../../bootstrap/lib/ui/ListItem"
-import ContentDragHandle from "../../../bootstrap/lib/ui/ContentDragHandle"
-import TitleWithSubtitle from "../../../bootstrap/lib/ui/TitleWithSubtitle"
+import { ContentProps } from "../../../lib/blutack/Content"
+import * as ContentTypes from "../../../lib/blutack/ContentTypes"
+import Badge from "../../../lib/ui/Badge"
+import ListItem from "../../../lib/ui/ListItem"
+import ContentDragHandle from "../../../lib/ui/ContentDragHandle"
+import TitleWithSubtitle from "../../../lib/ui/TitleWithSubtitle"
 import { useDocument } from "automerge-repo-react-hooks"
 import {
   createBinaryDataUrl,
   useBinaryDataHeader,
 } from "../../../blobstore/Blob"
-import { ContentType } from "../../../bootstrap/lib/blutack/ContentTypes"
+import { ContentType } from "../../../lib/blutack/ContentTypes"
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0

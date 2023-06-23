@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useRef } from "react"
-import { WorkspaceContext, WorkspaceDoc } from "../../../components/content-types/workspace/Workspace"
+import { WorkspaceContext, WorkspaceDoc } from "../../components/content-types/workspace/Workspace"
 import { useDocument } from "automerge-repo-react-hooks"
 import { parseDocumentLink, PushpinUrl } from "./Url"
 import {
@@ -14,7 +14,7 @@ import {
   List,
 } from "@automerge/automerge"
 
-import { readAsHasBadge } from "../../../lenses/HasBadge"
+import { readAsHasBadge } from "../../lenses/HasBadge"
 
 import memoize from "lodash.memoize"
 import { useSelf, useSelfId } from "./SelfHooks"

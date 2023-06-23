@@ -9,7 +9,23 @@ import {
   Changes,
   Searches,
   Url,
-} from "./lib/blutack"
+} from "../lib/blutack"
+
+/*
+const {
+  Automerge,
+  WebStreamLogic,
+  useDocument,
+  useStaticCallback,
+  useDocumentIds,
+  useSelfId,
+  usePresence,
+  Changes,
+  Searches,
+  Url,
+} = Blutack
+ */
+
 import Quill from "quill"
 import Delta from "quill-delta"
 import QuillCursors from "quill-cursors"

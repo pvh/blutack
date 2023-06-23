@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react"
 import Actions, { ActionItem } from "./Actions"
-import { PushpinUrl } from "../../../../bootstrap/lib/blutack/Url"
-import ListMenuItem, { Stretch } from "../../../../bootstrap/lib/ui/ListMenuItem"
+import { PushpinUrl } from "../../../../lib/blutack/Url"
+import ListMenuItem, { Stretch } from "../../../../lib/ui/ListMenuItem"
 
 export interface Props {
   contentUrl: PushpinUrl

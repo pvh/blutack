@@ -11,11 +11,11 @@ declare module "react-contextmenu" {
 }
 
 import "./ContextMenu.css"
-import * as ContentTypes from "../../../bootstrap/lib/blutack/ContentTypes"
-import { importFileList } from "../../../bootstrap/lib/blutack/ImportData"
+import * as ContentTypes from "../../../lib/blutack/ContentTypes"
+import { importFileList } from "../../../lib/blutack/ImportData"
 import { BoardAction } from "./Board"
 import { gridOffset, Position } from "./BoardGrid"
-import ColorPicker from "../../../bootstrap/lib/ui/ColorPicker"
+import ColorPicker from "../../../lib/ui/ColorPicker"
 
 interface Props {
   contentTypes: ContentTypes.LookupResult[]

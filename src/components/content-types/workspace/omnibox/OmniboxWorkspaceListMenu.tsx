@@ -6,29 +6,29 @@ import {
   createWebLink,
   parseDocumentLink,
   PushpinUrl,
-} from "../../../../bootstrap/lib/blutack/Url"
+} from "../../../../lib/blutack/Url"
 
 import { ContactDoc } from "../../contact"
-import Badge from "../../../../bootstrap/lib/ui/Badge"
+import Badge from "../../../../lib/ui/Badge"
 import "./Omnibox.css"
 import InvitationListItem from "./InvitationListItem"
-import ListMenuSection from "../../../../bootstrap/lib/ui/ListMenuSection"
-import ListMenuItem from "../../../../bootstrap/lib/ui/ListMenuItem"
-import ListMenu from "../../../../bootstrap/lib/ui/ListMenu"
+import ListMenuSection from "../../../../lib/ui/ListMenuSection"
+import ListMenuItem from "../../../../lib/ui/ListMenuItem"
+import ListMenu from "../../../../lib/ui/ListMenu"
 import { WorkspaceDoc as WorkspaceDoc } from "../Workspace"
 
 import "./OmniboxWorkspaceListMenu.css"
 import ActionListItem from "./ActionListItem"
-import Heading from "../../../../bootstrap/lib/ui/Heading"
+import Heading from "../../../../lib/ui/Heading"
 import { DocumentId } from "automerge-repo"
 import { Doc, List } from "@automerge/automerge"
 import { useDocument, useRepo } from "automerge-repo-react-hooks"
-import { useDocumentIds, useDocuments } from "../../../../bootstrap/lib/blutack/Hooks"
-import Content from "../../../../bootstrap/lib/blutack/Content"
+import { useDocumentIds, useDocuments } from "../../../../lib/blutack/Hooks"
+import Content from "../../../../lib/blutack/Content"
 import useInvitations, { Invitation } from "./InvitationsHook"
 import "./OmniboxWorkspaceListMenu.css"
-import { getCurrentDocUrl, openDoc } from "../../../../bootstrap/lib/blutack/Url"
-import ListItem from "../../../../bootstrap/lib/ui/ListItem"
+import { getCurrentDocUrl, openDoc } from "../../../../lib/blutack/Url"
+import ListItem from "../../../../lib/ui/ListItem"
 
 const log = Debug("pushpin:omnibox")
 

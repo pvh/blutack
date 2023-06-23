@@ -1,25 +1,25 @@
 import React, { useState, useCallback } from "react"
 
-import { createDocumentLink, parseDocumentLink, PushpinUrl } from "../../bootstrap/lib/blutack/Url"
+import { createDocumentLink, parseDocumentLink, PushpinUrl } from "../../lib/blutack/Url"
 
-import Content, { ContentProps } from "../../bootstrap/lib/blutack/Content"
+import Content, { ContentProps } from "../../lib/blutack/Content"
 
 import { DocHandle } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
-import CenteredStack from "../../bootstrap/lib/ui/CenteredStack"
-import ListMenu from "../../bootstrap/lib/ui/ListMenu"
+import CenteredStack from "../../lib/ui/CenteredStack"
+import ListMenu from "../../lib/ui/ListMenu"
 import "./ContentList.css"
-import ListItem from "../../bootstrap/lib/ui/ListItem"
+import ListItem from "../../lib/ui/ListItem"
 import classNames from "classnames"
 import ActionListItem from "./workspace/omnibox/ActionListItem"
-import CenteredStackRowItem from "../../bootstrap/lib/ui/CenteredStackRowItem"
-import { MIMETYPE_CONTENT_LIST_INDEX } from "../../bootstrap/lib/blutack/constants"
-import * as ImportData from "../../bootstrap/lib/blutack/ImportData"
-import { useViewState } from "../../bootstrap/lib/blutack/ViewState"
+import CenteredStackRowItem from "../../lib/ui/CenteredStackRowItem"
+import { MIMETYPE_CONTENT_LIST_INDEX } from "../../lib/blutack/constants"
+import * as ImportData from "../../lib/blutack/ImportData"
+import { useViewState } from "../../lib/blutack/ViewState"
 import NewDocumentButton from "../NewDocumentButton"
-import { openDoc } from "../../bootstrap/lib/blutack/Url"
-import { ContentType } from "../../bootstrap/lib/blutack/ContentTypes"
+import { openDoc } from "../../lib/blutack/Url"
+import { ContentType } from "../../lib/blutack/ContentTypes"
 import { ActionItem } from "./workspace/omnibox/Actions"
 
 export interface ContentListDoc {

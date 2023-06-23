@@ -1,13 +1,13 @@
 import React from "react"
 import { BoardDoc, BoardDocCard, CardId, icon } from "."
-import Content, { ContentProps } from "../../../bootstrap/lib/blutack/Content"
+import Content, { ContentProps } from "../../../lib/blutack/Content"
 import { useDocument } from "automerge-repo-react-hooks"
 import { useSelection } from "./BoardSelection"
-import Badge from "../../../bootstrap/lib/ui/Badge"
+import Badge from "../../../lib/ui/Badge"
 import CardBadge from "./CardBadge"
-import ListItem from "../../../bootstrap/lib/ui/ListItem"
-import TitleWithSubtitle from "../../../bootstrap/lib/ui/TitleWithSubtitle"
-import ContentDragHandle from "../../../bootstrap/lib/ui/ContentDragHandle"
+import ListItem from "../../../lib/ui/ListItem"
+import TitleWithSubtitle from "../../../lib/ui/TitleWithSubtitle"
+import ContentDragHandle from "../../../lib/ui/ContentDragHandle"
 
 interface Props extends ContentProps {
   editable: boolean

@@ -2,7 +2,7 @@ import React, { forwardRef, ForwardRefRenderFunction, memo, Ref, useCallback, us
 
 import * as ContentTypes from "./ContentTypes"
 import { parseDocumentLink, PushpinUrl } from "./Url"
-import Crashable from "../../../components/Crashable"
+import Crashable from "../../components/Crashable"
 import { DocumentId } from "automerge-repo"
 import { useSelfId } from "./SelfHooks"
 import { useHeartbeat } from "./PresenceHooks"

@@ -1,9 +1,9 @@
 import React from "react"
-import Badge from "../../../../bootstrap/lib/ui/Badge"
-import ListItem from "../../../../bootstrap/lib/ui/ListItem"
-import { PushpinUrl } from "../../../../bootstrap/lib/blutack/Url"
-import ContentDragHandle from "../../../../bootstrap/lib/ui/ContentDragHandle"
-import TitleWithSubtitle from "../../../../bootstrap/lib/ui/TitleWithSubtitle"
+import Badge from "../../../../lib/ui/Badge"
+import ListItem from "../../../../lib/ui/ListItem"
+import { PushpinUrl } from "../../../../lib/blutack/Url"
+import ContentDragHandle from "../../../../lib/ui/ContentDragHandle"
+import TitleWithSubtitle from "../../../../lib/ui/TitleWithSubtitle"
 import { DocumentId } from "automerge-repo"
 
 export interface Props {

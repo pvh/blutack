@@ -10,7 +10,8 @@ import localforage from "localforage"
 import { DocumentId, Repo } from "automerge-repo"
 import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechannel"
 import { RepoContext } from "automerge-repo-react-hooks"
-import * as ContentTypes from "./bootstrap/lib/blutack/ContentTypes"
+import * as Blutack from "./lib/blutack"
+import * as Ui from "./lib/ui"
 
 // TODO: load dynamically
 import { create as createProfile } from "./bootstrap/Profile.jsx"
@@ -18,6 +19,10 @@ import { create as createDevice } from "./bootstrap/Device.jsx"
 
 // hack: create globals so they are accessible in widgets
 (window as any).React = React;
+(window as any).Blutack = Blutack;
+(window as any).Ui = Ui;
+
+const { ContentTypes, Modules } = Blutack
 
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
@@ -135,7 +140,10 @@ console.log("profileDocId", profileDocId)
 const workspace = await (repo.find<any>(profileDocId).value())
 
 // load known content types
-// await Promise.all(workspace.contentTypeIds.map((contentTypeDocId : string) => loadWidgetModule(contentTypeDocId)))
+await Promise.all(workspace.contentTypeIds.map(async (contentTypeDocId : string) => {
+  const module = await Modules.load(contentTypeDocId as DocumentId)
+  console.log("load custom type", module.contentType.type)
+}))
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

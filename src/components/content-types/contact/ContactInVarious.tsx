@@ -2,27 +2,27 @@ import React from "react"
 import Debug from "debug"
 import classNames from "classnames"
 
-import Content, { ContentProps } from "../../../bootstrap/lib/blutack/Content"
+import Content, { ContentProps } from "../../../lib/blutack/Content"
 import { ContactDoc } from "."
 
-import { createDocumentLink } from "../../../bootstrap/lib/blutack/Url"
+import { createDocumentLink } from "../../../lib/blutack/Url"
 import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
 
 import "./ContactInVarious.css"
 import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import ConnectionStatusBadge from "./ConnectionStatusBadge"
-import ListItem from "../../../bootstrap/lib/ui/ListItem"
-import ContentDragHandle from "../../../bootstrap/lib/ui/ContentDragHandle"
-import TitleWithSubtitle from "../../../bootstrap/lib/ui/TitleWithSubtitle"
-import CenteredStack from "../../../bootstrap/lib/ui/CenteredStack"
-import Heading from "../../../bootstrap/lib/ui/Heading"
+import ListItem from "../../../lib/ui/ListItem"
+import ContentDragHandle from "../../../lib/ui/ContentDragHandle"
+import TitleWithSubtitle from "../../../lib/ui/TitleWithSubtitle"
+import CenteredStack from "../../../lib/ui/CenteredStack"
+import Heading from "../../../lib/ui/Heading"
 import {
   DocWithUrlState,
   getCurrentDocId,
   loadUrlOfUser,
   openDoc,
-} from "../../../bootstrap/lib/blutack/Url"
-import { useSelfId } from "../../../bootstrap/lib/blutack/SelfHooks"
+} from "../../../lib/blutack/Url"
+import { useSelfId } from "../../../lib/blutack/SelfHooks"
 
 const log = Debug("pushpin:settings")
 

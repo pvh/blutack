@@ -1,11 +1,11 @@
 import FileContent from "./FileContent"
 
-import * as ContentData from "../../../bootstrap/lib/blutack/ContentData"
+import * as ContentData from "../../../lib/blutack/ContentData"
 import { DocumentId, DocHandle } from "automerge-repo"
 import { BinaryDataId } from "../../../blobstore/Blob"
 
 import path from "path"
-import { ContentType } from "../../../bootstrap/lib/blutack/ContentTypes"
+import { ContentType } from "../../../lib/blutack/ContentTypes"
 
 export interface FileDoc {
   title: string // names are editable and not an intrinsic part of the file

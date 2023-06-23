@@ -5,7 +5,7 @@ import {
   ContentTypes,
   useDocument,
   Url
-} from "./lib/blutack"
+} from "../lib/blutack"
 import {
   Badge,
   CenteredStack,
@@ -16,12 +16,32 @@ import {
   Popover,
   TitleWithSubtitle,
   ActionListItem
-} from "./lib/ui"
+} from "../lib/ui"
+/*
+const {
+  MIMETYPE_CONTENT_LIST_INDEX,
+  ImportData,
+  ContentTypes,
+  useDocument,
+  Url
+} = Blutack
+const {
+  Badge,
+  CenteredStack,
+  ListItem,
+  ListMenu,
+  ListMenuItem,
+  ListMenuSection,
+  Popover,
+  TitleWithSubtitle,
+  ActionListItem
+} = Ui
+*/
 
 //const { useMemo, useState, useCallback } = React
 import { useMemo, useState, useCallback } from "react"
 import {useRepo} from "automerge-repo-react-hooks";
-import {createDocumentLink} from "./lib/blutack/Url";
+import {createDocumentLink} from "../lib/blutack/Url";
 
 function getListMenuItemElement(element) {
   if (!element) {

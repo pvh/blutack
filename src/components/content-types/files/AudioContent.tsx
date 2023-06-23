@@ -1,12 +1,12 @@
 import React, { useRef, useState } from "react"
 import { FileDoc } from "."
 
-import { ContentProps } from "../../../bootstrap/lib/blutack/Content"
+import { ContentProps } from "../../../lib/blutack/Content"
 import { useDocument } from "automerge-repo-react-hooks"
 import "./AudioContent.css"
 import { createBinaryDataUrl } from "../../../blobstore/Blob"
-import { usePresence } from "../../../bootstrap/lib/blutack/PresenceHooks"
-import { ContentType } from "../../../bootstrap/lib/blutack/ContentTypes"
+import { usePresence } from "../../../lib/blutack/PresenceHooks"
+import { ContentType } from "../../../lib/blutack/ContentTypes"
 
 interface AudioState {
   paused: boolean

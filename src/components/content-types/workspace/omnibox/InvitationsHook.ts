@@ -1,7 +1,7 @@
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
-import { useDocumentIds, useDocuments } from "../../../../bootstrap/lib/blutack/Hooks"
-import { PushpinUrl } from "../../../../bootstrap/lib/blutack/Url"
+import { useDocumentIds, useDocuments } from "../../../../lib/blutack/Hooks"
+import { PushpinUrl } from "../../../../lib/blutack/Url"
 import { ContactDoc } from "../../contact"
 import { WorkspaceDoc } from "../Workspace"
 
