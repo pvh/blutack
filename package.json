@@ -10,7 +10,7 @@
     "cli": "ts-node-esm cli.ts"
   },
   "dependencies": {
-    "@automerge/automerge": "2.1.0-alpha.1",
+    "@automerge/automerge": "2.1.0-alpha.6",
     "@babel/core": "^7.22.5",
     "@babel/standalone": "^7.22.5",
     "@codemirror/commands": "^6.2.4",
