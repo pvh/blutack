@@ -30,7 +30,7 @@ export default function Editor(props) {
     return null
   }
 
-  if (!doc.source) {
+  if (doc.source === undefined) {
     return <div>Source of document is not editable</div>
   }
 
@@ -56,7 +56,7 @@ export default function Editor(props) {
     })
   }
 
-  return <CodeEditor source={doc.source} onChangeSource={onChangeSource} />
+  return <div className="w-full h-full"><CodeEditor source={doc.source} onChangeSource={onChangeSource} /></div>
 }
 
 function CodeEditor({ source, onChangeSource }) {

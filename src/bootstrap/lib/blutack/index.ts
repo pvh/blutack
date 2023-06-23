@@ -8,10 +8,10 @@ import * as Searches from "./Searches"
 
 import Content from "./Content"
 
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument, useRepo } from "automerge-repo-react-hooks"
 import { useDocumentIds, useStaticCallback } from "./Hooks"
 import { useSelfId } from "./SelfHooks"
 import { usePresence } from "./PresenceHooks"
 
 export * from "./constants"
-export { Automerge, ImportData, ContentTypes, Url, WebStreamLogic, Changes, Content, Searches, useDocument, useDocumentIds, useStaticCallback, useSelfId, usePresence }
+export { Automerge, ImportData, ContentTypes, Url, WebStreamLogic, Changes, Content, Searches, useDocument, useDocumentIds, useStaticCallback, useSelfId, useRepo, usePresence }

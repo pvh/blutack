@@ -20,6 +20,8 @@ import {
 
 //const { useMemo, useState, useCallback } = React
 import { useMemo, useState, useCallback } from "react"
+import {useRepo} from "automerge-repo-react-hooks";
+import {createDocumentLink} from "./lib/blutack/Url";
 
 function getListMenuItemElement(element) {
   if (!element) {
@@ -216,10 +218,21 @@ function ContentListItem({ url, onDelete }) {
 
 export function NewDocumentButton({ trigger, onCreateDocument }) {
   const contentTypes = useMemo(() => ContentTypes.list({ context: "board" }), [])
+  const repo = useRepo()
 
   const createDoc = (contentType) => {
     ContentTypes.create(contentType.type, {}, (contentUrl) => {
       onCreateDocument(contentUrl)
+    })
+  }
+
+  const createBlancDoc = () => {
+    const handle = repo.create()
+
+    handle.change((doc) => {
+      doc.source = ""
+
+      onCreateDocument(createDocumentLink("editor", handle.documentId))
     })
   }
 
@@ -237,6 +250,12 @@ export function NewDocumentButton({ trigger, onCreateDocument }) {
             <span className="ContextMenu__label">{contentType.name}</span>
           </ListMenuItem>
         ))}
+        {<ListMenuItem
+          onClick={() => createBlancDoc()}
+        >
+          <Badge icon={"question"} />
+          <span className="ContextMenu__label">Blank Document</span>
+        </ListMenuItem>}
       </ListMenuSection>
     </Popover>
   )
