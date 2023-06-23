@@ -11,16 +11,19 @@ import { DocumentId, Repo } from "automerge-repo"
 import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechannel"
 import { RepoContext, useDocument } from "automerge-repo-react-hooks"
 import * as ContentTypes from "./components/pushpin-code/ContentTypes"
-import { create as createWorkspace, WorkspaceDoc } from "./components/content-types/workspace/Workspace"
+import {
+  create as createWorkspace,
+  WorkspaceDoc,
+} from "./components/content-types/workspace/Workspace"
 import { create as createDevice } from "./components/content-types/workspace/Device"
 import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
-import Content from "./components/Content";
-import { loadWidgetModule } from "./components/content-types/Widget";
+import Content from "./components/Content"
+import { loadWidgetModule } from "./components/content-types/Widget"
 
 // hack: create globals so they are accessible in widgets
-(window as any).React = React;
-(window as any).Content = Content;
-(window as any).useDocument = useDocument
+;(window as any).React = React
+;(window as any).Content = Content
+;(window as any).useDocument = useDocument
 
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
@@ -135,10 +138,12 @@ const workspaceDocId = await findOrMakeProfileDoc()
 console.log("deviceDocId", deviceDocId)
 console.log("workspaceDocId", workspaceDocId)
 
-const workspace = await (repo.find<WorkspaceDoc>(workspaceDocId).value())
+const workspace = await repo.find<WorkspaceDoc>(workspaceDocId).value()
 
 // load known content types
-await Promise.all(workspace.contentTypeIds.map((contentTypeDocId) => loadWidgetModule(contentTypeDocId)))
+await Promise.all(
+  (workspace.contentTypeIds || []).map((contentTypeDocId) => loadWidgetModule(contentTypeDocId))
+)
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
