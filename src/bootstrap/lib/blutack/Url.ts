@@ -1,6 +1,6 @@
 import { ViewState } from "./ViewState"
 import { useEffect, useState } from "react"
-import { DocumentId } from "../../../../automerge-repo"
+import { DocumentId } from "../../../../../automerge-repo"
 
 export type PushpinUrl = string & { pushpin: true }
 

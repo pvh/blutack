@@ -1,14 +1,14 @@
 import React from "react"
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import { ContentProps } from "../../Content"
-import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
+import * as ContentTypes from "../../../bootstrap/lib/blutack/ContentTypes"
+import { ContentProps } from "../../../bootstrap/lib/blutack/Content"
+import TitleWithSubtitle from "../../../bootstrap/lib/ui/TitleWithSubtitle"
 import { useDocument } from "automerge-repo-react-hooks"
-import { useLastSeenHeads } from "../../pushpin-code/Changes"
-import { createDocumentLink } from "../../pushpin-code/Url"
+import { useLastSeenHeads } from "../../../bootstrap/lib/blutack/Changes"
+import { createDocumentLink } from "../../../bootstrap/lib/blutack/Url"
 import { readWithSchema } from "../../../lenses"
 import { HasTitle } from "../../../lenses/HasTitle"
 import { HasBadge } from "../../../lenses/HasBadge"
-import { useSelf, useSelfId } from "../../pushpin-code/SelfHooks"
+import { useSelf, useSelfId } from "../../../bootstrap/lib/blutack/SelfHooks"
 
 export default function DefaultInTitle(props: ContentProps) {
   const { documentId } = props

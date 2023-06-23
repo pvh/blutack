@@ -1,13 +1,13 @@
 import React from "react"
 
-import { ContentProps } from "../../Content"
+import { ContentProps } from "../../../bootstrap/lib/blutack/Content"
 import { BoardDoc, icon } from "."
 import { useDocument } from "automerge-repo-react-hooks"
 import "./BoardInBoard.css"
-import Badge from "../../ui/Badge"
-import SecondaryText from "../../ui/SecondaryText"
-import Heading from "../../ui/Heading"
-import CenteredStack from "../../ui/CenteredStack"
+import Badge from "../../../bootstrap/lib/ui/Badge"
+import SecondaryText from "../../../bootstrap/lib/ui/SecondaryText"
+import Heading from "../../../bootstrap/lib/ui/Heading"
+import CenteredStack from "../../../bootstrap/lib/ui/CenteredStack"
 
 BoardInBoard.minWidth = 5
 BoardInBoard.minHeight = 6

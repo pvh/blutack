@@ -1,14 +1,14 @@
 import React from "react"
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import { ContentProps } from "../../Content"
-import Badge from "../../ui/Badge"
-import ContentDragHandle from "../../ui/ContentDragHandle"
+import * as ContentTypes from "../../../bootstrap/lib/blutack/ContentTypes"
+import { ContentProps } from "../../../bootstrap/lib/blutack/Content"
+import Badge from "../../../bootstrap/lib/ui/Badge"
+import ContentDragHandle from "../../../bootstrap/lib/ui/ContentDragHandle"
 import { useDocument } from "automerge-repo-react-hooks"
-import { useLastSeenHeads } from "../../pushpin-code/Changes"
-import { createDocumentLink } from "../../pushpin-code/Url"
+import { useLastSeenHeads } from "../../../bootstrap/lib/blutack/Changes"
+import { createDocumentLink } from "../../../bootstrap/lib/blutack/Url"
 import { HasBadge } from "../../../lenses/HasBadge"
 import { readWithSchema } from "../../../lenses"
-import { useSelf, useSelfId } from "../../pushpin-code/SelfHooks"
+import { useSelf, useSelfId } from "../../../bootstrap/lib/blutack/SelfHooks"
 
 interface Doc {
   title?: string

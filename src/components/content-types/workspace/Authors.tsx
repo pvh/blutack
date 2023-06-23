@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import Debug from "debug"
 
-import { PushpinUrl, parseDocumentLink } from "../../pushpin-code/Url"
+import { PushpinUrl, parseDocumentLink } from "../../../bootstrap/lib/blutack/Url"
 import { WorkspaceDoc as WorkspaceDoc } from "./Workspace"
 import Author from "./Author"
 
@@ -9,8 +9,8 @@ import "./Authors.css"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
-import { useSelfId } from "../../pushpin-code/SelfHooks"
-import { usePresence } from "../../pushpin-code/PresenceHooks"
+import { useSelfId } from "../../../bootstrap/lib/blutack/SelfHooks"
+import { usePresence } from "../../../bootstrap/lib/blutack/PresenceHooks"
 import { List } from "@automerge/automerge"
 
 const log = Debug("pushpin:authors")

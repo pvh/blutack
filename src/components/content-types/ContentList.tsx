@@ -1,25 +1,25 @@
 import React, { useState, useCallback } from "react"
 
-import { createDocumentLink, parseDocumentLink, PushpinUrl } from "../pushpin-code/Url"
+import { createDocumentLink, parseDocumentLink, PushpinUrl } from "../../bootstrap/lib/blutack/Url"
 
-import Content, { ContentProps } from "../Content"
+import Content, { ContentProps } from "../../bootstrap/lib/blutack/Content"
 
 import { DocHandle } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
-import CenteredStack from "../ui/CenteredStack"
-import ListMenu from "../ui/ListMenu"
+import CenteredStack from "../../bootstrap/lib/ui/CenteredStack"
+import ListMenu from "../../bootstrap/lib/ui/ListMenu"
 import "./ContentList.css"
-import ListItem from "../ui/ListItem"
+import ListItem from "../../bootstrap/lib/ui/ListItem"
 import classNames from "classnames"
 import ActionListItem from "./workspace/omnibox/ActionListItem"
-import CenteredStackRowItem from "../ui/CenteredStackRowItem"
-import { MIMETYPE_CONTENT_LIST_INDEX } from "../constants"
-import * as ImportData from "../pushpin-code/ImportData"
-import { useViewState } from "../pushpin-code/ViewState"
+import CenteredStackRowItem from "../../bootstrap/lib/ui/CenteredStackRowItem"
+import { MIMETYPE_CONTENT_LIST_INDEX } from "../../bootstrap/lib/blutack/constants"
+import * as ImportData from "../../bootstrap/lib/blutack/ImportData"
+import { useViewState } from "../../bootstrap/lib/blutack/ViewState"
 import NewDocumentButton from "../NewDocumentButton"
-import { openDoc } from "../pushpin-code/Url"
-import { ContentType } from "../pushpin-code/ContentTypes"
+import { openDoc } from "../../bootstrap/lib/blutack/Url"
+import { ContentType } from "../../bootstrap/lib/blutack/ContentTypes"
 import { ActionItem } from "./workspace/omnibox/Actions"
 
 export interface ContentListDoc {

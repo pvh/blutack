@@ -1,4 +1,4 @@
-import { useStaticCallback, useSharedState } from "../../pushpin-code/Hooks"
+import { useStaticCallback, useSharedState } from "../../../bootstrap/lib/blutack/Hooks"
 
 export type Selection<T> = T[]
 

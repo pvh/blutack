@@ -3,7 +3,7 @@ import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
 import React, { useContext } from "react"
-import { ContactDoc } from "../content-types/contact"
+import { ContactDoc } from "../../../components/content-types/contact"
 
 // createContext requires a default value...
 // which we don't really have a sensible answer for

@@ -1,8 +1,8 @@
 import React from "react"
 
-import { ContentProps } from "../../Content"
+import { ContentProps } from "../../../bootstrap/lib/blutack/Content"
 
-import { useSelfId } from "../../pushpin-code/SelfHooks"
+import { useSelfId } from "../../../bootstrap/lib/blutack/SelfHooks"
 
 import ContactViewer from "./ContactViewer"
 import ContactEditor from "./ContactEditor"

@@ -1,7 +1,7 @@
 import { useEffect } from "react"
-import { WorkspaceDoc } from "../content-types/workspace/Workspace"
+import { WorkspaceDoc } from "../../../components/content-types/workspace/Workspace"
 import { useDocumentIds } from "./Hooks"
-import { ContactDoc } from "../content-types/contact"
+import { ContactDoc } from "../../../components/content-types/contact"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 

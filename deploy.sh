@@ -10,7 +10,7 @@ rm -rf dist
 npm run build
 
 # navigate into the build output directory
-cd dist
+cd dist/blutack
 
 # place .nojekyll to bypass Jekyll processing
 echo > .nojekyll

@@ -9,11 +9,8 @@ import localforage from "localforage"
 
 import { DocumentId, Repo } from "automerge-repo"
 import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechannel"
-import { RepoContext, useDocument } from "automerge-repo-react-hooks"
-import * as ContentTypes from "./components/pushpin-code/ContentTypes"
-import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
-import Content from "./components/Content";
-import { loadWidgetModule } from "./components/content-types/Widget";
+import { RepoContext } from "automerge-repo-react-hooks"
+import * as ContentTypes from "./bootstrap/lib/blutack/ContentTypes"
 
 // TODO: load dynamically
 import { create as createProfile } from "./bootstrap/Profile.jsx"
@@ -21,8 +18,6 @@ import { create as createDevice } from "./bootstrap/Device.jsx"
 
 // hack: create globals so they are accessible in widgets
 (window as any).React = React;
-(window as any).Content = Content;
-(window as any).useDocument = useDocument
 
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {

@@ -1,20 +1,11 @@
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  forwardRef,
-  Ref,
-  memo,
-  ForwardRefRenderFunction,
-} from "react"
+import React, { forwardRef, ForwardRefRenderFunction, memo, Ref, useCallback, useEffect, useState, } from "react"
 
-import * as ContentTypes from "./pushpin-code/ContentTypes"
-import { parseDocumentLink, PushpinUrl } from "./pushpin-code/Url"
-import Crashable from "./Crashable"
+import * as ContentTypes from "./ContentTypes"
+import { parseDocumentLink, PushpinUrl } from "./Url"
+import Crashable from "../../../components/Crashable"
 import { DocumentId } from "automerge-repo"
-import { useSelfId } from "./pushpin-code/SelfHooks"
-import { useHeartbeat } from "./pushpin-code/PresenceHooks"
-import { useDocument } from "../../../automerge-repo/packages/automerge-repo-react-hooks"
+import { useSelfId } from "./SelfHooks"
+import { useHeartbeat } from "./PresenceHooks"
 
 // this is the interface imported by Content types
 export interface ContentProps {

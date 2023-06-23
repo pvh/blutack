@@ -1,12 +1,5 @@
-import { createContext } from "react"
-import { useDocument } from "automerge-repo-react-hooks"
-import * as ContentTypes from "../components/pushpin-code/ContentTypes"
-import {
-  createDocumentLink,
-  parseDocumentLink,
-  useActiveRoute,
-} from "../components/pushpin-code/Url"
-import Content from "../components/Content"
+import { useDocument, ContentTypes, Url } from "./lib/blutack"
+const { createContext } = React
 
 export const ProfileContext = createContext(undefined)
 
@@ -26,7 +19,7 @@ interface ProfileDoc {
 
 export default function Profile({ documentId }) {
   const [workspace] = useDocument(documentId)
-  const activeRoute = useActiveRoute()
+  const activeRoute = Url.useActiveRoute()
 
   if (!workspace) {
     return null
@@ -40,7 +33,7 @@ export default function Profile({ documentId }) {
           <Content url={workspace.homeDocUrl} />
         </div>
         {activeRoute && (
-          <Content url={createDocumentLink(activeRoute.type, activeRoute.documentId)} />
+          <Content url={Url.createDocumentLink(activeRoute.type, activeRoute.documentId)} />
         )}
       </div>
     </ProfileContext.Provider>
@@ -49,7 +42,7 @@ export default function Profile({ documentId }) {
 
 export function create(_attrs, profileHndle) {
   ContentTypes.create("contact", {}, (selfContentUrl) => {
-    const selfDocumentId = parseDocumentLink(selfContentUrl).documentId
+    const selfDocumentId = Url.parseDocumentLink(selfContentUrl).documentId
     // this is, uh, a nasty hack.
     // we should refactor not to require the DocumentId on the contact
     // but i don't want to pull that in scope right now

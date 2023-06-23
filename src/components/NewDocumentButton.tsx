@@ -1,11 +1,11 @@
-import { PushpinUrl } from "./pushpin-code/Url"
+import { PushpinUrl } from "../bootstrap/lib/blutack/Url"
 import React, { ReactElement, useMemo, useRef } from "react"
-import * as ContentTypes from "./pushpin-code/ContentTypes"
-import { Popover } from "./ui/Popover"
-import ListMenuSection from "./ui/ListMenuSection"
-import ListMenuItem from "./ui/ListMenuItem"
+import * as ContentTypes from "../bootstrap/lib/blutack/ContentTypes"
+import { Popover } from "../bootstrap/lib/ui/Popover"
+import ListMenuSection from "../bootstrap/lib/ui/ListMenuSection"
+import ListMenuItem from "../bootstrap/lib/ui/ListMenuItem"
 import classNames from "classnames"
-import * as ImportData from "./pushpin-code/ImportData"
+import * as ImportData from "../bootstrap/lib/blutack/ImportData"
 
 interface NewDocumentButtonProps {
   trigger: ReactElement

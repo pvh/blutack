@@ -3,11 +3,11 @@ import Debug from "debug"
 import { useDocument } from "automerge-repo-react-hooks"
 import { DocHandle, DocumentId } from "automerge-repo"
 
-import { parseDocumentLink, PushpinUrl, storeCurrentUrlOfUser } from "../../pushpin-code/Url"
-import Content, { ContentHandle, ContentProps } from "../../Content"
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import { ContentType } from "../../pushpin-code/ContentTypes"
-import SelfContext from "../../pushpin-code/SelfHooks"
+import { parseDocumentLink, PushpinUrl, storeCurrentUrlOfUser } from "../../../bootstrap/lib/blutack/Url"
+import Content, { ContentHandle, ContentProps } from "../../../bootstrap/lib/blutack/Content"
+import * as ContentTypes from "../../../bootstrap/lib/blutack/ContentTypes"
+import { ContentType } from "../../../bootstrap/lib/blutack/ContentTypes"
+import SelfContext from "../../../bootstrap/lib/blutack/SelfHooks"
 import TitleBar from "./TitleBar"
 import { ContactDoc } from "../contact"
 
@@ -17,15 +17,15 @@ import {
   useContactOnlineStatus,
   useDeviceOnlineStatus,
   useHeartbeat,
-} from "../../pushpin-code/PresenceHooks"
+} from "../../../bootstrap/lib/blutack/PresenceHooks"
 
 import { CurrentDeviceContext } from "./Device"
 
 import WorkspaceInList from "./WorkspaceInList"
 import { ContentListDoc } from "../ContentList"
-import { ViewStateContext } from "../../pushpin-code/ViewState"
-import { PersistedLastSeenHeadsMap } from "../../pushpin-code/Changes"
-import { useMentionAutocompletion } from "../../pushpin-code/Searches"
+import { ViewStateContext } from "../../../bootstrap/lib/blutack/ViewState"
+import { PersistedLastSeenHeadsMap } from "../../../bootstrap/lib/blutack/Changes"
+import { useMentionAutocompletion } from "../../../bootstrap/lib/blutack/Searches"
 import { Doc, Extend, List } from "@automerge/automerge"
 
 const log = Debug("pushpin:workspace")

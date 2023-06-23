@@ -1,29 +1,29 @@
-import { createDocumentLink, PushpinUrl } from "../../pushpin-code/Url"
+import { createDocumentLink, PushpinUrl } from "../../../bootstrap/lib/blutack/Url"
 
 import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
-import Content, { ContentProps } from "../../Content"
+import Content, { ContentProps } from "../../../bootstrap/lib/blutack/Content"
 import { ContactDoc } from "."
 import { FileDoc } from "../files"
 
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
-import Heading from "../../ui/Heading"
-import SecondaryText from "../../ui/SecondaryText"
+import Heading from "../../../bootstrap/lib/ui/Heading"
+import SecondaryText from "../../../bootstrap/lib/ui/SecondaryText"
 
 import ConnectionStatusBadge from "./ConnectionStatusBadge"
-import Badge from "../../ui/Badge"
-import CenteredStack from "../../ui/CenteredStack"
-import ListMenuSection from "../../ui/ListMenuSection"
-import ListMenuItem from "../../ui/ListMenuItem"
+import Badge from "../../../bootstrap/lib/ui/Badge"
+import CenteredStack from "../../../bootstrap/lib/ui/CenteredStack"
+import ListMenuSection from "../../../bootstrap/lib/ui/ListMenuSection"
+import ListMenuItem from "../../../bootstrap/lib/ui/ListMenuItem"
 import SharesSection from "./SharesSection"
 
 // @ts-ignore-next-line
 import { Swatch } from "react-color/lib/components/common/Swatch"
 
 import "./ContactEditor.css"
-import ListMenu from "../../ui/ListMenu"
-import ListItem from "../../ui/ListItem"
+import ListMenu from "../../../bootstrap/lib/ui/ListMenu"
+import ListItem from "../../../bootstrap/lib/ui/ListItem"
 
 export default function ContactViewer(props: ContentProps) {
   const { documentId: contactId } = props

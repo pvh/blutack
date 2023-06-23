@@ -1,6 +1,6 @@
 import { DocumentId } from "automerge-repo"
-import Badge, { BadgeSize } from "../../ui/Badge"
-import { useConnectionStatus } from "../../pushpin-code/PresenceHooks"
+import Badge, { BadgeSize } from "../../../bootstrap/lib/ui/Badge"
+import { useConnectionStatus } from "../../../bootstrap/lib/blutack/PresenceHooks"
 import "./ConnectionStatusBadge.css"
 
 export interface Props {

@@ -11,6 +11,17 @@ export default defineConfig({
       plugins: [wasm(), topLevelAwait()] 
   },
 
+  build: {
+    outDir: "dist/blutack/lib",
+    lib: {
+      entry: {
+        "ui": 'src/bootstrap/lib/ui/index.ts',
+        "blutack": "src/bootstrap/lib/blutack/index.ts",
+      },
+      formats: ['es']
+    }
+  },
+
   optimizeDeps: {
     // This is necessary because otherwise `vite dev` includes two separate
     // versions of the JS wrapper. This causes problems because the JS

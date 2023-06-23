@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react"
 
-import { ContentType } from "../pushpin-code/ContentTypes"
+import { ContentType } from "../../bootstrap/lib/blutack/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import "./TextContent.css"
-import { ContentProps } from "../Content"
+import { ContentProps } from "../../bootstrap/lib/blutack/Content"
 import "./RawView.css"
 import ReactJson, { InteractionProps, OnSelectProps } from "react-json-view"
 import {
@@ -12,7 +12,7 @@ import {
   openDoc,
   parseDocumentLink,
   PushpinUrl,
-} from "../pushpin-code/Url"
+} from "../../bootstrap/lib/blutack/Url"
 import { DocumentId } from "automerge-repo"
 import * as Automerge from "@automerge/automerge"
 

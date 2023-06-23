@@ -2,7 +2,7 @@ import { DocumentId } from "automerge-repo"
 import { useRepo } from "automerge-repo-react-hooks"
 import { useEffect, useState } from "react"
 import { v4 } from "uuid"
-import { __getRepo } from "../components/pushpin-code/ContentTypes"
+import { __getRepo } from "../bootstrap/lib/blutack/ContentTypes"
 
 export type BinaryDataId = string & { __binaryDataId: true }
 

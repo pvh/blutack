@@ -1,30 +1,30 @@
 import React, { useCallback, useRef } from "react"
 
-import { ContentType } from "../pushpin-code/ContentTypes"
-import Content, { ContentProps } from "../Content"
-import { createDocumentLink, isPushpinUrl, PushpinUrl } from "../pushpin-code/Url"
-import ListItem from "../ui/ListItem"
+import { ContentType } from "../../bootstrap/lib/blutack/ContentTypes"
+import Content, { ContentProps } from "../../bootstrap/lib/blutack/Content"
+import { createDocumentLink, isPushpinUrl, PushpinUrl } from "../../bootstrap/lib/blutack/Url"
+import ListItem from "../../bootstrap/lib/ui/ListItem"
 import "./ThreadContent.css"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
 import { DocHandle } from "automerge-repo"
-import * as ImportData from "../pushpin-code/ImportData"
-import { openDoc } from "../pushpin-code/Url"
+import * as ImportData from "../../bootstrap/lib/blutack/ImportData"
+import { openDoc } from "../../bootstrap/lib/blutack/Url"
 import {
   getUnseenPatches,
   LastSeenHeads,
   useAutoAdvanceLastSeenHeads,
-} from "../pushpin-code/Changes"
+} from "../../bootstrap/lib/blutack/Changes"
 import { Doc, Text } from "@automerge/automerge"
-import { evalSearchFor, MENTION } from "../pushpin-code/Searches"
+import { evalSearchFor, MENTION } from "../../bootstrap/lib/blutack/Searches"
 import { useQuill } from "./TextContent"
-import { useStaticCallback } from "../pushpin-code/Hooks"
-import { useDocumentIds } from "../pushpin-code/Hooks"
+import { useStaticCallback } from "../../bootstrap/lib/blutack/Hooks"
+import { useDocumentIds } from "../../bootstrap/lib/blutack/Hooks"
 import { ContactDoc } from "./contact"
 import { readWithSchema } from "../../lenses"
 import { HasTitle } from "../../lenses/HasTitle"
-import Heading from "../ui/Heading"
+import Heading from "../../bootstrap/lib/ui/Heading"
 
 interface Message {
   authorId: DocumentId

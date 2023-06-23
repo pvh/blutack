@@ -1,6 +1,6 @@
 import React from "react"
-import Content from "../../Content"
-import { createDocumentLink } from "../../pushpin-code/Url"
+import Content from "../../../bootstrap/lib/blutack/Content"
+import { createDocumentLink } from "../../../bootstrap/lib/blutack/Url"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 

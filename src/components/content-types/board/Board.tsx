@@ -16,10 +16,10 @@ declare module "react-contextmenu" {
   }
 }
 
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import * as ImportData from "../../pushpin-code/ImportData"
-import { createWebLink, PushpinUrl } from "../../pushpin-code/Url"
-import { ContentProps } from "../../Content"
+import * as ContentTypes from "../../../bootstrap/lib/blutack/ContentTypes"
+import * as ImportData from "../../../bootstrap/lib/blutack/ImportData"
+import { createWebLink, PushpinUrl } from "../../../bootstrap/lib/blutack/Url"
+import { ContentProps } from "../../../bootstrap/lib/blutack/Content"
 import { BoardDoc, BoardDocCard, CardId } from "."
 import BoardCard, { BoardCardAction } from "./BoardCard"
 import BoardContextMenu from "./BoardContextMenu"
@@ -35,9 +35,9 @@ import {
   BoardDocManipulationAction,
 } from "./BoardDocManipulation"
 
-import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN, MIMETYPE_BOARD_CARD_DATA } from "../../constants"
-import { useDocumentReducer } from "../../pushpin-code/Hooks"
-import { openDoc } from "../../pushpin-code/Url"
+import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN, MIMETYPE_BOARD_CARD_DATA } from "../../../bootstrap/lib/blutack/constants"
+import { useDocumentReducer } from "../../../bootstrap/lib/blutack/Hooks"
+import { openDoc } from "../../../bootstrap/lib/blutack/Url"
 
 const log = Debug("pushpin:board")
 

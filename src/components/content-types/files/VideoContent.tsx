@@ -1,12 +1,12 @@
 import React from "react"
 
 import { FileDoc } from "."
-import { ContentProps } from "../../Content"
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import { ContentProps } from "../../../bootstrap/lib/blutack/Content"
+import * as ContentTypes from "../../../bootstrap/lib/blutack/ContentTypes"
 import { useDocument } from "automerge-repo-react-hooks"
 import "./VideoContent.css"
 import { createBinaryDataUrl } from "../../../blobstore/Blob"
-import { ContentType } from "../../pushpin-code/ContentTypes"
+import { ContentType } from "../../../bootstrap/lib/blutack/ContentTypes"
 
 export default function VideoContent({ documentId }: ContentProps) {
   const [doc] = useDocument<FileDoc>(documentId)

@@ -1,21 +1,24 @@
-import { createDocumentLink, openDocument, parseDocumentLink } from "../components/pushpin-code/Url"
-
-import CenteredStack from "../components/ui/CenteredStack"
-import ListMenu from "../components/ui/ListMenu"
 import classNames from "classnames"
-import { MIMETYPE_CONTENT_LIST_INDEX } from "../components/constants"
-import * as ImportData from "../components/pushpin-code/ImportData"
-import { useDocument } from "automerge-repo-react-hooks"
-import ActionListItem from "../components/content-types/workspace/omnibox/ActionListItem"
-import TitleWithSubtitle from "../components/ui/TitleWithSubtitle"
-import React, { useMemo } from "react"
-import * as ContentTypes from "../components/pushpin-code/ContentTypes"
-import { Popover } from "../components/ui/Popover"
-import ListMenuSection from "../components/ui/ListMenuSection"
-import ListMenuItem from "../components/ui/ListMenuItem"
-import Badge from "../components/ui/Badge"
-import ListItem from "../components/ui/ListItem";
-import {typeNameToContentType} from "../components/pushpin-code/ContentTypes";
+import {
+  MIMETYPE_CONTENT_LIST_INDEX,
+  ImportData,
+  ContentTypes,
+  useDocument,
+  Url
+} from "./lib/blutack"
+import {
+  Badge,
+  CenteredStack,
+  ListItem,
+  ListMenu,
+  ListMenuItem,
+  ListMenuSection,
+  Popover,
+  TitleWithSubtitle,
+  ActionListItem
+} from "./lib/ui"
+
+const { useMemo, useState, useCallback } = React
 
 function getListMenuItemElement(element) {
   if (!element) {
@@ -31,9 +34,9 @@ function getListMenuItemElement(element) {
 
 export default function ContentList({ documentId }) {
   const [doc, changeDoc] = useDocument(documentId)
-  const [draggedOverIndex, setDraggedOverIndex] = React.useState()
+  const [draggedOverIndex, setDraggedOverIndex] = useState()
 
-  const onDragOver = React.useCallback((e, index) => {
+  const onDragOver = useCallback((e, index) => {
     const element = getListMenuItemElement(e.target)
 
     if (!element) {
@@ -48,15 +51,15 @@ export default function ContentList({ documentId }) {
     e.stopPropagation()
   }, [])
 
-  const onDragStart = React.useCallback((e, index) => {
+  const onDragStart = useCallback((e, index) => {
     e.dataTransfer.setData(MIMETYPE_CONTENT_LIST_INDEX, index.toString())
   }, [])
 
-  const onDragLeave = React.useCallback((e, index) => {
+  const onDragLeave = useCallback((e, index) => {
     setDraggedOverIndex(undefined)
   }, [])
 
-  const onDrop = React.useCallback(
+  const onDrop = useCallback(
     (e) => {
       if (draggedOverIndex === undefined) {
         return
@@ -90,11 +93,11 @@ export default function ContentList({ documentId }) {
     [draggedOverIndex]
   )
 
-  const onCreateContent = React.useCallback(
+  const onCreateContent = useCallback(
     (contentUrl) => {
       changeDoc((doc) => {
         doc.content.push(contentUrl)
-        openDocument(contentUrl)
+        Url.openDocument(contentUrl)
       })
     },
     [changeDoc]
@@ -163,7 +166,7 @@ function ContentListItem({ url, onDelete }) {
       shortcut: "⏎",
       keysForActionPressed: (e) => !e.shiftKey && e.key === "Enter",
       callback: (url) => () => {
-        openDocument(url)
+        Url.openDocument(url)
       },
     },
     {
@@ -173,7 +176,7 @@ function ContentListItem({ url, onDelete }) {
       shortcut: "⌘+d",
       keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "d",
       callback: (url) => () =>
-        openDocument(createDocumentLink("raw", parseDocumentLink(url).documentId)),
+        Url.openDocument(Url.createDocumentLink("raw", Url.parseDocumentLink(url).documentId)),
     },
     {
       name: "remove",
@@ -186,7 +189,7 @@ function ContentListItem({ url, onDelete }) {
     },
   ]
 
-  const { type, documentId } = parseDocumentLink(url)
+  const { type, documentId } = Url.parseDocumentLink(url)
   const [doc] = useDocument(documentId)
 
   const contentType = ContentTypes.typeNameToContentType(type)

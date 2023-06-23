@@ -1,25 +1,8 @@
-import React, { useEffect, useRef, useMemo, useState, useId } from "react"
-
-import * as Automerge from "@automerge/automerge"
+import { Automerge, WebStreamLogic, useDocument, useStaticCallback, useDocumentIds, useSelfId, Changes, Searches, Url } from "./lib/blutack"
 import Quill from "quill"
 import Delta from "quill-delta"
-import { useDocument } from "automerge-repo-react-hooks"
-import { useDocumentIds, useStaticCallback } from "../components/pushpin-code/Hooks"
-import "./TextContent.css"
-import * as WebStreamLogic from "../components/pushpin-code/WebStreamLogic"
 import QuillCursors from "quill-cursors"
-import { usePresence } from "../components/pushpin-code/PresenceHooks"
-import { useSelfId } from "../components/pushpin-code/SelfHooks"
-import {
-  getUnseenPatches,
-  useAutoAdvanceLastSeenHeads
-} from "../components/pushpin-code/Changes"
-import { createDocumentLink } from "../components/pushpin-code/Url"
-import {
-  evalAllSearches,
-  evalSearchFor,
-  MENTION
-} from "../components/pushpin-code/Searches"
+const { useEffect, useRef, useMemo, useState, useId } = React
 
 Quill.register("modules/cursors", QuillCursors)
 
@@ -35,13 +18,13 @@ export default function TextContent(props) {
   const scrollingContainerId = `scroll-container-${useId().slice(1, -1)}`
   const containerRef = useRef(null)
 
-  useAutoAdvanceLastSeenHeads(createDocumentLink("text", props.documentId))
+  Changes.useAutoAdvanceLastSeenHeads(Url.createDocumentLink("text", props.documentId))
 
   const presence = usePresence(props.documentId, cursorPos, "cursorPos")
 
   const cursors = useMemo(
     () =>
-      presence.flatMap(p => {
+      presence.flatMap((p) => {
         if (p.data === undefined || p.contact === selfId) {
           return []
         }
@@ -53,7 +36,7 @@ export default function TextContent(props) {
   const [ref, quill] = useQuill({
     text: doc ? doc.text : null,
     change(fn) {
-      changeDoc(doc => fn(doc.text))
+      changeDoc((doc) => fn(doc.text))
     },
     selectionChange(range) {
       setCursorPos(range)
@@ -66,19 +49,19 @@ export default function TextContent(props) {
         mention: {},
         cursors: {
           hideDelayMs: 500,
-          transformOnTextChange: true
+          transformOnTextChange: true,
         },
         toolbar: false,
         history: {
           maxStack: 500,
-          userOnly: true
+          userOnly: true,
         },
         clipboard: {
-          disableFormattingOnPaste: true
-        }
+          disableFormattingOnPaste: true,
+        },
       },
-      scrollingContainer: `#${scrollingContainerId}`
-    }
+      scrollingContainer: `#${scrollingContainerId}`,
+    },
   })
 
   return (
@@ -100,14 +83,7 @@ export default function TextContent(props) {
   )
 }
 
-export function useQuill({
-                           text,
-                           change,
-                           selectionChange,
-                           cursors = [],
-                           selected,
-                           config
-                         }) {
+export function useQuill({ text, change, selectionChange, cursors = [], selected, config }) {
   const ref = useRef(null)
   const quill = useRef(null)
   // @ts-ignore-next-line
@@ -115,9 +91,7 @@ export function useQuill({
   const makeChange = useStaticCallback(change ?? (() => {}))
   const onSelectionChange = useStaticCallback(selectionChange ?? (() => {}))
 
-  const contactIds = useMemo(() => cursors.map(({ contactId }) => contactId), [
-    cursors
-  ])
+  const contactIds = useMemo(() => cursors.map(({ contactId }) => contactId), [cursors])
   const contactsById = useDocumentIds(contactIds)
 
   useEffect(() => {
@@ -133,7 +107,7 @@ export function useQuill({
     const onChange = (changeDelta, _oldContents, source) => {
       if (source !== "user") return
 
-      makeChange(content => applyDeltaToText(content, changeDelta))
+      makeChange((content) => applyDeltaToText(content, changeDelta))
     }
 
     function onKeyDown(e) {
@@ -175,11 +149,11 @@ export function useQuill({
 
     q.updateContents(diff)
 
-    const matches = evalAllSearches(textString)
+    const matches = Searches.evalAllSearches(textString)
 
     q.removeFormat(0, textString.length, "api")
 
-    matches.forEach(formatting => {
+    matches.forEach((formatting) => {
       const index = formatting.from
       const length = formatting.to - index
       const { color, isBold, isItalic } = formatting.style
@@ -254,7 +228,7 @@ function applyDeltaToText(text, delta) {
 
 async function createFrom(contentData, handle) {
   const text = await WebStreamLogic.toString(contentData.data)
-  handle.change(doc => {
+  handle.change((doc) => {
     doc.text = new Automerge.Text()
     if (text) {
       doc.text.insertAt(0, ...text.split(""))
@@ -267,7 +241,7 @@ async function createFrom(contentData, handle) {
 }
 
 function create({ text, title }, handle) {
-  handle.change(doc => {
+  handle.change((doc) => {
     if (title) {
       doc.title = title
     }
@@ -281,7 +255,7 @@ function create({ text, title }, handle) {
   })
 }
 
-const supportsMimeType = mimeType => !!mimeType.match("text/")
+const supportsMimeType = (mimeType) => !!mimeType.match("text/")
 
 export const contentType = {
   type: "text",
@@ -289,9 +263,9 @@ export const contentType = {
   icon: "sticky-note",
   contexts: {
     board: TextContent,
-    expanded: TextContent
+    expanded: TextContent,
   },
   create,
   createFrom,
-  supportsMimeType
+  supportsMimeType,
 }

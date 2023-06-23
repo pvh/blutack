@@ -1,6 +1,6 @@
 import mime from "mime-types"
 import * as WebStreamLogic from "./WebStreamLogic"
-import { BinaryDataId, storeBinaryData } from "../../blobstore/Blob"
+import { BinaryDataId, storeBinaryData } from "../../../blobstore/Blob"
 
 export type FileUrl = string & { __fileUrl: false }
 

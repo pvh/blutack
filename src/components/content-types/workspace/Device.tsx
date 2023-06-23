@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react"
-import { ContentProps } from "../../Content"
+import { ContentProps } from "../../../bootstrap/lib/blutack/Content"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
-import Badge from "../../ui/Badge"
+import Badge from "../../../bootstrap/lib/ui/Badge"
 import "./Device.css"
-import { useDeviceOnlineStatus } from "../../pushpin-code/PresenceHooks"
-import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
+import { useDeviceOnlineStatus } from "../../../bootstrap/lib/blutack/PresenceHooks"
+import TitleWithSubtitle from "../../../bootstrap/lib/ui/TitleWithSubtitle"
 import { DocHandle } from "automerge-repo"
-import { ContentType } from "../../pushpin-code/ContentTypes"
+import { ContentType } from "../../../bootstrap/lib/blutack/ContentTypes"
 
 export interface DeviceDoc {
   icon: string // fa-icon name

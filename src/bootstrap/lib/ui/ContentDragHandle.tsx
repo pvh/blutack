@@ -1,11 +1,11 @@
 import React, { ReactNode, useRef } from "react"
 import "./Heading.css"
 import mime from "mime-types"
-import * as UriList from "../pushpin-code/UriList"
+import * as UriList from "../blutack/UriList"
 import "./ContentDragHandle.css"
-import { PushpinUrl } from "../pushpin-code/Url"
+import { PushpinUrl } from "../blutack/Url"
 import { DocumentId } from "automerge-repo"
-import { BinaryDataId, useBinaryDataHeader } from "../../blobstore/Blob"
+import { BinaryDataId, useBinaryDataHeader } from "../../../blobstore/Blob"
 
 interface SimpleProps {
   url: PushpinUrl

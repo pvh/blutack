@@ -4,18 +4,18 @@ import { FileDoc } from "."
 
 import "./ImageContent.css"
 
-import { ContentProps } from "../../Content"
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import Badge from "../../ui/Badge"
-import ListItem from "../../ui/ListItem"
-import ContentDragHandle from "../../ui/ContentDragHandle"
-import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
+import { ContentProps } from "../../../bootstrap/lib/blutack/Content"
+import * as ContentTypes from "../../../bootstrap/lib/blutack/ContentTypes"
+import Badge from "../../../bootstrap/lib/ui/Badge"
+import ListItem from "../../../bootstrap/lib/ui/ListItem"
+import ContentDragHandle from "../../../bootstrap/lib/ui/ContentDragHandle"
+import TitleWithSubtitle from "../../../bootstrap/lib/ui/TitleWithSubtitle"
 import { useDocument } from "automerge-repo-react-hooks"
 import {
   createBinaryDataUrl,
   useBinaryDataHeader,
 } from "../../../blobstore/Blob"
-import { ContentType } from "../../pushpin-code/ContentTypes"
+import { ContentType } from "../../../bootstrap/lib/blutack/ContentTypes"
 
 function humanFileSize(size: number) {
   const i = size ? Math.floor(Math.log(size) / Math.log(1024)) : 0

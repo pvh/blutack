@@ -4,9 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "dev": "vite --config vite.config.app.ts",
+    "build": "tsc && build-app && build-lib",
+    "build-unsafe": "build-app && build-lib",
+    "build-app": "vite build --config vite.config.app.ts",
+    "build-lib": "vite build --config vite.config.lib.ts",
+    "preview": "vite preview --config vite.config.app.ts",
     "cli": "ts-node-esm cli.ts"
   },
   "dependencies": {

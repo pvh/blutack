@@ -3,8 +3,8 @@
 
 import { BOARD_HEIGHT, BOARD_WIDTH } from "./Board"
 import { Dimension, Position, gridCellsToPixels } from "./BoardGrid"
-import { PushpinUrl, parseDocumentLink } from "../../pushpin-code/Url"
-import * as ContentTypes from "../../pushpin-code/ContentTypes"
+import { PushpinUrl, parseDocumentLink } from "../../../bootstrap/lib/blutack/Url"
+import * as ContentTypes from "../../../bootstrap/lib/blutack/ContentTypes"
 
 export const boundPosition = (
   { x, y }: Position,

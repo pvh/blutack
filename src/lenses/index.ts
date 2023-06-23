@@ -1,4 +1,4 @@
-import { LastSeenHeads } from "../components/pushpin-code/Changes"
+import { LastSeenHeads } from "../bootstrap/lib/blutack/Changes"
 import { HasBadge, readAsHasBadge } from "./HasBadge"
 import { HasTitle, readAsHasTitle } from "./HasTitle"
 
