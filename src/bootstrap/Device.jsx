@@ -1,3 +1,5 @@
+import React from "react";
+
 export function create(deviceAttrs, handle) {
   handle.change((doc) => {
     doc.name = "computer"

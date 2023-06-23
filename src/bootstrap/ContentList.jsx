@@ -18,7 +18,8 @@ import {
   ActionListItem
 } from "./lib/ui"
 
-const { useMemo, useState, useCallback } = React
+//const { useMemo, useState, useCallback } = React
+import { useMemo, useState, useCallback } from "react"
 
 function getListMenuItemElement(element) {
   if (!element) {

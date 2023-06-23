@@ -1,5 +1,6 @@
-import { useDocument, ContentTypes, Url } from "./lib/blutack"
-const { createContext } = React
+import { useDocument, ContentTypes, Url, Content } from "./lib/blutack"
+//const { createContext } = React
+import { createContext } from "react"
 
 export const ProfileContext = createContext(undefined)
 

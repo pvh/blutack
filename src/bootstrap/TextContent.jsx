@@ -1,8 +1,20 @@
-import { Automerge, WebStreamLogic, useDocument, useStaticCallback, useDocumentIds, useSelfId, Changes, Searches, Url } from "./lib/blutack"
+import {
+  Automerge,
+  WebStreamLogic,
+  useDocument,
+  useStaticCallback,
+  useDocumentIds,
+  useSelfId,
+  usePresence,
+  Changes,
+  Searches,
+  Url,
+} from "./lib/blutack"
 import Quill from "quill"
 import Delta from "quill-delta"
 import QuillCursors from "quill-cursors"
-const { useEffect, useRef, useMemo, useState, useId } = React
+// const { useEffect, useRef, useMemo, useState, useId, usePresence } = React
+import { useEffect, useRef, useMemo, useState, useId } from "react"
 
 Quill.register("modules/cursors", QuillCursors)
 

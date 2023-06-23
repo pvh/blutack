@@ -2,6 +2,7 @@ import Content from "../bootstrap/lib/blutack/Content"
 import * as ContentTypes from "../bootstrap/lib/blutack/ContentTypes"
 import { DocumentId } from "automerge-repo"
 import { CurrentDeviceContext } from "./content-types/workspace/Device"
+import { createDocumentLink } from "../bootstrap/lib/blutack/Url";
 
 // Import css files
 // todo: find solution that allows to add styling from docs
@@ -20,8 +21,11 @@ import * as TextContent from "../bootstrap/TextContent"
 ContentTypes.register(TextContent.contentType)
 
 import * as Contact from "../bootstrap/Contact"
-import { createDocumentLink } from "../bootstrap/lib/blutack/Url";
 ContentTypes.register(Contact.contentType)
+
+import * as Editor from "../bootstrap/Editor"
+ContentTypes.register(Editor.contentType)
+
 
 /*import * as B from "./content-types/board"
 ContentTypes.register(B.contentType)
