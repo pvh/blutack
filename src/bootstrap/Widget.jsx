@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 //const { useEffect, useRef, useState } = React
 
-import {ContentTypes, useDocument, Context, Modules} from "../lib/blutack"
+import {ContentTypes, useDocument, Context, Modules, useRepo, Url} from "../lib/blutack"
 
 // const {ContentTypes, useDocument, Context} = Blutack
 
@@ -21,7 +21,8 @@ export default function Widget(props) {
   const [doc, changeDoc] = useDocument(documentId)
   const errorBoundaryRef = useRef(null)
   const [View, setView] = useState(undefined)
-  const [profile, changeProfile] = Context.useProfile()
+  const [profile] = Context.useProfile()
+  const repo = useRepo()
 
   const source = doc?.source
 
@@ -40,10 +41,14 @@ export default function Widget(props) {
 
       // if widget exports content type add it to list of known content types
       if (module.contentType) {
-        const contentTypeDocIds = profile?.contentTypeIds ?? []
-        if (!contentTypeDocIds.includes(documentId)) {
-          changeProfile(profile => {
-            profile.contentTypeIds.push(documentId)
+        const documentUrl = Url.createDocumentLink("widget", documentId)
+
+        const contentTypesListHandle = repo.find(profile.contentTypesListId)
+        const contentTypesList = await contentTypesListHandle.value()
+
+        if (!contentTypesList.content.includes(documentUrl)) {
+          contentTypesListHandle.change((contentTypesList) => {
+            contentTypesList.content.unshift(documentUrl)
           })
         }
       }

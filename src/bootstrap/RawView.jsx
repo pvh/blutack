@@ -9,7 +9,7 @@ const {
   Url
 } = Blutack
  */
-const { createDocumentLink, isPushpinUrl, openDoc, parseDocumentLink } = Url
+const { createDocumentLink, isPushpinUrl, openDocument, parseDocumentLink } = Url
 
 
 export default function RawView(props) {
@@ -54,11 +54,11 @@ export default function RawView(props) {
       }
 
       if (isPushpinUrl(value)) {
-        openDoc(
+        openDocument(
           isMetaPressed ? createDocumentLink("raw", parseDocumentLink(value).documentId) : value
         )
       } else if (isDocumentId(value)) {
-        openDoc(createDocumentLink("raw", value))
+        openDocument(createDocumentLink("raw", value))
       }
     },
     [changeDoc]

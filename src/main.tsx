@@ -16,6 +16,7 @@ import * as Ui from "./lib/ui"
 // TODO: load dynamically
 import { create as createProfile } from "./bootstrap/Profile.jsx"
 import { create as createDevice } from "./bootstrap/Device.jsx"
+import { parseDocumentLink } from "./lib/blutack/Url";
 
 // hack: create globals so they are accessible in widgets
 (window as any).React = React;
@@ -137,11 +138,18 @@ const profileDocId = await findOrMakeProfileDoc()
 console.log("deviceDocId", deviceDocId)
 console.log("profileDocId", profileDocId)
 
-const workspace = await (repo.find<any>(profileDocId).value())
+const profile = await (repo.find<any>(profileDocId).value())
+const contentTypesList = await (repo.find<any>(profile.contentTypesListId).value())
 
 // load known content types
-await Promise.all(workspace.contentTypeIds.map(async (contentTypeDocId : string) => {
-  const module = await Modules.load(contentTypeDocId as DocumentId)
+await Promise.all(contentTypesList.content.map(async (contentTypeUrl : string) => {
+  const {documentId, type} = parseDocumentLink(contentTypeUrl)
+
+  if (type !== "widget") {
+    return
+  }
+
+  const module = await Modules.load(documentId as DocumentId)
   console.log("load custom type", module.contentType.type)
 }))
 

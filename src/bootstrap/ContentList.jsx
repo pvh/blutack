@@ -198,33 +198,36 @@ function ContentListItem({ url, onDelete }) {
       label: "Debug",
       shortcut: "⌘+d",
       keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "d",
-      callback: (url) => () =>
-        Url.openDocument(Url.createDocumentLink("raw", documentId)),
-    },
-    {
-      name: "remove",
-      destructive: true,
-      callback: (url) => () => onDelete(),
-      faIcon: "fa-trash",
-      label: "Remove",
-      shortcut: "⌘+⌫",
-      keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "Backspace",
+      callback: () => () => Url.openDocument(Url.createDocumentLink("raw", documentId)),
     },
   ]
-
-
-  if (type === "widget") {
-    actions.push({
-      name: "edit",
-      faIcon: "fa-code",
-      label: "Edit",
-      shortcut: "⌘+e",
-      keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "e",
-      callback: (url) => () => {
-        Url.openDocument(Url.createDocumentLink("editor", documentId))
+    .concat(
+      type === "widget"
+        ? [
+            {
+              name: "edit",
+              faIcon: "fa-code",
+              label: "Edit",
+              shortcut: "⌘+e",
+              keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "e",
+              callback: () => () => {
+                Url.openDocument(Url.createDocumentLink("editor", documentId))
+              },
+            },
+          ]
+        : []
+    )
+    .concat([
+      {
+        name: "remove",
+        destructive: true,
+        callback: () => () => onDelete(),
+        faIcon: "fa-trash",
+        label: "Remove",
+        shortcut: "⌘+⌫",
+        keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "Backspace",
       },
-    })
-  }
+    ])
 
   const [doc] = useDocument(documentId)
 
