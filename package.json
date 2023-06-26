@@ -3,14 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite --config vite.config.app.ts",
-    "build": "tsc && build-app && build-lib",
-    "build-unsafe": "build-app && build-lib",
-    "build-app": "vite build --config vite.config.app.ts",
-    "build-lib": "vite build --config vite.config.lib.ts",
-    "preview": "vite preview --config vite.config.app.ts",
-    "cli": "ts-node-esm cli.ts"
+  "scripts":  {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@automerge/automerge": "2.1.0-alpha.1",
