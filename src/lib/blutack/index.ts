@@ -7,6 +7,7 @@ import * as Changes from "./Changes"
 import * as Searches from "./Searches"
 import * as Modules from "./Modules"
 import * as Context from "./Context"
+import CodeMirror from "./CodeMirror"
 
 import Content from "./Content"
 
@@ -16,4 +17,4 @@ import { useSelfId } from "./SelfHooks"
 import { usePresence } from "./PresenceHooks"
 
 export * from "./constants"
-export { Automerge, ImportData, ContentTypes, Url, WebStreamLogic, Changes, Content, Searches, Modules, Context, useDocument, useDocumentIds, useStaticCallback, useSelfId, useRepo, usePresence }
+export { Automerge, ImportData, ContentTypes, Url, WebStreamLogic, Changes, Content, Searches, Modules, Context, CodeMirror, useDocument, useDocumentIds, useStaticCallback, useSelfId, useRepo, usePresence }

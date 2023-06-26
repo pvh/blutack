@@ -16,12 +16,13 @@ import * as Ui from "./lib/ui"
 // TODO: load dynamically
 import { create as createProfile } from "./bootstrap/Profile.jsx"
 import { create as createDevice } from "./bootstrap/Device.jsx"
-import { parseDocumentLink } from "./lib/blutack/Url";
+import { parseDocumentLink } from "./lib/blutack/Url"
 
 // hack: create globals so they are accessible in widgets
-(window as any).React = React;
-(window as any).Blutack = Blutack;
-(window as any).Ui = Ui;
+
+;(window as any).React = React
+;(window as any).Blutack = Blutack
+;(window as any).Ui = Ui
 
 const { ContentTypes, Modules } = Blutack
 
@@ -39,6 +40,7 @@ async function registerServiceWorker() {
     }
   }
 }
+
 registerServiceWorker()
 
 let sharedWorker = await createSharedWorker()
@@ -77,6 +79,7 @@ async function introduceWorkers(sharedWorker: SharedWorker) {
   sharedWorker.port.postMessage({ serviceWorkerPort: channel.port2 }, [channel.port2])
   console.log("posted to both workers")
 }
+
 introduceWorkers(sharedWorker)
 
 function setupSharedWorkerAndRepo() {
@@ -103,15 +106,24 @@ async function findOrMakeDeviceDoc(): Promise<DocumentId> {
     return deviceDocId as DocumentId
   }
 
-  const handle = repo.create()
-  const newDeviceDocId = handle.documentId
-
-  createDevice({}, handle)
-
-  await localforage.setItem("deviceDocId", newDeviceDocId)
-
-  return newDeviceDocId
+  return new Promise((resolve) => {
+    ContentTypes.create("device", {}, async (deviceDocUrl, deviceDocHandle) => {
+      await localforage.setItem("deviceDocId", deviceDocHandle.documentId)
+      resolve(deviceDocHandle.documentId)
+    })
+  })
 }
+
+const BASE_CONTENT_TYPE_IDS = [
+  "fe1c6cd6-8432-4ac7-8302-f6b16197f5c7", // content list
+  "197067ec-0aa2-4d67-80f6-6959d561385b", // text
+  "442ca202-f038-41d2-a61e-a6f586d62abd", // raw
+  "2a12d381-a1ce-4e88-a158-bd2719cadd01", // profile
+  "674bcfba-cc2c-404b-a2dc-ec8bc4baf182", // contact
+  "11a46795-a9b4-48d1-bc4f-4da504fff93f", // device
+  "a1652eae-8f52-4bfe-908d-76e48910cd34", // widget
+  "043862bd-12e1-4b22-87d2-fc9fc7fe4ed1", // editor
+]
 
 async function findOrMakeProfileDoc(): Promise<DocumentId> {
   // profiles used to be called workspaces, for backwards compatibility keep the old name here
@@ -121,37 +133,49 @@ async function findOrMakeProfileDoc(): Promise<DocumentId> {
     return profileDocId as DocumentId
   }
 
+  // load base content types
+  await Promise.all(
+    BASE_CONTENT_TYPE_IDS.map((contentTypeId) => Modules.load(contentTypeId as DocumentId))
+  )
+
   const handle = repo.create()
   const newProfileDocId = handle.documentId
 
   await localforage.setItem("profileDocId", newProfileDocId)
 
-  createProfile({}, handle)
-
-  return newProfileDocId
+  return new Promise((resolve) => {
+    ContentTypes.create(
+      "profile",
+      { baseContentTypeIds: BASE_CONTENT_TYPE_IDS },
+      async (profileDocUrl, profileDocHandle) => {
+        await localforage.setItem("profileDocId", profileDocHandle.documentId)
+        resolve(profileDocHandle.documentId)
+      }
+    )
+  })
 }
 
 // bootstrapping: first try the indexedDB, then make one
-const deviceDocId = await findOrMakeDeviceDoc()
 const profileDocId = await findOrMakeProfileDoc()
 
-console.log("deviceDocId", deviceDocId)
-console.log("profileDocId", profileDocId)
-
-const profile = await (repo.find<any>(profileDocId).value())
-const contentTypesList = await (repo.find<any>(profile.contentTypesListId).value())
+const profile = await repo.find<any>(profileDocId).value()
+const contentTypesList = await repo.find<any>(profile.contentTypesListId).value()
 
 // load known content types
-await Promise.all(contentTypesList.content.map(async (contentTypeUrl : string) => {
-  const {documentId, type} = parseDocumentLink(contentTypeUrl)
+await Promise.all(
+  contentTypesList.content.map(async (contentTypeUrl: string) => {
+    const { documentId, type } = parseDocumentLink(contentTypeUrl)
 
-  if (type !== "widget") {
-    return
-  }
+    if (type !== "widget") {
+      return
+    }
 
-  const module = await Modules.load(documentId as DocumentId)
-  console.log("load custom type", module.contentType.type)
-}))
+    await Modules.load(documentId as DocumentId)
+  })
+)
+
+// bootstrap device only after all base types are loaded through bootstrapping the profile
+const deviceDocId = await findOrMakeDeviceDoc()
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

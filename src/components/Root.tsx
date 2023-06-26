@@ -9,27 +9,6 @@ import { createDocumentLink } from "../lib/blutack/Url";
 import "../bootstrap/ContentList.css"
 import "../bootstrap/TextContent.css"
 
-// required to create profile
-import * as Profile from "../bootstrap/Profile"
-ContentTypes.register(Profile.contentType)
-import * as ContentList from "../bootstrap/ContentList"
-ContentTypes.register(ContentList.contentType)
-import * as Contact from "../bootstrap/Contact"
-ContentTypes.register(Contact.contentType)
-
-// could not bootstrap yet because it depends on babel
-import * as Editor from "../bootstrap/Editor"
-ContentTypes.register(Editor.contentType)
-
-import * as TextContent from "../bootstrap/TextContent"
-ContentTypes.register(TextContent.contentType)
-
-import * as RawView from "../bootstrap/RawView"
-ContentTypes.register(RawView.contentType)
-
-import * as Widget from "../bootstrap/Widget"
-ContentTypes.register(Widget.contentType)
-
 interface RootArgs {
   profileDocId: DocumentId
   deviceDocId: DocumentId

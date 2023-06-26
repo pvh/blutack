@@ -1,6 +1,7 @@
 import { DocumentId } from "automerge-repo"
 import { BinaryDataId, createBinaryDataUrl } from "../../blobstore/Blob"
 import * as ContentTypes from "./ContentTypes"
+import { transform } from "@babel/standalone"
 
 export async function load(documentId: DocumentId) {
   const module = await import(
@@ -14,4 +15,28 @@ export async function load(documentId: DocumentId) {
   }
 
   return module
+}
+
+const importTransformPlugin = {
+  name: "transform-imports-to-skypack",
+  visitor: {
+    ImportDeclaration(path: any) {
+      const value = path.node.source.value
+
+      // Don't replace relative or absolute URLs.
+      if (/^([./])/.test(value)) {
+        return
+      }
+
+      path.node.source.value = `https://cdn.skypack.dev/${value}`
+    },
+  },
+}
+
+export function transformSource(source: string) {
+  return transform(source,{
+    presets: ["react"],
+    plugins: [importTransformPlugin],
+    parserOpts: { allowReturnOutsideFunction: true },
+  })
 }

@@ -61,7 +61,7 @@ export function ProfileExpanded({ documentId }) {
   )
 }
 
-export function create(_attrs, profileHandle) {
+export function create({ baseContentTypeIds }, profileHandle) {
   ContentTypes.create("contact", {}, (selfContentUrl) => {
     const selfDocumentId = Url.parseDocumentLink(selfContentUrl).documentId
     // this is, uh, a nasty hack.
@@ -82,11 +82,9 @@ export function create(_attrs, profileHandle) {
         { title: "Content Types" },
         (contentTypesListUrl, contentTypesListHandle) => {
           contentTypesListHandle.change((contentTypesList) => {
-            contentTypesList.content = [
-              createDocumentLink("widget", "fe1c6cd6-8432-4ac7-8302-f6b16197f5c7"), // content list
-              createDocumentLink("widget", "197067ec-0aa2-4d67-80f6-6959d561385b"), // text
-              createDocumentLink("widget", "a8d903f9-afc9-41f4-95e7-75193d427e73"), // raw
-            ]
+            contentTypesList.content = baseContentTypeIds.map((id) =>
+              createDocumentLink("widget", id)
+            )
           })
 
           profileHandle.change((profile) => {

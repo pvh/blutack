@@ -85,7 +85,9 @@ function fallbackRender({ error }) {
   )
 }
 
-const EXAMPLE_SOURCE = `export default ({ documentId }) => {
+const EXAMPLE_SOURCE = `const { useDocument } = Blutack
+
+export default ({ documentId }) => {
    const [doc, changeDoc] = useDocument(documentId)
 
   const counter = doc ? doc.counter ?? 0 : 0

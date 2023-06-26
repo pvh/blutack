@@ -26,4 +26,3 @@ export const contentType = {
   create
 }
 
-export const CurrentDeviceContext = React.createContext(undefined)

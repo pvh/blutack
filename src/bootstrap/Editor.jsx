@@ -1,27 +1,6 @@
 import React, { useEffect, useRef } from "react"
-import { useDocument, Modules, Context } from "../lib/blutack"
+import { useDocument, Modules, Context, CodeMirror  } from "../lib/blutack"
 // const { useDocument, Modules, Context } = Blutack
-import { basicSetup } from "codemirror"
-import { javascript } from "@codemirror/lang-javascript"
-import { EditorView, keymap } from "@codemirror/view"
-import { indentWithTab } from "@codemirror/commands"
-import { transform } from "@babel/standalone"
-
-const importTransformPlugin = {
-  name: "transform-imports-to-skypack",
-  visitor: {
-    ImportDeclaration(path) {
-      const value = path.node.source.value
-
-      // Don't replace relative or absolute URLs.
-      if (/^([./])/.test(value)) {
-        return
-      }
-
-      path.node.source.value = `https://cdn.skypack.dev/${value}`
-    },
-  },
-}
 
 export default function Editor(props) {
   const [doc, changeDoc] = useDocument(props.documentId)
@@ -40,12 +19,7 @@ export default function Editor(props) {
       doc.source = source
 
       try {
-        const transformedCode = transform(source, {
-          presets: ["react"],
-          plugins: [importTransformPlugin],
-          parserOpts: { allowReturnOutsideFunction: true },
-        })
-
+        const transformedCode = Modules.transformSource(source)
         if (!transformedCode.code) {
           return
         }
@@ -76,43 +50,11 @@ export default function Editor(props) {
 
   return (
     <div className="w-full h-full">
-      <CodeEditor source={doc.source} onChangeSource={onChangeSource} />
+      <CodeMirror source={doc.source} onChangeSource={onChangeSource} />
     </div>
   )
 }
 
-function CodeEditor({ source, onChangeSource }) {
-  const containerRef = useRef(null)
-  const editorViewRef = useRef()
-
-  useEffect(() => {
-    if (!containerRef.current) {
-      return
-    }
-
-    const view = (editorViewRef.current = new EditorView({
-      doc: source,
-      extensions: [basicSetup, javascript({ jsx: true }), keymap.of([indentWithTab])],
-      dispatch(transaction) {
-        view.update([transaction])
-
-        if (transaction.docChanged) {
-          const newValue = view.state.doc.toString()
-          onChangeSource(newValue)
-        }
-      },
-      parent: containerRef.current,
-    }))
-
-    return () => {
-      view.destroy()
-    }
-  }, [])
-
-  return (
-    <div className="WidgetEditor" ref={containerRef} onKeyDown={(evt) => evt.stopPropagation()} />
-  )
-}
 
 export const contentType = {
   type: "editor",
