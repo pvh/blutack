@@ -21,3 +21,11 @@ export function useProfile(): [
   const profileId = useProfileId()
   return useDocument(profileId)
 }
+
+export function usePr(): [
+  doc: Doc<any> | undefined,
+  changeFn: (cf: (d: Extend<any>) => void) => void
+] {
+  const profileId = useProfileId()
+  return useDocument(profileId)
+}

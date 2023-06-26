@@ -31,6 +31,8 @@ import * as RawView from "../bootstrap/RawView"
 ContentTypes.register(RawView.contentType)
  */
 
+import * as Widget from "../bootstrap/Widget"
+ContentTypes.register(Widget.contentType)
 
 interface RootArgs {
   profileDocId: DocumentId

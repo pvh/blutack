@@ -43,7 +43,6 @@ const Content: ForwardRefRenderFunction<ContentHandle, Props> = (
   const selfId = useSelfId()
   const onCatch = useCallback(() => setCrashed(true), [])
 
-
   useHeartbeat(["expanded"].includes(context) ? documentId : undefined)
 
   useEffect(() => {

@@ -1,12 +1,13 @@
 import classNames from "classnames"
 import {
-  MIMETYPE_CONTENT_LIST_INDEX,
-  ImportData,
   ContentTypes,
+  ImportData,
+  MIMETYPE_CONTENT_LIST_INDEX,
+  Url,
   useDocument,
-  Url
 } from "../lib/blutack"
 import {
+  ActionListItem,
   Badge,
   CenteredStack,
   ListItem,
@@ -15,7 +16,6 @@ import {
   ListMenuSection,
   Popover,
   TitleWithSubtitle,
-  ActionListItem
 } from "../lib/ui"
 /*
 const {
@@ -37,11 +37,9 @@ const {
   ActionListItem
 } = Ui
 */
-
 //const { useMemo, useState, useCallback } = React
-import { useMemo, useState, useCallback } from "react"
-import {useRepo} from "automerge-repo-react-hooks";
-import {createDocumentLink} from "../lib/blutack/Url";
+import { useCallback, useMemo, useState } from "react"
+import { useRepo } from "automerge-repo-react-hooks"
 
 function getListMenuItemElement(element) {
   if (!element) {
@@ -181,6 +179,8 @@ export default function ContentList({ documentId }) {
 }
 
 function ContentListItem({ url, onDelete }) {
+  const { type, documentId } = Url.parseDocumentLink(url)
+
   const actions = [
     {
       name: "view",
@@ -199,7 +199,7 @@ function ContentListItem({ url, onDelete }) {
       shortcut: "⌘+d",
       keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "d",
       callback: (url) => () =>
-        Url.openDocument(Url.createDocumentLink("raw", Url.parseDocumentLink(url).documentId)),
+        Url.openDocument(Url.createDocumentLink("raw", documentId)),
     },
     {
       name: "remove",
@@ -212,7 +212,20 @@ function ContentListItem({ url, onDelete }) {
     },
   ]
 
-  const { type, documentId } = Url.parseDocumentLink(url)
+
+  if (type === "widget") {
+    actions.push({
+      name: "edit",
+      faIcon: "fa-code",
+      label: "Edit",
+      shortcut: "⌘+e",
+      keysForActionPressed: (e) => (e.metaKey || e.ctrlKey) && e.key === "e",
+      callback: (url) => () => {
+        Url.openDocument(Url.createDocumentLink("editor", documentId))
+      },
+    })
+  }
+
   const [doc] = useDocument(documentId)
 
   const contentType = ContentTypes.typeNameToContentType(type)
@@ -246,16 +259,6 @@ export function NewDocumentButton({ trigger, onCreateDocument }) {
     })
   }
 
-  const createBlancDoc = () => {
-    const handle = repo.create()
-
-    handle.change((doc) => {
-      doc.source = ""
-
-      onCreateDocument(createDocumentLink("editor", handle.documentId))
-    })
-  }
-
   return (
     <Popover closeOnClick={true} trigger={trigger}>
       <ListMenuSection>
@@ -270,12 +273,6 @@ export function NewDocumentButton({ trigger, onCreateDocument }) {
             <span className="ContextMenu__label">{contentType.name}</span>
           </ListMenuItem>
         ))}
-        {<ListMenuItem
-          onClick={() => createBlancDoc()}
-        >
-          <Badge icon={"question"} />
-          <span className="ContextMenu__label">Blank Document</span>
-        </ListMenuItem>}
       </ListMenuSection>
     </Popover>
   )
