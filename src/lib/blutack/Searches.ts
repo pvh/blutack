@@ -1,7 +1,6 @@
 import { useEffect } from "react"
-import { WorkspaceDoc } from "../../components/content-types/workspace/Workspace"
+import { ContactDoc, ProfileDoc } from "./DocumentTypes"
 import { useDocumentIds } from "./Hooks"
-import { ContactDoc } from "../../components/content-types/contact"
 import { DocumentId } from "automerge-repo"
 import { useDocument } from "automerge-repo-react-hooks"
 
@@ -46,14 +45,9 @@ interface Autocompletion {
 
 const AUTOCOMPLETIONS: { [name: string]: Autocompletion } = {}
 
-export function registerAutocompletion(
-  name: string,
-  autocompletion: Autocompletion
-) {
+export function registerAutocompletion(name: string, autocompletion: Autocompletion) {
   if (!autocompletion.pattern.toString().endsWith("$/")) {
-    console.error(
-      "pattern has to match at the end of a string so it needs to end with '$'"
-    )
+    console.error("pattern has to match at the end of a string so it needs to end with '$'")
     return
   }
 
@@ -66,22 +60,18 @@ export function evalAutocompletion(text: string): {
 } {
   let matchOffset = 0
 
-  const suggestions = Object.entries(AUTOCOMPLETIONS).flatMap(
-    ([name, autocompletion]) => {
-      const match = text.match(autocompletion.pattern)
+  const suggestions = Object.entries(AUTOCOMPLETIONS).flatMap(([name, autocompletion]) => {
+    const match = text.match(autocompletion.pattern)
 
-      if (!match) {
-        return []
-      }
-
-      // todo: doesn't handle case where multiple autocompletions match on different prefix
-      matchOffset = -match[0].length
-
-      return autocompletion
-        .suggestions(match)
-        .filter(({ value }) => value !== match[0])
+    if (!match) {
+      return []
     }
-  )
+
+    // todo: doesn't handle case where multiple autocompletions match on different prefix
+    matchOffset = -match[0].length
+
+    return autocompletion.suggestions(match).filter(({ value }) => value !== match[0])
+  })
 
   return {
     matchOffset,
@@ -113,9 +103,7 @@ export function evalSearchFor(name: string, text: string): Match[] {
     const to = from + value.length
 
     if (from === prevIndex) {
-      throw new Error(
-        "regex causes infinite loop because it matches empty string"
-      )
+      throw new Error("regex causes infinite loop because it matches empty string")
     }
 
     prevIndex = from
@@ -166,17 +154,16 @@ registerAutocompletion(SOC, {
 
     return [
       {
-        value:
-          `SOC ${soc}` + (fraction === 0 ? "" : fraction.toString().slice(1)),
+        value: `SOC ${soc}` + (fraction === 0 ? "" : fraction.toString().slice(1)),
       },
     ]
   },
 })
 
-export function useMentionAutocompletion(workspaceId: DocumentId) {
-  const [workspace] = useDocument<WorkspaceDoc>(workspaceId)
+export function useMentionAutocompletion(profileId: DocumentId) {
+  const [profile] = useDocument<ProfileDoc>(profileId)
   const contacts = useDocumentIds<ContactDoc>(
-    workspace && workspace.contactIds ? workspace.contactIds : []
+    profile && profile.contactIds ? profile.contactIds : []
   )
 
   useEffect(() => {

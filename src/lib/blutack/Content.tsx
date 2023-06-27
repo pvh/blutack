@@ -1,8 +1,16 @@
-import React, { forwardRef, ForwardRefRenderFunction, memo, Ref, useCallback, useEffect, useState, } from "react"
+import React, {
+  forwardRef,
+  ForwardRefRenderFunction,
+  memo,
+  Ref,
+  useCallback,
+  useEffect,
+  useState,
+} from "react"
 
 import * as ContentTypes from "./ContentTypes"
 import { parseDocumentLink, PushpinUrl } from "./Url"
-import Crashable from "../../components/Crashable"
+import Crashable from "../ui/Crashable"
 import { DocumentId } from "automerge-repo"
 import { useSelfId } from "./SelfHooks"
 import { useHeartbeat } from "./PresenceHooks"

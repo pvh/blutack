@@ -2,7 +2,7 @@ import React from "react"
 import "./Heading.css"
 import Heading from "./Heading"
 import SecondaryText from "./SecondaryText"
-import TitleEditor from "../../components/TitleEditor"
+import TitleEditor from "./TitleEditor"
 import "./TitleWithSubtitle.css"
 import { DocumentId } from "automerge-repo"
 
@@ -48,11 +48,7 @@ export default function TitleWithSubtitle(props: Props) {
           {title}
         </Heading>
       )}
-      {subtitle && (
-        <SecondaryText>
-          {href ? <a href={href}>{subtitle}</a> : subtitle}
-        </SecondaryText>
-      )}
+      {subtitle && <SecondaryText>{href ? <a href={href}>{subtitle}</a> : subtitle}</SecondaryText>}
     </div>
   )
 }

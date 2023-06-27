@@ -1,6 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import Root from "./components/Root"
+import Root from "./Root"
 import "./App.css"
 import "./ibm-plex.css"
 import "./vendor/line-awesome/css/line-awesome.min.css"
@@ -17,7 +17,6 @@ import * as Ui from "./lib/ui"
 import { parseDocumentLink } from "./lib/blutack/Url"
 
 // hack: create globals so they are accessible in widgets
-
 ;(window as any).React = React
 ;(window as any).Blutack = Blutack
 ;(window as any).Ui = Ui

@@ -2,8 +2,8 @@ import { useState, useEffect, useContext } from "react"
 import { parseDocumentLink, createDocumentLink, PushpinUrl } from "./Url"
 import { useTimeouts, useMessaging } from "./Hooks"
 import { useSelfId } from "./SelfHooks"
-import { CurrentDeviceContext } from "../../components/content-types/workspace/Device"
-import { ContactDoc } from "../../components/content-types/contact"
+import { useCurrentDeviceId } from "./DeviceHooks"
+import { ContactDoc } from "./DocumentTypes"
 import { ChannelId, DocumentId } from "automerge-repo"
 import { useDocument, useRepo } from "automerge-repo-react-hooks"
 
@@ -46,7 +46,7 @@ interface HeartbeatMessage {
  */
 export function useAllHeartbeats(contact: DocumentId | undefined) {
   const repo = useRepo()
-  const device = useContext(CurrentDeviceContext)
+  const device = useCurrentDeviceId()
 
   useEffect(() => {
     if (!contact) {
@@ -95,9 +95,7 @@ export function useAllHeartbeats(contact: DocumentId | undefined) {
     return () => {
       clearInterval(interval)
       // heartbeats can't have DocumentIds as keys, so we do this
-      Object.entries(heartbeats).forEach(([documentId]) =>
-        depart(documentId as ChannelId)
-      )
+      Object.entries(heartbeats).forEach(([documentId]) => depart(documentId as ChannelId))
     }
   }, [contact, device, repo])
 }
@@ -137,13 +135,10 @@ export function usePresence<P>(
     }))
   }
 
-  const [bumpTimeout, depart] = useTimeouts(
-    HEARTBEAT_INTERVAL * 2,
-    (key: string) => {
-      const [contact, device] = lookupKeyToPresencePieces(key)
-      setSingleRemote({ contact, device, data: undefined })
-    }
-  )
+  const [bumpTimeout, depart] = useTimeouts(HEARTBEAT_INTERVAL * 2, (key: string) => {
+    const [contact, device] = lookupKeyToPresencePieces(key)
+    setSingleRemote({ contact, device, data: undefined })
+  })
 
   useMessaging<HeartbeatMessage>(url, (msg) => {
     const { contact, device, heartbeat, departing, data } = msg
@@ -186,15 +181,11 @@ export function usePresence<P>(
  * devices for that context. Will return an empty array if no device is online for the contact.
  * If the contact is self (the current user), the current device will be listed first.
  */
-export function useOnlineDevicesForContact(
-  contactId?: DocumentId
-): DocumentId[] {
+export function useOnlineDevicesForContact(contactId?: DocumentId): DocumentId[] {
   const selfId = useSelfId()
-  const selfDeviceId = useContext(CurrentDeviceContext)
+  const selfDeviceId = useCurrentDeviceId()
 
-  const onlineRemotes = usePresence(contactId).filter(
-    (p) => p.contact === contactId
-  )
+  const onlineRemotes = usePresence(contactId).filter((p) => p.contact === contactId)
   const remoteDevices = onlineRemotes.map((presence) => presence.device)
 
   if (selfId === contactId && selfDeviceId) {
@@ -214,7 +205,7 @@ export function useContactOnlineStatus(contactId?: DocumentId): boolean {
  * If the passed device is the current device, always returns true.
  */
 export function useDeviceOnlineStatus(deviceId?: DocumentId): boolean {
-  const currentDeviceId = useContext(CurrentDeviceContext)
+  const currentDeviceId = useCurrentDeviceId()
   const isCurrentDevice = currentDeviceId === deviceId
   const presence = usePresence(deviceId, {}, "onlineStatus")
   return isCurrentDevice || presence.some((p) => p.device === deviceId)
@@ -234,8 +225,7 @@ export function useConnectionStatus(contactId?: DocumentId): ConnectionStatus {
     return onlineDevices.length > 0 ? "connected" : "not-connected"
   }
 
-  if (!contact || !contact.devices || contact.devices.length <= 1)
-    return "self-no-devices"
+  if (!contact || !contact.devices || contact.devices.length <= 1) return "self-no-devices"
 
   return onlineDevices.length > 1 ? "connected" : "self-unreachable"
 }

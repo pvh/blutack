@@ -1,6 +1,6 @@
 import mime from "mime-types"
 import * as WebStreamLogic from "./WebStreamLogic"
-import { BinaryDataId, storeBinaryData } from "../../blobstore/Blob"
+import { BinaryDataId, storeBinaryData } from "./Blob"
 
 export type FileUrl = string & { __fileUrl: false }
 
@@ -28,10 +28,7 @@ export function fromString(str: string, mimeType: string = "text/plain") {
   }
 }
 
-export async function storeContentData({
-  data,
-  mimeType,
-}: ContentData): Promise<BinaryDataId> {
+export async function storeContentData({ data, mimeType }: ContentData): Promise<BinaryDataId> {
   const url = await storeBinaryData(data, mimeType)
   return url
 }

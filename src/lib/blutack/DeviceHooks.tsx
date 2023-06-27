@@ -7,18 +7,16 @@ import { ContactDoc } from "./DocumentTypes"
 
 // createContext requires a default value...
 // which we don't really have a sensible answer for
-const SelfContext = React.createContext<DocumentId>("" as DocumentId)
+export const CurrentDeviceContext = React.createContext<DocumentId>("" as DocumentId)
 
-export default SelfContext
-
-export function useSelfId(): DocumentId {
-  return useContext(SelfContext)
+export function useCurrentDeviceId(): DocumentId {
+  return useContext(CurrentDeviceContext)
 }
 
-export function useSelf(): [
+export function useCurrentDevice(): [
   doc: Doc<ContactDoc> | undefined,
   changeFn: (cf: (d: Extend<ContactDoc>) => void) => void
 ] {
-  const selfId = useSelfId()
+  const selfId = useCurrentDeviceId()
   return useDocument<ContactDoc>(selfId)
 }

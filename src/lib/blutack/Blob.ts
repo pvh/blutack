@@ -2,7 +2,7 @@ import { DocumentId } from "automerge-repo"
 import { useRepo } from "automerge-repo-react-hooks"
 import { useEffect, useState } from "react"
 import { v4 } from "uuid"
-import { __getRepo } from "../lib/blutack/ContentTypes"
+import { __getRepo } from "./ContentTypes"
 
 export type BinaryDataId = string & { __binaryDataId: true }
 
@@ -55,25 +55,19 @@ export async function storeBinaryData(
 }
 
 // TODO: implement correct responses...
-export function useBinaryDataHeader(
-  binaryDataId?: BinaryDataId
-): BinaryDataHeader | undefined {
+export function useBinaryDataHeader(binaryDataId?: BinaryDataId): BinaryDataHeader | undefined {
   const [header, setHeader] = useState<BinaryDataHeader | undefined>()
   useEffect(() => {
-    binaryDataId &&
-      loadBinaryData(binaryDataId).then(([header]) => setHeader(header))
+    binaryDataId && loadBinaryData(binaryDataId).then(([header]) => setHeader(header))
   }, [binaryDataId])
   return header
 }
 
 /* TODO: could request this from the shared-worker? would that be more efficient? */
-export function useBinaryDataContents(
-  binaryDataId?: BinaryDataId
-): ArrayBuffer | undefined {
+export function useBinaryDataContents(binaryDataId?: BinaryDataId): ArrayBuffer | undefined {
   const [buffer, setBuffer] = useState<ArrayBuffer | undefined>()
   useEffect(() => {
-    binaryDataId &&
-      loadBinaryData(binaryDataId).then(([, buffer]) => setBuffer(buffer))
+    binaryDataId && loadBinaryData(binaryDataId).then(([, buffer]) => setBuffer(buffer))
   }, [binaryDataId])
   return buffer
 }
@@ -83,9 +77,7 @@ async function loadBinaryData(
 ): Promise<[BinaryDataHeader, ArrayBuffer]> {
   return new Promise(async (resolve, reject) => {
     const { id: documentId } = parseBinaryDataId(binaryDataId)
-    const handle = __getRepo().find<BinaryObjectDoc>(
-      documentId as unknown as DocumentId
-    )
+    const handle = __getRepo().find<BinaryObjectDoc>(documentId as unknown as DocumentId)
 
     const doc = await handle.value()
     if (!doc.binary) throw new Error("Got a document with no binary...")

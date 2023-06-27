@@ -5,7 +5,7 @@ import { DocumentId, PeerId, Repo } from "automerge-repo"
 import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechannel"
 import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
 import { BrowserWebSocketClientAdapter } from "automerge-repo-network-websocket"
-import { BinaryDataId, BinaryObjectDoc, parseBinaryDataId } from "./blobstore/Blob"
+import { BinaryDataId, BinaryObjectDoc, parseBinaryDataId } from "./lib/blutack/Blob"
 
 console.log("shared-worker starting up")
 import debug from "debug"
@@ -22,12 +22,6 @@ export interface ServerWorkerRequest {
 }
 
 export type SharedWorkerMessage = ServiceWorkerConnection | FrontendConnection
-
-// TODO: this is just a debugging thing, take out the next few lines if you notice them here
-import * as Automerge from "@automerge/automerge"
-import { TextDoc } from "./components/content-types/TextContent"
-// @ts-ignore-next-line
-self.Automerge = Automerge
 
 // BYO sync-server instructions:
 // $ cd automerge-repo/packages/automerge-repo-sync-server

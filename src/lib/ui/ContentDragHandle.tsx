@@ -5,7 +5,7 @@ import * as UriList from "../blutack/UriList"
 import "./ContentDragHandle.css"
 import { PushpinUrl } from "../blutack/Url"
 import { DocumentId } from "automerge-repo"
-import { BinaryDataId, useBinaryDataHeader } from "../../blobstore/Blob"
+import { BinaryDataId, useBinaryDataHeader } from "../blutack/Blob"
 
 interface SimpleProps {
   url: PushpinUrl
@@ -45,12 +45,7 @@ export default function ContentDragHandle(props: Props) {
   }
 
   return (
-    <span
-      draggable
-      ref={ref}
-      onDragStart={onDragStart}
-      className="ContentDragHandle"
-    >
+    <span draggable ref={ref} onDragStart={onDragStart} className="ContentDragHandle">
       {children}
     </span>
   )

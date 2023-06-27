@@ -6,8 +6,6 @@ const {
   useDocumentIds,
   useSelfId,
   usePresence,
-  Changes,
-  Searches,
   Url,
 } = Blutack
 
@@ -25,15 +23,13 @@ TextContent.defaultWidth = 15
 
 export default function TextContent(props) {
   console.log("render text content")
-  
+
   const [doc, changeDoc] = useDocument(props.documentId)
   const [cursorPos, setCursorPos] = useState(undefined)
   const selfId = useSelfId()
   // need to remove first and last char because id starts and ends with ":" which is not allowed in a html id
   const scrollingContainerId = `scroll-container-${useId().slice(1, -1)}`
   const containerRef = useRef(null)
-
-  Changes.useAutoAdvanceLastSeenHeads(Url.createDocumentLink("text", props.documentId))
 
   const presence = usePresence(props.documentId, cursorPos, "cursorPos")
 
@@ -192,7 +188,6 @@ export function useQuill({ text, change, selectionChange, cursors = [], selected
     if (!quill.current) {
       return
     }
-
 
     // todo:  commented out to make bootstrapping work
     // const quillCursors = quill.current?.getModule("cursors")

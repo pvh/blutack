@@ -4,7 +4,6 @@ import { createDocumentLink, PushpinUrl } from "./Url"
 import { ContentData } from "./ContentData"
 import { DocumentId } from "automerge-repo"
 import { DocCollection, DocHandle } from "automerge-repo"
-import { LastSeenHeads } from "./Changes"
 import { Doc } from "@automerge/automerge"
 
 const log = Debug("pushpin:content-types")
@@ -34,12 +33,6 @@ export interface ContentType {
   createFrom?: (contentData: ContentData, handle: DocHandle<any>) => Promise<void> | void
   supportsMimeType?: (type: string) => boolean
   // TODO: i don't love this, but we'll put it here for now
-  hasUnseenChanges?: (doc: Doc<unknown>, lastHeads?: LastSeenHeads) => boolean
-  hasUnseenMentions?: (
-    doc: Doc<unknown>,
-    lastHeads: LastSeenHeads | undefined,
-    name: string
-  ) => boolean
 }
 
 const registry: { [type: string]: ContentType } = {}

@@ -1,5 +1,5 @@
 import { DocumentId } from "automerge-repo"
-import { BinaryDataId, createBinaryDataUrl } from "../../blobstore/Blob"
+import { BinaryDataId, createBinaryDataUrl } from "./Blob"
 import * as ContentTypes from "./ContentTypes"
 import { transform } from "@babel/standalone"
 
@@ -34,7 +34,7 @@ const importTransformPlugin = {
 }
 
 export function transformSource(source: string) {
-  return transform(source,{
+  return transform(source, {
     presets: ["react"],
     plugins: [importTransformPlugin],
     parserOpts: { allowReturnOutsideFunction: true },
