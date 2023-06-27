@@ -1,17 +1,3 @@
-import {
-  Automerge,
-  WebStreamLogic,
-  useDocument,
-  useStaticCallback,
-  useDocumentIds,
-  useSelfId,
-  usePresence,
-  Changes,
-  Searches,
-  Url,
-} from "../lib/blutack"
-
-/*
 const {
   Automerge,
   WebStreamLogic,
@@ -24,21 +10,22 @@ const {
   Searches,
   Url,
 } = Blutack
- */
 
 import Quill from "quill"
 import Delta from "quill-delta"
 import QuillCursors from "quill-cursors"
-// const { useEffect, useRef, useMemo, useState, useId, usePresence } = React
-import { useEffect, useRef, useMemo, useState, useId } from "react"
+const { useEffect, useRef, useMemo, useState, useId } = React
 
-Quill.register("modules/cursors", QuillCursors)
+// todo:  commented out to make bootstrapping work
+// Quill.register("modules/cursors", QuillCursors)
 
 TextContent.minWidth = 6
 TextContent.minHeight = 2
 TextContent.defaultWidth = 15
 
 export default function TextContent(props) {
+  console.log("render text content")
+  
   const [doc, changeDoc] = useDocument(props.documentId)
   const [cursorPos, setCursorPos] = useState(undefined)
   const selfId = useSelfId()
@@ -74,11 +61,12 @@ export default function TextContent(props) {
     config: {
       formats: ["bold", "color", "italic"],
       modules: {
-        mention: {},
+        // todo:  commented out to make bootstrapping work
+        /* mention: {},
         cursors: {
           hideDelayMs: 500,
           transformOnTextChange: true,
-        },
+        }, */
         toolbar: false,
         history: {
           maxStack: 500,
@@ -205,10 +193,13 @@ export function useQuill({ text, change, selectionChange, cursors = [], selected
       return
     }
 
-    const quillCursors = quill.current?.getModule("cursors")
+
+    // todo:  commented out to make bootstrapping work
+    // const quillCursors = quill.current?.getModule("cursors")
 
     const cursorsToDelete = {}
-    for (const cursor of quillCursors.cursors()) {
+    // todo:  commented out to make bootstrapping work
+    for (const cursor of [] /* quillCursors.cursors() */) {
       cursorsToDelete[cursor.id] = true
     }
 

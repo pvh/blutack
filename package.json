@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "import-doc": "npx ts-node --esm cli.ts import-doc",
-    "export-doc": "npx ts-node --esm cli.ts export-doc"
+    "export-doc": "npx ts-node --esm cli.ts export-doc",
+    "export-cts": "npx ts-node --esm cli.ts export-cts"
   },
   "dependencies": {
     "@automerge/automerge": "2.1.0-alpha.1",

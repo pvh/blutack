@@ -14,8 +14,6 @@ import * as Blutack from "./lib/blutack"
 import * as Ui from "./lib/ui"
 
 // TODO: load dynamically
-import { create as createProfile } from "./bootstrap/Profile.jsx"
-import { create as createDevice } from "./bootstrap/Device.jsx"
 import { parseDocumentLink } from "./lib/blutack/Url"
 
 // hack: create globals so they are accessible in widgets

@@ -1,29 +1,11 @@
 import classNames from "classnames"
-import {
-  ContentTypes,
-  ImportData,
-  MIMETYPE_CONTENT_LIST_INDEX,
-  Url,
-  useDocument,
-} from "../lib/blutack"
-import {
-  ActionListItem,
-  Badge,
-  CenteredStack,
-  ListItem,
-  ListMenu,
-  ListMenuItem,
-  ListMenuSection,
-  Popover,
-  TitleWithSubtitle,
-} from "../lib/ui"
-/*
 const {
   MIMETYPE_CONTENT_LIST_INDEX,
   ImportData,
   ContentTypes,
+  Url,
   useDocument,
-  Url
+  useRepo
 } = Blutack
 const {
   Badge,
@@ -36,10 +18,7 @@ const {
   TitleWithSubtitle,
   ActionListItem
 } = Ui
-*/
-//const { useMemo, useState, useCallback } = React
-import { useCallback, useMemo, useState } from "react"
-import { useRepo } from "automerge-repo-react-hooks"
+const { useMemo, useState, useCallback } = React
 
 function getListMenuItemElement(element) {
   if (!element) {
@@ -53,7 +32,7 @@ function getListMenuItemElement(element) {
   return getListMenuItemElement(element.parentElement)
 }
 
-export default function ContentList({ documentId }) {
+export default function ContentList({ documentId, disableOpenOnClick = false }) {
   const [doc, changeDoc] = useDocument(documentId)
   const [draggedOverIndex, setDraggedOverIndex] = useState()
 
@@ -154,7 +133,17 @@ export default function ContentList({ documentId }) {
               onDrop={(evt) => onDrop(evt)}
               key={url}
             >
-              <ContentListItem url={url} onDelete={() => removeContentAt(index)} />
+              <ContentListItem 
+                url={url} 
+                onDelete={() => removeContentAt(index)}
+                onOpen={() => {
+                  if (disableOpenOnClick) {
+                    return
+                  }
+                
+                  Url.openDocument(url)
+                }}
+              />
             </div>
           )
         })}
@@ -178,7 +167,7 @@ export default function ContentList({ documentId }) {
   )
 }
 
-function ContentListItem({ url, onDelete }) {
+function ContentListItem({ url, onDelete, onOpen }) {
   const { type, documentId } = Url.parseDocumentLink(url)
 
   const actions = [
@@ -189,7 +178,7 @@ function ContentListItem({ url, onDelete }) {
       shortcut: "⏎",
       keysForActionPressed: (e) => !e.shiftKey && e.key === "Enter",
       callback: (url) => () => {
-        Url.openDocument(url)
+        onOpen()
       },
     },
     {

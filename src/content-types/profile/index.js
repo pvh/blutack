@@ -1,6 +1,4 @@
-import { Content, ContentTypes, Context, Url, useDocument } from "../lib/blutack"
-import { createDocumentLink } from "../lib/blutack/Url"
-// const { useDocument, ContentTypes, Url, Content, Context } = Blutack
+const { useDocument, ContentTypes, Url, Content, Context } = Blutack
 const { ProfileContext } = Context
 
 /*
@@ -55,7 +53,7 @@ export function ProfileExpanded({ documentId }) {
 
       <div>
         <h2 className="text-md">Content Types</h2>
-        <Content url={Url.createDocumentLink("contentlist", profile.contentTypesListId)} />
+        <Content url={Url.createDocumentLink("contentlist", profile.contentTypesListId)} disableOpenOnClick={true} />
       </div>
     </div>
   )
@@ -69,11 +67,7 @@ export function create({ baseContentTypeIds }, profileHandle) {
     // but i don't want to pull that in scope right now
 
     ContentTypes.create("contentlist", { title: "Home" }, (homeDocUrl, homeDocHandle) => {
-      console.log("add own thing")
-
       homeDocHandle.change((homeDoc) => {
-        console.log("home doc", JSON.parse(JSON.stringify(homeDoc)))
-
         homeDoc.content.push(Url.createDocumentLink("profile", profileHandle.documentId))
       })
 
@@ -83,7 +77,7 @@ export function create({ baseContentTypeIds }, profileHandle) {
         (contentTypesListUrl, contentTypesListHandle) => {
           contentTypesListHandle.change((contentTypesList) => {
             contentTypesList.content = baseContentTypeIds.map((id) =>
-              createDocumentLink("widget", id)
+              Url.createDocumentLink("widget", id)
             )
           })
 

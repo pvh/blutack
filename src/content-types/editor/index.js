@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react"
-import { useDocument, Modules, Context, CodeMirror  } from "../lib/blutack"
-// const { useDocument, Modules, Context } = Blutack
+const { useEffect, useRef } = React
+const { useDocument, Modules, Context, CodeMirror } = Blutack
+
 
 export default function Editor(props) {
   const [doc, changeDoc] = useDocument(props.documentId)
@@ -45,6 +45,17 @@ export default function Editor(props) {
       } else if (!module.contentType && indexOfModule !== -1) {
         profile.contentTypeIds.splice(indexOfModule, 1)
       }
+
+        
+      // add content type to document so the type is known when exporting it without parsing the js
+      // todo: figure out a more principled way to do this
+      changeDoc((doc) => {
+        if (module.contentType) {      
+          doc.contentType = module.contentType.type
+        } else {
+          delete doc.contentType
+        }
+      })
     })
   }
 

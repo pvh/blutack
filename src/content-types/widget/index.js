@@ -1,9 +1,5 @@
-import { useEffect, useRef, useState } from "react"
-//const { useEffect, useRef, useState } = React
-
-import {ContentTypes, useDocument, Context, Modules, useRepo, Url} from "../lib/blutack"
-
-// const {ContentTypes, useDocument, Context} = Blutack
+const { useEffect, useRef, useState } = React
+const {ContentTypes, useDocument, Context, Modules, useRepo, Url} = Blutack
 
 import {ErrorBoundary} from "react-error-boundary"
 
@@ -45,7 +41,7 @@ export default function Widget(props) {
 
         const contentTypesListHandle = repo.find(profile.contentTypesListId)
         const contentTypesList = await contentTypesListHandle.value()
-
+        
         if (!contentTypesList.content.includes(documentUrl)) {
           contentTypesListHandle.change((contentTypesList) => {
             contentTypesList.content.unshift(documentUrl)

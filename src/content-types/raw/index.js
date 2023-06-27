@@ -1,14 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react"
-
-import { useDocument } from "automerge-repo-react-hooks"
-import "./TextContent.css"
 import ReactJson from "react-json-view"
-import { Url, Automerge } from "../lib/blutack"
-/*
+
+const{ useCallback, useEffect, useState } = React
 const {
-  Url
+  Url, useDocument, Automerge
 } = Blutack
- */
+
 const { createDocumentLink, isPushpinUrl, openDocument, parseDocumentLink } = Url
 
 

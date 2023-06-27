@@ -6,8 +6,8 @@ import { createDocumentLink } from "../lib/blutack/Url";
 
 // Import css files
 // todo: find solution that allows to add styling from docs
-import "../bootstrap/ContentList.css"
-import "../bootstrap/TextContent.css"
+import "../styles/ContentList.css"
+import "../styles/TextContent.css"
 
 interface RootArgs {
   profileDocId: DocumentId
