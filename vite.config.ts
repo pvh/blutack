@@ -12,7 +12,7 @@ export default defineConfig({
   },
 
   build: {
-    outDir: "dist/blutack"
+    outDir: "dist"
   },
 
   optimizeDeps: {

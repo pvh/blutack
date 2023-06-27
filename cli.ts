@@ -15,7 +15,7 @@ program
   .requiredOption("-d, --docId <value>", "Document ID")
 
 program
-  .command("export")
+  .command("export-doc")
   .description("export a document")
   .action(() => {
     const docId = program.opts().docId
@@ -24,7 +24,7 @@ program
   })
 
 program
-  .command("import")
+  .command("import-doc")
   .description("import a document")
   .action((options) => {
     const input = fs.readFileSync(process.stdin.fd, "utf-8")
@@ -33,6 +33,5 @@ program
       d.source = input
     })
   })
-
 
 program.parse(process.argv)
