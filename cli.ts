@@ -1,10 +1,9 @@
 import * as fs from "fs"
-import path from "path"
+import * as path from "path"
 import { program } from "commander"
 import { DocumentId, PeerId, Repo } from "automerge-repo"
 import { BrowserWebSocketClientAdapter } from "automerge-repo-network-websocket"
 import { rimrafSync } from "rimraf"
-
 
 const repo = new Repo({
   network: [new BrowserWebSocketClientAdapter("wss://sync.inkandswitch.com")],
@@ -46,50 +45,147 @@ program
   .requiredOption("-o, --outputDir <value>", "Output directory")
   .action(async (options) => {
     const docId = program.opts().docId
-    const profileDoc = await (repo.find<any>(docId).value())
+    const profileDoc = await repo.find<any>(docId).value()
     const outputPath = path.join(process.cwd(), options.outputDir)
 
     if (!fs.existsSync(outputPath)) {
-      fs.mkdirSync(outputPath);
+      fs.mkdirSync(outputPath)
     }
 
-    const contentTypesListDoc = await (repo.find<any>(profileDoc.contentTypesListId).value())
+    const contentTypesListDoc = await repo.find<any>(profileDoc.contentTypesListId).value()
 
-    await Promise.all(contentTypesListDoc.content.map(async (widgetUrl: string) => {
-      const parts = widgetUrl.split("/")
-      const widgetDocId = parts[parts.length - 1] as DocumentId
+    await Promise.all(
+      contentTypesListDoc.content.map(async (widgetUrl: string) => {
+        const parts = widgetUrl.split("/")
+        const widgetDocId = parts[parts.length - 1] as DocumentId
 
-      const widgetDoc = await (repo.find<any>(widgetDocId).value())
+        const widgetDoc = await repo.find<any>(widgetDocId).value()
 
-      if (!widgetDoc.source) {
-        return
-      }
+        if (!widgetDoc.source) {
+          return
+        }
 
-      const contentTypePath = path.join(outputPath, widgetDoc.contentType)
+        const contentTypePath = path.join(outputPath, widgetDoc.contentType)
 
-      // ensure we have an empty directory
-      if (fs.existsSync(contentTypePath)) {
-        rimrafSync(contentTypePath)
-      }
-      fs.mkdirSync(contentTypePath);
+        // ensure we have an empty directory
+        if (fs.existsSync(contentTypePath)) {
+          rimrafSync(contentTypePath)
+        }
+        fs.mkdirSync(contentTypePath)
 
+        const sourceFilePath = path.join(contentTypePath, "index.js")
+        fs.writeFileSync(sourceFilePath, widgetDoc.source)
 
-      const sourceFilePath = path.join(contentTypePath, "index.js")
-      fs.writeFileSync(sourceFilePath, widgetDoc.source)
-
-      const packageFilePath = path.join(contentTypePath, "package.json")
-      const packageJson = {
-        name: `content-type-${widgetDoc.contentType}`,
-        documentId: widgetDocId
-      }
-      fs.writeFileSync(packageFilePath, JSON.stringify(packageJson, null, 2))
-    }))
+        const packageFilePath = path.join(contentTypePath, "package.json")
+        const packageJson = {
+          name: `content-type-${widgetDoc.contentType}`,
+          contentType: widgetDoc.contentType,
+          documentId: widgetDocId,
+        }
+        fs.writeFileSync(packageFilePath, JSON.stringify(packageJson, null, 2))
+      })
+    )
 
     process.exit()
   })
 
+interface PackageJson {
+  name: string
+  documentId: DocumentId
+  contentType: string
+}
 
+program
+  .command("import-cts")
+  .description("import content types")
+  .option("--replace", "delete any content type that is not found in the input directory")
+  .requiredOption("-o, --inputDir <value>", "input directory")
+  .action(async (options) => {
+    const docId = program.opts().docId
+    const profileDoc = await repo.find<any>(docId).value()
+    const inputPath = path.join(process.cwd(), options.inputDir)
 
+    if (!fs.existsSync(inputPath)) {
+      console.log("directory doesn't exist", inputPath)
+      process.exit()
+    }
+
+    const contentTypesListDocHandle = repo.find<any>(profileDoc.contentTypesListId)
+
+    const contentTypeDocUrls = (
+      await Promise.all(
+        getDirectories(inputPath).map(async (contentTypeDirPath) => {
+          const sourceFilePath = path.join(contentTypeDirPath, "index.js")
+          const packageFilePath = path.join(contentTypeDirPath, "package.json")
+
+          if (!fs.existsSync(packageFilePath)) {
+            console.error(`skip "${contentTypeDirPath}": missing a package.json`)
+            return
+          }
+
+          if (!fs.existsSync(sourceFilePath)) {
+            console.error(`skip "${contentTypeDirPath}": missing a index.js file`)
+            return
+          }
+
+          let packageJson: PackageJson
+
+          try {
+            packageJson = JSON.parse(fs.readFileSync(packageFilePath, "utf-8"))
+          } catch (err) {
+            console.error(`skip ${contentTypeDirPath}: invalid package.json`)
+            return
+          }
+
+          if (!packageJson.contentType) {
+            console.error(`skip ${contentTypeDirPath}: package.json is missing content type`)
+            return
+          }
+
+          const widgetDocHandle = repo.find<any>(packageJson.documentId)
+
+          // await value to make sure doc is ready
+          await widgetDocHandle.value()
+
+          console.log(`import ${contentTypeDirPath}`)
+
+          const source = fs.readFileSync(sourceFilePath, "utf-8")
+
+          widgetDocHandle.change((widgetDoc) => {
+            widgetDoc.contentType = packageJson.contentType
+            widgetDoc.source = source
+          })
+
+          return packageJson.documentId
+        })
+      )
+    )
+      .filter((value) => value !== undefined)
+      .map((documentId) => `web+pushpin://widget/${documentId}`)
+
+    contentTypesListDocHandle.change((contentTypesListDoc) => {
+      if (options.replace) {
+        contentTypesListDoc.content = contentTypeDocUrls
+      } else {
+        console.log("typesListDoc", JSON.parse(JSON.stringify(contentTypesListDoc)))
+
+        for (const contentTypeDocUrl of contentTypeDocUrls) {
+
+          if (!contentTypesListDoc.content.includes(contentTypeDocUrl)) {
+            console.log("insert", contentTypeDocUrl)
+
+            contentTypesListDoc.content.push(contentTypeDocUrl)
+          }
+        }
+      }
+    })
+  })
+
+function getDirectories(dirPath: string) {
+  return fs
+    .readdirSync(dirPath, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join(dirPath, entry.name))
+}
 
 program.parse(process.argv)
-

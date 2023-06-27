@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "import-doc": "npx ts-node --esm cli.ts import-doc",
     "export-doc": "npx ts-node --esm cli.ts export-doc",
-    "export-cts": "npx ts-node --esm cli.ts export-cts"
+    "export-cts": "npx ts-node --esm cli.ts export-cts --outputDir src/content-types",
+    "import-cts": "npx ts-node --esm cli.ts import-cts --inputDir src/content-types"
   },
   "dependencies": {
     "@automerge/automerge": "2.1.0-alpha.1",
