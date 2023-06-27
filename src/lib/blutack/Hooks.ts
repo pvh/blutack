@@ -1,15 +1,15 @@
 import { Doc, Extend } from "@automerge/automerge"
-import { DocumentId, DocCollection, DocHandle, ChannelId } from "automerge-repo"
-import { useDocument, useHandle, useRepo } from "automerge-repo-react-hooks"
+import { DocumentId, DocCollection, DocHandle, ChannelId } from "@automerge/automerge-repo"
+import { useDocument, useHandle, useRepo } from "@automerge/automerge-repo-react-hooks"
 import { useEffect, useState, useRef, useCallback, createContext, useContext } from "react"
-import { parseDocumentLink, PushpinUrl } from "./Url"
+import { parseDocumentLink, ContentUrl } from "../blutack-content/Url"
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
 type Cleanup = void | (() => void)
 
 export interface DocMap<T> {
-  [id: PushpinUrl]: T
+  [id: ContentUrl]: T
 }
 
 export interface DocIdMap<T> {
@@ -69,7 +69,7 @@ export function useDocumentIds<T>(docIds?: DocumentId[]): DocIdMap<T> {
   return documents
 }
 
-export function useDocuments<T>(urls?: PushpinUrl[]): DocMap<T> {
+export function useDocuments<T>(urls?: ContentUrl[]): DocMap<T> {
   const handlersRef = useRef<DocMap<DocHandle<T>>>({})
   const repo = useRepo()
   const [documents, setDocuments] = useState<DocMap<T>>({})
@@ -79,7 +79,7 @@ export function useDocuments<T>(urls?: PushpinUrl[]): DocMap<T> {
   }
 
   const handlers = handlersRef.current
-  const prevHandlerIds = Object.keys(handlers) as PushpinUrl[]
+  const prevHandlerIds = Object.keys(handlers) as ContentUrl[]
 
   urls.forEach((url) => {
     if (handlers[url]) {

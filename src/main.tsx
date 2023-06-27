@@ -7,14 +7,14 @@ import "./vendor/line-awesome/css/line-awesome.min.css"
 
 import localforage from "localforage"
 
-import { DocumentId, Repo } from "automerge-repo"
-import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechannel"
-import { RepoContext } from "automerge-repo-react-hooks"
+import { DocumentId, Repo } from "@automerge/automerge-repo"
+import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel"
+import { RepoContext } from "@automerge/automerge-repo-react-hooks"
 import * as Blutack from "./lib/blutack"
 import * as Ui from "./lib/ui"
 
 // TODO: load dynamically
-import { parseDocumentLink } from "./lib/blutack/Url"
+import { parseDocumentLink } from "./lib/blutack-content/Url"
 
 // hack: create globals so they are accessible in widgets
 ;(window as any).React = React

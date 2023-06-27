@@ -1,8 +1,8 @@
 import { useEffect } from "react"
 import { ContactDoc, ProfileDoc } from "./DocumentTypes"
 import { useDocumentIds } from "./Hooks"
-import { DocumentId } from "automerge-repo"
-import { useDocument } from "automerge-repo-react-hooks"
+import { DocumentId } from "@automerge/automerge-repo"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 
 const SEARCHES: { [name: string]: Search } = {}
 

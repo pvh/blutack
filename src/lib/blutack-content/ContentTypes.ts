@@ -1,9 +1,9 @@
 import Debug from "debug"
 import { ComponentType } from "react"
-import { createDocumentLink, PushpinUrl } from "./Url"
-import { ContentData } from "./ContentData"
-import { DocumentId } from "automerge-repo"
-import { DocCollection, DocHandle } from "automerge-repo"
+import { createDocumentLink, ContentUrl } from "./Url"
+import { ContentData } from "../blutack/ContentData"
+import { DocumentId } from "@automerge/automerge-repo"
+import { DocCollection, DocHandle } from "@automerge/automerge-repo"
 import { Doc } from "@automerge/automerge"
 
 const log = Debug("pushpin:content-types")
@@ -121,7 +121,7 @@ export function mimeTypeToContentType(mimeType?: string): ContentType {
   return supportingType
 }
 
-export type CreateCallback = (url: PushpinUrl, handle: DocHandle<unknown>) => void
+export type CreateCallback = (url: ContentUrl, handle: DocHandle<unknown>) => void
 
 export function createFrom(contentData: ContentData, callback: CreateCallback): void {
   // importFromText

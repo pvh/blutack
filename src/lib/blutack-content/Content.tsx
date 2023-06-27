@@ -9,11 +9,11 @@ import React, {
 } from "react"
 
 import * as ContentTypes from "./ContentTypes"
-import { parseDocumentLink, PushpinUrl } from "./Url"
+import { parseDocumentLink, ContentUrl } from "./Url"
 import Crashable from "../ui/Crashable"
-import { DocumentId } from "automerge-repo"
-import { useSelfId } from "./SelfHooks"
-import { useHeartbeat } from "./PresenceHooks"
+import { DocumentId } from "@automerge/automerge-repo"
+import { useSelfId } from "../blutack/SelfHooks"
+import { useHeartbeat } from "../blutack/PresenceHooks"
 
 // this is the interface imported by Content types
 export interface ContentProps {
@@ -31,13 +31,13 @@ export interface EditableContentProps extends ContentProps {
 
 // These are the props the generic Content wrapper receives
 interface Props {
-  url: PushpinUrl
+  url: ContentUrl
   context: ContentTypes.Context
   [arbitraryProp: string]: any
 }
 
 export interface ContentHandle {
-  onContent: (url: PushpinUrl) => boolean
+  onContent: (url: ContentUrl) => boolean
 }
 
 const Content: ForwardRefRenderFunction<ContentHandle, Props> = (

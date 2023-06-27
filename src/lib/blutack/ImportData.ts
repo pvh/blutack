@@ -1,13 +1,10 @@
-import { isPushpinUrl, parseDocumentLink, PushpinUrl } from "./Url"
-import * as ContentTypes from "./ContentTypes"
+import { isContentUrl, parseDocumentLink, ContentUrl } from "../blutack-content/Url"
+import * as ContentTypes from "../blutack-content/ContentTypes"
 import * as ContentData from "./ContentData"
 import * as URIList from "./UriList"
 
 // TODO: Convert these functions to be async rather than accepting a callback.
-export type CreatedContentCallback = (
-  contentUrl: PushpinUrl,
-  index: number
-) => void
+export type CreatedContentCallback = (contentUrl: ContentUrl, index: number) => void
 
 export async function importDataTransfer(
   dataTransfer: DataTransfer,
@@ -15,7 +12,7 @@ export async function importDataTransfer(
 ) {
   const url = dataTransfer.getData("application/pushpin-url")
   if (url) {
-    callback(url as PushpinUrl, 0)
+    callback(url as ContentUrl, 0)
     return
   }
 
@@ -25,7 +22,7 @@ export async function importDataTransfer(
   if (uriList) {
     const uris = URIList.parse(uriList)
     uris.forEach((uri, i) =>
-      importPlainText(uri, (contentUrl: PushpinUrl) => callback(contentUrl, i))
+      importPlainText(uri, (contentUrl: ContentUrl) => callback(contentUrl, i))
     )
   }
 
@@ -42,16 +39,11 @@ export async function importDataTransfer(
   // If we can't get the item as a bunch of files, let's hope it works as plaintext.
   const plainText = dataTransfer.getData("text/plain")
   if (plainText) {
-    importPlainText(plainText, (contentUrl: PushpinUrl) =>
-      callback(contentUrl, 0)
-    )
+    importPlainText(plainText, (contentUrl: ContentUrl) => callback(contentUrl, 0))
   }
 }
 
-export function importFileList(
-  files: FileList,
-  callback: CreatedContentCallback
-) {
+export function importFileList(files: FileList, callback: CreatedContentCallback) {
   /* Adapted from:
     https://www.meziantou.net/2017/09/04/upload-files-and-directories-using-an-input-drag-and-drop-or-copy-and-paste-with */
   const { length } = files
@@ -60,9 +52,7 @@ export function importFileList(
   for (let i = 0; i < length; i += 1) {
     const file = files[i]
     // @ts-ignore-next-line (TODO: this is probably a real bug)
-    ContentTypes.createFrom(ContentData.fromFile(file), (url) =>
-      callback(url, i)
-    )
+    ContentTypes.createFrom(ContentData.fromFile(file), (url) => callback(url, i))
   }
 }
 
@@ -74,9 +64,7 @@ function importImagesFromHTML(html: string, callback: CreatedContentCallback) {
     iframe.contentDocument!.documentElement.innerHTML = html
     const images = iframe.contentDocument!.getElementsByTagName("img")
     if (images.length > 0) {
-      importUrl(images[0].src, (contentUrl: PushpinUrl) =>
-        callback(contentUrl, 0)
-      )
+      importUrl(images[0].src, (contentUrl: ContentUrl) => callback(contentUrl, 0))
       return true
     }
   } finally {
@@ -93,11 +81,8 @@ function importImagesFromHTML(html: string, callback: CreatedContentCallback) {
  * If the text is a pushpin url, invoke the callback to turn the text into a card.
  * NOTE: this code should not know about cards - what is this really doing?
  */
-export function importPlainText(
-  plainText: string,
-  callback: ContentTypes.CreateCallback
-) {
-  if (isPushpinUrl(plainText)) {
+export function importPlainText(plainText: string, callback: ContentTypes.CreateCallback) {
+  if (isContentUrl(plainText)) {
     const { documentId } = parseDocumentLink(plainText)
     const handle = ContentTypes.__getRepo().find(documentId)
     callback(plainText, handle)
@@ -133,8 +118,7 @@ async function importUrl(url: string, callback: ContentTypes.CreateCallback) {
     ContentTypes.create("url", { url }, callback)
     return
   }
-  const mimeType =
-    response.headers.get("Content-Type") || "application/octet-stream"
+  const mimeType = response.headers.get("Content-Type") || "application/octet-stream"
   if (mimeType.includes("text/html")) {
     ContentTypes.create("url", { url }, callback)
     return

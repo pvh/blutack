@@ -8,7 +8,9 @@ interface ProfileDoc {
   contactIds: DocumentId[]
   homeDocUrl: DocumentId,
   viewedDocUrls: PushpinUrl[]
+  archivedDocUrls: PushpinUrl[]
   contentTypeIds: DocumentId[]
+  persistedLastSeenHeads: PersistedLastSeenHeadsMap
 }
 
 */
@@ -51,10 +53,7 @@ export function ProfileExpanded({ documentId }) {
 
       <div>
         <h2 className="text-md">Content Types</h2>
-        <Content
-          url={Url.createDocumentLink("contentlist", profile.contentTypesListId)}
-          disableOpenOnClick={true}
-        />
+        <Content url={Url.createDocumentLink("contentlist", profile.contentTypesListId)} disableOpenOnClick={true} />
       </div>
     </div>
   )

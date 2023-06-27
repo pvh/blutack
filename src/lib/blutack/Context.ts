@@ -1,7 +1,7 @@
-import { createContext, useContext } from "react";
-import { DocumentId } from "automerge-repo";
-import { Doc, Extend } from "@automerge/automerge";
-import { useDocument } from "automerge-repo-react-hooks";
+import { createContext, useContext } from "react"
+import { DocumentId } from "@automerge/automerge-repo"
+import { Doc, Extend } from "@automerge/automerge"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 
 export const ProfileContext = createContext(undefined)
 

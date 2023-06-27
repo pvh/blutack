@@ -1,11 +1,11 @@
 import { useState, useEffect, useContext } from "react"
-import { parseDocumentLink, createDocumentLink, PushpinUrl } from "./Url"
+import { parseDocumentLink, createDocumentLink, ContentUrl } from "../blutack-content/Url"
 import { useTimeouts, useMessaging } from "./Hooks"
 import { useSelfId } from "./SelfHooks"
 import { useCurrentDeviceId } from "./DeviceHooks"
 import { ContactDoc } from "./DocumentTypes"
-import { ChannelId, DocumentId } from "automerge-repo"
-import { useDocument, useRepo } from "automerge-repo-react-hooks"
+import { ChannelId, DocumentId } from "@automerge/automerge-repo"
+import { useDocument, useRepo } from "@automerge/automerge-repo-react-hooks"
 
 /**
  * heartbeats are an accumulated list of the URLs we have "open" and so should

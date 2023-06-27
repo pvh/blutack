@@ -25,7 +25,7 @@ Start by copying an existing simple widget. I recommend Device.tsx. Delete the "
 import React, { useCallback, useEffect, useState } from "react"
 
 import { ContentType } from "../pushpin-code/ContentTypes"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import { ContentProps } from "../Content"
 import {
   createDocumentLink,
@@ -34,7 +34,7 @@ import {
   parseDocumentLink,
   PushpinUrl,
 } from "../pushpin-code/Url"
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 import * as Automerge from "@automerge/automerge"
 
 export default function MyThing(props: ContentProps) {

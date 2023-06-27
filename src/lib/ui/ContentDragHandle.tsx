@@ -3,12 +3,12 @@ import "./Heading.css"
 import mime from "mime-types"
 import * as UriList from "../blutack/UriList"
 import "./ContentDragHandle.css"
-import { PushpinUrl } from "../blutack/Url"
-import { DocumentId } from "automerge-repo"
+import { ContentUrl } from "../blutack-content/Url"
+import { DocumentId } from "@automerge/automerge-repo"
 import { BinaryDataId, useBinaryDataHeader } from "../blutack/Blob"
 
 interface SimpleProps {
-  url: PushpinUrl
+  url: ContentUrl
   children: ReactNode
 }
 interface FileProps extends SimpleProps {

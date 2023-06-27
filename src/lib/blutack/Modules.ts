@@ -1,6 +1,6 @@
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 import { BinaryDataId, createBinaryDataUrl } from "./Blob"
-import * as ContentTypes from "./ContentTypes"
+import * as ContentTypes from "../blutack-content/ContentTypes"
 import { transform } from "@babel/standalone"
 
 export async function load(documentId: DocumentId) {

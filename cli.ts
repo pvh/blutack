@@ -1,7 +1,7 @@
 import * as fs from "fs"
 import * as path from "path"
 import { program } from "commander"
-import { DocumentId, PeerId, Repo } from "automerge-repo"
+import { DocumentId, PeerId, Repo } from "@automerge/automerge-repo"
 import { BrowserWebSocketClientAdapter } from "automerge-repo-network-websocket"
 import { rimrafSync } from "rimraf"
 
@@ -170,7 +170,6 @@ program
         console.log("typesListDoc", JSON.parse(JSON.stringify(contentTypesListDoc)))
 
         for (const contentTypeDocUrl of contentTypeDocUrls) {
-
           if (!contentTypesListDoc.content.includes(contentTypeDocUrl)) {
             console.log("insert", contentTypeDocUrl)
 

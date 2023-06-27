@@ -1,8 +1,8 @@
-import Content from "./lib/blutack/Content"
-import * as ContentTypes from "./lib/blutack/ContentTypes"
-import { DocumentId } from "automerge-repo"
+import Content from "./lib/blutack-content/Content"
+import * as ContentTypes from "./lib/blutack-content/ContentTypes"
+import { DocumentId } from "@automerge/automerge-repo"
 import { CurrentDeviceContext } from "./lib/blutack/DeviceHooks"
-import { createDocumentLink } from "./lib/blutack/Url"
+import { createDocumentLink } from "./lib/blutack-content/Url"
 
 // Import css files
 // todo: find solution that allows to add styling from docs

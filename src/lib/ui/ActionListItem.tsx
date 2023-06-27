@@ -1,10 +1,10 @@
 import React, { ReactNode } from "react"
 import Actions, { ActionItem } from "./Actions"
-import { PushpinUrl } from "../blutack/Url"
+import { ContentUrl } from "../blutack-content/Url"
 import ListMenuItem, { Stretch } from "./ListMenuItem"
 
 export interface Props {
-  contentUrl: PushpinUrl
+  contentUrl: ContentUrl
   defaultAction?: ActionItem
   actions: ActionItem[]
   selected: boolean

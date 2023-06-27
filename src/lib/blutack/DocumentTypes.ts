@@ -1,5 +1,5 @@
-import { DocumentId } from "automerge-repo"
-import { PushpinUrl } from "./Url"
+import { DocumentId } from "@automerge/automerge-repo"
+import { ContentUrl } from "../blutack-content/Url"
 
 export interface ContactDoc {
   name: string
@@ -17,6 +17,6 @@ export interface ProfileDoc {
   selfId: DocumentId
   contactIds: DocumentId[]
   homeDocUrl: DocumentId
-  viewedDocUrls: PushpinUrl[]
+  viewedDocUrls: ContentUrl[]
   contentTypeIds: DocumentId[]
 }

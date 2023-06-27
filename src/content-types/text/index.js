@@ -6,6 +6,7 @@ const {
   useDocumentIds,
   useSelfId,
   usePresence,
+  Searches,
   Url,
 } = Blutack
 
@@ -23,7 +24,7 @@ TextContent.defaultWidth = 15
 
 export default function TextContent(props) {
   console.log("render text content")
-
+  
   const [doc, changeDoc] = useDocument(props.documentId)
   const [cursorPos, setCursorPos] = useState(undefined)
   const selfId = useSelfId()
@@ -188,6 +189,7 @@ export function useQuill({ text, change, selectionChange, cursors = [], selected
     if (!quill.current) {
       return
     }
+
 
     // todo:  commented out to make bootstrapping work
     // const quillCursors = quill.current?.getModule("cursors")
