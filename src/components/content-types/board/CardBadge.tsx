@@ -2,7 +2,7 @@ import React from "react"
 import { parseDocumentLink, PushpinUrl } from "../../pushpin-code/Url"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
 import Badge from "../../ui/Badge"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import ContentDragHandle from "../../ui/ContentDragHandle"
 
 interface Props {

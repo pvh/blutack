@@ -6,8 +6,8 @@ import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
 import { ContentProps } from "../../Content"
 import { ContactDoc } from "."
 
-import { DocumentId } from "automerge-repo"
-import { useDocument, useRepo } from "automerge-repo-react-hooks"
+import { DocumentId } from "@automerge/automerge-repo"
+import { useDocument, useRepo } from "@automerge/automerge-repo-react-hooks"
 import Heading from "../../ui/Heading"
 import SecondaryText from "../../ui/SecondaryText"
 

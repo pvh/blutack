@@ -5,8 +5,8 @@ import Content, { ContentProps } from "../../Content"
 import { ContactDoc } from "."
 import { FileDoc } from "../files"
 
-import { DocumentId } from "automerge-repo"
-import { useDocument } from "automerge-repo-react-hooks"
+import { DocumentId } from "@automerge/automerge-repo"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 
 import Heading from "../../ui/Heading"
 import SecondaryText from "../../ui/SecondaryText"

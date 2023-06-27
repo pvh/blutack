@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react"
 
 import { ContentType } from "../pushpin-code/ContentTypes"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import "./TextContent.css"
 import { ContentProps } from "../Content"
 import "./RawView.css"
@@ -13,7 +13,7 @@ import {
   parseDocumentLink,
   PushpinUrl,
 } from "../pushpin-code/Url"
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 import * as Automerge from "@automerge/automerge"
 
 export default function RawView(props: ContentProps) {

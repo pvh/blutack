@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useRef } from "react"
 import { WorkspaceContext, WorkspaceDoc } from "../content-types/workspace/Workspace"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import { parseDocumentLink, PushpinUrl } from "./Url"
 import {
   Doc,

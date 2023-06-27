@@ -3,8 +3,8 @@ import ContactInVarious from "./ContactInVarious"
 import { USER_COLORS } from "./Constants"
 
 import "./Avatar.css"
-import { DocumentId } from "automerge-repo"
-import { DocHandle } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
+import { DocHandle } from "@automerge/automerge-repo"
 import { PushpinUrl } from "../../pushpin-code/Url"
 import { ContentType } from "../../pushpin-code/ContentTypes"
 

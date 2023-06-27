@@ -4,7 +4,7 @@ import Heading from "./Heading"
 import SecondaryText from "./SecondaryText"
 import TitleEditor from "../TitleEditor"
 import "./TitleWithSubtitle.css"
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 
 export interface Props {
   title: string

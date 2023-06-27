@@ -4,7 +4,7 @@ import mime from "mime-types"
 import * as UriList from "../pushpin-code/UriList"
 import "./ContentDragHandle.css"
 import { PushpinUrl } from "../pushpin-code/Url"
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 import { BinaryDataId, useBinaryDataHeader } from "../../blobstore/Blob"
 
 interface SimpleProps {

@@ -4,7 +4,7 @@ import ListItem from "../../../ui/ListItem"
 import { PushpinUrl } from "../../../pushpin-code/Url"
 import ContentDragHandle from "../../../ui/ContentDragHandle"
 import TitleWithSubtitle from "../../../ui/TitleWithSubtitle"
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 
 export interface Props {
   url: PushpinUrl

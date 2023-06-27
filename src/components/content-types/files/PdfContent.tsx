@@ -7,7 +7,7 @@ import { Document, Page, pdfjs } from "react-pdf"
 // some ideas: https://github.com/wojtekmaj/react-pdf/issues/97
 pdfjs.GlobalWorkerOptions.workerSrc = `/blutack/pdf.worker.js`
 
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import { FileDoc } from "."
 
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
@@ -16,7 +16,7 @@ import "./PdfContent.css"
 import { createBinaryDataUrl } from "../../../blobstore/Blob"
 import { useConfirmableInput } from "../../pushpin-code/Hooks"
 import { PushpinUrl } from "../../pushpin-code/Url"
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 import { ContactDoc } from "../contact"
 import classNames from "classnames"
 import ListMenuItem from "../../ui/ListMenuItem"

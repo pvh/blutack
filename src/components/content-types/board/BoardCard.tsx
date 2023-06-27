@@ -8,13 +8,13 @@ import { parseDocumentLink } from "../../pushpin-code/Url"
 
 import { BoardDocCard, CardId } from "."
 import { Position, Dimension } from "./BoardGrid"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import { useSelf } from "../../pushpin-code/SelfHooks"
 import { usePresence } from "../../pushpin-code/PresenceHooks"
 import { MIMETYPE_BOARD_CARD_DRAG_ORIGIN } from "../../constants"
 import { boundDimension, boundSizeByType } from "./BoardBoundary"
 import * as UriList from "../../pushpin-code/UriList"
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 import "./BoardCard.css"
 
 interface CardClicked {

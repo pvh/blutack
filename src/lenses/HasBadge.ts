@@ -12,7 +12,7 @@ import {
   hasUnseenMentions as threadHasUnseenMentions,
 } from "../components/content-types/ThreadContent"
 import { LastSeenHeads } from "../components/pushpin-code/Changes"
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 import { shouldNotifyUserAboutDoc } from "../components/content-types/workspace/NotificationSetting"
 
 export type HasBadge = {

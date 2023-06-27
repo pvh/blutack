@@ -1,7 +1,7 @@
 import React from "react"
 import { BoardDoc, BoardDocCard, CardId, icon } from "."
 import Content, { ContentProps } from "../../Content"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import { useSelection } from "./BoardSelection"
 import Badge from "../../ui/Badge"
 import CardBadge from "./CardBadge"

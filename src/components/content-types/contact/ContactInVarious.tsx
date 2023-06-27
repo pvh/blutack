@@ -9,7 +9,7 @@ import { createDocumentLink } from "../../pushpin-code/Url"
 import DEFAULT_AVATAR_PATH from "../../../images/default-avatar.png"
 
 import "./ContactInVarious.css"
-import { useDocument, useRepo } from "automerge-repo-react-hooks"
+import { useDocument, useRepo } from "@automerge/automerge-repo-react-hooks"
 import ConnectionStatusBadge from "./ConnectionStatusBadge"
 import ListItem from "../../ui/ListItem"
 import ContentDragHandle from "../../ui/ContentDragHandle"
