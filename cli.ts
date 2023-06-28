@@ -4,6 +4,7 @@ import { program } from "commander"
 import { DocumentId, PeerId, Repo } from "@automerge/automerge-repo"
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket"
 import { rimrafSync } from "rimraf"
+import { transform } from "@babel/standalone"
 
 const repo = new Repo({
   network: [new BrowserWebSocketClientAdapter("wss://sync.inkandswitch.com")],
@@ -150,10 +151,19 @@ program
           console.log(`import ${contentTypeDirPath}`)
 
           const source = fs.readFileSync(sourceFilePath, "utf-8")
+          let dist: string | undefined | null
+
+          try {
+            dist = transformSource(source).code
+          } catch (err) {
+            console.error(`skip ${contentTypeDirPath}: could not compile`)
+            return
+          }
 
           widgetDocHandle.change((widgetDoc) => {
             widgetDoc.contentType = packageJson.contentType
             widgetDoc.source = source
+            widgetDoc.dist = dist
           })
 
           return packageJson.documentId
@@ -188,3 +198,28 @@ function getDirectories(dirPath: string) {
 }
 
 program.parse(process.argv)
+
+// todo: workaround, duplicote code copied from blutack/Modules because importing it causes errors with ts-node
+const importTransformPlugin = {
+  name: "transform-imports-to-skypack",
+  visitor: {
+    ImportDeclaration(path: any) {
+      const value = path.node.source.value
+
+      // Don't replace relative or absolute URLs.
+      if (/^([./])/.test(value)) {
+        return
+      }
+
+      path.node.source.value = `https://cdn.skypack.dev/${value}`
+    },
+  },
+}
+
+export function transformSource(source: string) {
+  return transform(source, {
+    presets: ["react"],
+    plugins: [importTransformPlugin],
+    parserOpts: { allowReturnOutsideFunction: true },
+  })
+}
