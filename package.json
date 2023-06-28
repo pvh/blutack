@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@automerge/automerge": "2.1.0-alpha.7",
+    "@automerge/automerge-codemirror": "0.0.3",
     "@automerge/automerge-repo": "0.1.2",
     "@automerge/automerge-repo-network-messagechannel": "0.1.2",
     "@automerge/automerge-repo-network-websocket": "0.1.2",

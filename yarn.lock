@@ -15,6 +15,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@automerge/automerge-codemirror@npm:0.0.3":
+  version: 0.0.3
+  resolution: "@automerge/automerge-codemirror@npm:0.0.3"
+  dependencies:
+    "@automerge/automerge": ^2.1.0-alpha.7
+    "@codemirror/state": ^6.2.1
+    "@codemirror/view": ^6.13.2
+    automerge-repo: ^0.1.0
+    codemirror: ^6.0.1
+  checksum: 4363034b3a3db03695e4eeb977979462d78b44f80fc7e4da9b90fdb608a02c4e754a55dbbd4b5a1e0e9584e5f8faadb7058f90025d996bc6f319055d80aed151
+  languageName: node
+  linkType: hard
+
 "@automerge/automerge-repo-network-messagechannel@npm:0.1.2":
   version: 0.1.2
   resolution: "@automerge/automerge-repo-network-messagechannel@npm:0.1.2"
@@ -79,7 +92,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@automerge/automerge@npm:2.1.0-alpha.7":
+"@automerge/automerge@npm:2.1.0-alpha.7, @automerge/automerge@npm:^2.1.0-alpha.7":
   version: 2.1.0-alpha.7
   resolution: "@automerge/automerge@npm:2.1.0-alpha.7"
   dependencies:
@@ -1375,6 +1388,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"automerge-repo@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "automerge-repo@npm:0.1.0"
+  dependencies:
+    cbor-x: ^1.3.0
+    debug: ^4.3.4
+    eventemitter3: ^4.0.7
+    tiny-typed-emitter: ^2.1.0
+    ts-node: ^10.9.1
+    uuid: ^8.3.2
+    xstate: ^4.37.0
+  peerDependencies:
+    "@automerge/automerge": ^2.1.0-alpha.5
+  checksum: 367f5df4fb9c46a330dbf936619d86a019adac0bb2ab1b4e9a0920b830f940e90253735ee1daaf464d7f69e1a4c3175ad6187e0129388f3810b52cbcedf20a19
+  languageName: node
+  linkType: hard
+
 "babel-plugin-macros@npm:^3.1.0":
   version: 3.1.0
   resolution: "babel-plugin-macros@npm:3.1.0"
@@ -1412,6 +1442,7 @@ __metadata:
   resolution: "blutack@workspace:."
   dependencies:
     "@automerge/automerge": 2.1.0-alpha.7
+    "@automerge/automerge-codemirror": 0.0.3
     "@automerge/automerge-repo": 0.1.2
     "@automerge/automerge-repo-network-messagechannel": 0.1.2
     "@automerge/automerge-repo-network-websocket": 0.1.2

@@ -16,7 +16,11 @@ export default defineConfig({
     // versions of the JS wrapper. This causes problems because the JS
     // wrapper has a module level variable to track JS side heap
     // allocations, initializing this twice causes horrible breakage
-    exclude: ["@automerge/automerge-wasm", "@automerge/automerge-wasm/bundler/bindgen_bg.wasm","@syntect/wasm"],
+    exclude: [
+      "@automerge/automerge-wasm",
+      "@automerge/automerge-wasm/bundler/bindgen_bg.wasm",
+      "@syntect/wasm",
+    ],
   },
 
   resolve: {

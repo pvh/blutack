@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from "react"
 import { ContentType } from "../pushpin-code/ContentTypes"
-import { useDocument, useHandle } from "automerge-repo-react-hooks"
+import { useDocument, useHandle } from "@automerge/automerge-repo-react-hooks"
 import Content, { ContentProps } from "../Content"
-import { DocHandle } from "automerge-repo"
+import { DocHandle } from "@automerge/automerge-repo"
 import { ErrorBoundary } from "react-error-boundary"
 import "./Widget.css"
 import { transform } from "@babel/standalone"
+import * as automerge from "@automerge/automerge"
 
 export interface WidgetDoc {
   title: string
-  source: string
+  source: string | automerge.Text
   error: string | undefined
 }
 
@@ -33,7 +34,7 @@ export default function Widget(props: ContentProps) {
 
     ;(async () => {
       try {
-        const transformedSource = transform(source, {
+        const transformedSource = transform(source.toString(), {
           presets: ["react"],
           parserOpts: { allowReturnOutsideFunction: true },
         })
@@ -100,7 +101,7 @@ const EXAMPLE_SOURCE = `return ({doc, changeDoc}) => {
 
 function create({ text }: any, handle: DocHandle<any>) {
   handle.change((doc) => {
-    doc.source = EXAMPLE_SOURCE
+    doc.source = new automerge.Text(EXAMPLE_SOURCE)
   })
 }
 
