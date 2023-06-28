@@ -1,5 +1,6 @@
 {
   "name": "content-type-profile",
   "contentType": "profile",
-  "documentId": "2a12d381-a1ce-4e88-a158-bd2719cadd01"
+  "documentId": "2a12d381-a1ce-4e88-a158-bd2719cadd01",
+  "dependencies": {}
 }

@@ -1,5 +1,6 @@
 {
   "name": "content-type-editor",
   "contentType": "editor",
-  "documentId": "043862bd-12e1-4b22-87d2-fc9fc7fe4ed1"
+  "documentId": "043862bd-12e1-4b22-87d2-fc9fc7fe4ed1",
+  "dependencies": {}
 }

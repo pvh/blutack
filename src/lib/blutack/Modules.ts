@@ -21,12 +21,12 @@ export async function load(documentId: DocumentId) {
   return module
 }
 
-interface Dependency {
-  version: string
+export interface Dependency {
+  url: string
   sourceDocId: DocumentId
 }
 
-interface DependencyMap {
+export interface DependencyMap {
   [name: string]: Dependency
 }
 

@@ -1,5 +1,6 @@
 {
   "name": "content-type-ink",
   "contentType": "ink",
-  "documentId": "ad5a2f2d-8417-46f1-bc98-28ce3572e227"
+  "documentId": "ad5a2f2d-8417-46f1-bc98-28ce3572e227",
+  "dependencies": {}
 }

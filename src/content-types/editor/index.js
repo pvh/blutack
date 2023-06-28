@@ -18,6 +18,8 @@ export default function Editor(props) {
     changeDoc((doc) => {
       doc.source = source
 
+      console.log("transform", JSON.parse(JSON.stringify(doc.dependencies)))
+      
       try {
         const transformedCode = Modules.transformSource(source, doc.dependencies)
         if (!transformedCode.code) {

@@ -5,7 +5,7 @@ import { DocumentId, PeerId, Repo } from "@automerge/automerge-repo"
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket"
 import { rimrafSync } from "rimraf"
 import { parseDocumentLink } from "./src/lib/blutack/content/Url.js"
-import { transformSource } from "./src/lib/blutack/Modules.js"
+import { DependencyMap, transformSource } from "./src/lib/blutack/Modules.js"
 import { Generator } from "@jspm/generator"
 import fetch from "node-fetch"
 
@@ -84,6 +84,7 @@ program
           name: `content-type-${widgetDoc.contentType}`,
           contentType: widgetDoc.contentType,
           documentId: widgetDocId,
+          dependencies: widgetDoc.dependencies ?? {},
         }
         fs.writeFileSync(packageFilePath, JSON.stringify(packageJson, null, 2))
       })
@@ -96,6 +97,7 @@ interface PackageJson {
   name: string
   documentId: DocumentId
   contentType: string
+  dependencies: DependencyMap
 }
 
 program
@@ -166,6 +168,7 @@ program
             widgetDoc.contentType = packageJson.contentType
             widgetDoc.source = source
             widgetDoc.dist = dist
+            widgetDoc.dependecies = packageJson.dependencies
           })
 
           return packageJson.documentId
@@ -218,8 +221,7 @@ program
       await generator.link(packageName)
     }
 
-    const dependencies: { [name: string]: { sourceDocId: DocumentId; url: string } } =
-      targetDoc.dependencies ?? {}
+    const dependencies: DependencyMap = targetDoc.dependencies ?? {}
 
     for (const [name, url] of Object.entries(generator.importMap.imports)) {
       if (dependencies[name] && dependencies[name].url === url) {

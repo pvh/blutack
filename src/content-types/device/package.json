@@ -1,5 +1,6 @@
 {
   "name": "content-type-device",
   "contentType": "device",
-  "documentId": "11a46795-a9b4-48d1-bc4f-4da504fff93f"
+  "documentId": "11a46795-a9b4-48d1-bc4f-4da504fff93f",
+  "dependencies": {}
 }
