@@ -8,7 +8,7 @@ export const ProfileContext = createContext(undefined)
 export function useProfileId(): DocumentId {
   const context = useContext(ProfileContext)
   if (!context) {
-    throw new Error("Missing workspace context")
+    throw new Error("Missing profile context")
   }
 
   return context
