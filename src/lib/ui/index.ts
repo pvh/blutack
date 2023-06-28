@@ -9,6 +9,9 @@ import Badge from "./Badge"
 import ActionListItem from "./ActionListItem"
 import CodeMirror from "./CodeMirror"
 
+// todo: remove once we can share the same instance of react across widgets
+import ReactJson from "react-json-view"
+
 export {
   ListItem,
   CenteredStack,
@@ -20,4 +23,5 @@ export {
   Badge,
   ActionListItem,
   CodeMirror,
+  ReactJson,
 }

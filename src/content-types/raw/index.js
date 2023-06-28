@@ -1,12 +1,10 @@
-import ReactJson from "react-json-view"
-
 const{ useCallback, useEffect, useState } = React
 const {
   Url, useDocument, Automerge
 } = Blutack
+const { ReactJson } = Ui
 
 const { createDocumentLink, isPushpinUrl, openDocument, parseDocumentLink } = Url
-
 
 export default function RawView(props) {
   const [doc, changeDoc] = useDocument(props.documentId)

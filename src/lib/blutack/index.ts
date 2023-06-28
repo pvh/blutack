@@ -9,8 +9,6 @@ import * as Modules from "./Modules"
 import * as Context from "./globals/ProfileHooks"
 import * as Searches from "./Searches"
 
-// todo: remove once we can share the same instance of react across widgets
-import ReactJson from "react-json-view"
 import Content from "../blutack/content/Content"
 
 import { useDocument, useRepo } from "@automerge/automerge-repo-react-hooks"
@@ -20,7 +18,6 @@ import { usePresence } from "./presence/PresenceHooks"
 
 export * from "./ddcp/constants"
 export {
-  ReactJson,
   Automerge,
   ImportData,
   ContentTypes,
