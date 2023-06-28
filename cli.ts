@@ -6,6 +6,8 @@ import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network
 import { rimrafSync } from "rimraf"
 import { parseDocumentLink } from "./src/lib/blutack/content/Url.js"
 import { transformSource } from "./src/lib/blutack/Modules.js"
+import { Generator } from "@jspm/generator"
+import fetch from "node-fetch"
 
 const repo = new Repo({
   network: [new BrowserWebSocketClientAdapter("wss://sync.inkandswitch.com")],
@@ -196,5 +198,56 @@ function getDirectories(dirPath: string) {
     .filter((entry) => entry.isDirectory())
     .map((entry) => path.join(dirPath, entry.name))
 }
+
+interface DependencyDoc {
+  source: string
+}
+
+program
+  .command("install")
+  .requiredOption("--packages <packages...>")
+  .description("import content types")
+  .action(async (options) => {
+    const targetDocId = program.opts().docId
+    const targetDocHandle = repo.find<any>(targetDocId)
+    const targetDoc = await targetDocHandle.value()
+
+    const generator = new Generator()
+
+    for (const packageName of options.packages) {
+      await generator.link(packageName)
+    }
+
+    const dependencies: { [name: string]: { sourceDocId: DocumentId; url: string } } =
+      targetDoc.dependencies ?? {}
+
+    for (const [name, url] of Object.entries(generator.importMap.imports)) {
+      if (dependencies[name] && dependencies[name].url === url) {
+        console.log(`skip ${name}: already installed`)
+        continue
+      }
+
+      console.log(`install ${name} ${url}`)
+
+      const source = await fetch("https://github.com/").then((res) => res.text())
+      const dependencyDocHandle = repo.create<DependencyDoc>()
+
+      dependencies[name] = { sourceDocId: dependencyDocHandle.documentId, url }
+
+      dependencyDocHandle.change((doc) => {
+        doc.source = source
+      })
+    }
+
+    targetDocHandle.change((targetDoc) => {
+      const existingDependencies = targetDoc.dependencies
+
+      for (const [name, dependency] of Object.entries(dependencies)) {
+        if (!existingDependencies[name] || existingDependencies[name].url !== dependency.url) {
+          targetDoc.dependencies[name] = dependency
+        }
+      }
+    })
+  })
 
 program.parse(process.argv)

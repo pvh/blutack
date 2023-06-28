@@ -10,7 +10,8 @@
     "import-doc": "npx ts-node --esm cli.ts import-doc",
     "export-doc": "npx ts-node --esm cli.ts export-doc",
     "export-cts": "npx ts-node --esm cli.ts export-cts --outputDir src/content-types",
-    "import-cts": "npx ts-node --esm cli.ts import-cts --inputDir src/content-types"
+    "import-cts": "npx ts-node --esm cli.ts import-cts --inputDir src/content-types",
+    "install-packages": "npx ts-node --esm cli.ts install"
   },
   "dependencies": {
     "@automerge/automerge": "2.1.0-alpha.1",
@@ -51,6 +52,8 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "node-fetch": "^3.3.1",
+    "@jspm/generator": "^1.1.9",
     "@types/babel__core": "^7.20.1",
     "@types/babel__standalone": "^7.1.4",
     "@types/debug": "^4.1.7",
