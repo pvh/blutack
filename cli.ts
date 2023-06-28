@@ -2,7 +2,7 @@ import * as fs from "fs"
 import * as path from "path"
 import { program } from "commander"
 import { DocumentId, PeerId, Repo } from "@automerge/automerge-repo"
-import { BrowserWebSocketClientAdapter } from "automerge-repo-network-websocket"
+import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket"
 import { rimrafSync } from "rimraf"
 
 const repo = new Repo({
