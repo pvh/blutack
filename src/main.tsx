@@ -7,13 +7,13 @@ import "./vendor/line-awesome/css/line-awesome.min.css"
 
 import localforage from "localforage"
 
-import { DocumentId, Repo } from "automerge-repo"
-import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechannel"
-import { RepoContext } from "automerge-repo-react-hooks"
+import { DocumentId, Repo } from "@automerge/automerge-repo"
+import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel"
+import { RepoContext } from "@automerge/automerge-repo-react-hooks"
 import * as ContentTypes from "./components/pushpin-code/ContentTypes"
 import { create as createWorkspace } from "./components/content-types/workspace/Workspace"
 import { create as createDevice } from "./components/content-types/workspace/Device"
-import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
+import { LocalForageStorageAdapter } from "@automerge/automerge-repo-storage-localforage"
 
 async function registerServiceWorker() {
   if ("serviceWorker" in navigator) {

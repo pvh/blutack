@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react"
 import { ContentProps } from "../../Content"
-import { DocumentId } from "automerge-repo"
-import { useDocument } from "automerge-repo-react-hooks"
+import { DocumentId } from "@automerge/automerge-repo"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 
 import Badge from "../../ui/Badge"
 import "./Device.css"
 import { useDeviceOnlineStatus } from "../../pushpin-code/PresenceHooks"
 import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
-import { DocHandle } from "automerge-repo"
+import { DocHandle } from "@automerge/automerge-repo"
 import { ContentType } from "../../pushpin-code/ContentTypes"
 
 export interface DeviceDoc {

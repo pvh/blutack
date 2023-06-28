@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react"
 import { FileDoc } from "."
 
 import { ContentProps } from "../../Content"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import "./AudioContent.css"
 import { createBinaryDataUrl } from "../../../blobstore/Blob"
 import { usePresence } from "../../pushpin-code/PresenceHooks"

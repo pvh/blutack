@@ -1,10 +1,10 @@
 /// <reference lib="webworker" />
 declare const self: SharedWorkerGlobalScope
 
-import { DocumentId, PeerId, Repo } from "automerge-repo"
-import { MessageChannelNetworkAdapter } from "automerge-repo-network-messagechannel"
-import { LocalForageStorageAdapter } from "automerge-repo-storage-localforage"
-import { BrowserWebSocketClientAdapter } from "automerge-repo-network-websocket"
+import { DocumentId, PeerId, Repo } from "@automerge/automerge-repo"
+import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel"
+import { LocalForageStorageAdapter } from "@automerge/automerge-repo-storage-localforage"
+import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket"
 import { BinaryDataId, BinaryObjectDoc, parseBinaryDataId } from "./blobstore/Blob"
 
 console.log("shared-worker starting up")

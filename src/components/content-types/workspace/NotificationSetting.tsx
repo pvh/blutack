@@ -1,5 +1,5 @@
-import { DocumentId } from "automerge-repo"
-import { useDocument } from "automerge-repo-react-hooks"
+import { DocumentId } from "@automerge/automerge-repo"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import { Popover } from "../../ui/Popover"
 import Badge from "../../ui/Badge"
 import ListMenuItem from "../../ui/ListMenuItem"

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react"
-import { DocumentId } from "automerge-repo"
-import { useDocument } from "automerge-repo-react-hooks"
+import { DocumentId } from "@automerge/automerge-repo"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 
 import Omnibox from "./omnibox/Omnibox"
 import Content from "../../Content"

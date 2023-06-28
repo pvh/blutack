@@ -1,6 +1,6 @@
 import React from "react"
 import Content, { ContentProps } from "../../Content"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import Badge from "../../ui/Badge"
 import { WorkspaceDoc } from "./Workspace"
 import { createDocumentLink } from "../../pushpin-code/Url"

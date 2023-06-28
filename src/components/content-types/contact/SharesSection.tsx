@@ -1,5 +1,5 @@
 import React from "react"
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 
 import { createDocumentLink } from "../../pushpin-code/Url"
 import Content from "../../Content"

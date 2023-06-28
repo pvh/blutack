@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useRef } from "react"
 import Debug from "debug"
-import { useDocument } from "automerge-repo-react-hooks"
-import { DocHandle, DocumentId } from "automerge-repo"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
+import { DocHandle, DocumentId } from "@automerge/automerge-repo"
 
 import { parseDocumentLink, PushpinUrl, storeCurrentUrlOfUser } from "../../pushpin-code/Url"
 import Content, { ContentHandle, ContentProps } from "../../Content"

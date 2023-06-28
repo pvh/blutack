@@ -1,5 +1,5 @@
-import { DocumentId } from "automerge-repo"
-import { useDocument } from "automerge-repo-react-hooks"
+import { DocumentId } from "@automerge/automerge-repo"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import { useDocumentIds, useDocuments } from "../../../pushpin-code/Hooks"
 import { PushpinUrl } from "../../../pushpin-code/Url"
 import { ContactDoc } from "../../contact"

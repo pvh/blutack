@@ -5,10 +5,10 @@ import Content, { ContentProps } from "../Content"
 import { createDocumentLink, isPushpinUrl, PushpinUrl } from "../pushpin-code/Url"
 import ListItem from "../ui/ListItem"
 import "./ThreadContent.css"
-import { DocumentId } from "automerge-repo"
-import { useDocument } from "automerge-repo-react-hooks"
+import { DocumentId } from "@automerge/automerge-repo"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 
-import { DocHandle } from "automerge-repo"
+import { DocHandle } from "@automerge/automerge-repo"
 import * as ImportData from "../pushpin-code/ImportData"
 import { openDoc } from "../pushpin-code/Url"
 import {

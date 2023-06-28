@@ -4,8 +4,8 @@ import classNames from "classnames"
 
 import { PushpinUrl } from "../../../pushpin-code/Url"
 import { useEvent } from "../../../pushpin-code/Hooks"
-import { DocumentId } from "automerge-repo"
-import { useRepo } from "automerge-repo-react-hooks"
+import { DocumentId } from "@automerge/automerge-repo"
+import { useRepo } from "@automerge/automerge-repo-react-hooks"
 import OmniboxWorkspaceListMenu from "./OmniboxWorkspaceListMenu"
 
 import "./Omnibox.css"
