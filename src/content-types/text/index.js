@@ -23,8 +23,6 @@ TextContent.minHeight = 2
 TextContent.defaultWidth = 15
 
 export default function TextContent(props) {
-  console.log("render text content")
-  
   const [doc, changeDoc] = useDocument(props.documentId)
   const [cursorPos, setCursorPos] = useState(undefined)
   const selfId = useSelfId()

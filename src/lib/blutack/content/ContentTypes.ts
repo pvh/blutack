@@ -1,6 +1,6 @@
 import Debug from "debug"
 import { ComponentType } from "react"
-import { createDocumentLink, ContentUrl } from "./Url"
+import { createDocumentLink, ContentUrl } from "./Url.js"
 import { ContentData } from "../binary/ContentData"
 import { DocumentId } from "@automerge/automerge-repo"
 import { DocCollection, DocHandle } from "@automerge/automerge-repo"

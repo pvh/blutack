@@ -19,7 +19,7 @@ export default function Editor(props) {
       doc.source = source
 
       try {
-        const transformedCode = Modules.transformSource(source)
+        const transformedCode = Modules.transformSource(source, doc.dependencies)
         if (!transformedCode.code) {
           return
         }

@@ -4,7 +4,8 @@ import { program } from "commander"
 import { DocumentId, PeerId, Repo } from "@automerge/automerge-repo"
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket"
 import { rimrafSync } from "rimraf"
-import { transform } from "@babel/standalone"
+import { parseDocumentLink } from "./src/lib/blutack/content/Url.js"
+import { transformSource } from "./src/lib/blutack/Modules.js"
 
 const repo = new Repo({
   network: [new BrowserWebSocketClientAdapter("wss://sync.inkandswitch.com")],
@@ -57,8 +58,7 @@ program
 
     await Promise.all(
       contentTypesListDoc.content.map(async (widgetUrl: string) => {
-        const parts = widgetUrl.split("/")
-        const widgetDocId = parts[parts.length - 1] as DocumentId
+        const widgetDocId = parseDocumentLink(widgetUrl).documentId
 
         const widgetDoc = await repo.find<any>(widgetDocId).value()
 
@@ -198,28 +198,3 @@ function getDirectories(dirPath: string) {
 }
 
 program.parse(process.argv)
-
-// todo: workaround, duplicote code copied from blutack/Modules because importing it causes errors with ts-node
-const importTransformPlugin = {
-  name: "transform-imports-to-skypack",
-  visitor: {
-    ImportDeclaration(path: any) {
-      const value = path.node.source.value
-
-      // Don't replace relative or absolute URLs.
-      if (/^([./])/.test(value)) {
-        return
-      }
-
-      path.node.source.value = `https://cdn.skypack.dev/${value}`
-    },
-  },
-}
-
-export function transformSource(source: string) {
-  return transform(source, {
-    presets: ["react"],
-    plugins: [importTransformPlugin],
-    parserOpts: { allowReturnOutsideFunction: true },
-  })
-}
