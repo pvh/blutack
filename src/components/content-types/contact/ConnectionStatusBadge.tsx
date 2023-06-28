@@ -1,4 +1,4 @@
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 import Badge, { BadgeSize } from "../../ui/Badge"
 import { useConnectionStatus } from "../../pushpin-code/PresenceHooks"
 import "./ConnectionStatusBadge.css"

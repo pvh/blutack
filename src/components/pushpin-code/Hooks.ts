@@ -1,6 +1,6 @@
-import { Doc, Extend } from "@automerge/automerge"
-import { DocumentId, DocCollection, DocHandle, ChannelId } from "automerge-repo"
-import { useDocument, useHandle, useRepo } from "automerge-repo-react-hooks"
+import { Doc } from "@automerge/automerge"
+import { DocumentId, DocCollection, DocHandle, ChannelId } from "@automerge/automerge-repo"
+import { useDocument, useHandle, useRepo } from "@automerge/automerge-repo-react-hooks"
 import { useEffect, useState, useRef, useCallback, createContext, useContext } from "react"
 import { parseDocumentLink, PushpinUrl } from "./Url"
 
@@ -125,7 +125,7 @@ export function useDocuments<T>(urls?: PushpinUrl[]): DocMap<T> {
 
 export function useDocumentReducer<D, A>(
   documentId: DocumentId | undefined,
-  reducer: (doc: Extend<D>, action: A) => void,
+  reducer: (doc: D, action: A) => void,
   deps?: any[]
 ): [Doc<D> | undefined, (action: A) => void] {
   const [doc, changeDoc] = useDocument<D>(documentId)

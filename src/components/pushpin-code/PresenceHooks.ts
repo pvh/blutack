@@ -4,8 +4,8 @@ import { useTimeouts, useMessaging } from "./Hooks"
 import { useSelfId } from "./SelfHooks"
 import { CurrentDeviceContext } from "../content-types/workspace/Device"
 import { ContactDoc } from "../content-types/contact"
-import { ChannelId, DocumentId } from "automerge-repo"
-import { useDocument, useRepo } from "automerge-repo-react-hooks"
+import { ChannelId, DocumentId } from "@automerge/automerge-repo"
+import { useDocument, useRepo } from "@automerge/automerge-repo-react-hooks"
 
 /**
  * heartbeats are an accumulated list of the URLs we have "open" and so should

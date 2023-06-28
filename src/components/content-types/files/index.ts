@@ -1,7 +1,7 @@
 import FileContent from "./FileContent"
 
 import * as ContentData from "../../pushpin-code/ContentData"
-import { DocumentId, DocHandle } from "automerge-repo"
+import { DocumentId, DocHandle } from "@automerge/automerge-repo"
 import { BinaryDataId } from "../../../blobstore/Blob"
 
 import path from "path"

@@ -1,6 +1,6 @@
 import Content from "./Content"
 import * as ContentTypes from "./pushpin-code/ContentTypes"
-import { DocumentId } from "automerge-repo"
+import { DocumentId } from "@automerge/automerge-repo"
 import { CurrentDeviceContext } from "./content-types/workspace/Device"
 import { ViewStateContext } from "./pushpin-code/ViewState"
 import { createDocumentLink } from "./pushpin-code/Url"

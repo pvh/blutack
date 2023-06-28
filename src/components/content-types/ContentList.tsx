@@ -4,8 +4,8 @@ import { createDocumentLink, parseDocumentLink, PushpinUrl } from "../pushpin-co
 
 import Content, { ContentProps } from "../Content"
 
-import { DocHandle } from "automerge-repo"
-import { useDocument } from "automerge-repo-react-hooks"
+import { DocHandle } from "@automerge/automerge-repo"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 
 import CenteredStack from "../ui/CenteredStack"
 import ListMenu from "../ui/ListMenu"

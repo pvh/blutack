@@ -1,7 +1,7 @@
 import { useRef } from "react"
 import Content, { ContentProps } from "../../Content"
 import * as ContentTypes from "../../pushpin-code/ContentTypes"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import { createDocumentLink } from "../../pushpin-code/Url"
 import { FileDoc } from "."
 

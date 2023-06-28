@@ -1,4 +1,4 @@
-import { DocumentId, DocHandle } from "automerge-repo"
+import { DocumentId, DocHandle } from "@automerge/automerge-repo"
 import { ContentType } from "../../pushpin-code/ContentTypes"
 import { PushpinUrl } from "../../pushpin-code/Url"
 

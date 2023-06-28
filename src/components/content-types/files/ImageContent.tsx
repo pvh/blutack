@@ -10,7 +10,7 @@ import Badge from "../../ui/Badge"
 import ListItem from "../../ui/ListItem"
 import ContentDragHandle from "../../ui/ContentDragHandle"
 import TitleWithSubtitle from "../../ui/TitleWithSubtitle"
-import { useDocument } from "automerge-repo-react-hooks"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 import {
   createBinaryDataUrl,
   useBinaryDataHeader,

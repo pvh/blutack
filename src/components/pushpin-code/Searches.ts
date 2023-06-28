@@ -2,8 +2,8 @@ import { useEffect } from "react"
 import { WorkspaceDoc } from "../content-types/workspace/Workspace"
 import { useDocumentIds } from "./Hooks"
 import { ContactDoc } from "../content-types/contact"
-import { DocumentId } from "automerge-repo"
-import { useDocument } from "automerge-repo-react-hooks"
+import { DocumentId } from "@automerge/automerge-repo"
+import { useDocument } from "@automerge/automerge-repo-react-hooks"
 
 const SEARCHES: { [name: string]: Search } = {}
 
