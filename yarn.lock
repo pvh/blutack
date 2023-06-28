@@ -47,26 +47,13 @@
   dependencies:
     "@automerge/automerge-repo" "^0.1.2"
 
-"@automerge/automerge-repo-storage-localforage@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@automerge/automerge-repo-storage-localforage/-/automerge-repo-storage-localforage-0.1.0.tgz#e77d7442783c28e3707346c1b6c55d7939b46c1f"
-  integrity sha512-wGMgHDr8rdvR+XwxrKEpz0E3muWTa8qmproQccqV9BY57TzHx0iZlUfDvtVTK0hgxYcMI0gqOalfC+vUm841eg==
+"@automerge/automerge-repo-storage-localforage@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@automerge/automerge-repo-storage-localforage/-/automerge-repo-storage-localforage-0.1.2.tgz#b59b5ab4f1f7cc5c373b462c5782e9d5b1393919"
+  integrity sha512-K/Igc0+LjTfCy5DsIczbO8kaTsk2hBhgQIXonjLMSfUFFueKYin99XUUBurEBlntN0NeZt6bw5dOI507+AJbSA==
   dependencies:
-    "@automerge/automerge-repo" "^0.1.0"
+    "@automerge/automerge-repo" "^0.1.2"
     localforage "^1.10.0"
-
-"@automerge/automerge-repo@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@automerge/automerge-repo/-/automerge-repo-0.1.0.tgz#2964820d289618a054ddfaba141aad953e27a33c"
-  integrity sha512-7kTosak9Pg62orqiZBjk7e0hvBjY54COQGTCQLj5boC1J4s3xvUBWfC+qtunq4lLHtvWvNJxqHyyUpurX/dEFQ==
-  dependencies:
-    cbor-x "^1.3.0"
-    debug "^4.3.4"
-    eventemitter3 "^4.0.7"
-    tiny-typed-emitter "^2.1.0"
-    ts-node "^10.9.1"
-    uuid "^8.3.2"
-    xstate "^4.37.0"
 
 "@automerge/automerge-repo@^0.1.2":
   version "0.1.2"
