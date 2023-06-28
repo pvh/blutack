@@ -168,7 +168,7 @@ program
             widgetDoc.contentType = packageJson.contentType
             widgetDoc.source = source
             widgetDoc.dist = dist
-            widgetDoc.dependecies = packageJson.dependencies
+            widgetDoc.dependencies = packageJson.dependencies
           })
 
           return packageJson.documentId
@@ -231,7 +231,7 @@ program
 
       console.log(`install ${name} ${url}`)
 
-      const source = await fetch("https://github.com/").then((res) => res.text())
+      const source = await fetch(url, {}).then((res) => res.text())
       const dependencyDocHandle = repo.create<DependencyDoc>()
 
       dependencies[name] = { sourceDocId: dependencyDocHandle.documentId, url }
