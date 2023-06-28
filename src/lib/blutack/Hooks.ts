@@ -1,8 +1,10 @@
+// PVH note: this is a file full of unused code and we should comb through it a bit
+
 import { Doc, Extend } from "@automerge/automerge"
 import { DocumentId, DocCollection, DocHandle, ChannelId } from "@automerge/automerge-repo"
 import { useDocument, useHandle, useRepo } from "@automerge/automerge-repo-react-hooks"
 import { useEffect, useState, useRef, useCallback, createContext, useContext } from "react"
-import { parseDocumentLink, ContentUrl } from "../blutack-content/Url"
+import { parseDocumentLink, ContentUrl } from "../blutack/content/Url"
 
 export type ChangeFn<T> = (cb: (doc: T) => void) => void
 
@@ -172,82 +174,6 @@ export function useMessaging<M>(
   )
 
   return sendObj
-}
-
-/*
-export function useHyperfile(
-  url: HyperfileUrl | null
-): [Header, Readable] | [null, null] {
-  const [header, setHeader] = useState<[Header, Readable] | [null, null]>([
-    null,
-    null,
-  ]);
-
-  useEffect(() => {
-    header && setHeader([null, null]);
-    url &&
-      Hyperfile.fetch(url).then(([header, readable]) =>
-        setHeader([header, readable])
-      );
-  }, [url]);
-
-  return header;
-}
-
-export function useHyperfileHeader(url: HyperfileUrl | null): Header | null {
-  const [header, setHeader] = useState<Header | null>(null);
-  const { files } = useRepo();
-
-  useEffect(() => {
-    header && setHeader(null);
-    url && files.header(url).then(setHeader);
-  }, [url]);
-
-  return header;
-}
-*/
-
-export function useInterval(ms: number, cb: () => void, deps: any[]) {
-  useEffect(() => {
-    const id = setInterval(cb, ms)
-
-    return () => {
-      clearInterval(id)
-    }
-  }, deps)
-}
-
-/**
- * Starts a timeout when `cond` is first set to true.
- * The timeout can be restarted by calling the returned `reset` function.
- *
- * @remarks
- * The timeout is cancelled when `cond` is set to false.
- */
-export function useTimeoutWhen(cond: boolean, ms: number, cb: () => void) {
-  const reset = useRef(() => {})
-
-  useEffect(() => {
-    if (!cond) {
-      reset.current = () => {}
-      return () => {}
-    }
-
-    let id: NodeJS.Timeout
-
-    reset.current = () => {
-      id != null && clearTimeout(id)
-      id = setTimeout(cb, ms)
-    }
-
-    reset.current()
-
-    return () => {
-      clearTimeout(id)
-    }
-  }, [cond])
-
-  return () => reset.current()
 }
 
 /**

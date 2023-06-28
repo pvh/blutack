@@ -1,6 +1,8 @@
+// PVH note: This should go into the widget code not generic Blutack stuff.
+
 import { DocumentId } from "@automerge/automerge-repo"
-import { BinaryDataId, createBinaryDataUrl } from "./Blob"
-import * as ContentTypes from "../blutack-content/ContentTypes"
+import { BinaryDataId, createBinaryDataUrl } from "./binary/Blob"
+import * as ContentTypes from "../blutack/content/ContentTypes"
 import { transform } from "@babel/standalone"
 
 export async function load(documentId: DocumentId) {

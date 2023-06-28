@@ -5,7 +5,7 @@ import { DocumentId, PeerId, Repo } from "@automerge/automerge-repo"
 import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel"
 import { LocalForageStorageAdapter } from "@automerge/automerge-repo-storage-localforage"
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket"
-import { BinaryDataId, BinaryObjectDoc, parseBinaryDataId } from "./lib/blutack/Blob"
+import { BinaryDataId, BinaryObjectDoc, parseBinaryDataId } from "./lib/blutack/binary/Blob"
 
 console.log("shared-worker starting up")
 import debug from "debug"

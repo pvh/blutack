@@ -1,3 +1,5 @@
+// PVH note: this should be part of automerge? Or something. Not here.
+
 /**
  * Helper function for removing an item from an Automerge list.
  */

@@ -1,6 +1,6 @@
-import { isContentUrl, parseDocumentLink, ContentUrl } from "../blutack-content/Url"
-import * as ContentTypes from "../blutack-content/ContentTypes"
-import * as ContentData from "./ContentData"
+import { isContentUrl, parseDocumentLink, ContentUrl } from "../../blutack/content/Url"
+import * as ContentTypes from "../../blutack/content/ContentTypes"
+import * as ContentData from "../binary/ContentData"
 import * as URIList from "./UriList"
 
 // TODO: Convert these functions to be async rather than accepting a callback.

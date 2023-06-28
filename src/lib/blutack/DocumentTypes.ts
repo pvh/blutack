@@ -1,5 +1,7 @@
+// PVH note: this file would be retired once we have like, lenses and stuff
+
 import { DocumentId } from "@automerge/automerge-repo"
-import { ContentUrl } from "../blutack-content/Url"
+import { ContentUrl } from "./content/Url"
 
 export interface ContactDoc {
   name: string

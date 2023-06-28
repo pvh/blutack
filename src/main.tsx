@@ -14,7 +14,7 @@ import * as Blutack from "./lib/blutack"
 import * as Ui from "./lib/ui"
 
 // TODO: load dynamically
-import { parseDocumentLink } from "./lib/blutack-content/Url"
+import { parseDocumentLink } from "./lib/blutack/content/Url"
 
 // hack: create globals so they are accessible in widgets
 ;(window as any).React = React

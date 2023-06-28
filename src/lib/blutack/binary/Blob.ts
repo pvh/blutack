@@ -1,6 +1,6 @@
 import { DocumentId } from "@automerge/automerge-repo"
 import { useEffect, useState } from "react"
-import { __getRepo } from "../blutack-content/ContentTypes"
+import { __getRepo } from "../../blutack/content/ContentTypes"
 
 export type BinaryDataId = string & { __binaryDataId: true }
 

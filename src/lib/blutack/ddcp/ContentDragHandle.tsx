@@ -1,11 +1,10 @@
 import React, { ReactNode, useRef } from "react"
 import "./Heading.css"
 import mime from "mime-types"
-import * as UriList from "../blutack/ddcp/UriList"
 import "./ContentDragHandle.css"
-import { ContentUrl } from "../blutack/content/Url"
-import { DocumentId } from "@automerge/automerge-repo"
-import { BinaryDataId, useBinaryDataHeader } from "../blutack/binary/Blob"
+import * as UriList from "./UriList"
+import { type ContentUrl } from "../../blutack/content/Url"
+import { BinaryDataId, useBinaryDataHeader } from "../binary/Blob"
 
 interface SimpleProps {
   url: ContentUrl

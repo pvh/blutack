@@ -1,7 +1,7 @@
 import Debug from "debug"
 import { ComponentType } from "react"
 import { createDocumentLink, ContentUrl } from "./Url"
-import { ContentData } from "../blutack/ContentData"
+import { ContentData } from "../binary/ContentData"
 import { DocumentId } from "@automerge/automerge-repo"
 import { DocCollection, DocHandle } from "@automerge/automerge-repo"
 import { Doc } from "@automerge/automerge"

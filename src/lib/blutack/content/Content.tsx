@@ -10,10 +10,10 @@ import React, {
 
 import * as ContentTypes from "./ContentTypes"
 import { parseDocumentLink, ContentUrl } from "./Url"
-import Crashable from "../ui/Crashable"
+import Crashable from "../../ui/Crashable"
 import { DocumentId } from "@automerge/automerge-repo"
-import { useSelfId } from "../blutack/SelfHooks"
-import { useHeartbeat } from "../blutack/PresenceHooks"
+import { useSelfId } from "../globals/SelfHooks"
+import { useHeartbeat } from "../presence/PresenceHooks"
 
 // this is the interface imported by Content types
 export interface ContentProps {

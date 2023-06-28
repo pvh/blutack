@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react"
 import Actions, { ActionItem } from "./Actions"
-import { ContentUrl } from "../blutack-content/Url"
+import { ContentUrl } from "../blutack/content/Url"
 import ListMenuItem, { Stretch } from "./ListMenuItem"
 
 export interface Props {

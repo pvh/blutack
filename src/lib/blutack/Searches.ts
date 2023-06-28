@@ -1,3 +1,5 @@
+// PVH note: This also probably should be part of the TextContent, not here
+
 import { useEffect } from "react"
 import { ContactDoc, ProfileDoc } from "./DocumentTypes"
 import { useDocumentIds } from "./Hooks"
