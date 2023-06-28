@@ -120,6 +120,7 @@ const BASE_CONTENT_TYPE_IDS = [
   "11a46795-a9b4-48d1-bc4f-4da504fff93f", // device
   "a1652eae-8f52-4bfe-908d-76e48910cd34", // widget
   "043862bd-12e1-4b22-87d2-fc9fc7fe4ed1", // editor
+  "ad5a2f2d-8417-46f1-bc98-28ce3572e227", // ink
 ]
 
 async function findOrMakeProfileDoc(): Promise<DocumentId> {
