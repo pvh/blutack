@@ -221,33 +221,47 @@ program
       await generator.link(packageName)
     }
 
-    const dependencies: DependencyMap = targetDoc.dependencies ?? {}
+    const existingDependencies: DependencyMap = targetDoc.dependencies ?? {}
+    const newDependencies: DependencyMap = {}
 
+    // iterate over import map and create automerge docs for dependencies that are not already there
     for (const [name, url] of Object.entries(generator.importMap.imports)) {
-      if (dependencies[name] && dependencies[name].url === url) {
+      if (existingDependencies[name] && existingDependencies[name].url === url) {
         console.log(`skip ${name}: already installed`)
         continue
       }
 
-      console.log(`install ${name} ${url}`)
-
-      const source = await fetch(url, {}).then((res) => res.text())
       const dependencyDocHandle = repo.create<DependencyDoc>()
-
-      dependencies[name] = { sourceDocId: dependencyDocHandle.documentId, url }
-
-      dependencyDocHandle.change((doc) => {
-        doc.source = source
-      })
+      newDependencies[name] = { url, sourceDocId: dependencyDocHandle.documentId }
     }
 
-    targetDocHandle.change((targetDoc) => {
-      const existingDependencies = targetDoc.dependencies
+    const allDependencies = { ...existingDependencies, ...newDependencies }
 
-      for (const [name, dependency] of Object.entries(dependencies)) {
-        if (!existingDependencies[name] || existingDependencies[name].url !== dependency.url) {
-          targetDoc.dependencies[name] = dependency
-        }
+    // download source of new dependencies and write them to automerge documents
+    for (const [name, dependency] of Object.entries(newDependencies)) {
+      const source = await fetch(dependency.url, {}).then((res) => res.text())
+      const transformedSource = transformSource(source, allDependencies).code
+
+      if (!transformedSource) {
+        throw new Error(`could not transform imports of ${name}`)
+      }
+
+      const dependencyDocHandle = repo.find<DependencyDoc>(dependency.sourceDocId)
+      dependencyDocHandle.change((doc) => {
+        doc.source = transformedSource
+      })
+
+      console.log(`added ${name} ${dependency.url}`)
+    }
+
+    // write new dependencies into dependency map of target doc
+    targetDocHandle.change((targetDoc) => {
+      if (!targetDoc.dependencies) {
+        targetDoc.dependencies = {}
+      }
+
+      for (const [name, dependency] of Object.entries(newDependencies)) {
+        targetDoc.dependencies[name] = dependency
       }
     })
   })
